@@ -1,3 +1,4 @@
+import 'package:clout/components/datatextfield.dart';
 import 'package:clout/services/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   textAlign: TextAlign.center,
+                  enableSuggestions: false,
+                  autocorrect: false,
                 ),
               ),
             ),
@@ -95,6 +98,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   obscureText: true,
                   keyboardType: TextInputType.visiblePassword,
                   textAlign: TextAlign.center,
+                  enableSuggestions: false,
+                  autocorrect: false,
                 ),
               ),
             ),
@@ -111,6 +116,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     error = "";
                     errorcolor = Colors.white;
                   });
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => UserInfoScreen(),
+                    ),
+                  );
                 } else {
                   setState(() {
                     error = res;
@@ -142,6 +153,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class UserInfoScreen extends StatefulWidget {
+  const UserInfoScreen({Key? key}) : super(key: key);
+
+  @override
+  State<UserInfoScreen> createState() => _UserInfoScreenState();
+}
+
+class _UserInfoScreenState extends State<UserInfoScreen> {
+  String gender = "";
+  final fullnamecontroller = TextEditingController();
+  final usernamecontroller = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          "Profile",
+          style: TextStyle(
+              color: Color.fromARGB(255, 255, 48, 117),
+              fontWeight: FontWeight.bold,
+              fontSize: 30),
+        ),
+        backgroundColor: Colors.white,
+        shadowColor: Colors.white,
+        elevation: 0.0,
+        automaticallyImplyLeading: false,
+      ),
+      body: SingleChildScrollView(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(height: screenheight * 0.02),
+          Center(
+              child: CircleAvatar(
+            radius: 80,
+            backgroundColor: Color.fromARGB(255, 255, 48, 117),
+          )),
+          SizedBox(height: screenheight * 0.02),
+          textdatafield(screenwidth, "Full Name", fullnamecontroller),
+          SizedBox(height: screenheight * 0.02),
+          textdatafield(screenwidth, "Username", usernamecontroller),
+          SizedBox(height: screenheight * 0.02),
+        ],
+      )),
     );
   }
 }
