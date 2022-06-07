@@ -1,3 +1,4 @@
+import 'package:clout/components/button.dart';
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatelessWidget {
@@ -24,22 +25,7 @@ class AuthScreen extends StatelessWidget {
               SizedBox(height: screenheight * 0.1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                      height: 50,
-                      width: screenwidth * 0.5,
-                      child: Container(
-                        child: Center(
-                            child: Text(
-                          "SIGN UP",
-                          style: TextStyle(fontSize: 20, color: Colors.white),
-                        )),
-                        decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 48, 117),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                      )),
-                ],
+                children: [primaryButton(context, screenwidth, "SIGN IN")],
               )
             ],
           )),
