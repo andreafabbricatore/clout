@@ -1,18 +1,17 @@
-import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-class SignInScreen extends StatefulWidget {
-  SignInScreen({Key? key}) : super(key: key);
+class SignUpScreen extends StatefulWidget {
+  SignUpScreen({Key? key}) : super(key: key);
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final emailController = TextEditingController();
   final pswController = TextEditingController();
   String? error = "";
@@ -104,7 +103,7 @@ class _SignInScreenState extends State<SignInScreen> {
               onTap: () async {
                 String? res = await context
                     .read<AuthenticationService>()
-                    .signIn(
+                    .signUp(
                         email: emailController.text.trim(),
                         password: pswController.text.trim());
                 if (res == "Yes") {
@@ -112,12 +111,6 @@ class _SignInScreenState extends State<SignInScreen> {
                     error = "";
                     errorcolor = Colors.white;
                   });
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => MainScreen(),
-                    ),
-                  );
                 } else {
                   setState(() {
                     error = res;
@@ -131,7 +124,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Container(
                     child: Center(
                         child: Text(
-                      "Sign In",
+                      "Sign Up",
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     )),
                     decoration: BoxDecoration(

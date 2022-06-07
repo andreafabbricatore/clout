@@ -1,13 +1,15 @@
-import 'package:clout/components/button.dart';
+import 'package:clout/screens/signinscreen.dart';
+import 'package:clout/screens/signupscreen.dart';
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatelessWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  AuthScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -25,8 +27,44 @@ class AuthScreen extends StatelessWidget {
               SizedBox(height: screenheight * 0.1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [primaryButton(context, screenwidth, "SIGN IN")],
-              )
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignUpScreen()),
+                      );
+                    },
+                    child: SizedBox(
+                        height: 50,
+                        width: screenwidth * 0.5,
+                        child: Container(
+                          child: Center(
+                              child: Text(
+                            "Sign Up",
+                            style: TextStyle(fontSize: 20, color: Colors.white),
+                          )),
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 255, 48, 117),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                        )),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: screenheight * 0.02,
+              ),
+              Center(
+                  child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SignInScreen()),
+                        );
+                      },
+                      child: Text("Already have an account?")))
             ],
           )),
     );
