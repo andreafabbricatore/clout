@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-Widget textdatafield(
-    double screenwidth, String hinttext, TextEditingController controller) {
+Widget datetextfield(double screenwidth, String hinttext,
+    TextEditingController controller, formatter) {
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
     child: TextField(
@@ -15,6 +15,7 @@ Widget textdatafield(
       enableSuggestions: false,
       autocorrect: false,
       controller: controller,
+      inputFormatters: [formatter],
     ),
   );
 }
