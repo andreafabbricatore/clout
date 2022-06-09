@@ -32,4 +32,8 @@ class AuthenticationService {
       return e.message;
     }
   }
+
+  String? getuid() {
+    return _firebaseAuth.currentUser?.uid;
+  }
 }

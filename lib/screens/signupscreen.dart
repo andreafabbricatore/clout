@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/datetextfield.dart';
 import 'package:clout/services/auth.dart';
+import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,6 +20,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final emailController = TextEditingController();
   final pswController = TextEditingController();
+  db_conn db = db_conn();
   String? error = "";
   Color errorcolor = Colors.white;
   @override
@@ -120,12 +122,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     error = "";
                     errorcolor = Colors.white;
                   });
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => PicandNameScreen(),
-                    ),
-                  );
+                  try {
+                    await db.createuserinstance(
+                        emailController.text.trim(),
+                        context
+                            .read<AuthenticationService>()
+                            .getuid()
+                            .toString());
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => PicandNameScreen(),
+                      ),
+                    );
+                  } catch (e) {
+                    setState(() {
+                      error = "Error Signing Up, try again!";
+                      errorcolor = Colors.red;
+                    });
+                  }
                 } else {
                   setState(() {
                     error = res;
@@ -172,6 +187,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   final fullnamecontroller = TextEditingController();
   ImagePicker picker = ImagePicker();
   var imagepath;
+  db_conn db = db_conn();
   String error = "";
   Color errorcolor = Colors.white;
   @override
@@ -241,13 +257,52 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
         height: 70,
         width: 70,
         child: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => UsernameScreen(),
-              ),
-            );
+          onPressed: () async {
+            bool cond = true;
+            try {
+              if (fullnamecontroller.text.isNotEmpty) {
+                await db.changeattribute('fullname', fullnamecontroller.text,
+                    context.read<AuthenticationService>().getuid().toString());
+                setState(() {
+                  error = "";
+                  errorcolor = Colors.white;
+                });
+              } else {
+                setState(() {
+                  error = "Please enter full name";
+                  errorcolor = Colors.red;
+                });
+                cond = false;
+              }
+            } catch (e) {
+              setState(() {
+                error = "Error with full name";
+                errorcolor = Colors.red;
+              });
+              cond = false;
+            }
+            try {
+              await db.changepfp(imagepath,
+                  context.read<AuthenticationService>().getuid().toString());
+              setState(() {
+                error = "";
+                errorcolor = Colors.white;
+              });
+            } catch (e) {
+              setState(() {
+                error = "Error uploading picture";
+                errorcolor = Colors.red;
+              });
+              cond = false;
+            }
+            if (cond) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => UsernameScreen(),
+                ),
+              );
+            }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
           child: Icon(
@@ -269,6 +324,7 @@ class UsernameScreen extends StatefulWidget {
 
 class _UsernameScreenState extends State<UsernameScreen> {
   final usernamecontroller = TextEditingController();
+  db_conn db = db_conn();
   String error = "";
   Color errorcolor = Colors.white;
   @override
@@ -312,13 +368,39 @@ class _UsernameScreenState extends State<UsernameScreen> {
         height: 70,
         width: 70,
         child: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => MiscScreen(),
-              ),
-            );
+          onPressed: () async {
+            bool uniqueness = await db.usernameUnique(usernamecontroller.text);
+            if (!uniqueness && usernamecontroller.text.isNotEmpty) {
+              setState(() {
+                error = "Username already taken";
+                errorcolor = Colors.red;
+              });
+            } else if (usernamecontroller.text.isEmpty) {
+              setState(() {
+                error = "Invalid Username";
+                errorcolor = Colors.red;
+              });
+            } else {
+              try {
+                await db.changeattribute('username', usernamecontroller.text,
+                    context.read<AuthenticationService>().getuid().toString());
+                setState(() {
+                  error = "";
+                  errorcolor = Colors.white;
+                });
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => MiscScreen(),
+                  ),
+                );
+              } catch (e) {
+                setState(() {
+                  error = "Error setting username";
+                  errorcolor = Colors.red;
+                });
+              }
+            }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
           child: Icon(
@@ -342,6 +424,7 @@ class _MiscScreenState extends State<MiscScreen> {
   final birthdaycontroller = TextEditingController();
   String gender = 'Male';
   String nationality = 'Australia';
+  db_conn db = db_conn();
   String error = "";
   Color errorcolor = Colors.white;
   var maskFormatter = new MaskTextInputFormatter(
@@ -601,8 +684,6 @@ class _MiscScreenState extends State<MiscScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    error = "";
-    errorcolor = Colors.white;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
@@ -688,7 +769,46 @@ class _MiscScreenState extends State<MiscScreen> {
         height: 70,
         width: 70,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () async {
+            if (birthdaycontroller.text.isEmpty) {
+              setState(() {
+                error = "Please fill all fields";
+                errorcolor = Colors.red;
+              });
+            } else {
+              try {
+                await db.changeattribute('gender', gender,
+                    context.read<AuthenticationService>().getuid().toString());
+              } catch (e) {
+                setState(() {
+                  error = "Could not update gender";
+                  errorcolor = Colors.red;
+                });
+              }
+              try {
+                await db.changeattribute('nationality', nationality,
+                    context.read<AuthenticationService>().getuid().toString());
+              } catch (e) {
+                setState(() {
+                  error = "Could not update nationality";
+                  errorcolor = Colors.red;
+                });
+              }
+              try {
+                await db.changeattribute('birthday', birthdaycontroller.text,
+                    context.read<AuthenticationService>().getuid().toString());
+              } catch (e) {
+                setState(() {
+                  error = "Could not update birth date";
+                  errorcolor = Colors.red;
+                });
+              }
+              setState(() {
+                error = "";
+                errorcolor = Colors.white;
+              });
+            }
+          },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
           child: Icon(
             Icons.arrow_circle_right_outlined,
