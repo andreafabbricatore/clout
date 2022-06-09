@@ -17,7 +17,8 @@ class db_conn {
         'gender': '',
         'nationality': '',
         'pfp_url': '',
-        'birthday': ''
+        'birthday': '',
+        'interests': []
       });
     } catch (e) {
       return Future.error("Could not Sign Up");
@@ -48,6 +49,18 @@ class db_conn {
     return users
         .doc(id)
         .update({attribute: value})
+        .then((value) => print("changed $attribute"))
+        .catchError((error) {
+          throw Exception("Could not change $attribute");
+        });
+  }
+
+  Future changeinterests(String attribute, List interests, String uid) async {
+    String id = "";
+    await getUserDocID(uid).then((value) => id = value);
+    return users
+        .doc(id)
+        .update({attribute: interests})
         .then((value) => print("changed $attribute"))
         .catchError((error) {
           throw Exception("Could not change $attribute");

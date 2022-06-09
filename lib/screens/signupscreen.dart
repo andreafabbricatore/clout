@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/datetextfield.dart';
+import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
@@ -237,6 +238,11 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                           )
                         : Container(
                             color: Color.fromARGB(255, 255, 48, 117),
+                            child: Icon(
+                              Icons.account_circle_outlined,
+                              color: Colors.white,
+                              size: screenheight * 0.18,
+                            ),
                             height: screenheight * 0.2,
                             width: screenheight * 0.2),
                   ))),
@@ -770,10 +776,12 @@ class _MiscScreenState extends State<MiscScreen> {
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
+            bool cond = true;
             if (birthdaycontroller.text.isEmpty) {
               setState(() {
                 error = "Please fill all fields";
                 errorcolor = Colors.red;
+                cond = false;
               });
             } else {
               try {
@@ -783,6 +791,7 @@ class _MiscScreenState extends State<MiscScreen> {
                 setState(() {
                   error = "Could not update gender";
                   errorcolor = Colors.red;
+                  cond = false;
                 });
               }
               try {
@@ -792,6 +801,7 @@ class _MiscScreenState extends State<MiscScreen> {
                 setState(() {
                   error = "Could not update nationality";
                   errorcolor = Colors.red;
+                  cond = false;
                 });
               }
               try {
@@ -801,12 +811,142 @@ class _MiscScreenState extends State<MiscScreen> {
                 setState(() {
                   error = "Could not update birth date";
                   errorcolor = Colors.red;
+                  cond = false;
                 });
               }
-              setState(() {
-                error = "";
-                errorcolor = Colors.white;
-              });
+              if (cond) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => InterestScreen(),
+                  ),
+                );
+              } else {}
+            }
+          },
+          backgroundColor: Color.fromARGB(255, 255, 48, 117),
+          child: Icon(
+            Icons.arrow_circle_right_outlined,
+            size: 60,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class InterestScreen extends StatefulWidget {
+  const InterestScreen({Key? key}) : super(key: key);
+
+  @override
+  State<InterestScreen> createState() => _InterestScreenState();
+}
+
+class _InterestScreenState extends State<InterestScreen> {
+  List interests = [
+    "Sports",
+    "Nature",
+    "Music",
+    "Dance",
+    "Movies",
+    "Acting",
+    "Singing",
+    "Drinking",
+    "Food",
+    "Art"
+  ];
+  List<Color> textcolors = List.filled(10, Color.fromARGB(255, 255, 48, 117));
+  List<Color> cardcolors = List.filled(10, Colors.white);
+  List selectedinterests = [];
+  db_conn db = db_conn();
+  @override
+  Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          "Interests",
+          style: TextStyle(
+              color: Color.fromARGB(255, 255, 48, 117),
+              fontWeight: FontWeight.bold,
+              fontSize: 30),
+        ),
+        bottom: PreferredSize(
+          child: Text(
+            "Choose at least 3",
+            style: TextStyle(color: Color.fromARGB(255, 255, 48, 117)),
+          ),
+          preferredSize: Size.zero,
+        ),
+        backgroundColor: Colors.white,
+        shadowColor: Colors.white,
+        elevation: 0.0,
+        automaticallyImplyLeading: false,
+      ),
+      body: GridView.builder(
+          gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+          itemCount: interests.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                if (textcolors[index] == Colors.white) {
+                  setState(() {
+                    cardcolors[index] = Colors.white;
+                    textcolors[index] = Color.fromARGB(255, 255, 48, 117);
+                  });
+                  selectedinterests
+                      .removeWhere((item) => item == interests[index]);
+                } else {
+                  setState(() {
+                    cardcolors[index] = Color.fromARGB(255, 255, 48, 117);
+                    textcolors[index] = Colors.white;
+                  });
+                  selectedinterests.add(interests[index]);
+                }
+              },
+              child: Card(
+                color: cardcolors[index],
+                shadowColor: Colors.black,
+                margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                        color: Color.fromARGB(255, 255, 48, 117), width: 1.0),
+                    borderRadius: BorderRadius.circular(40)),
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      top: 10, bottom: 10, left: 10, right: 10),
+                  child: Center(
+                    child: Text(
+                      interests[index],
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: textcolors[index]),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+      floatingActionButton: SizedBox(
+        height: 70,
+        width: 70,
+        child: FloatingActionButton(
+          onPressed: () async {
+            if (selectedinterests.length >= 3) {
+              await db.changeinterests('interests', selectedinterests,
+                  context.read<AuthenticationService>().getuid().toString());
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => MainScreen(),
+                ),
+              );
             }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
