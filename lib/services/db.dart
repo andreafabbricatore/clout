@@ -227,9 +227,9 @@ class db_conn {
     }
   }
 
-  Future<List<String>> getUserInterests(String id) async {
+  Future<List> getUserInterests(String id) async {
     DocumentSnapshot documentSnapshot = await users.doc(id).get();
-    List<String> interests = documentSnapshot['interests'];
+    List interests = documentSnapshot['interests'];
     return interests;
   }
 
@@ -242,9 +242,19 @@ class db_conn {
     return eventlist;
   }
 
+  Future<List<Event>> getInterestEvents(List interests) async {
+    QuerySnapshot querySnapshot =
+        await events.where('interest', whereIn: interests).get();
+    List<Event> interesteventlist = [];
+    querySnapshot.docs.forEach((element) {
+      interesteventlist.add(Event.fromJson(element.data()));
+    });
+    return interesteventlist;
+  }
+
   Future<String> downloadBannerUrl(String interest) async {
     String downloadBannerUrl = await FirebaseStorage.instance
-        .ref('/interest_banners/$interest.jpeg')
+        .ref('/interest_banners/${interest.toLowerCase()}.jpeg')
         .getDownloadURL();
     return downloadBannerUrl;
   }

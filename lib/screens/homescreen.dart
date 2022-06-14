@@ -7,19 +7,39 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key? key}) : super(key: key);
+  String docid;
+  List interests = [];
+  List<Event> eventlist = [];
+  List<Event> interestevents = [];
+  HomeScreen(
+      {Key? key,
+      required this.docid,
+      required this.interests,
+      required this.eventlist,
+      required this.interestevents})
+      : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   db_conn db = db_conn();
-  List<Event> eventlist = [];
-  List<String> interests = [];
+  String userdocid = "";
+  List<Event> generaleventlist = [];
+  List<Event> interesteventlist = [];
+  List userinterests = [];
+
   void getEventsList() async {
     List<Event> events = await db.getEvents();
     setState(() {
-      eventlist = events;
+      generaleventlist = events;
+    });
+  }
+
+  void getInterestEventsList(interests) async {
+    List<Event> interestevents = await db.getInterestEvents(interests);
+    setState(() {
+      interesteventlist = interestevents;
     });
   }
 
@@ -46,7 +66,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    getEventsList();
+    generaleventlist = widget.eventlist;
+    userdocid = widget.docid;
+    userinterests = widget.interests;
+    interesteventlist = widget.interestevents;
+    if (generaleventlist.isEmpty) {
+      getEventsList();
+    }
+    if (interesteventlist.isEmpty) {
+      getInterestEventsList(userinterests);
+    }
     super.initState();
   }
 
@@ -89,13 +118,13 @@ class _HomeScreenState extends State<HomeScreen> {
             InkWell(
               onTap: () async {
                 db.createevent(
-                    "Karaoke",
-                    "Singing 80s song till we physically can",
-                    "singing",
-                    "China Town",
+                    "Baking",
+                    "Felt hungry and wanted to make cakes with people",
+                    "Food",
+                    "Duomo Milano",
                     "andreafabb11",
-                    DateTime(2022, 6, 18, 17, 00),
-                    10,
+                    DateTime.now(),
+                    5,
                     ["andreafabb11"]);
               },
               child: Text(
@@ -109,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: screenheight * 0.02),
             EventListView(
-              eventList: eventlist,
+              eventList: generaleventlist,
               onTap: _navigate,
             ),
             Text("Popular",
@@ -120,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.w600)),
             EventListView(
               isHorizontal: false,
-              eventList: eventlist,
+              eventList: generaleventlist,
               onTap: _navigate,
             )
           ],

@@ -1,3 +1,4 @@
+import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
@@ -9,14 +10,45 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key? key}) : super(key: key);
+  String docid;
+  List interests;
+  List<Event> eventlist;
+  List<Event> interesteventlist;
+  MainScreen(
+      {Key? key,
+      required this.docid,
+      required this.interests,
+      required this.eventlist,
+      required this.interesteventlist})
+      : super(key: key);
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
   int _index = 0;
-  List Page = [HomeScreen(), ProfileScreen()];
+  List Page = [];
+
+  void parampasser() {
+    Page = [
+      HomeScreen(
+        docid: widget.docid,
+        interests: widget.interests,
+        eventlist: widget.eventlist,
+        interestevents: widget.interesteventlist,
+      ),
+      ProfileScreen(
+        name: widget.docid,
+      )
+    ];
+  }
+
+  @override
+  void initState() {
+    parampasser();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

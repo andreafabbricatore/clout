@@ -1,4 +1,5 @@
 import 'package:clout/screens/authscreen.dart';
+import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,7 +45,7 @@ class AuthenticationWrapper extends StatelessWidget {
     final firebaseUser = context.watch<User?>();
 
     if (firebaseUser != null) {
-      return MainScreen();
+      return LoadingScreen(uid: firebaseUser.uid);
     }
     return AuthScreen();
   }

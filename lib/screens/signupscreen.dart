@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/datetextfield.dart';
+import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
@@ -949,10 +950,15 @@ class _InterestScreenState extends State<InterestScreen> {
             if (selectedinterests.length >= 3) {
               await db.changeinterests('interests', selectedinterests,
                   context.read<AuthenticationService>().getuid().toString());
+
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => MainScreen(),
+                  builder: (BuildContext context) => LoadingScreen(
+                      uid: context
+                          .read<AuthenticationService>()
+                          .getuid()
+                          .toString()),
                 ),
               );
             }
