@@ -1,6 +1,8 @@
+import 'package:clout/components/event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:intl/intl.dart';
 
 class EventListView extends StatelessWidget {
   final bool isHorizontal;
@@ -43,7 +45,17 @@ class EventListView extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 255, 48, 117))),
               Text(
-                "${event.location} @ ${event.time}",
+                "${event.location}",
+                style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                "${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}",
                 style: TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 12,
@@ -78,7 +90,17 @@ class EventListView extends StatelessWidget {
                               color: Color.fromARGB(255, 255, 48, 117))),
                       const SizedBox(height: 5),
                       Text(
-                        "${event.location} @ ${event.time}",
+                        "${event.location}",
+                        style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}",
                         style: TextStyle(
                             fontFamily: "Poppins",
                             fontSize: 12,
@@ -98,6 +120,19 @@ class EventListView extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(height: 5),
+                      Text(
+                        event.participants.length != event.maxparticipants
+                            ? "${event.participants.length}/${event.maxparticipants} participants"
+                            : "Participant number reached",
+                        style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),
@@ -113,9 +148,12 @@ class EventListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
+
     return isHorizontal == true
         ? SizedBox(
-            height: 220,
+            height: screenheight * 0.28,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: eventList.length,
@@ -144,21 +182,4 @@ class EventListView extends StatelessWidget {
             ),
           );
   }
-}
-
-class Event {
-  String title;
-  String description;
-  String interest;
-  String image;
-  String location;
-  String time;
-
-  Event(
-      {required this.title,
-      required this.description,
-      required this.interest,
-      required this.image,
-      required this.location,
-      required this.time});
 }
