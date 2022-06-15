@@ -1,6 +1,8 @@
+import 'package:clout/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key, required this.name});
@@ -9,7 +11,12 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: Text(name)),
+      body: SafeArea(
+          child: InkWell(
+              onTap: () {
+                context.read<AuthenticationService>().signOut();
+              },
+              child: Text(name))),
     );
   }
 }

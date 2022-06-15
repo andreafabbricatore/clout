@@ -73,11 +73,71 @@ class db_conn {
           'joined_events': joined_events,
           'hosted_events': hosted_events
         }).catchError((error) {
-          throw Exception("Could not join/host event");
+          throw Exception("Could not host event");
         });
       }
     } catch (e) {
       return Future.error("Could not create event");
+    }
+  }
+
+  Future joinevent(Event event, DocumentSnapshot userdoc, String userdocid,
+      String eventid) async {
+    try {
+      DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
+      List participants = eventSnapshot['participants'];
+      List joined_events = userdoc['joined_events'];
+      if (participants.length + 1 > event.maxparticipants) {
+        throw Exception("Too many participants");
+      } else {
+        joined_events.add(eventid);
+        participants.add(userdoc['username']);
+        users.doc(userdocid).update({'joined_events': joined_events});
+        events.doc(eventid).update({'participants': participants});
+      }
+    } catch (e) {
+      throw Exception("Could not join event");
+    }
+  }
+
+  Future leaveevent(Event event, DocumentSnapshot userdoc, String userdocid,
+      String eventid) async {
+    try {
+      DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
+      List participants = eventSnapshot['participants'];
+      List joined_events = userdoc['joined_events'];
+      if (participants.length == 1) {
+        throw Exception("Cannot leave event");
+      } else {
+        joined_events.removeWhere((element) => element == eventid);
+        participants.removeWhere((element) => element == userdoc['username']);
+        users.doc(userdocid).update({'joined_events': joined_events});
+        events.doc(eventid).update({'participants': participants});
+      }
+    } catch (e) {
+      throw Exception("Could not leave event");
+    }
+  }
+
+  Future geteventdocid(Event event) async {
+    String docID = "";
+    await events.get().then((QuerySnapshot querySnapshot) => {
+          querySnapshot.docs.forEach((doc) {
+            if (doc["title"] == event.title &&
+                doc['description'] == event.description &&
+                doc['interest'] == event.interest &&
+                doc['location'] == event.location &&
+                doc['host'] == event.host &&
+                doc['maxparticipants'] == event.maxparticipants &&
+                listEquals(doc['participants'], event.participants)) {
+              docID = doc.id;
+            }
+          })
+        });
+    if (docID != "") {
+      return docID;
+    } else {
+      return "error";
     }
   }
 
@@ -178,6 +238,25 @@ class db_conn {
     }
   }
 
+  Future<String> getUserPFPfromUsername(String username) async {
+    String pfp_url = "";
+    await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((QuerySnapshot querySnapshot) => {
+              querySnapshot.docs.forEach((doc) {
+                if (doc["username"] == username) {
+                  pfp_url = doc["pfp_url"];
+                }
+              })
+            });
+    if (pfp_url != "") {
+      return pfp_url;
+    } else {
+      return "error";
+    }
+  }
+
   Future<bool> usernameUnique(String username) async {
     int instances = 0;
     await FirebaseFirestore.instance
@@ -240,6 +319,12 @@ class db_conn {
       eventlist.add(Event.fromJson(element.data()));
     });
     return eventlist;
+  }
+
+  Future<Event> getEventfromDocId(String eventid) async {
+    DocumentSnapshot documentSnapshot = await events.doc(eventid).get();
+    Event event = Event.fromJson(documentSnapshot.data());
+    return event;
   }
 
   Future<List<Event>> getInterestEvents(List interests) async {

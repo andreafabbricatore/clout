@@ -5,6 +5,7 @@ import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
 
 class HomeScreen extends StatefulWidget {
   String docid;
@@ -64,6 +65,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> refreshevents() async {
+    print("refreshed");
+    List<Event> events = await db.getEvents();
+    setState(() {
+      generaleventlist = events;
+    });
+  }
+
   @override
   void initState() {
     generaleventlist = widget.eventlist;
@@ -84,14 +93,36 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
-    Future<Widget?> _navigate(Event event, int index) {
-      return Navigator.push(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(seconds: 1),
-          pageBuilder: (_, __, ___) => EventDetailScreen(),
-        ),
-      );
+    Future<Widget?> _navigate(Event event, int index) async {
+      List pfpurls = [
+        for (String x in event.participants) await db.getUserPFPfromUsername(x)
+      ];
+      Event newevent = await Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => EventDetailScreen(
+                    event: event,
+                    pfp_urls: pfpurls,
+                    userdocid: widget.docid,
+                  )));
+      try {
+        int index1 = generaleventlist.indexWhere((element) => element == event);
+        setState(() {
+          generaleventlist[index1] = newevent;
+        });
+      } catch (e) {
+        print("not general");
+      }
+
+      try {
+        int index2 =
+            interesteventlist.indexWhere((element) => element == event);
+        setState(() {
+          interesteventlist[index2] = newevent;
+        });
+      } catch (e) {
+        print("not interest");
+      }
     }
 
     return Scaffold(
@@ -118,10 +149,10 @@ class _HomeScreenState extends State<HomeScreen> {
             InkWell(
               onTap: () async {
                 db.createevent(
-                    "Baking",
-                    "Felt hungry and wanted to make cakes with people",
-                    "Food",
-                    "Duomo Milano",
+                    "Hip Hip",
+                    "dancing till our feet hurt",
+                    "Dance",
+                    "parco valentino",
                     "andreafabb11",
                     DateTime.now(),
                     5,
@@ -138,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: screenheight * 0.02),
             EventListView(
-              eventList: generaleventlist,
+              eventList: interesteventlist,
               onTap: _navigate,
             ),
             Text("Popular",
