@@ -25,7 +25,8 @@ class db_conn {
         'birthday': '',
         'interests': [],
         'hosted_events': [],
-        'joined_events': []
+        'joined_events': [],
+        'clout': 0
       });
     } catch (e) {
       return Future.error("Could not Sign Up");
@@ -81,17 +82,17 @@ class db_conn {
     }
   }
 
-  Future joinevent(Event event, DocumentSnapshot userdoc, String userdocid,
-      String eventid) async {
+  Future joinevent(Event event, DocumentSnapshot? userdoc, String userdocid,
+      String? eventid) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
-      List joined_events = userdoc['joined_events'];
+      List joined_events = userdoc?['joined_events'];
       if (participants.length + 1 > event.maxparticipants) {
         throw Exception("Too many participants");
       } else {
         joined_events.add(eventid);
-        participants.add(userdoc['username']);
+        participants.add(userdoc?['username']);
         users.doc(userdocid).update({'joined_events': joined_events});
         events.doc(eventid).update({'participants': participants});
       }
@@ -100,22 +101,48 @@ class db_conn {
     }
   }
 
-  Future leaveevent(Event event, DocumentSnapshot userdoc, String userdocid,
-      String eventid) async {
+  Future leaveevent(Event event, DocumentSnapshot? userdoc, String userdocid,
+      String? eventid) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
-      List joined_events = userdoc['joined_events'];
+      List joined_events = userdoc?['joined_events'];
       if (participants.length == 1) {
         throw Exception("Cannot leave event");
       } else {
         joined_events.removeWhere((element) => element == eventid);
-        participants.removeWhere((element) => element == userdoc['username']);
+        participants.removeWhere((element) => element == userdoc?['username']);
         users.doc(userdocid).update({'joined_events': joined_events});
         events.doc(eventid).update({'participants': participants});
       }
     } catch (e) {
       throw Exception("Could not leave event");
+    }
+  }
+
+  Future deleteevent(DocumentSnapshot? userdoc, String userdocid,
+      String? eventid, String host) async {
+    try {
+      DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
+      List participants = eventSnapshot['participants'];
+      List docids = [
+        for (String x in participants) await getUserDocIDfromUsername(x)
+      ];
+      String hostdocid = await getUserDocIDfromUsername(host);
+      for (String x in docids) {
+        DocumentSnapshot documentSnapshot = await users.doc(x).get();
+        List joined_events = documentSnapshot['joined_events'];
+        if (x == hostdocid) {
+          List hosted_events = documentSnapshot['hosted_events'];
+          hosted_events.removeWhere((element) => element == eventid);
+          users.doc(x).update({'hosted_events': hosted_events});
+        }
+        joined_events.removeWhere((element) => element == eventid);
+        users.doc(x).update({'joined_events': joined_events});
+      }
+      await events.doc(eventid).delete();
+    } catch (e) {
+      throw Exception("Could not delete event");
     }
   }
 
@@ -294,7 +321,8 @@ class db_conn {
                 doc['location'] == location &&
                 doc['host'] == host &&
                 doc['maxparticipants'] == maxparticipants &&
-                listEquals(doc['participants'], participants)) {
+                listEquals(doc['participants'], participants) &&
+                doc['time'].toDate() == time) {
               instances = instances + 1;
             }
           })
@@ -312,8 +340,9 @@ class db_conn {
     return interests;
   }
 
-  Future<List<Event>> getEvents() async {
-    QuerySnapshot querySnapshot = await events.get();
+  Future<List<Event>> getEvents(List interests) async {
+    QuerySnapshot querySnapshot =
+        await events.where('interest', whereNotIn: interests).get();
     List<Event> eventlist = [];
     querySnapshot.docs.forEach((element) {
       eventlist.add(Event.fromJson(element.data()));

@@ -1,9 +1,12 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/screens/authscreen.dart';
+import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
+import 'package:clout/screens/favscreen.dart';
 import 'package:clout/screens/homescreen.dart';
 import 'package:clout/screens/profilescreen.dart';
+import 'package:clout/screens/searchscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +17,14 @@ class MainScreen extends StatefulWidget {
   List interests;
   List<Event> eventlist;
   List<Event> interesteventlist;
+  List interestpics;
   MainScreen(
       {Key? key,
       required this.docid,
       required this.interests,
       required this.eventlist,
-      required this.interesteventlist})
+      required this.interesteventlist,
+      required this.interestpics})
       : super(key: key);
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -29,14 +34,18 @@ class _MainScreenState extends State<MainScreen> {
   int _index = 0;
   List Page = [];
 
-  void parampasser() {
+  void parampasser(bool updatehome) {
     Page = [
       HomeScreen(
         docid: widget.docid,
         interests: widget.interests,
         eventlist: widget.eventlist,
         interestevents: widget.interesteventlist,
+        updatehome: updatehome,
       ),
+      SearchScreen(interestpics: widget.interestpics, userdocid: widget.docid),
+      CreateEventScreen(),
+      FavScreen(),
       ProfileScreen(
         name: widget.docid,
       )
@@ -45,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
-    parampasser();
+    parampasser(false);
     super.initState();
   }
 
@@ -54,7 +63,13 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: Page[_index],
       bottomNavigationBar: BottomNavigationBar(
-        onTap: (newIndex) => setState(() => _index = newIndex),
+        type: BottomNavigationBarType.fixed,
+        onTap: (newIndex) {
+          if (newIndex == 0) {
+            parampasser(true);
+          }
+          setState(() => _index = newIndex);
+        },
         currentIndex: _index,
         showSelectedLabels: false,
         showUnselectedLabels: false,
@@ -66,6 +81,21 @@ class _MainScreenState extends State<MainScreen> {
                 Icons.home,
               ),
               label: "Home"),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.search,
+              ),
+              label: "Search"),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.add,
+              ),
+              label: "Create"),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.bookmark,
+              ),
+              label: "Favorites"),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person_crop_circle),
             label: "Profile",

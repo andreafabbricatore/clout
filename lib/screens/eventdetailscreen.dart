@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/screens/loading.dart';
+import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class EventDetailScreen extends StatefulWidget {
   EventDetailScreen(
@@ -23,20 +26,37 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
-  late DocumentSnapshot documentSnapshot;
-  late String eventid;
-
+  DocumentSnapshot? documentSnapshot;
+  String? eventid;
+  String error = "Error";
+  String joinedval = "Join";
   void checkifjoined() async {
     DocumentSnapshot documentSnapshot =
         await db.users.doc(widget.userdocid).get();
     if (widget.event.participants.contains(documentSnapshot['username'])) {
-      setState(() {
-        joined = true;
-      });
+      if (documentSnapshot['username'] == widget.event.host) {
+        setState(() {
+          joined = true;
+          joinedval = "Delete event";
+        });
+      } else {
+        setState(() {
+          joined = true;
+          joinedval = "Leave";
+        });
+      }
     } else {
-      setState(() {
-        joined = false;
-      });
+      if (widget.event.participants.length == widget.event.maxparticipants) {
+        setState(() {
+          joined = false;
+          joinedval = "Full";
+        });
+      } else {
+        setState(() {
+          joined = false;
+          joinedval = "Join";
+        });
+      }
     }
   }
 
@@ -56,6 +76,63 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       widget.pfp_urls = urls;
     });
     checkifjoined();
+  }
+
+  void interactevent(context) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    if (!joined && joinedval == "Join") {
+      try {
+        await db.joinevent(
+            widget.event, documentSnapshot, widget.userdocid, eventid);
+      } catch (e) {
+        setState(() {
+          error = e.toString();
+        });
+        await Future.delayed(Duration(milliseconds: 400));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } finally {
+        updatescreen(eventid);
+      }
+    } else if (!joined && joinedval == "Full") {
+      print("full");
+    } else if (joined && joinedval == "Delete event") {
+      try {
+        await db.deleteevent(
+            documentSnapshot, widget.userdocid, eventid, widget.event.host);
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => LoadingScreen(
+                      uid: context
+                          .read<AuthenticationService>()
+                          .getuid()
+                          .toString(),
+                    )),
+            (Route<dynamic> route) => false);
+      } catch (e) {
+        setState(() {
+          error = e.toString();
+        });
+        await Future.delayed(Duration(milliseconds: 400));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        updatescreen(eventid);
+      }
+    } else {
+      try {
+        await db.leaveevent(
+            widget.event, documentSnapshot, widget.userdocid, eventid);
+      } catch (e) {
+        setState(() {
+          error = e.toString();
+        });
+        await Future.delayed(Duration(seconds: 1));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } finally {
+        updatescreen(eventid);
+      }
+    }
   }
 
   @override
@@ -87,7 +164,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           Text(
             "@$username",
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(
+                fontSize: 18,
+                color: documentSnapshot?['username'] == username
+                    ? Color.fromARGB(255, 255, 48, 117)
+                    : Colors.black),
           )
         ],
       ),
@@ -224,15 +305,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           InkWell(
             onTap: () async {
-              if (!joined) {
-                await db.joinevent(
-                    widget.event, documentSnapshot, widget.userdocid, eventid);
-                updatescreen(eventid);
-              } else {
-                await db.leaveevent(
-                    widget.event, documentSnapshot, widget.userdocid, eventid);
-                updatescreen(eventid);
-              }
+              interactevent(context);
             },
             child: SizedBox(
                 height: 50,
@@ -240,7 +313,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 child: Container(
                   child: Center(
                       child: Text(
-                    joined ? "Leave" : "Join",
+                    joinedval,
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   )),
                   decoration: BoxDecoration(

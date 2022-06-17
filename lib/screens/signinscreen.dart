@@ -1,4 +1,5 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
@@ -119,24 +120,14 @@ class _SignInScreenState extends State<SignInScreen> {
                     error = "";
                     errorcolor = Colors.white;
                   });
-                  String docid = await db.getUserDocID(context
-                      .read<AuthenticationService>()
-                      .getuid()
-                      .toString());
-                  List interests = await db.getUserInterests(docid);
-                  List<Event> eventlist = await db.getEvents();
-                  List<Event> interesteventlist =
-                      await db.getInterestEvents(interests);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => MainScreen(
-                        docid: docid,
-                        interests: interests,
-                        eventlist: eventlist,
-                        interesteventlist: interesteventlist,
-                      ),
-                    ),
+                        builder: (BuildContext context) => LoadingScreen(
+                            uid: context
+                                .read<AuthenticationService>()
+                                .getuid()
+                                .toString())),
                   );
                 } else {
                   setState(() {

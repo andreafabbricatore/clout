@@ -12,12 +12,14 @@ class HomeScreen extends StatefulWidget {
   List interests = [];
   List<Event> eventlist = [];
   List<Event> interestevents = [];
+  bool updatehome;
   HomeScreen(
       {Key? key,
       required this.docid,
       required this.interests,
       required this.eventlist,
-      required this.interestevents})
+      required this.interestevents,
+      required this.updatehome})
       : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -30,8 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> interesteventlist = [];
   List userinterests = [];
 
-  void getEventsList() async {
-    List<Event> events = await db.getEvents();
+  void getEventsList(interests) async {
+    List<Event> events = await db.getEvents(interests);
     setState(() {
       generaleventlist = events;
     });
@@ -44,32 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Widget _searchBar() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: TextField(
-        decoration: InputDecoration(
-            hintText: 'Search',
-            prefixIcon: const Icon(Icons.search, color: Colors.grey),
-            suffixIcon: const Icon(Icons.menu, color: Colors.grey),
-            contentPadding: const EdgeInsets.all(20),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-            )),
-      ),
-    );
-  }
-
   Future<void> refreshevents() async {
     print("refreshed");
-    List<Event> events = await db.getEvents();
+    List<Event> events = await db.getEvents(userinterests);
+    List<Event> interestevents = await db.getInterestEvents(userinterests);
     setState(() {
       generaleventlist = events;
+      interesteventlist = interestevents;
     });
   }
 
@@ -80,10 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
     userinterests = widget.interests;
     interesteventlist = widget.interestevents;
     if (generaleventlist.isEmpty) {
-      getEventsList();
+      getEventsList(userinterests);
     }
     if (interesteventlist.isEmpty) {
       getInterestEventsList(userinterests);
+    }
+    if (widget.updatehome) {
+      refreshevents();
     }
     super.initState();
   }
@@ -93,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
-    Future<Widget?> _navigate(Event event, int index) async {
+    Future<void> _navigate(Event event, int index) async {
       List pfpurls = [
         for (String x in event.participants) await db.getUserPFPfromUsername(x)
       ];
@@ -140,50 +126,62 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0.0,
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(screenheight * 0.02),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _searchBar(),
-            InkWell(
-              onTap: () async {
-                db.createevent(
-                    "Hip Hip",
-                    "dancing till our feet hurt",
-                    "Dance",
-                    "parco valentino",
-                    "andreafabb11",
-                    DateTime.now(),
-                    5,
-                    ["andreafabb11"]);
-              },
-              child: Text(
-                "Suggested",
-                style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.black,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w600),
+      body: RefreshIndicator(
+        color: Color.fromARGB(255, 255, 48, 117),
+        backgroundColor: Colors.white,
+        onRefresh: refreshevents,
+        child: SizedBox(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: screenheight,
+              width: screenwidth,
+              child: Padding(
+                padding: EdgeInsets.all(screenheight * 0.02),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        await db.createevent(
+                            "Hip Hip",
+                            "dancing till our feet hurt",
+                            "Dance",
+                            "parco valentino",
+                            "andreafabb11",
+                            DateTime(2022, 7, 8, 17, 00),
+                            5,
+                            ["andreafabb11"]);
+                      },
+                      child: Text(
+                        "Suggested",
+                        style: TextStyle(
+                            fontSize: 30,
+                            color: Colors.black,
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    SizedBox(height: screenheight * 0.02),
+                    EventListView(
+                      eventList: interesteventlist,
+                      onTap: _navigate,
+                    ),
+                    Text("Popular",
+                        style: TextStyle(
+                            fontSize: 30,
+                            color: Colors.black,
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w600)),
+                    EventListView(
+                      isHorizontal: false,
+                      eventList: generaleventlist,
+                      onTap: _navigate,
+                    )
+                  ],
+                ),
               ),
             ),
-            SizedBox(height: screenheight * 0.02),
-            EventListView(
-              eventList: interesteventlist,
-              onTap: _navigate,
-            ),
-            Text("Popular",
-                style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.black,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w600)),
-            EventListView(
-              isHorizontal: false,
-              eventList: generaleventlist,
-              onTap: _navigate,
-            )
-          ],
+          ),
         ),
       ),
     );
