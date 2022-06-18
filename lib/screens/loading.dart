@@ -1,5 +1,8 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/user.dart';
+import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/mainscreen.dart';
+import 'package:clout/screens/signupscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -33,7 +36,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void appinit() async {
     try {
       docid = await db.getUserDocID(widget.uid);
-      interests = await db.getUserInterests(docid);
+      AppUser curruser = await db.getUserFromDocID(docid);
+      interests = curruser.interests;
       eventlist = await db.getEvents(interests);
       interesteventlist = await db.getInterestEvents(interests);
       interestpics = [
@@ -45,21 +49,21 @@ class _LoadingScreenState extends State<LoadingScreen> {
         context,
         MaterialPageRoute(
           builder: (BuildContext context) => MainScreen(
-            docid: docid,
-            interests: interests,
-            eventlist: eventlist,
-            interesteventlist: interesteventlist,
-            interestpics: interestpics,
-          ),
+              docid: docid,
+              interests: interests,
+              eventlist: eventlist,
+              interesteventlist: interesteventlist,
+              interestpics: interestpics,
+              curruser: curruser),
         ),
       );
     } catch (e) {
-      final snackBar = SnackBar(
-        content: Text("Cannot connect, please check internet connection"),
-        duration: Duration(seconds: 2),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => AuthScreen(),
+        ),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      appinit();
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
@@ -13,13 +14,15 @@ class HomeScreen extends StatefulWidget {
   List<Event> eventlist = [];
   List<Event> interestevents = [];
   bool updatehome;
+  AppUser curruser;
   HomeScreen(
       {Key? key,
       required this.docid,
       required this.interests,
       required this.eventlist,
       required this.interestevents,
-      required this.updatehome})
+      required this.updatehome,
+      required this.curruser})
       : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -87,10 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
           CupertinoPageRoute(
               builder: (_) => EventDetailScreen(
-                    event: event,
-                    pfp_urls: pfpurls,
-                    userdocid: widget.docid,
-                  )));
+                  event: event,
+                  pfp_urls: pfpurls,
+                  userdocid: widget.docid,
+                  curruser: widget.curruser)));
       try {
         int index1 = generaleventlist.indexWhere((element) => element == event);
         setState(() {
@@ -143,14 +146,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     InkWell(
                       onTap: () async {
                         await db.createevent(
-                            "Hip Hop",
-                            "dancing till our feet hurt",
-                            "Dance",
-                            "parco valentino",
-                            "andreafabb11",
-                            DateTime(2022, 7, 8, 17, 00),
-                            5,
-                            ["andreafabb11"]);
+                            "HIIT",
+                            "Working out till we can",
+                            "Sports",
+                            "McFit",
+                            widget.curruser.username,
+                            DateTime(2022, 9, 7, 17, 30),
+                            3,
+                            [widget.curruser.username],
+                            widget.curruser,
+                            widget.docid);
                       },
                       child: Text(
                         "Suggested",

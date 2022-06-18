@@ -15,6 +15,7 @@ class ProfileScreen extends StatelessWidget {
           child: InkWell(
               onTap: () {
                 context.read<AuthenticationService>().signOut();
+                print("here");
               },
               child: Text(name))),
     );

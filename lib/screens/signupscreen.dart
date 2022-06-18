@@ -389,7 +389,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
               });
             } else {
               try {
-                await db.changeattribute('username', usernamecontroller.text,
+                await db.changeusername(usernamecontroller.text,
                     context.read<AuthenticationService>().getuid().toString());
                 setState(() {
                   error = "";

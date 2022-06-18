@@ -1,5 +1,6 @@
 import 'package:clout/components/searchbarlistview.dart';
 import 'package:clout/components/searchgridview.dart';
+import 'package:clout/components/user.dart';
 import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,9 +10,13 @@ import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreen(
-      {super.key, required this.interestpics, required this.userdocid});
+      {super.key,
+      required this.interestpics,
+      required this.userdocid,
+      required this.curruser});
   List interestpics;
   String userdocid;
+  AppUser curruser;
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
@@ -32,8 +37,10 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
 
   List<Event> searchedevents = [];
+  List<AppUser> searchedusers = [];
   TextEditingController searchcontroller = TextEditingController();
   bool searching = false;
+  bool searchevents = true;
   FocusNode focusNode = FocusNode();
   Color suffixiconcolor = Colors.white;
   Color eventsbuttoncolor = Color.fromARGB(255, 255, 48, 117);
@@ -74,6 +81,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     interest: interest,
                     events: res,
                     userdocid: widget.userdocid,
+                    curruser: widget.curruser,
                   )));
     }
 
@@ -94,10 +102,17 @@ class _SearchScreenState extends State<SearchScreen> {
             child: TextField(
               controller: searchcontroller,
               onChanged: (String searchquery) async {
-                List<Event> res = await db.searchEvents(searchquery);
-                setState(() {
-                  searchedevents = res;
-                });
+                if (searchevents) {
+                  List<Event> res = await db.searchEvents(searchquery);
+                  setState(() {
+                    searchedevents = res;
+                  });
+                } else {
+                  List<AppUser> res = await db.searchUsers(searchquery);
+                  setState(() {
+                    searchedusers = res;
+                  });
+                }
               },
               decoration: InputDecoration(
                   hintText: 'Search',
@@ -131,10 +146,17 @@ class _SearchScreenState extends State<SearchScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     InkWell(
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           eventsbuttoncolor = Color.fromARGB(255, 255, 48, 117);
                           usersbuttoncolor = Colors.black;
+                          searchedusers = [];
+                          searchevents = true;
+                        });
+                        List<Event> res =
+                            await db.searchEvents(searchcontroller.text);
+                        setState(() {
+                          searchedevents = res;
                         });
                       },
                       child: SizedBox(
@@ -152,10 +174,17 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                     InkWell(
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           usersbuttoncolor = Color.fromARGB(255, 255, 48, 117);
                           eventsbuttoncolor = Colors.black;
+                          searchedevents = [];
+                          searchevents = false;
+                        });
+                        List<AppUser> res =
+                            await db.searchUsers(searchcontroller.text);
+                        setState(() {
+                          searchedusers = res;
                         });
                       },
                       child: SizedBox(
@@ -177,8 +206,11 @@ class _SearchScreenState extends State<SearchScreen> {
               : Container(),
           searching
               ? SearchBarListView(
+                  searchevents: searchevents,
                   eventres: searchedevents,
+                  userres: searchedusers,
                   userdocid: widget.userdocid,
+                  curruser: widget.curruser,
                 )
               : SearchGridView(
                   interests: interests,

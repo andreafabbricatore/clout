@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/user.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
@@ -14,10 +15,12 @@ class EventDetailScreen extends StatefulWidget {
       {super.key,
       required this.event,
       required this.pfp_urls,
-      required this.userdocid});
+      required this.userdocid,
+      required this.curruser});
   Event event;
   List pfp_urls;
   String userdocid;
+  AppUser curruser;
 
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
@@ -26,15 +29,12 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
-  DocumentSnapshot? documentSnapshot;
   String? eventid;
   String error = "Error";
   String joinedval = "Join";
   void checkifjoined() async {
-    DocumentSnapshot documentSnapshot =
-        await db.users.doc(widget.userdocid).get();
-    if (widget.event.participants.contains(documentSnapshot['username'])) {
-      if (documentSnapshot['username'] == widget.event.host) {
+    if (widget.event.participants.contains(widget.curruser.username)) {
+      if (widget.curruser.username == widget.event.host) {
         setState(() {
           joined = true;
           joinedval = "Delete event";
@@ -61,7 +61,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   void datagetter() async {
-    documentSnapshot = await db.users.doc(widget.userdocid).get();
     eventid = await db.geteventdocid(widget.event);
   }
 
@@ -86,7 +85,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     if (!joined && joinedval == "Join") {
       try {
         await db.joinevent(
-            widget.event, documentSnapshot, widget.userdocid, eventid);
+            widget.event, widget.curruser, widget.userdocid, eventid);
       } catch (e) {
         setState(() {
           error = e.toString();
@@ -100,8 +99,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       print("full");
     } else if (joined && joinedval == "Delete event") {
       try {
-        await db.deleteevent(
-            documentSnapshot, widget.userdocid, eventid, widget.event.host);
+        await db.deleteevent(widget.userdocid, eventid, widget.event.host);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) => LoadingScreen(
@@ -122,7 +120,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     } else {
       try {
         await db.leaveevent(
-            widget.event, documentSnapshot, widget.userdocid, eventid);
+            widget.event, widget.curruser, widget.userdocid, eventid);
       } catch (e) {
         setState(() {
           error = e.toString();
@@ -166,7 +164,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             "@$username",
             style: TextStyle(
                 fontSize: 18,
-                color: documentSnapshot?['username'] == username
+                color: widget.curruser.username == username
                     ? Color.fromARGB(255, 255, 48, 117)
                     : Colors.black),
           )

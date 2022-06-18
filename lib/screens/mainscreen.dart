@@ -1,5 +1,6 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
@@ -18,13 +19,15 @@ class MainScreen extends StatefulWidget {
   List<Event> eventlist;
   List<Event> interesteventlist;
   List interestpics;
+  AppUser curruser;
   MainScreen(
       {Key? key,
       required this.docid,
       required this.interests,
       required this.eventlist,
       required this.interesteventlist,
-      required this.interestpics})
+      required this.interestpics,
+      required this.curruser})
       : super(key: key);
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -38,12 +41,17 @@ class _MainScreenState extends State<MainScreen> {
     Page = [
       HomeScreen(
         docid: widget.docid,
+        curruser: widget.curruser,
         interests: widget.interests,
         eventlist: widget.eventlist,
         interestevents: widget.interesteventlist,
         updatehome: updatehome,
       ),
-      SearchScreen(interestpics: widget.interestpics, userdocid: widget.docid),
+      SearchScreen(
+        interestpics: widget.interestpics,
+        userdocid: widget.docid,
+        curruser: widget.curruser,
+      ),
       CreateEventScreen(),
       FavScreen(),
       ProfileScreen(

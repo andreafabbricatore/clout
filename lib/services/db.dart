@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -26,7 +27,8 @@ class db_conn {
         'interests': [],
         'hosted_events': [],
         'joined_events': [],
-        'clout': 0
+        'clout': 0,
+        'searchfield': []
       });
     } catch (e) {
       return Future.error("Could not Sign Up");
@@ -41,17 +43,23 @@ class db_conn {
       String host,
       DateTime time,
       int maxparticipants,
-      List participants) async {
+      List participants,
+      AppUser curruser,
+      String id) async {
     try {
       String banner_url = await downloadBannerUrl(interest);
-      String id = await getUserDocIDfromUsername(host);
-      DocumentSnapshot documentSnapshot = await users.doc(id).get();
-      List joined_events = documentSnapshot['joined_events'];
-      List hosted_events = documentSnapshot['hosted_events'];
+      List joined_events = curruser.joined_events;
+      List hosted_events = curruser.hosted_events;
       String eventid = "";
       bool unique = await eventUnique(title, description, interest, location,
           host, time, maxparticipants, participants);
       print(unique);
+      List searchfield = [];
+      String temp = "";
+      for (int i = 0; i < title.length; i++) {
+        temp = temp + title[i];
+        searchfield.add(temp.toLowerCase());
+      }
       if (!unique) {
         throw Exception("Event already exists");
       } else {
@@ -64,7 +72,8 @@ class db_conn {
           'time': time,
           'maxparticipants': maxparticipants,
           'participants': participants,
-          'image': banner_url
+          'image': banner_url,
+          'searchfield': searchfield
         }).then((value) {
           eventid = value.id;
         });
@@ -82,17 +91,17 @@ class db_conn {
     }
   }
 
-  Future joinevent(Event event, DocumentSnapshot? userdoc, String userdocid,
-      String? eventid) async {
+  Future joinevent(
+      Event event, AppUser curruser, String userdocid, String? eventid) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
-      List joined_events = userdoc?['joined_events'];
+      List joined_events = curruser.joined_events;
       if (participants.length + 1 > event.maxparticipants) {
         throw Exception("Too many participants");
       } else {
         joined_events.add(eventid);
-        participants.add(userdoc?['username']);
+        participants.add(curruser.username);
         users.doc(userdocid).update({'joined_events': joined_events});
         events.doc(eventid).update({'participants': participants});
       }
@@ -101,17 +110,17 @@ class db_conn {
     }
   }
 
-  Future leaveevent(Event event, DocumentSnapshot? userdoc, String userdocid,
-      String? eventid) async {
+  Future leaveevent(
+      Event event, AppUser curruser, String userdocid, String? eventid) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
-      List joined_events = userdoc?['joined_events'];
+      List joined_events = curruser.joined_events;
       if (participants.length == 1) {
         throw Exception("Cannot leave event");
       } else {
         joined_events.removeWhere((element) => element == eventid);
-        participants.removeWhere((element) => element == userdoc?['username']);
+        participants.removeWhere((element) => element == curruser.username);
         users.doc(userdocid).update({'joined_events': joined_events});
         events.doc(eventid).update({'participants': participants});
       }
@@ -120,8 +129,7 @@ class db_conn {
     }
   }
 
-  Future deleteevent(DocumentSnapshot? userdoc, String userdocid,
-      String? eventid, String host) async {
+  Future deleteevent(String userdocid, String? eventid, String host) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
@@ -195,6 +203,24 @@ class db_conn {
         .then((value) => print("changed $attribute"))
         .catchError((error) {
           throw Exception("Could not change $attribute");
+        });
+  }
+
+  Future changeusername(String username, String uid) async {
+    List searchfield = [];
+    String temp = "";
+    for (int i = 0; i < username.length; i++) {
+      temp = temp + username[i];
+      searchfield.add(temp.toLowerCase());
+    }
+    String id = "";
+    await getUserDocID(uid).then((value) => id = value);
+    return users
+        .doc(id)
+        .update({'username': username, 'searchfield': searchfield})
+        .then((value) => print("changed username"))
+        .catchError((error) {
+          throw Exception("Could not change username");
         });
   }
 
@@ -367,8 +393,9 @@ class db_conn {
   }
 
   Future<List<Event>> searchEvents(String searchquery) async {
-    QuerySnapshot querySnapshot =
-        await events.where('searchfield', arrayContains: searchquery).get();
+    QuerySnapshot querySnapshot = await events
+        .where('searchfield', arrayContains: searchquery.toLowerCase())
+        .get();
     List<Event> eventsearchres = [];
     querySnapshot.docs.forEach((element) {
       eventsearchres.add(Event.fromJson(element.data()));
@@ -376,10 +403,27 @@ class db_conn {
     return eventsearchres;
   }
 
+  Future<List<AppUser>> searchUsers(String searchquery) async {
+    QuerySnapshot querySnapshot = await users
+        .where('searchfield', arrayContains: searchquery.toLowerCase())
+        .get();
+    List<AppUser> usersearches = [];
+    querySnapshot.docs.forEach((element) {
+      usersearches.add(AppUser.fromJson(element.data()));
+    });
+
+    return usersearches;
+  }
+
   Future<String> downloadBannerUrl(String interest) async {
     String downloadBannerUrl = await FirebaseStorage.instance
         .ref('/interest_banners/${interest.toLowerCase()}.jpeg')
         .getDownloadURL();
     return downloadBannerUrl;
+  }
+
+  Future<AppUser> getUserFromDocID(String docid) async {
+    DocumentSnapshot documentSnapshot = await users.doc(docid).get();
+    return AppUser.fromJson(documentSnapshot.data());
   }
 }

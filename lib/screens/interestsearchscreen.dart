@@ -1,4 +1,5 @@
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,11 +12,13 @@ class InterestSearchScreen extends StatefulWidget {
       {Key? key,
       required this.interest,
       required this.events,
-      required this.userdocid})
+      required this.userdocid,
+      required this.curruser})
       : super(key: key);
   String interest;
   List<Event> events;
   String userdocid;
+  AppUser curruser;
 
   @override
   State<InterestSearchScreen> createState() => _InterestSearchScreenState();
@@ -37,6 +40,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                     event: event,
                     pfp_urls: pfpurls,
                     userdocid: widget.userdocid,
+                    curruser: widget.curruser,
                   )));
       try {
         int index = widget.events.indexWhere((element) => element == event);
