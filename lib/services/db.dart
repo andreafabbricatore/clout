@@ -366,6 +366,16 @@ class db_conn {
     return interesteventlist;
   }
 
+  Future<List<Event>> searchEvents(String searchquery) async {
+    QuerySnapshot querySnapshot =
+        await events.where('searchfield', arrayContains: searchquery).get();
+    List<Event> eventsearchres = [];
+    querySnapshot.docs.forEach((element) {
+      eventsearchres.add(Event.fromJson(element.data()));
+    });
+    return eventsearchres;
+  }
+
   Future<String> downloadBannerUrl(String interest) async {
     String downloadBannerUrl = await FirebaseStorage.instance
         .ref('/interest_banners/${interest.toLowerCase()}.jpeg')

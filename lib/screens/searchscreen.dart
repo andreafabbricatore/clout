@@ -1,9 +1,10 @@
+import 'package:clout/components/searchbarlistview.dart';
 import 'package:clout/components/searchgridview.dart';
 import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:getwidget/getwidget.dart';
 import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -30,6 +31,14 @@ class _SearchScreenState extends State<SearchScreen> {
     "Art"
   ];
 
+  List<Event> searchedevents = [];
+  TextEditingController searchcontroller = TextEditingController();
+  bool searching = false;
+  FocusNode focusNode = FocusNode();
+  Color suffixiconcolor = Colors.white;
+  Color eventsbuttoncolor = Color.fromARGB(255, 255, 48, 117);
+  Color usersbuttoncolor = Colors.black;
+
   Widget _listviewitem(String banner, String interest) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15.0),
@@ -44,6 +53,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
+    focusNode.addListener(() {
+      print('1:  ${focusNode.hasFocus}');
+    });
     super.initState();
   }
 
@@ -69,27 +81,110 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.fromLTRB(10, screenheight * 0.1, 10, 10),
-        child: Column(children: [
-          TextField(
-            decoration: InputDecoration(
-                hintText: 'Search',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                suffixIcon: const Icon(Icons.menu, color: Colors.grey),
-                contentPadding: const EdgeInsets.all(20),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: Colors.grey, width: 1.0),
-                )),
+        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Focus(
+            onFocusChange: (hasfocus) {
+              if (hasfocus) {
+                setState(() {
+                  searching = hasfocus;
+                  suffixiconcolor = Colors.grey;
+                });
+              }
+            },
+            child: TextField(
+              controller: searchcontroller,
+              onChanged: (String searchquery) async {
+                List<Event> res = await db.searchEvents(searchquery);
+                setState(() {
+                  searchedevents = res;
+                });
+              },
+              decoration: InputDecoration(
+                  hintText: 'Search',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          searching = false;
+                          suffixiconcolor = Colors.white;
+                        });
+                        searchcontroller.clear();
+                        FocusScope.of(context).unfocus();
+                      },
+                      child: Icon(Icons.close, color: suffixiconcolor)),
+                  contentPadding: const EdgeInsets.all(20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  )),
+            ),
           ),
-          SearchGridView(
-            interests: interests,
-            interestpics: widget.interestpics,
-            onTap: _searchnav,
-          )
+          SizedBox(
+            height: screenheight * 0.01,
+          ),
+          searching
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          eventsbuttoncolor = Color.fromARGB(255, 255, 48, 117);
+                          usersbuttoncolor = Colors.black;
+                        });
+                      },
+                      child: SizedBox(
+                        height: screenheight * 0.035,
+                        width: screenwidth * 0.2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border:
+                                Border.all(width: 1, color: eventsbuttoncolor),
+                          ),
+                          child: Center(child: Text("Events")),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          usersbuttoncolor = Color.fromARGB(255, 255, 48, 117);
+                          eventsbuttoncolor = Colors.black;
+                        });
+                      },
+                      child: SizedBox(
+                        height: screenheight * 0.035,
+                        width: screenwidth * 0.2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border:
+                                Border.all(width: 1, color: usersbuttoncolor),
+                          ),
+                          child: Center(child: Text("Users")),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Container(),
+          searching
+              ? SearchBarListView(
+                  eventres: searchedevents,
+                  userdocid: widget.userdocid,
+                )
+              : SearchGridView(
+                  interests: interests,
+                  interestpics: widget.interestpics,
+                  onTap: _searchnav,
+                )
         ]),
       ),
     );

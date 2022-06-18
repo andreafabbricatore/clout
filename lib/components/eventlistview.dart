@@ -155,6 +155,7 @@ class EventListView extends StatelessWidget {
         ? SizedBox(
             height: screenheight * 0.28,
             child: ListView.separated(
+              padding: EdgeInsets.zero,
               scrollDirection: Axis.horizontal,
               itemCount: eventList.length,
               itemBuilder: (_, index) {
@@ -170,6 +171,7 @@ class EventListView extends StatelessWidget {
           )
         : Expanded(
             child: ListView.builder(
+              padding: EdgeInsets.zero,
               shrinkWrap: true,
               itemCount: eventList.length,
               itemBuilder: (_, index) {

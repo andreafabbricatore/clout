@@ -38,13 +38,14 @@ class SearchGridView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: GridView.builder(
+        padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         shrinkWrap: true,
         itemCount: interests.length,
         itemBuilder: ((context, index) {
           return Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
             child: _listviewitem(interestpics[index], interests[index]),
           );
         }),

@@ -71,12 +71,36 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-          child: SpinKitFadingFour(
-        color: Color.fromARGB(255, 255, 48, 117),
-      )),
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Clout",
+              style: TextStyle(
+                  color: Color.fromARGB(255, 255, 48, 117),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 60),
+            ),
+            Text(
+              "Go Out",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 40),
+            ),
+            SizedBox(
+              height: screenheight * 0.1,
+            ),
+            SpinKitFadingFour(
+              color: Color.fromARGB(255, 255, 48, 117),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

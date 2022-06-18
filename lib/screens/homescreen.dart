@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     InkWell(
                       onTap: () async {
                         await db.createevent(
-                            "Hip Hip",
+                            "Hip Hop",
                             "dancing till our feet hurt",
                             "Dance",
                             "parco valentino",
