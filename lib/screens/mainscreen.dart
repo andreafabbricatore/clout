@@ -55,7 +55,10 @@ class _MainScreenState extends State<MainScreen> {
       CreateEventScreen(),
       FavScreen(),
       ProfileScreen(
-          user: widget.curruser, curruser: widget.curruser, docid: widget.docid)
+        user: widget.curruser,
+        curruser: widget.curruser,
+        visit: false,
+      )
     ];
   }
 

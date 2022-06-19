@@ -94,24 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   pfp_urls: pfpurls,
                   userdocid: widget.docid,
                   curruser: widget.curruser)));
-      try {
-        int index1 = generaleventlist.indexWhere((element) => element == event);
-        setState(() {
-          generaleventlist[index1] = newevent;
-        });
-      } catch (e) {
-        print("not general");
-      }
-
-      try {
-        int index2 =
-            interesteventlist.indexWhere((element) => element == event);
-        setState(() {
-          interesteventlist[index2] = newevent;
-        });
-      } catch (e) {
-        print("not interest");
-      }
+      refreshevents();
     }
 
     return Scaffold(
@@ -128,65 +111,70 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
-      ),
-      body: RefreshIndicator(
-        color: Color.fromARGB(255, 255, 48, 117),
-        backgroundColor: Colors.white,
-        onRefresh: refreshevents,
-        child: SizedBox(
-          child: SingleChildScrollView(
-            child: SizedBox(
-              height: screenheight,
-              width: screenwidth,
-              child: Padding(
-                padding: EdgeInsets.all(screenheight * 0.02),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      onTap: () async {
-                        await db.createevent(
-                            "HIIT",
-                            "Working out till we can",
-                            "Sports",
-                            "McFit",
-                            widget.curruser.username,
-                            DateTime(2022, 9, 7, 17, 30),
-                            3,
-                            [widget.curruser.username],
-                            widget.curruser,
-                            widget.docid);
-                      },
-                      child: Text(
-                        "Suggested",
-                        style: TextStyle(
-                            fontSize: 30,
-                            color: Colors.black,
-                            fontFamily: "Poppins",
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    SizedBox(height: screenheight * 0.02),
-                    EventListView(
-                      eventList: interesteventlist,
-                      onTap: _navigate,
-                    ),
-                    Text("Popular",
-                        style: TextStyle(
-                            fontSize: 30,
-                            color: Colors.black,
-                            fontFamily: "Poppins",
-                            fontWeight: FontWeight.w600)),
-                    EventListView(
-                      isHorizontal: false,
-                      eventList: generaleventlist,
-                      onTap: _navigate,
-                    )
-                  ],
-                ),
+        actions: [
+          InkWell(
+            onTap: () {
+              refreshevents();
+            },
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+              child: Icon(
+                Icons.refresh,
+                color: Colors.black,
               ),
             ),
           ),
+        ],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(screenheight * 0.02),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () async {
+                await db.createevent(
+                    "HIIT",
+                    "Working out till we can",
+                    "Dance",
+                    "McFit",
+                    widget.curruser.username,
+                    DateTime(2022, 9, 7, 17, 30),
+                    3,
+                    [widget.curruser.username],
+                    widget.curruser,
+                    widget.docid);
+              },
+              child: Text(
+                "Suggested",
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.black,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+            SizedBox(height: screenheight * 0.02),
+            EventListView(
+              eventList: interesteventlist,
+              onTap: _navigate,
+              scrollable: true,
+              leftpadding: false,
+            ),
+            Text("Popular",
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.black,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.w600)),
+            EventListView(
+              isHorizontal: false,
+              eventList: generaleventlist,
+              onTap: _navigate,
+              scrollable: true,
+              leftpadding: false,
+            )
+          ],
         ),
       ),
     );

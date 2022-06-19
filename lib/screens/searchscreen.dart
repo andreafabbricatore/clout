@@ -43,8 +43,6 @@ class _SearchScreenState extends State<SearchScreen> {
   bool searchevents = true;
   FocusNode focusNode = FocusNode();
   Color suffixiconcolor = Colors.white;
-  Color eventsbuttoncolor = Color.fromARGB(255, 255, 48, 117);
-  Color usersbuttoncolor = Colors.black;
 
   Widget _listviewitem(String banner, String interest) {
     return ClipRRect(
@@ -148,8 +146,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     InkWell(
                       onTap: () async {
                         setState(() {
-                          eventsbuttoncolor = Color.fromARGB(255, 255, 48, 117);
-                          usersbuttoncolor = Colors.black;
                           searchedusers = [];
                           searchevents = true;
                         });
@@ -166,8 +162,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(5),
-                            border:
-                                Border.all(width: 1, color: eventsbuttoncolor),
+                            border: Border.all(
+                                width: 1,
+                                color: searchevents
+                                    ? Color.fromARGB(255, 255, 48, 117)
+                                    : Colors.black),
                           ),
                           child: Center(child: Text("Events")),
                         ),
@@ -176,8 +175,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     InkWell(
                       onTap: () async {
                         setState(() {
-                          usersbuttoncolor = Color.fromARGB(255, 255, 48, 117);
-                          eventsbuttoncolor = Colors.black;
                           searchedevents = [];
                           searchevents = false;
                         });
@@ -194,8 +191,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(5),
-                            border:
-                                Border.all(width: 1, color: usersbuttoncolor),
+                            border: Border.all(
+                                width: 1,
+                                color: searchevents
+                                    ? Colors.black
+                                    : Color.fromARGB(255, 255, 48, 117)),
                           ),
                           child: Center(child: Text("Users")),
                         ),

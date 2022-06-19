@@ -12,7 +12,7 @@ class UserListView extends StatelessWidget {
   AppUser curruser;
   final Function(AppUser user, int index)? onTap;
 
-  Widget _listviewitem(String username, String pfp_url) {
+  Widget _listviewitem(AppUser user, int index) {
     Widget widget;
     widget = Row(
       children: [
@@ -24,17 +24,17 @@ class UserListView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100.0),
               child: Image.network(
-                pfp_url,
+                user.pfp_url,
                 fit: BoxFit.cover,
               ),
             ),
           ),
         ),
         Text(
-          "@$username",
+          "@${user.username}",
           style: TextStyle(
               fontSize: 25,
-              color: curruser.username == username
+              color: curruser.username == user.username
                   ? Color.fromARGB(255, 255, 48, 117)
                   : Colors.black),
         )
@@ -42,7 +42,7 @@ class UserListView extends StatelessWidget {
     );
 
     return GestureDetector(
-      onTap: () => {},
+      onTap: () => onTap?.call(user, index),
       child: widget,
     );
   }
@@ -56,8 +56,7 @@ class UserListView extends StatelessWidget {
           itemBuilder: (_, index) {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                child: _listviewitem(
-                    userres[index].username, userres[index].pfp_url));
+                child: _listviewitem(userres[index], index));
           }),
     );
   }

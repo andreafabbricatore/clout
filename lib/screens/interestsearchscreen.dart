@@ -89,6 +89,8 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
               isHorizontal: false,
               eventList: widget.events,
               onTap: _navigate,
+              scrollable: true,
+              leftpadding: false,
             )
           ],
         ),

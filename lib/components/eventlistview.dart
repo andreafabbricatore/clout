@@ -8,9 +8,15 @@ class EventListView extends StatelessWidget {
   final bool isHorizontal;
   final Function(Event event, int index)? onTap;
   final List<Event> eventList;
-
-  const EventListView(
-      {Key? key, this.isHorizontal = true, this.onTap, required this.eventList})
+  bool scrollable;
+  bool leftpadding;
+  EventListView(
+      {Key? key,
+      this.isHorizontal = true,
+      this.onTap,
+      required this.eventList,
+      required this.scrollable,
+      required this.leftpadding})
       : super(key: key);
 
   Widget _eventImage(String image) {
@@ -171,13 +177,17 @@ class EventListView extends StatelessWidget {
           )
         : Expanded(
             child: ListView.builder(
+              physics: scrollable
+                  ? AlwaysScrollableScrollPhysics()
+                  : NeverScrollableScrollPhysics(),
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               itemCount: eventList.length,
               itemBuilder: (_, index) {
                 Event event = eventList.reversed.toList()[index];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 15, top: 10),
+                  padding: EdgeInsets.only(
+                      bottom: 15, top: 10, left: leftpadding ? 16 : 0),
                   child: _listViewItem(event, index),
                 );
               },

@@ -3,6 +3,7 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
+import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,12 +56,24 @@ class _SearchBarListViewState extends State<SearchBarListView> {
       }
     }
 
-    Future<void> _usernavigate(AppUser user, int index) async {}
+    Future<void> _usernavigate(AppUser user, int index) async {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => ProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                  )));
+    }
+
     return widget.searchevents
         ? EventListView(
             eventList: widget.eventres,
             onTap: _eventnavigate,
             isHorizontal: false,
+            scrollable: true,
+            leftpadding: false,
           )
         : UserListView(
             userres: widget.userres,
