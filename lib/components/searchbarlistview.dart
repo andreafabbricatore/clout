@@ -65,6 +65,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         : UserListView(
             userres: widget.userres,
             onTap: _usernavigate,
+            curruser: widget.curruser,
           );
   }
 }

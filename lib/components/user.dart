@@ -12,6 +12,9 @@ class AppUser {
   String fullname;
   String email;
   String birthday;
+  List followers;
+  List following;
+  int clout;
 
   AppUser(
       {required this.username,
@@ -24,21 +27,26 @@ class AppUser {
       required this.gender,
       required this.fullname,
       required this.email,
-      required this.birthday});
+      required this.birthday,
+      required this.followers,
+      required this.following,
+      required this.clout});
 
   factory AppUser.fromJson(dynamic json) {
     return AppUser(
-      username: json['username'],
-      uid: json['uid'],
-      pfp_url: json['pfp_url'],
-      nationality: json['nationality'],
-      joined_events: json['joined_events'] as List,
-      hosted_events: json['hosted_events'] as List,
-      interests: json['interests'] as List,
-      gender: json['gender'],
-      fullname: json['fullname'],
-      email: json['email'],
-      birthday: json['birthday'],
-    );
+        username: json['username'],
+        uid: json['uid'],
+        pfp_url: json['pfp_url'],
+        nationality: json['nationality'],
+        joined_events: json['joined_events'] as List,
+        hosted_events: json['hosted_events'] as List,
+        interests: json['interests'] as List,
+        gender: json['gender'],
+        fullname: json['fullname'],
+        email: json['email'],
+        birthday: json['birthday'],
+        followers: json['followers'] as List,
+        following: json['following'] as List,
+        clout: json['clout'] as int);
   }
 }

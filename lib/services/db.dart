@@ -28,7 +28,9 @@ class db_conn {
         'hosted_events': [],
         'joined_events': [],
         'clout': 0,
-        'searchfield': []
+        'searchfield': [],
+        'followers': [],
+        'following': []
       });
     } catch (e) {
       return Future.error("Could not Sign Up");

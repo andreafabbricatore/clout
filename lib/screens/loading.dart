@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingScreen extends StatefulWidget {
-  LoadingScreen({Key? key, required this.uid}) : super(key: key);
+  bool signup = false;
+  LoadingScreen({Key? key, required this.uid, signup}) : super(key: key);
   final String uid;
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -58,12 +59,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
         ),
       );
     } catch (e) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => AuthScreen(),
-        ),
-      );
+      if (widget.signup) {
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => AuthScreen(),
+          ),
+        );
+      }
     }
   }
 

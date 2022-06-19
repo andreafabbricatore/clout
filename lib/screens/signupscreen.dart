@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/datetextfield.dart';
+import 'package:clout/components/user.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
@@ -25,6 +26,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   db_conn db = db_conn();
   String? error = "";
   Color errorcolor = Colors.white;
+  AppUser curruser = AppUser(
+      username: "",
+      uid: "",
+      pfp_url: "",
+      nationality: "",
+      joined_events: [],
+      hosted_events: [],
+      interests: [],
+      gender: "",
+      fullname: "",
+      email: "",
+      birthday: "",
+      followers: [],
+      following: [],
+      clout: 0);
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -114,38 +130,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(height: screenheight * 0.02),
             InkWell(
               onTap: () async {
-                String? res = await context
-                    .read<AuthenticationService>()
-                    .signUp(
-                        email: emailController.text.trim(),
-                        password: pswController.text.trim());
-                if (res == "Yes") {
+                if (emailController.text.isNotEmpty &&
+                    pswController.text.isNotEmpty) {
                   setState(() {
                     error = "";
                     errorcolor = Colors.white;
                   });
-                  try {
-                    await db.createuserinstance(
-                        emailController.text.trim(),
-                        context
-                            .read<AuthenticationService>()
-                            .getuid()
-                            .toString());
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => PicandNameScreen(),
-                      ),
-                    );
-                  } catch (e) {
-                    setState(() {
-                      error = "Error Signing Up, try again!";
-                      errorcolor = Colors.red;
-                    });
-                  }
+                  setState(() {
+                    curruser.email = emailController.text.trim();
+                  });
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => PicandNameScreen(
+                          curruser: curruser, psw: pswController.text),
+                    ),
+                  );
                 } else {
                   setState(() {
-                    error = res;
+                    error = "Invalid email and/or password";
                     errorcolor = Colors.red;
                   });
                 }
@@ -179,8 +182,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class PicandNameScreen extends StatefulWidget {
-  const PicandNameScreen({super.key});
-
+  PicandNameScreen({super.key, required this.curruser, required this.psw});
+  AppUser curruser;
+  String psw;
   @override
   State<PicandNameScreen> createState() => _PicandNameScreenState();
 }
@@ -265,50 +269,27 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            bool cond = true;
-            try {
-              if (fullnamecontroller.text.isNotEmpty) {
-                await db.changeattribute('fullname', fullnamecontroller.text,
-                    context.read<AuthenticationService>().getuid().toString());
-                setState(() {
-                  error = "";
-                  errorcolor = Colors.white;
-                });
-              } else {
-                setState(() {
-                  error = "Please enter full name";
-                  errorcolor = Colors.red;
-                });
-                cond = false;
-              }
-            } catch (e) {
-              setState(() {
-                error = "Error with full name";
-                errorcolor = Colors.red;
-              });
-              cond = false;
-            }
-            try {
-              await db.changepfp(imagepath,
-                  context.read<AuthenticationService>().getuid().toString());
+            if (imagepath.toString().isNotEmpty &&
+                fullnamecontroller.text.isNotEmpty) {
               setState(() {
                 error = "";
                 errorcolor = Colors.white;
+                widget.curruser.fullname = fullnamecontroller.text.trim();
               });
-            } catch (e) {
-              setState(() {
-                error = "Error uploading picture";
-                errorcolor = Colors.red;
-              });
-              cond = false;
-            }
-            if (cond) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => UsernameScreen(),
+                  builder: (BuildContext context) => UsernameScreen(
+                      curruser: widget.curruser,
+                      imagepath: imagepath,
+                      psw: widget.psw),
                 ),
               );
+            } else {
+              setState(() {
+                error = "Invalid email and/or password";
+                errorcolor = Colors.red;
+              });
             }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
@@ -323,8 +304,15 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
 }
 
 class UsernameScreen extends StatefulWidget {
-  UsernameScreen({Key? key}) : super(key: key);
-
+  UsernameScreen(
+      {Key? key,
+      required this.curruser,
+      required this.imagepath,
+      required this.psw})
+      : super(key: key);
+  AppUser curruser;
+  var imagepath;
+  String psw;
   @override
   State<UsernameScreen> createState() => _UsernameScreenState();
 }
@@ -388,25 +376,20 @@ class _UsernameScreenState extends State<UsernameScreen> {
                 errorcolor = Colors.red;
               });
             } else {
-              try {
-                await db.changeusername(usernamecontroller.text,
-                    context.read<AuthenticationService>().getuid().toString());
-                setState(() {
-                  error = "";
-                  errorcolor = Colors.white;
-                });
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => MiscScreen(),
-                  ),
-                );
-              } catch (e) {
-                setState(() {
-                  error = "Error setting username";
-                  errorcolor = Colors.red;
-                });
-              }
+              setState(() {
+                error = "";
+                errorcolor = Colors.white;
+                widget.curruser.username = usernamecontroller.text.trim();
+              });
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => MiscScreen(
+                      curruser: widget.curruser,
+                      imagepath: widget.imagepath,
+                      psw: widget.psw),
+                ),
+              );
             }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
@@ -421,8 +404,14 @@ class _UsernameScreenState extends State<UsernameScreen> {
 }
 
 class MiscScreen extends StatefulWidget {
-  const MiscScreen({super.key});
-
+  MiscScreen(
+      {super.key,
+      required this.curruser,
+      required this.imagepath,
+      required this.psw});
+  AppUser curruser;
+  var imagepath;
+  String psw;
   @override
   State<MiscScreen> createState() => _MiscScreenState();
 }
@@ -785,52 +774,28 @@ class _MiscScreenState extends State<MiscScreen> {
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            bool cond = true;
-            if (birthdaycontroller.text.isEmpty) {
+            if (birthdaycontroller.text.isNotEmpty) {
+              setState(() {
+                error = "";
+                errorcolor = Colors.white;
+                widget.curruser.birthday = birthdaycontroller.text;
+                widget.curruser.nationality = nationality;
+                widget.curruser.gender = gender;
+              });
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => InterestScreen(
+                      curruser: widget.curruser,
+                      imagepath: widget.imagepath,
+                      psw: widget.psw),
+                ),
+              );
+            } else {
               setState(() {
                 error = "Please fill all fields";
                 errorcolor = Colors.red;
-                cond = false;
               });
-            } else {
-              try {
-                await db.changeattribute('gender', gender,
-                    context.read<AuthenticationService>().getuid().toString());
-              } catch (e) {
-                setState(() {
-                  error = "Could not update gender";
-                  errorcolor = Colors.red;
-                  cond = false;
-                });
-              }
-              try {
-                await db.changeattribute('nationality', nationality,
-                    context.read<AuthenticationService>().getuid().toString());
-              } catch (e) {
-                setState(() {
-                  error = "Could not update nationality";
-                  errorcolor = Colors.red;
-                  cond = false;
-                });
-              }
-              try {
-                await db.changeattribute('birthday', birthdaycontroller.text,
-                    context.read<AuthenticationService>().getuid().toString());
-              } catch (e) {
-                setState(() {
-                  error = "Could not update birth date";
-                  errorcolor = Colors.red;
-                  cond = false;
-                });
-              }
-              if (cond) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => InterestScreen(),
-                  ),
-                );
-              } else {}
             }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
@@ -845,8 +810,15 @@ class _MiscScreenState extends State<MiscScreen> {
 }
 
 class InterestScreen extends StatefulWidget {
-  const InterestScreen({Key? key}) : super(key: key);
-
+  InterestScreen(
+      {Key? key,
+      required this.curruser,
+      required this.imagepath,
+      required this.psw})
+      : super(key: key);
+  AppUser curruser;
+  String psw;
+  var imagepath;
   @override
   State<InterestScreen> createState() => _InterestScreenState();
 }
@@ -948,17 +920,33 @@ class _InterestScreenState extends State<InterestScreen> {
         child: FloatingActionButton(
           onPressed: () async {
             if (selectedinterests.length >= 3) {
-              await db.changeinterests('interests', selectedinterests,
-                  context.read<AuthenticationService>().getuid().toString());
+              setState(() {
+                widget.curruser.interests = selectedinterests;
+              });
+
+              await context
+                  .read<AuthenticationService>()
+                  .signUp(email: widget.curruser.email, password: widget.psw);
+              String uid =
+                  context.read<AuthenticationService>().getuid().toString();
+              await db.createuserinstance(widget.curruser.email, uid);
+              await db.changepfp(widget.imagepath, uid);
+              await db.changeusername(widget.curruser.username, uid);
+              await db.changeattribute(
+                  'fullname', widget.curruser.fullname, uid);
+              await db.changeattribute('gender', widget.curruser.gender, uid);
+              await db.changeattribute(
+                  'nationality', widget.curruser.nationality, uid);
+              await db.changeattribute(
+                  'birthday', widget.curruser.birthday, uid);
+              await db.changeinterests(
+                  'interests', widget.curruser.interests, uid);
 
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => LoadingScreen(
-                      uid: context
-                          .read<AuthenticationService>()
-                          .getuid()
-                          .toString()),
+                  builder: (BuildContext context) =>
+                      LoadingScreen(uid: uid, signup: true),
                 ),
               );
             }

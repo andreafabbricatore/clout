@@ -120,14 +120,13 @@ class _SignInScreenState extends State<SignInScreen> {
                     error = "";
                     errorcolor = Colors.white;
                   });
+                  String uid =
+                      context.read<AuthenticationService>().getuid().toString();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext context) => LoadingScreen(
-                            uid: context
-                                .read<AuthenticationService>()
-                                .getuid()
-                                .toString())),
+                        builder: (BuildContext context) =>
+                            LoadingScreen(uid: uid)),
                   );
                 } else {
                   setState(() {

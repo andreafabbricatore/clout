@@ -2,9 +2,14 @@ import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
 class UserListView extends StatelessWidget {
-  UserListView({Key? key, required this.userres, required this.onTap})
+  UserListView(
+      {Key? key,
+      required this.userres,
+      required this.onTap,
+      required this.curruser})
       : super(key: key);
   List<AppUser> userres;
+  AppUser curruser;
   final Function(AppUser user, int index)? onTap;
 
   Widget _listviewitem(String username, String pfp_url) {
@@ -27,7 +32,11 @@ class UserListView extends StatelessWidget {
         ),
         Text(
           "@$username",
-          style: TextStyle(fontSize: 25, color: Colors.black),
+          style: TextStyle(
+              fontSize: 25,
+              color: curruser.username == username
+                  ? Color.fromARGB(255, 255, 48, 117)
+                  : Colors.black),
         )
       ],
     );
@@ -41,15 +50,15 @@ class UserListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: userres.length,
-            itemBuilder: (_, index) {
-              return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                  child: _listviewitem(
-                      userres[index].username, userres[index].pfp_url));
-            }));
+      child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: userres.length,
+          itemBuilder: (_, index) {
+            return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+                child: _listviewitem(
+                    userres[index].username, userres[index].pfp_url));
+          }),
+    );
   }
 }

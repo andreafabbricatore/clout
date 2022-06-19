@@ -1,6 +1,9 @@
 import 'package:clout/screens/signinscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../services/auth.dart';
 
 class AuthScreen extends StatelessWidget {
   AuthScreen({Key? key}) : super(key: key);
@@ -9,7 +12,6 @@ class AuthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
