@@ -2,6 +2,7 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/profiletopcontainer.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
+import 'package:clout/screens/editprofilescreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
@@ -39,15 +40,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> refresh() async {
     try {
-      AppUser updateduser = await db.getUserFromDocID(userdocid);
-      setState(() {
-        widget.user = updateduser;
-      });
+      updateuser();
+      updatecurruser();
       geteventlist(widget.user.joined_events, true);
       geteventlist(widget.user.hosted_events, false);
     } catch (e) {
       print("error");
     }
+  }
+
+  Future<void> updateuser() async {
+    AppUser updateduser = await db.getUserFromDocID(userdocid);
+    setState(() {
+      widget.user = updateduser;
+    });
+  }
+
+  Future<void> updatecurruser() async {
+    AppUser updateduser = await db.getUserFromDocID(curruserdocid);
+    setState(() {
+      widget.curruser = updateduser;
+    });
   }
 
   Future<void> geteventlist(List events, bool joined) async {
@@ -69,7 +82,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> getuserid(String uid) async {
     String id = await db.getUserDocID(widget.user.uid);
-    print(id);
     setState(() {
       userdocid = id;
     });
@@ -77,18 +89,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> getcurruserid(String uid) async {
     String id = await db.getUserDocID(widget.curruser.uid);
-    print(id);
     setState(() {
       curruserdocid = id;
     });
   }
 
-  @override
-  void initState() {
-    getuserid(widget.user.uid);
-    getcurruserid(widget.curruser.uid);
+  void editprofile() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
+  }
+
+  Future<void> follow() async {
+    try {
+      await db.Follow(curruserdocid, userdocid);
+      refresh();
+    } catch (e) {
+      print("error");
+    }
+  }
+
+  Future<void> unfollow() async {
+    try {
+      await db.unFollow(curruserdocid, userdocid);
+      refresh();
+    } catch (e) {
+      print("error");
+    }
+  }
+
+  Future<void> init() async {
+    await getuserid(widget.user.uid);
+    await getcurruserid(widget.curruser.uid);
+    updateuser();
+    updatecurruser();
     geteventlist(widget.user.joined_events, true);
     geteventlist(widget.user.hosted_events, false);
+  }
+
+  @override
+  void initState() {
+    init();
     super.initState();
   }
 
@@ -104,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ];
       Event newevent = await Navigator.push(
           context,
-          CupertinoPageRoute(
+          MaterialPageRoute(
               builder: (_) => EventDetailScreen(
                     event: event,
                     pfp_urls: pfpurls,
@@ -165,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(
-                      Icons.edit,
+                      Icons.settings,
                       color: Colors.black,
                     ),
                   ),
@@ -189,7 +229,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
       ),
       body: Column(children: [
-        ProfileTopContainer(user: widget.user),
+        ProfileTopContainer(
+          user: widget.user,
+          iscurruser: widget.iscurruser,
+          curruser: widget.curruser,
+          curruserdocid: curruserdocid,
+          userdocid: userdocid,
+          editprofile: editprofile,
+          follow:
+              widget.curruser.following.contains(userdocid) ? unfollow : follow,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -212,7 +261,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: BoxDecoration(
                     border: Border(
                         bottom: BorderSide(
-                            color: Color.fromARGB(55, 158, 158, 158)),
+                            color: joinedevents
+                                ? Colors.black
+                                : Color.fromARGB(55, 158, 158, 158)),
                         right: BorderSide(
                             color: Color.fromARGB(55, 158, 158, 158)))),
               ),
@@ -236,7 +287,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: BoxDecoration(
                     border: Border(
                         bottom: BorderSide(
-                            color: Color.fromARGB(55, 158, 158, 158)),
+                            color: joinedevents
+                                ? Color.fromARGB(55, 158, 158, 158)
+                                : Colors.black),
                         left: BorderSide(color: Colors.white))),
               ),
             )

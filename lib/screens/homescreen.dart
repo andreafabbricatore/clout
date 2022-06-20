@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ];
       Event newevent = await Navigator.push(
           context,
-          CupertinoPageRoute(
+          MaterialPageRoute(
               builder: (_) => EventDetailScreen(
                   event: event,
                   pfp_urls: pfpurls,

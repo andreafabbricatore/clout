@@ -74,7 +74,7 @@ class _SearchScreenState extends State<SearchScreen> {
       print(res);
       Navigator.push(
           context,
-          CupertinoPageRoute(
+          MaterialPageRoute(
               builder: (_) => InterestSearchScreen(
                     interest: interest,
                     events: res,

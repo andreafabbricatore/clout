@@ -1,9 +1,27 @@
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/editprofilescreen.dart';
+import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 
 class ProfileTopContainer extends StatelessWidget {
-  ProfileTopContainer({Key? key, required this.user}) : super(key: key);
+  ProfileTopContainer(
+      {Key? key,
+      required this.user,
+      required this.curruser,
+      required this.iscurruser,
+      required this.curruserdocid,
+      required this.userdocid,
+      required this.follow,
+      required this.editprofile})
+      : super(key: key);
   AppUser user;
+  AppUser curruser;
+  String curruserdocid;
+  String userdocid;
+  bool iscurruser;
+  final VoidCallback follow;
+  final VoidCallback editprofile;
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -61,11 +79,55 @@ class ProfileTopContainer extends StatelessWidget {
             height: screenheight * 0.02,
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-            child: Text(
-              user.fullname,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  user.fullname,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w300),
+                ),
+                iscurruser
+                    ? GestureDetector(
+                        onTap: () {
+                          editprofile();
+                        },
+                        child: Container(
+                          height: screenheight * 0.025,
+                          width: screenheight * 0.1,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                              border: Border.all(
+                                  color: Color.fromARGB(161, 158, 158, 158))),
+                          child: Center(child: Text("Edit Profile")),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          follow();
+                        },
+                        child: Container(
+                          height: screenheight * 0.03,
+                          width: curruser.following.contains(userdocid)
+                              ? screenwidth * 0.3
+                              : screenwidth * 0.2,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                              border: Border.all(
+                                  color: Color.fromARGB(161, 158, 158, 158))),
+                          child: Center(
+                              child: Text(
+                            curruser.following.contains(userdocid)
+                                ? "Stop Following"
+                                : "Follow",
+                            style: TextStyle(fontSize: 15),
+                          )),
+                        ),
+                      )
+              ],
             ),
           )
         ],

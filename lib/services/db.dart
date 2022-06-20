@@ -428,4 +428,34 @@ class db_conn {
     DocumentSnapshot documentSnapshot = await users.doc(docid).get();
     return AppUser.fromJson(documentSnapshot.data());
   }
+
+  Future<void> Follow(String curruserdocid, String userdocid) async {
+    try {
+      DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
+      DocumentSnapshot userdoc = await users.doc(userdocid).get();
+      List following = curruserdoc['following'];
+      List followers = userdoc['following'];
+      following.add(userdocid);
+      followers.add(curruserdocid);
+      users.doc(curruserdocid).update({'following': following});
+      users.doc(userdocid).update({'followers': followers});
+    } catch (e) {
+      throw Exception("Could not follow");
+    }
+  }
+
+  Future<void> unFollow(String curruserdocid, String userdocid) async {
+    try {
+      DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
+      DocumentSnapshot userdoc = await users.doc(userdocid).get();
+      List following = curruserdoc['following'];
+      List followers = userdoc['following'];
+      following.removeWhere((element) => element == userdocid);
+      followers.removeWhere((element) => element == curruserdocid);
+      users.doc(curruserdocid).update({'following': following});
+      users.doc(userdocid).update({'followers': followers});
+    } catch (e) {
+      throw Exception("Could not follow");
+    }
+  }
 }

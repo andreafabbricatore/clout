@@ -35,7 +35,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
       ];
       Event newevent = await Navigator.push(
           context,
-          CupertinoPageRoute(
+          MaterialPageRoute(
               builder: (_) => EventDetailScreen(
                     event: event,
                     pfp_urls: pfpurls,
