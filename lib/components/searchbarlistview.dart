@@ -64,6 +64,8 @@ class _SearchBarListViewState extends State<SearchBarListView> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
+                    interestpics: [],
+                    interests: [],
                   )));
     }
 

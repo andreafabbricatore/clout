@@ -58,6 +58,8 @@ class _MainScreenState extends State<MainScreen> {
         user: widget.curruser,
         curruser: widget.curruser,
         visit: false,
+        interestpics: widget.interestpics,
+        interests: widget.interests,
       )
     ];
   }

@@ -14,16 +14,21 @@ import 'package:provider/provider.dart';
 import '../components/event.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen(
-      {super.key,
-      required this.user,
-      required this.curruser,
-      required this.visit,
-      iscurruser});
   AppUser user;
   AppUser curruser;
   bool visit;
   bool iscurruser = false;
+  List interestpics;
+  List interests;
+  ProfileScreen({
+    super.key,
+    required this.user,
+    required this.curruser,
+    required this.visit,
+    required this.interestpics,
+    required this.interests,
+    iscurruser,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -94,9 +99,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  void editprofile() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
+  void editprofile() async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => EditProfileScreen(
+                  curruser: widget.curruser,
+                  interestpics: widget.interestpics,
+                  interests: widget.interests,
+                )));
+    refresh();
   }
 
   Future<void> follow() async {
