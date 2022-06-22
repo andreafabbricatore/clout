@@ -30,9 +30,16 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
   @override
   Widget build(BuildContext context) {
     Future<void> _navigate(Event event, int index) async {
-      List pfpurls = [
-        for (String x in event.participants) await db.getUserPFPfromUsername(x)
-      ];
+      List pfpurls = [];
+      List usernames = [];
+      for (int i = 0; i < event.participants.length; i++) {
+        AppUser temp = await db.getUserFromDocID(event.participants[i]);
+        setState(() {
+          pfpurls.add(temp.pfp_url);
+          usernames.add(temp.username);
+        });
+      }
+
       Event newevent = await Navigator.push(
           context,
           MaterialPageRoute(
@@ -41,6 +48,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                     pfp_urls: pfpurls,
                     userdocid: widget.userdocid,
                     curruser: widget.curruser,
+                    usernames: usernames,
                   )));
       try {
         int index = widget.events.indexWhere((element) => element == event);

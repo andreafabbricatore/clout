@@ -82,12 +82,18 @@ class EventListView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(event.title,
-                          style: TextStyle(
-                              fontFamily: "Poppins",
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(event.title,
+                              style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black)),
+                          Icon(Icons.bookmark_border),
+                        ],
+                      ),
                       Text(event.interest,
                           style: TextStyle(
                               fontFamily: "Poppins",

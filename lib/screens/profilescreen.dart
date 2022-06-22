@@ -4,6 +4,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/editprofilescreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
+import 'package:clout/screens/followerfollowingscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
@@ -111,6 +112,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     refresh();
   }
 
+  void followerscreen() async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => FollowerFollowingScreen(
+                  user: widget.user,
+                  curruser: widget.curruser,
+                  iscurruser: widget.iscurruser,
+                  onfollowers: true,
+                )));
+    refresh();
+  }
+
+  void followingscreen() async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => FollowerFollowingScreen(
+                  user: widget.user,
+                  curruser: widget.curruser,
+                  iscurruser: widget.iscurruser,
+                  onfollowers: false,
+                )));
+    refresh();
+  }
+
   Future<void> follow() async {
     try {
       await db.Follow(curruserdocid, userdocid);
@@ -151,9 +178,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     Future<void> _navigate(Event event, int index) async {
-      List pfpurls = [
-        for (String x in event.participants) await db.getUserPFPfromUsername(x)
-      ];
+      List pfpurls = [];
+      List usernames = [];
+      for (int i = 0; i < event.participants.length; i++) {
+        AppUser temp = await db.getUserFromDocID(event.participants[i]);
+        setState(() {
+          pfpurls.add(temp.pfp_url);
+          usernames.add(temp.username);
+        });
+      }
+
       Event newevent = await Navigator.push(
           context,
           MaterialPageRoute(
@@ -162,6 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     pfp_urls: pfpurls,
                     userdocid: curruserdocid,
                     curruser: widget.curruser,
+                    usernames: usernames,
                   )));
       refresh();
     }
@@ -248,6 +283,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           curruserdocid: curruserdocid,
           userdocid: userdocid,
           editprofile: editprofile,
+          followerscreen: followerscreen,
+          followingscreen: followingscreen,
           follow:
               widget.curruser.following.contains(userdocid) ? unfollow : follow,
         ),

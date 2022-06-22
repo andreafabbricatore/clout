@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/loading.dart';
+import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -16,11 +18,13 @@ class EventDetailScreen extends StatefulWidget {
       required this.event,
       required this.pfp_urls,
       required this.userdocid,
-      required this.curruser});
+      required this.curruser,
+      required this.usernames});
   Event event;
   List pfp_urls;
   String userdocid;
   AppUser curruser;
+  List usernames;
 
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
@@ -141,9 +145,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     super.initState();
   }
 
-  Widget _listviewitem(String username, String pfp_url) {
+  Widget _listviewitem(String username, String pfp_url, String docid) {
     return InkWell(
-      onTap: () {},
+      onTap: () async {
+        AppUser user = await db.getUserFromDocID(docid);
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (_) => ProfileScreen(
+                      user: user,
+                      curruser: widget.curruser,
+                      visit: true,
+                      interestpics: [],
+                      interests: [],
+                    )));
+      },
       child: Row(
         children: [
           Padding(
@@ -294,8 +310,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-                  child: _listviewitem(
-                      widget.event.participants[index], widget.pfp_urls[index]),
+                  child: _listviewitem(widget.usernames[index],
+                      widget.pfp_urls[index], widget.event.participants[index]),
                 );
               }),
           SizedBox(

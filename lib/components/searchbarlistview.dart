@@ -33,9 +33,15 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     Future<void> _eventnavigate(Event event, int index) async {
-      List pfpurls = [
-        for (String x in event.participants) await db.getUserPFPfromUsername(x)
-      ];
+      List pfpurls = [];
+      List usernames = [];
+      for (int i = 0; i < event.participants.length; i++) {
+        AppUser temp = await db.getUserFromDocID(event.participants[i]);
+        setState(() {
+          pfpurls.add(temp.pfp_url);
+          usernames.add(temp.username);
+        });
+      }
       Event newevent = await Navigator.push(
           context,
           CupertinoPageRoute(
@@ -44,6 +50,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
                     pfp_urls: pfpurls,
                     userdocid: widget.userdocid,
                     curruser: widget.curruser,
+                    usernames: usernames,
                   )));
 
       try {

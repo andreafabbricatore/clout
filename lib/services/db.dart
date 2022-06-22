@@ -45,7 +45,6 @@ class db_conn {
       String host,
       DateTime time,
       int maxparticipants,
-      List participants,
       AppUser curruser,
       String id) async {
     try {
@@ -53,8 +52,9 @@ class db_conn {
       List joined_events = curruser.joined_events;
       List hosted_events = curruser.hosted_events;
       String eventid = "";
+      String userdocid = await getUserDocID(curruser.uid);
       bool unique = await eventUnique(title, description, interest, location,
-          host, time, maxparticipants, participants);
+          host, time, maxparticipants, [userdocid]);
       print(unique);
       List searchfield = [];
       String temp = "";
@@ -73,7 +73,7 @@ class db_conn {
           'host': host,
           'time': time,
           'maxparticipants': maxparticipants,
-          'participants': participants,
+          'participants': [userdocid],
           'image': banner_url,
           'searchfield': searchfield
         }).then((value) {
@@ -103,7 +103,7 @@ class db_conn {
         throw Exception("Too many participants");
       } else {
         joined_events.add(eventid);
-        participants.add(curruser.username);
+        participants.add(userdocid);
         users.doc(userdocid).update({'joined_events': joined_events});
         events.doc(eventid).update({'participants': participants});
       }
@@ -122,7 +122,7 @@ class db_conn {
         throw Exception("Cannot leave event");
       } else {
         joined_events.removeWhere((element) => element == eventid);
-        participants.removeWhere((element) => element == curruser.username);
+        participants.removeWhere((element) => element == userdocid);
         users.doc(userdocid).update({'joined_events': joined_events});
         events.doc(eventid).update({'participants': participants});
       }
@@ -135,11 +135,8 @@ class db_conn {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
-      List docids = [
-        for (String x in participants) await getUserDocIDfromUsername(x)
-      ];
       String hostdocid = await getUserDocIDfromUsername(host);
-      for (String x in docids) {
+      for (String x in participants) {
         DocumentSnapshot documentSnapshot = await users.doc(x).get();
         List joined_events = documentSnapshot['joined_events'];
         if (x == hostdocid) {

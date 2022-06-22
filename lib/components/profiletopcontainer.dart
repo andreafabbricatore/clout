@@ -12,7 +12,9 @@ class ProfileTopContainer extends StatelessWidget {
       required this.curruserdocid,
       required this.userdocid,
       required this.follow,
-      required this.editprofile})
+      required this.editprofile,
+      required this.followerscreen,
+      required this.followingscreen})
       : super(key: key);
   AppUser user;
   AppUser curruser;
@@ -21,6 +23,8 @@ class ProfileTopContainer extends StatelessWidget {
   bool iscurruser;
   final VoidCallback follow;
   final VoidCallback editprofile;
+  final VoidCallback followerscreen;
+  final VoidCallback followingscreen;
 
   @override
   Widget build(BuildContext context) {
@@ -61,16 +65,26 @@ class ProfileTopContainer extends StatelessWidget {
                 SizedBox(
                   width: screenwidth * 0.05,
                 ),
-                Text(
-                  "${user.followers.length}\nFollowers",
-                  textAlign: TextAlign.center,
+                GestureDetector(
+                  onTap: () {
+                    followerscreen();
+                  },
+                  child: Text(
+                    "${user.followers.length}\nFollowers",
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 SizedBox(
                   width: screenwidth * 0.05,
                 ),
-                Text(
-                  "${user.following.length}\nFollowing",
-                  textAlign: TextAlign.center,
+                GestureDetector(
+                  onTap: () {
+                    followingscreen();
+                  },
+                  child: Text(
+                    "${user.following.length}\nFollowing",
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),

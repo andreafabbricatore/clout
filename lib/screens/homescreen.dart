@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/user.dart';
@@ -83,17 +84,26 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     Future<void> _navigate(Event event, int index) async {
-      List pfpurls = [
-        for (String x in event.participants) await db.getUserPFPfromUsername(x)
-      ];
+      List pfpurls = [];
+      List usernames = [];
+      for (int i = 0; i < event.participants.length; i++) {
+        AppUser temp = await db.getUserFromDocID(event.participants[i]);
+        setState(() {
+          pfpurls.add(temp.pfp_url);
+          usernames.add(temp.username);
+        });
+      }
+
       Event newevent = await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => EventDetailScreen(
-                  event: event,
-                  pfp_urls: pfpurls,
-                  userdocid: widget.docid,
-                  curruser: widget.curruser)));
+                    event: event,
+                    pfp_urls: pfpurls,
+                    userdocid: widget.docid,
+                    curruser: widget.curruser,
+                    usernames: usernames,
+                  )));
       refreshevents();
     }
 
@@ -141,7 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     widget.curruser.username,
                     DateTime(2022, 9, 7, 17, 30),
                     3,
-                    [widget.curruser.username],
                     widget.curruser,
                     widget.docid);
               },
