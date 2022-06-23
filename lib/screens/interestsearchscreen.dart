@@ -2,7 +2,6 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../components/event.dart';
@@ -25,11 +24,24 @@ class InterestSearchScreen extends StatefulWidget {
 class _InterestSearchScreenState extends State<InterestSearchScreen> {
   db_conn db = db_conn();
 
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> updatecurruser() async {
-    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
-    setState(() {
-      widget.curruser = updateduser;
-    });
+    try {
+      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      setState(() {
+        widget.curruser = updateduser;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh user");
+    }
   }
 
   Future interactfav(Event event) async {
@@ -40,7 +52,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
         await db.addToFav(widget.curruser.docid, event.docid);
       }
     } catch (e) {
-      print("Could not interact");
+      displayErrorSnackBar("Could not update favorites");
     } finally {
       updatecurruser();
     }
@@ -49,26 +61,27 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
   @override
   Widget build(BuildContext context) {
     Future<void> _navigate(Event event, int index) async {
-      List<AppUser> participants = [
-        for (String x in event.participants) await db.getUserFromDocID(x)
-      ];
-
-      Event newevent = await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => EventDetailScreen(
-                    event: event,
-                    curruser: widget.curruser,
-                    participants: participants,
-                    interactfav: interactfav,
-                  )));
       try {
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromDocID(x)
+        ];
+
+        Event newevent = await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => EventDetailScreen(
+                      event: event,
+                      curruser: widget.curruser,
+                      participants: participants,
+                      interactfav: interactfav,
+                    )));
+
         int index = widget.events.indexWhere((element) => element == event);
         setState(() {
           widget.events[index] = newevent;
         });
       } catch (e) {
-        print("error");
+        displayErrorSnackBar("Could not display event");
       }
     }
 

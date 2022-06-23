@@ -1,16 +1,12 @@
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/profiletopcontainer.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/main.dart';
 import 'package:clout/screens/editprofilescreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/followerfollowingscreen.dart';
-import 'package:clout/screens/loading.dart';
-import 'package:clout/services/auth.dart';
+import 'package:clout/screens/settings.dart';
 import 'package:clout/services/db.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../components/event.dart';
 
@@ -42,6 +38,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<Event> joined_events = [];
   List<Event> hosted_events = [];
 
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> refresh() async {
     try {
       updateuser();
@@ -49,38 +54,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
       geteventlist(widget.user.joined_events, true);
       geteventlist(widget.user.hosted_events, false);
     } catch (e) {
-      print("error");
+      displayErrorSnackBar("Could not refresh");
     }
   }
 
   Future<void> updateuser() async {
-    AppUser updateduser = await db.getUserFromDocID(widget.user.docid);
-    setState(() {
-      widget.user = updateduser;
-    });
+    try {
+      AppUser updateduser = await db.getUserFromDocID(widget.user.docid);
+      setState(() {
+        widget.user = updateduser;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh user");
+    }
   }
 
   Future<void> updatecurruser() async {
-    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
-    setState(() {
-      widget.curruser = updateduser;
-    });
+    try {
+      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      setState(() {
+        widget.curruser = updateduser;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh user");
+    }
   }
 
   Future<void> geteventlist(List events, bool joined) async {
     List<Event> temp = [];
-    for (int i = 0; i < events.length; i++) {
-      Event event = await db.getEventfromDocId(events[i]);
-      temp.add(event);
-    }
-    if (joined) {
-      setState(() {
-        joined_events = temp;
-      });
-    } else {
-      setState(() {
-        hosted_events = temp;
-      });
+    try {
+      for (int i = 0; i < events.length; i++) {
+        Event event = await db.getEventfromDocId(events[i]);
+        temp.add(event);
+      }
+      if (joined) {
+        setState(() {
+          joined_events = temp;
+        });
+      } else {
+        setState(() {
+          hosted_events = temp;
+        });
+      }
+    } catch (e) {
+      displayErrorSnackBar("Could not retrieve events");
     }
   }
 
@@ -93,6 +110,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   interestpics: widget.interestpics,
                   interests: widget.interests,
                 )));
+    refresh();
+  }
+
+  void settings() async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (_) => SetttingsScreen()));
     refresh();
   }
 
@@ -127,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await db.Follow(widget.curruser.docid, widget.user.docid);
       refresh();
     } catch (e) {
-      print("error");
+      displayErrorSnackBar("Could not follow @${widget.user.username}");
     }
   }
 
@@ -136,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await db.unFollow(widget.curruser.docid, widget.user.docid);
       refresh();
     } catch (e) {
-      print("error");
+      displayErrorSnackBar("Could not unfollow @${widget.user.username}");
     }
   }
 
@@ -148,7 +171,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await db.addToFav(widget.curruser.docid, event.docid);
       }
     } catch (e) {
-      print("Could not interact");
+      displayErrorSnackBar("Could not update favorites");
     } finally {
       updatecurruser();
     }
@@ -174,19 +197,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     Future<void> _navigate(Event event, int index) async {
-      List<AppUser> participants = [
-        for (String x in event.participants) await db.getUserFromDocID(x)
-      ];
+      try {
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromDocID(x)
+        ];
 
-      Event newevent = await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => EventDetailScreen(
-                    event: event,
-                    curruser: widget.curruser,
-                    participants: participants,
-                    interactfav: interactfav,
-                  )));
+        Event newevent = await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => EventDetailScreen(
+                      event: event,
+                      curruser: widget.curruser,
+                      participants: participants,
+                      interactfav: interactfav,
+                    )));
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
       refresh();
     }
 
@@ -237,7 +264,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    settings();
+                  },
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(

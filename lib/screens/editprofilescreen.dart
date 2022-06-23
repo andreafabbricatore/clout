@@ -6,8 +6,7 @@ import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -286,6 +285,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   ];
   String gender = "";
   String nationality = "";
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   void initState() {
     setState(() {
@@ -333,7 +342,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     print(imagepath);
                   }
                 } catch (e) {
-                  print("error with pfp");
+                  displayErrorSnackBar("Error with profile picture");
                 }
               },
               child: ClipRRect(
@@ -477,28 +486,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           InkWell(
             onTap: () async {
-              if (imagepath != null) {
-                await db.changepfp(imagepath, widget.curruser.uid);
-              }
-              bool unique =
-                  await db.usernameUnique(usernamecontroller.text.trim());
-              if (unique && usernamecontroller.text.isNotEmpty) {
-                await db.changeusername(
-                    usernamecontroller.text.trim(), widget.curruser.uid);
-              }
-              if (fullnamecontroller.text.isNotEmpty) {
-                await db.changeattribute('fullname',
-                    fullnamecontroller.text.trim(), widget.curruser.uid);
-              }
-              await db.changeattribute('gender', gender, widget.curruser.uid);
-              await db.changeattribute(
-                  'nationality', nationality, widget.curruser.uid);
-              if (birthdaycontroller.text.isNotEmpty) {
+              try {
+                if (imagepath != null) {
+                  await db.changepfp(imagepath, widget.curruser.uid);
+                }
+                bool unique =
+                    await db.usernameUnique(usernamecontroller.text.trim());
+                if (unique && usernamecontroller.text.isNotEmpty) {
+                  await db.changeusername(
+                      usernamecontroller.text.trim(), widget.curruser.uid);
+                }
+                if (fullnamecontroller.text.isNotEmpty) {
+                  await db.changeattribute('fullname',
+                      fullnamecontroller.text.trim(), widget.curruser.uid);
+                }
+                await db.changeattribute('gender', gender, widget.curruser.uid);
                 await db.changeattribute(
-                    'birthday', birthdaycontroller.text, widget.curruser.uid);
+                    'nationality', nationality, widget.curruser.uid);
+                if (birthdaycontroller.text.isNotEmpty) {
+                  await db.changeattribute(
+                      'birthday', birthdaycontroller.text, widget.curruser.uid);
+                }
+                await db.changeinterests(
+                    'interests', widget.interests, widget.curruser.uid);
+              } catch (e) {
+                displayErrorSnackBar("Could not update profile");
+              } finally {
+                Navigator.pop(context);
               }
-              await db.changeinterests(
-                  'interests', widget.interests, widget.curruser.uid);
             },
             child: SizedBox(
                 height: 50,

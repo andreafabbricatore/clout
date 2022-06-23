@@ -2,8 +2,6 @@ import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:intl/intl.dart';
 
 class EventListView extends StatelessWidget {

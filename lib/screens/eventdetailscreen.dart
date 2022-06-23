@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
@@ -8,8 +7,6 @@ import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -31,15 +28,26 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
-
-  String error = "Error";
   String joinedval = "Join";
 
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> updatecurruser() async {
-    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
-    setState(() {
-      widget.curruser = updateduser;
-    });
+    try {
+      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      setState(() {
+        widget.curruser = updateduser;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not update user");
+    }
   }
 
   void checkifjoined() async {
@@ -79,35 +87,31 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   void updatescreen(eventid) async {
-    Event updatedevent = await db.getEventfromDocId(eventid);
-    setState(() {
-      widget.event = updatedevent;
-    });
-    List<AppUser> temp = [
-      for (String x in widget.event.participants) await db.getUserFromDocID(x)
-    ];
-    setState(() {
-      widget.participants = temp;
-    });
+    try {
+      Event updatedevent = await db.getEventfromDocId(eventid);
+      setState(() {
+        widget.event = updatedevent;
+      });
+      List<AppUser> temp = [
+        for (String x in widget.event.participants) await db.getUserFromDocID(x)
+      ];
+      setState(() {
+        widget.participants = temp;
+      });
 
-    checkifjoined();
+      checkifjoined();
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh");
+    }
   }
 
   void interactevent(context) async {
-    final snackBar = SnackBar(
-      content: Text(error),
-      duration: Duration(seconds: 2),
-    );
     if (!joined && joinedval == "Join") {
       try {
         await db.joinevent(widget.event, widget.curruser, widget.curruser.docid,
             widget.event.docid);
       } catch (e) {
-        setState(() {
-          error = e.toString();
-        });
-        await Future.delayed(Duration(milliseconds: 400));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        displayErrorSnackBar("Could not join event");
       } finally {
         updatescreen(widget.event.docid);
       }
@@ -127,11 +131,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     )),
             (Route<dynamic> route) => false);
       } catch (e) {
-        setState(() {
-          error = e.toString();
-        });
-        await Future.delayed(Duration(milliseconds: 400));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        displayErrorSnackBar("Could not delete event");
         updatescreen(widget.event.docid);
       }
     } else {
@@ -139,11 +139,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await db.leaveevent(widget.event, widget.curruser,
             widget.curruser.docid, widget.event.docid);
       } catch (e) {
-        setState(() {
-          error = e.toString();
-        });
-        await Future.delayed(Duration(seconds: 1));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        displayErrorSnackBar("Could not leave event");
       } finally {
         updatescreen(widget.event.docid);
       }
@@ -251,10 +247,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               InkWell(
                 onTap: () async {
-                  String hostdocid =
-                      await db.getUserDocIDfromUsername(widget.event.host);
-                  AppUser eventhost = await db.getUserFromDocID(hostdocid);
-                  _usernavigate(eventhost, 0);
+                  try {
+                    String hostdocid =
+                        await db.getUserDocIDfromUsername(widget.event.host);
+                    AppUser eventhost = await db.getUserFromDocID(hostdocid);
+                    _usernavigate(eventhost, 0);
+                  } catch (e) {
+                    displayErrorSnackBar("Could not retrieve host information");
+                  }
                 },
                 child: Text(
                   "@${widget.event.host}",

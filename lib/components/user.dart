@@ -1,5 +1,3 @@
-import 'package:clout/components/event.dart';
-
 class AppUser {
   String username;
   String uid;

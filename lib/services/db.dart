@@ -1,12 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class db_conn {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -34,7 +31,7 @@ class db_conn {
         'favorites': []
       });
     } catch (e) {
-      return Future.error("Could not Sign Up");
+      throw Exception("Could not create user");
     }
   }
 
@@ -168,7 +165,7 @@ class db_conn {
             throw Exception("Could not upload pfp");
           });
     } catch (e) {
-      return e;
+      throw Exception();
     }
   }
 
@@ -220,110 +217,128 @@ class db_conn {
           .ref('/user_pfp/$uid.jpg')
           .putFile(filePath);
     } catch (e) {
-      return e;
+      throw Exception();
     }
   }
 
   Future<String> downloadURL(String uid) async {
-    String downloadUrl = await FirebaseStorage.instance
-        .ref('/user_pfp/$uid.jpg')
-        .getDownloadURL();
-    return downloadUrl;
+    try {
+      String downloadUrl = await FirebaseStorage.instance
+          .ref('/user_pfp/$uid.jpg')
+          .getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      throw Exception("Could not get download url");
+    }
   }
 
   Future<String> getUserDocID(String uid) async {
     String docID = "";
-    await FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((QuerySnapshot querySnapshot) => {
-              querySnapshot.docs.forEach((doc) {
-                if (doc["uid"] == uid) {
-                  docID = doc.id;
-                }
-              })
-            });
+    try {
+      await users.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["uid"] == uid) {
+                docID = doc.id;
+              }
+            })
+          });
+    } catch (e) {
+      throw Exception("Error with userdocid");
+    }
     if (docID != "") {
       return docID;
     } else {
-      return "error";
+      throw Exception("Error with userdocid");
     }
   }
 
   Future<String> getEventDocID(Event event) async {
     String docID = "";
-    await events.get().then((QuerySnapshot querySnapshot) => {
-          querySnapshot.docs.forEach((doc) {
-            if (doc["title"] == event.title &&
-                doc['description'] == event.description &&
-                doc['interest'] == event.interest &&
-                doc['location'] == event.location &&
-                doc['host'] == event.host &&
-                doc['maxparticipants'] == event.maxparticipants &&
-                listEquals(doc['participants'], event.participants) &&
-                doc['time'].toDate() == event.datetime) {
-              docID = doc.id;
-            }
-          })
-        });
+    try {
+      await events.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["title"] == event.title &&
+                  doc['description'] == event.description &&
+                  doc['interest'] == event.interest &&
+                  doc['location'] == event.location &&
+                  doc['host'] == event.host &&
+                  doc['maxparticipants'] == event.maxparticipants &&
+                  listEquals(doc['participants'], event.participants) &&
+                  doc['time'].toDate() == event.datetime) {
+                docID = doc.id;
+              }
+            })
+          });
+    } catch (e) {
+      throw Exception("Error with eventdocid");
+    }
     if (docID != "") {
       return docID;
     } else {
-      return "error";
+      throw Exception("Error with eventdocid");
     }
   }
 
   Future<String> getUserDocIDfromUsername(String username) async {
     String docID = "";
-    await FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((QuerySnapshot querySnapshot) => {
-              querySnapshot.docs.forEach((doc) {
-                if (doc["username"] == username) {
-                  docID = doc.id;
-                }
-              })
-            });
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .get()
+          .then((QuerySnapshot querySnapshot) => {
+                querySnapshot.docs.forEach((doc) {
+                  if (doc["username"] == username) {
+                    docID = doc.id;
+                  }
+                })
+              });
+    } catch (e) {
+      throw Exception("Error with userdocid");
+    }
     if (docID != "") {
       return docID;
     } else {
-      return "error";
+      throw Exception("Error with userdocid");
     }
   }
 
   Future<String> getUserPFPfromUsername(String username) async {
     String pfp_url = "";
-    await FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((QuerySnapshot querySnapshot) => {
-              querySnapshot.docs.forEach((doc) {
-                if (doc["username"] == username) {
-                  pfp_url = doc["pfp_url"];
-                }
-              })
-            });
+    try {
+      await users.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["username"] == username) {
+                pfp_url = doc["pfp_url"];
+              }
+            })
+          });
+    } catch (e) {
+      throw Exception("Error with user pfp");
+    }
     if (pfp_url != "") {
       return pfp_url;
     } else {
-      return "error";
+      throw Exception("Error with user pfp");
     }
   }
 
   Future<bool> usernameUnique(String username) async {
     int instances = 0;
-    await users.get().then((QuerySnapshot querySnapshot) => {
-          querySnapshot.docs.forEach((doc) {
-            if (doc["username"] == username) {
-              instances = instances + 1;
-            }
-          })
-        });
-    if (instances == 0) {
-      return true;
-    } else {
-      return false;
+    try {
+      await users.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["username"] == username) {
+                instances = instances + 1;
+              }
+            })
+          });
+      if (instances == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception("Could not connect");
     }
   }
 
@@ -337,92 +352,139 @@ class db_conn {
       int maxparticipants,
       List participants) async {
     int instances = 0;
-    await events.get().then((QuerySnapshot querySnapshot) => {
-          querySnapshot.docs.forEach((doc) {
-            if (doc["title"] == title &&
-                doc['description'] == description &&
-                doc['interest'] == interest &&
-                doc['location'] == location &&
-                doc['host'] == host &&
-                doc['maxparticipants'] == maxparticipants &&
-                listEquals(doc['participants'], participants) &&
-                doc['time'].toDate() == time) {
-              instances = instances + 1;
-            }
-          })
-        });
-    if (instances == 0) {
-      return true;
-    } else {
-      return false;
+    try {
+      await events.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["title"] == title &&
+                  doc['description'] == description &&
+                  doc['interest'] == interest &&
+                  doc['location'] == location &&
+                  doc['host'] == host &&
+                  doc['maxparticipants'] == maxparticipants &&
+                  listEquals(doc['participants'], participants) &&
+                  doc['time'].toDate() == time) {
+                instances = instances + 1;
+              }
+            })
+          });
+      if (instances == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception("Could not connect");
     }
   }
 
   Future<List> getUserInterests(String id) async {
-    DocumentSnapshot documentSnapshot = await users.doc(id).get();
-    List interests = documentSnapshot['interests'];
-    return interests;
+    try {
+      DocumentSnapshot documentSnapshot = await users.doc(id).get();
+      List interests = documentSnapshot['interests'];
+      return interests;
+    } catch (e) {
+      throw Exception("Could not retrieve user interests");
+    }
   }
 
   Future<List<Event>> getEvents(List interests) async {
-    QuerySnapshot querySnapshot =
-        await events.where('interest', whereNotIn: interests).get();
-    List<Event> eventlist = [];
-    querySnapshot.docs.forEach((element) {
-      eventlist.add(Event.fromJson(element.data(), element.id));
-    });
-    return eventlist;
+    try {
+      QuerySnapshot querySnapshot =
+          await events.where('interest', whereNotIn: interests).get();
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        eventlist.add(Event.fromJson(element.data(), element.id));
+      });
+      return eventlist;
+    } catch (e) {
+      throw Exception("Could not connect");
+    }
+  }
+
+  Future<List<Event>> getFavEvents(AppUser user) async {
+    try {
+      List<Event> favEvents = [
+        for (String x in user.favorites) await getEventfromDocId(x)
+      ];
+      return favEvents;
+    } catch (e) {
+      throw Exception("Could not retrieve fav events");
+    }
   }
 
   Future<Event> getEventfromDocId(String eventid) async {
-    DocumentSnapshot documentSnapshot = await events.doc(eventid).get();
-    Event event = Event.fromJson(documentSnapshot.data(), eventid);
-    return event;
+    try {
+      DocumentSnapshot documentSnapshot = await events.doc(eventid).get();
+      Event event = Event.fromJson(documentSnapshot.data(), eventid);
+      return event;
+    } catch (e) {
+      throw Exception("Could not get event");
+    }
   }
 
   Future<List<Event>> getInterestEvents(List interests) async {
-    QuerySnapshot querySnapshot =
-        await events.where('interest', whereIn: interests).get();
-    List<Event> interesteventlist = [];
-    querySnapshot.docs.forEach((element) {
-      interesteventlist.add(Event.fromJson(element.data(), element.id));
-    });
-    return interesteventlist;
+    try {
+      QuerySnapshot querySnapshot =
+          await events.where('interest', whereIn: interests).get();
+      List<Event> interesteventlist = [];
+      querySnapshot.docs.forEach((element) {
+        interesteventlist.add(Event.fromJson(element.data(), element.id));
+      });
+      return interesteventlist;
+    } catch (e) {
+      throw Exception("Could not retreive events");
+    }
   }
 
   Future<List<Event>> searchEvents(String searchquery) async {
-    QuerySnapshot querySnapshot = await events
-        .where('searchfield', arrayContains: searchquery.toLowerCase())
-        .get();
-    List<Event> eventsearchres = [];
-    querySnapshot.docs.forEach((element) {
-      eventsearchres.add(Event.fromJson(element.data(), element.id));
-    });
-    return eventsearchres;
+    try {
+      QuerySnapshot querySnapshot = await events
+          .where('searchfield', arrayContains: searchquery.toLowerCase())
+          .get();
+      List<Event> eventsearchres = [];
+      querySnapshot.docs.forEach((element) {
+        eventsearchres.add(Event.fromJson(element.data(), element.id));
+      });
+      return eventsearchres;
+    } catch (e) {
+      throw Exception("Could not search for events");
+    }
   }
 
   Future<List<AppUser>> searchUsers(String searchquery) async {
-    QuerySnapshot querySnapshot = await users
-        .where('searchfield', arrayContains: searchquery.toLowerCase())
-        .get();
-    List<AppUser> usersearches = [];
-    querySnapshot.docs.forEach((element) {
-      usersearches.add(AppUser.fromJson(element.data(), element.id));
-    });
+    try {
+      QuerySnapshot querySnapshot = await users
+          .where('searchfield', arrayContains: searchquery.toLowerCase())
+          .get();
+      List<AppUser> usersearches = [];
+      querySnapshot.docs.forEach((element) {
+        usersearches.add(AppUser.fromJson(element.data(), element.id));
+      });
 
-    return usersearches;
+      return usersearches;
+    } catch (e) {
+      throw Exception("Could not search for users");
+    }
   }
 
   Future<String> downloadBannerUrl(String interest) async {
-    String downloadBannerUrl = await FirebaseStorage.instance
-        .ref('/interest_banners/${interest.toLowerCase()}.jpeg')
-        .getDownloadURL();
-    return downloadBannerUrl;
+    try {
+      String downloadBannerUrl = await FirebaseStorage.instance
+          .ref('/interest_banners/${interest.toLowerCase()}.jpeg')
+          .getDownloadURL();
+      return downloadBannerUrl;
+    } catch (e) {
+      throw Exception("Could not retreive banner url");
+    }
   }
 
   Future<AppUser> getUserFromDocID(String docid) async {
-    DocumentSnapshot documentSnapshot = await users.doc(docid).get();
-    return AppUser.fromJson(documentSnapshot.data(), docid);
+    try {
+      DocumentSnapshot documentSnapshot = await users.doc(docid).get();
+      return AppUser.fromJson(documentSnapshot.data(), docid);
+    } catch (e) {
+      throw Exception("Could not retrieve user");
+    }
   }
 
   Future<void> Follow(String curruserdocid, String userdocid) async {
@@ -430,7 +492,7 @@ class db_conn {
       DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
       DocumentSnapshot userdoc = await users.doc(userdocid).get();
       List following = curruserdoc['following'];
-      List followers = userdoc['following'];
+      List followers = userdoc['followers'];
       following.add(userdocid);
       followers.add(curruserdocid);
       users.doc(curruserdocid).update({'following': following});
@@ -445,7 +507,7 @@ class db_conn {
       DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
       DocumentSnapshot userdoc = await users.doc(userdocid).get();
       List following = curruserdoc['following'];
-      List followers = userdoc['following'];
+      List followers = userdoc['followers'];
       following.removeWhere((element) => element == userdocid);
       followers.removeWhere((element) => element == curruserdocid);
       users.doc(curruserdocid).update({'following': following});

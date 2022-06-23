@@ -1,13 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
-import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/cupertino.dart';
 
 class HomeScreen extends StatefulWidget {
   List interests = [];
@@ -33,35 +29,59 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> interesteventlist = [];
   List userinterests = [];
 
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void getEventsList(interests) async {
-    List<Event> events = await db.getEvents(interests);
-    setState(() {
-      generaleventlist = events;
-    });
+    try {
+      List<Event> events = await db.getEvents(interests);
+      setState(() {
+        generaleventlist = events;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not retrieve events");
+    }
   }
 
   void getInterestEventsList(interests) async {
-    List<Event> interestevents = await db.getInterestEvents(interests);
-    setState(() {
-      interesteventlist = interestevents;
-    });
+    try {
+      List<Event> interestevents = await db.getInterestEvents(interests);
+      setState(() {
+        interesteventlist = interestevents;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not retrieve events");
+    }
   }
 
   Future<void> refreshevents() async {
-    print("refreshed");
-    List<Event> events = await db.getEvents(userinterests);
-    List<Event> interestevents = await db.getInterestEvents(userinterests);
-    setState(() {
-      generaleventlist = events;
-      interesteventlist = interestevents;
-    });
+    try {
+      List<Event> events = await db.getEvents(userinterests);
+      List<Event> interestevents = await db.getInterestEvents(userinterests);
+      setState(() {
+        generaleventlist = events;
+        interesteventlist = interestevents;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh events");
+    }
   }
 
   Future<void> updatecurruser() async {
-    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
-    setState(() {
-      widget.curruser = updateduser;
-    });
+    try {
+      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      setState(() {
+        widget.curruser = updateduser;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh user");
+    }
   }
 
   Future interactfav(Event event) async {
@@ -72,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await db.addToFav(widget.curruser.docid, event.docid);
       }
     } catch (e) {
-      print("Could not interact");
+      displayErrorSnackBar("Could not update favorites");
     } finally {
       updatecurruser();
     }
@@ -83,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await updatecurruser();
       await refreshevents();
     } catch (e) {
-      print("error");
+      displayErrorSnackBar("Could not refresh");
     }
   }
 
@@ -110,20 +130,24 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     Future<void> _navigate(Event event, int index) async {
-      List<AppUser> participants = [
-        for (String x in event.participants) await db.getUserFromDocID(x)
-      ];
+      try {
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromDocID(x)
+        ];
 
-      Event newevent = await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => EventDetailScreen(
-                    event: event,
-                    curruser: widget.curruser,
-                    participants: participants,
-                    interactfav: interactfav,
-                  )));
-      refreshevents();
+        Event newevent = await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => EventDetailScreen(
+                      event: event,
+                      curruser: widget.curruser,
+                      participants: participants,
+                      interactfav: interactfav,
+                    )));
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
+      refresh();
     }
 
     return Scaffold(

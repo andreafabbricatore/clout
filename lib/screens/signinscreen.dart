@@ -1,11 +1,7 @@
-import 'package:clout/components/event.dart';
 import 'package:clout/screens/loading.dart';
-import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {

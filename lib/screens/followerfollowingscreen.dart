@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/profilescreen.dart';
@@ -28,23 +27,41 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
   List<AppUser> followers = [];
   List<AppUser> following = [];
   db_conn db = db_conn();
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> getfollowerslist() async {
     followers = [];
-    for (int i = 0; i < widget.user.followers.length; i++) {
-      AppUser temp = await db.getUserFromDocID(widget.user.followers[i]);
-      setState(() {
-        followers.add(temp);
-      });
+    try {
+      for (int i = 0; i < widget.user.followers.length; i++) {
+        AppUser temp = await db.getUserFromDocID(widget.user.followers[i]);
+        setState(() {
+          followers.add(temp);
+        });
+      }
+    } catch (e) {
+      displayErrorSnackBar("Could not retrieve followers");
     }
   }
 
   Future<void> getfollowinglist() async {
     following = [];
-    for (int i = 0; i < widget.user.following.length; i++) {
-      AppUser temp = await db.getUserFromDocID(widget.user.following[i]);
-      setState(() {
-        following.add(temp);
-      });
+    try {
+      for (int i = 0; i < widget.user.following.length; i++) {
+        AppUser temp = await db.getUserFromDocID(widget.user.following[i]);
+        setState(() {
+          following.add(temp);
+        });
+      }
+    } catch (e) {
+      displayErrorSnackBar("Could not retrieve following");
     }
   }
 

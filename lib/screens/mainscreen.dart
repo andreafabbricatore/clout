@@ -1,17 +1,12 @@
 import 'package:clout/components/event.dart';
-import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/createeventscreen.dart';
-import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/favscreen.dart';
 import 'package:clout/screens/homescreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/screens/searchscreen.dart';
-import 'package:clout/services/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   List interests;
@@ -49,7 +44,9 @@ class _MainScreenState extends State<MainScreen> {
         curruser: widget.curruser,
       ),
       CreateEventScreen(),
-      FavScreen(),
+      FavScreen(
+        curruser: widget.curruser,
+      ),
       ProfileScreen(
         user: widget.curruser,
         curruser: widget.curruser,

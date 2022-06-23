@@ -1,6 +1,4 @@
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/editprofilescreen.dart';
-import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 
 class ProfileTopContainer extends StatelessWidget {

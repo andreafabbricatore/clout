@@ -3,9 +3,7 @@ import 'package:clout/components/searchgridview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/services/db.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:getwidget/getwidget.dart';
 import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -39,6 +37,15 @@ class _SearchScreenState extends State<SearchScreen> {
   FocusNode focusNode = FocusNode();
   Color suffixiconcolor = Colors.white;
 
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Widget _listviewitem(String banner, String interest) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15.0),
@@ -65,16 +72,20 @@ class _SearchScreenState extends State<SearchScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     Future<void> _searchnav(String interest) async {
-      List<Event> res = await db.getInterestEvents([interest]);
-      print(res);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => InterestSearchScreen(
-                    interest: interest,
-                    events: res,
-                    curruser: widget.curruser,
-                  )));
+      try {
+        List<Event> res = await db.getInterestEvents([interest]);
+        print(res);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => InterestSearchScreen(
+                      interest: interest,
+                      events: res,
+                      curruser: widget.curruser,
+                    )));
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
     }
 
     return Scaffold(
@@ -95,15 +106,23 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: searchcontroller,
               onChanged: (String searchquery) async {
                 if (searchevents) {
-                  List<Event> res = await db.searchEvents(searchquery);
-                  setState(() {
-                    searchedevents = res;
-                  });
+                  try {
+                    List<Event> res = await db.searchEvents(searchquery);
+                    setState(() {
+                      searchedevents = res;
+                    });
+                  } catch (e) {
+                    displayErrorSnackBar("Could not search events");
+                  }
                 } else {
-                  List<AppUser> res = await db.searchUsers(searchquery);
-                  setState(() {
-                    searchedusers = res;
-                  });
+                  try {
+                    List<AppUser> res = await db.searchUsers(searchquery);
+                    setState(() {
+                      searchedusers = res;
+                    });
+                  } catch (e) {
+                    displayErrorSnackBar("Could not search users");
+                  }
                 }
               },
               decoration: InputDecoration(
@@ -143,11 +162,15 @@ class _SearchScreenState extends State<SearchScreen> {
                           searchedusers = [];
                           searchevents = true;
                         });
-                        List<Event> res =
-                            await db.searchEvents(searchcontroller.text);
-                        setState(() {
-                          searchedevents = res;
-                        });
+                        try {
+                          List<Event> res =
+                              await db.searchEvents(searchcontroller.text);
+                          setState(() {
+                            searchedevents = res;
+                          });
+                        } catch (e) {
+                          displayErrorSnackBar("Could not search events");
+                        }
                       },
                       child: SizedBox(
                         height: screenheight * 0.035,
@@ -172,11 +195,15 @@ class _SearchScreenState extends State<SearchScreen> {
                           searchedevents = [];
                           searchevents = false;
                         });
-                        List<AppUser> res =
-                            await db.searchUsers(searchcontroller.text);
-                        setState(() {
-                          searchedusers = res;
-                        });
+                        try {
+                          List<AppUser> res =
+                              await db.searchUsers(searchcontroller.text);
+                          setState(() {
+                            searchedusers = res;
+                          });
+                        } catch (e) {
+                          displayErrorSnackBar("Could not search users");
+                        }
                       },
                       child: SizedBox(
                         height: screenheight * 0.035,

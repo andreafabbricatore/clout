@@ -2,7 +2,6 @@ import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/mainscreen.dart';
-import 'package:clout/screens/signupscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';

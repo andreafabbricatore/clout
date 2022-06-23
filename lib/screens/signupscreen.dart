@@ -3,12 +3,9 @@ import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/datetextfield.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/loading.dart';
-import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -24,8 +21,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final emailController = TextEditingController();
   final pswController = TextEditingController();
   db_conn db = db_conn();
-  String? error = "";
-  Color errorcolor = Colors.white;
   AppUser curruser = AppUser(
       username: "",
       uid: "",
@@ -43,6 +38,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       favorites: [],
       docid: "",
       clout: 0);
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -135,10 +140,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 if (emailController.text.isNotEmpty &&
                     pswController.text.isNotEmpty) {
                   setState(() {
-                    error = "";
-                    errorcolor = Colors.white;
-                  });
-                  setState(() {
                     curruser.email = emailController.text.trim();
                   });
                   Navigator.pushReplacement(
@@ -149,10 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   );
                 } else {
-                  setState(() {
-                    error = "Invalid email and/or password";
-                    errorcolor = Colors.red;
-                  });
+                  displayErrorSnackBar("Invalid email and/or password");
                 }
               },
               child: SizedBox(
@@ -170,12 +168,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   )),
             ),
             SizedBox(height: screenheight * 0.02),
-            Center(
-              child: Text(
-                error.toString(),
-                style: TextStyle(color: errorcolor),
-              ),
-            )
           ],
         ),
       ),
@@ -196,8 +188,15 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   ImagePicker picker = ImagePicker();
   var imagepath;
   db_conn db = db_conn();
-  String error = "";
-  Color errorcolor = Colors.white;
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -258,12 +257,6 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Center(
-            child: Text(
-              error,
-              style: TextStyle(color: errorcolor),
-            ),
-          )
         ],
       )),
       floatingActionButton: SizedBox(
@@ -274,8 +267,6 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
             if (imagepath.toString().isNotEmpty &&
                 fullnamecontroller.text.isNotEmpty) {
               setState(() {
-                error = "";
-                errorcolor = Colors.white;
                 widget.curruser.fullname = fullnamecontroller.text.trim();
               });
               Navigator.pushReplacement(
@@ -288,10 +279,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                 ),
               );
             } else {
-              setState(() {
-                error = "Invalid email and/or password";
-                errorcolor = Colors.red;
-              });
+              displayErrorSnackBar("Error with profile picture or full name");
             }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
@@ -322,8 +310,15 @@ class UsernameScreen extends StatefulWidget {
 class _UsernameScreenState extends State<UsernameScreen> {
   final usernamecontroller = TextEditingController();
   db_conn db = db_conn();
-  String error = "";
-  Color errorcolor = Colors.white;
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -353,12 +348,6 @@ class _UsernameScreenState extends State<UsernameScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Center(
-            child: Text(
-              error,
-              style: TextStyle(color: errorcolor),
-            ),
-          )
         ],
       )),
       floatingActionButton: SizedBox(
@@ -369,18 +358,12 @@ class _UsernameScreenState extends State<UsernameScreen> {
             bool uniqueness = await db.usernameUnique(usernamecontroller.text);
             if (!uniqueness && usernamecontroller.text.isNotEmpty) {
               setState(() {
-                error = "Username already taken";
-                errorcolor = Colors.red;
+                displayErrorSnackBar("Username already taken");
               });
             } else if (usernamecontroller.text.isEmpty) {
-              setState(() {
-                error = "Invalid Username";
-                errorcolor = Colors.red;
-              });
+              displayErrorSnackBar("Invalid Username");
             } else {
               setState(() {
-                error = "";
-                errorcolor = Colors.white;
                 widget.curruser.username = usernamecontroller.text.trim();
               });
               Navigator.pushReplacement(
@@ -423,8 +406,28 @@ class _MiscScreenState extends State<MiscScreen> {
   String gender = 'Male';
   String nationality = 'Australia';
   db_conn db = db_conn();
-  String error = "";
-  Color errorcolor = Colors.white;
+  List allinterests = [
+    "Sports",
+    "Nature",
+    "Music",
+    "Dance",
+    "Movies",
+    "Acting",
+    "Singing",
+    "Drinking",
+    "Food",
+    "Art"
+  ];
+  List interestpics = [];
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   var maskFormatter = new MaskTextInputFormatter(
       mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
   var genders = ['Male', 'Female', 'Non-Binary'];
@@ -678,6 +681,22 @@ class _MiscScreenState extends State<MiscScreen> {
     'Zambia',
     'Zimbabwe'
   ];
+  Future<void> getinterestpics() async {
+    List temp = [
+      for (String x in allinterests) await db.downloadBannerUrl(x.toLowerCase())
+    ];
+    setState(() {
+      interestpics = temp;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getinterestpics();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -763,12 +782,6 @@ class _MiscScreenState extends State<MiscScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Center(
-            child: Text(
-              error,
-              style: TextStyle(color: errorcolor),
-            ),
-          ),
         ],
       )),
       floatingActionButton: SizedBox(
@@ -778,8 +791,6 @@ class _MiscScreenState extends State<MiscScreen> {
           onPressed: () async {
             if (birthdaycontroller.text.isNotEmpty) {
               setState(() {
-                error = "";
-                errorcolor = Colors.white;
                 widget.curruser.birthday = birthdaycontroller.text;
                 widget.curruser.nationality = nationality;
                 widget.curruser.gender = gender;
@@ -788,16 +799,14 @@ class _MiscScreenState extends State<MiscScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (BuildContext context) => InterestScreen(
+                      interestpics: interestpics,
                       curruser: widget.curruser,
                       imagepath: widget.imagepath,
                       psw: widget.psw),
                 ),
               );
             } else {
-              setState(() {
-                error = "Please fill all fields";
-                errorcolor = Colors.red;
-              });
+              displayErrorSnackBar("Please fill all fields correctly");
             }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
@@ -816,17 +825,19 @@ class InterestScreen extends StatefulWidget {
       {Key? key,
       required this.curruser,
       required this.imagepath,
-      required this.psw})
+      required this.psw,
+      required this.interestpics})
       : super(key: key);
   AppUser curruser;
   String psw;
+  List interestpics;
   var imagepath;
   @override
   State<InterestScreen> createState() => _InterestScreenState();
 }
 
 class _InterestScreenState extends State<InterestScreen> {
-  List interests = [
+  List allinterests = [
     "Sports",
     "Nature",
     "Music",
@@ -842,6 +853,57 @@ class _InterestScreenState extends State<InterestScreen> {
   List<Color> cardcolors = List.filled(10, Colors.white);
   List selectedinterests = [];
   db_conn db = db_conn();
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Widget _listviewitem(String banner, String interest) {
+    return GestureDetector(
+      onTap: () {
+        if (selectedinterests.contains(interest)) {
+          setState(() {
+            selectedinterests.removeWhere((element) => element == interest);
+          });
+        } else {
+          setState(() {
+            selectedinterests.add(interest);
+          });
+        }
+      },
+      child: Container(
+          child: Center(
+              child: Text(
+            interest,
+            style: TextStyle(
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
+                color: selectedinterests.contains(interest)
+                    ? Color.fromARGB(255, 255, 48, 117)
+                    : Colors.white),
+          )),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15.0),
+            border: Border.all(
+                width: selectedinterests.contains(interest) ? 2 : 0,
+                color: selectedinterests.contains(interest)
+                    ? Color.fromARGB(255, 255, 48, 117)
+                    : Colors.black),
+            image: DecorationImage(
+                opacity: selectedinterests.contains(interest) ? 0.8 : 1,
+                image: NetworkImage(
+                  banner,
+                ),
+                fit: BoxFit.cover),
+          )),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -870,87 +932,70 @@ class _InterestScreenState extends State<InterestScreen> {
         elevation: 0.0,
         automaticallyImplyLeading: false,
       ),
-      body: GridView.builder(
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-          itemCount: interests.length,
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () {
-                if (textcolors[index] == Colors.white) {
-                  setState(() {
-                    cardcolors[index] = Colors.white;
-                    textcolors[index] = Color.fromARGB(255, 255, 48, 117);
-                  });
-                  selectedinterests
-                      .removeWhere((item) => item == interests[index]);
-                } else {
-                  setState(() {
-                    cardcolors[index] = Color.fromARGB(255, 255, 48, 117);
-                    textcolors[index] = Colors.white;
-                  });
-                  selectedinterests.add(interests[index]);
-                }
-              },
-              child: Card(
-                color: cardcolors[index],
-                shadowColor: Colors.black,
-                margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                        color: Color.fromARGB(255, 255, 48, 117), width: 1.0),
-                    borderRadius: BorderRadius.circular(40)),
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, bottom: 10, left: 10, right: 10),
-                  child: Center(
-                    child: Text(
-                      interests[index],
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: textcolors[index]),
-                    ),
-                  ),
-                ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: GridView.builder(
+                padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                shrinkWrap: true,
+                itemCount: allinterests.length,
+                itemBuilder: ((context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: _listviewitem(
+                        widget.interestpics[index], allinterests[index]),
+                  );
+                }),
               ),
-            );
-          }),
+            )
+          ],
+        ),
+      ),
       floatingActionButton: SizedBox(
         height: 70,
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            if (selectedinterests.length >= 3) {
-              setState(() {
-                widget.curruser.interests = selectedinterests;
-              });
+            try {
+              if (selectedinterests.length >= 3) {
+                setState(() {
+                  widget.curruser.interests = selectedinterests;
+                });
 
-              await context
-                  .read<AuthenticationService>()
-                  .signUp(email: widget.curruser.email, password: widget.psw);
-              String uid =
-                  context.read<AuthenticationService>().getuid().toString();
-              await db.createuserinstance(widget.curruser.email, uid);
-              await db.changepfp(widget.imagepath, uid);
-              await db.changeusername(widget.curruser.username, uid);
-              await db.changeattribute(
-                  'fullname', widget.curruser.fullname, uid);
-              await db.changeattribute('gender', widget.curruser.gender, uid);
-              await db.changeattribute(
-                  'nationality', widget.curruser.nationality, uid);
-              await db.changeattribute(
-                  'birthday', widget.curruser.birthday, uid);
-              await db.changeinterests(
-                  'interests', widget.curruser.interests, uid);
+                await context
+                    .read<AuthenticationService>()
+                    .signUp(email: widget.curruser.email, password: widget.psw);
+                String uid =
+                    context.read<AuthenticationService>().getuid().toString();
+                await db.createuserinstance(widget.curruser.email, uid);
+                await db.changepfp(widget.imagepath, uid);
+                await db.changeusername(widget.curruser.username, uid);
+                await db.changeattribute(
+                    'fullname', widget.curruser.fullname, uid);
+                await db.changeattribute('gender', widget.curruser.gender, uid);
+                await db.changeattribute(
+                    'nationality', widget.curruser.nationality, uid);
+                await db.changeattribute(
+                    'birthday', widget.curruser.birthday, uid);
+                await db.changeinterests(
+                    'interests', widget.curruser.interests, uid);
 
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      LoadingScreen(uid: uid, signup: true),
-                ),
-              );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        LoadingScreen(uid: uid, signup: true),
+                  ),
+                );
+              } else {
+                displayErrorSnackBar("Choose at least 3 interests");
+              }
+            } catch (e) {
+              displayErrorSnackBar("Could not create user");
             }
           },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),

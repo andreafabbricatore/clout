@@ -26,6 +26,15 @@ class SearchBarListView extends StatefulWidget {
 class _SearchBarListViewState extends State<SearchBarListView> {
   db_conn db = db_conn();
 
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: Duration(seconds: 2),
+    );
+    await Future.delayed(Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> updatecurruser() async {
     AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
     setState(() {
@@ -41,7 +50,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         await db.addToFav(widget.curruser.docid, event.docid);
       }
     } catch (e) {
-      print("Could not interact");
+      displayErrorSnackBar("Could not update favorites");
     } finally {
       updatecurruser();
     }
@@ -72,7 +81,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
           widget.eventres[index] = newevent;
         });
       } catch (e) {
-        print("error");
+        displayErrorSnackBar("Could not refresh");
       }
     }
 
