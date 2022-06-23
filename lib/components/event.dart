@@ -10,6 +10,7 @@ class Event {
   int maxparticipants;
   List participants;
   String host;
+  String docid;
 
   Event(
       {required this.title,
@@ -20,9 +21,10 @@ class Event {
       required this.host,
       required this.maxparticipants,
       required this.participants,
-      required this.datetime});
+      required this.datetime,
+      required this.docid});
 
-  factory Event.fromJson(dynamic json) {
+  factory Event.fromJson(dynamic json, String docid) {
     return Event(
       title: json['title'],
       description: json['description'],
@@ -33,6 +35,7 @@ class Event {
       maxparticipants: json['maxparticipants'] as int,
       participants: json['participants'] as List,
       datetime: json['time'].toDate(),
+      docid: docid,
     );
   }
 }

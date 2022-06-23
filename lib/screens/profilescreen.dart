@@ -41,8 +41,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool joinedevents = true;
   List<Event> joined_events = [];
   List<Event> hosted_events = [];
-  String userdocid = "";
-  String curruserdocid = "";
 
   Future<void> refresh() async {
     try {
@@ -56,14 +54,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> updateuser() async {
-    AppUser updateduser = await db.getUserFromDocID(userdocid);
+    AppUser updateduser = await db.getUserFromDocID(widget.user.docid);
     setState(() {
       widget.user = updateduser;
     });
   }
 
   Future<void> updatecurruser() async {
-    AppUser updateduser = await db.getUserFromDocID(curruserdocid);
+    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
     setState(() {
       widget.curruser = updateduser;
     });
@@ -84,20 +82,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         hosted_events = temp;
       });
     }
-  }
-
-  Future<void> getuserid(String uid) async {
-    String id = await db.getUserDocID(widget.user.uid);
-    setState(() {
-      userdocid = id;
-    });
-  }
-
-  Future<void> getcurruserid(String uid) async {
-    String id = await db.getUserDocID(widget.curruser.uid);
-    setState(() {
-      curruserdocid = id;
-    });
   }
 
   void editprofile() async {
@@ -140,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> follow() async {
     try {
-      await db.Follow(curruserdocid, userdocid);
+      await db.Follow(widget.curruser.docid, widget.user.docid);
       refresh();
     } catch (e) {
       print("error");
@@ -149,16 +133,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> unfollow() async {
     try {
-      await db.unFollow(curruserdocid, userdocid);
+      await db.unFollow(widget.curruser.docid, widget.user.docid);
       refresh();
     } catch (e) {
       print("error");
     }
   }
 
+  Future interactfav(Event event) async {
+    try {
+      if (widget.curruser.favorites.contains(event.docid)) {
+        await db.remFromFav(widget.curruser.docid, event.docid);
+      } else {
+        await db.addToFav(widget.curruser.docid, event.docid);
+      }
+    } catch (e) {
+      print("Could not interact");
+    } finally {
+      updatecurruser();
+    }
+  }
+
   Future<void> init() async {
-    await getuserid(widget.user.uid);
-    await getcurruserid(widget.curruser.uid);
     updateuser();
     updatecurruser();
     geteventlist(widget.user.joined_events, true);
@@ -178,25 +174,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     Future<void> _navigate(Event event, int index) async {
-      List pfpurls = [];
-      List usernames = [];
-      for (int i = 0; i < event.participants.length; i++) {
-        AppUser temp = await db.getUserFromDocID(event.participants[i]);
-        setState(() {
-          pfpurls.add(temp.pfp_url);
-          usernames.add(temp.username);
-        });
-      }
+      List<AppUser> participants = [
+        for (String x in event.participants) await db.getUserFromDocID(x)
+      ];
 
       Event newevent = await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => EventDetailScreen(
                     event: event,
-                    pfp_urls: pfpurls,
-                    userdocid: curruserdocid,
                     curruser: widget.curruser,
-                    usernames: usernames,
+                    participants: participants,
+                    interactfav: interactfav,
                   )));
       refresh();
     }
@@ -280,13 +269,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           user: widget.user,
           iscurruser: widget.iscurruser,
           curruser: widget.curruser,
-          curruserdocid: curruserdocid,
-          userdocid: userdocid,
           editprofile: editprofile,
           followerscreen: followerscreen,
           followingscreen: followingscreen,
-          follow:
-              widget.curruser.following.contains(userdocid) ? unfollow : follow,
+          follow: widget.curruser.following.contains(widget.user.docid)
+              ? unfollow
+              : follow,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -350,6 +338,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onTap: _navigate,
           scrollable: true,
           leftpadding: true,
+          curruser: widget.curruser,
+          interactfav: interactfav,
         ),
       ]),
     );

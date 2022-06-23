@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
-  String docid;
   List interests;
   List<Event> eventlist;
   List<Event> interesteventlist;
@@ -22,7 +21,6 @@ class MainScreen extends StatefulWidget {
   AppUser curruser;
   MainScreen(
       {Key? key,
-      required this.docid,
       required this.interests,
       required this.eventlist,
       required this.interesteventlist,
@@ -40,7 +38,6 @@ class _MainScreenState extends State<MainScreen> {
   void parampasser(bool updatehome) {
     Page = [
       HomeScreen(
-        docid: widget.docid,
         curruser: widget.curruser,
         interests: widget.interests,
         eventlist: widget.eventlist,
@@ -49,7 +46,6 @@ class _MainScreenState extends State<MainScreen> {
       ),
       SearchScreen(
         interestpics: widget.interestpics,
-        userdocid: widget.docid,
         curruser: widget.curruser,
       ),
       CreateEventScreen(),

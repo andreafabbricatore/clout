@@ -50,7 +50,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         context,
         MaterialPageRoute(
           builder: (BuildContext context) => MainScreen(
-              docid: docid,
               interests: interests,
               eventlist: eventlist,
               interesteventlist: interesteventlist,

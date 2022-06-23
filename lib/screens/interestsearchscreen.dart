@@ -12,12 +12,10 @@ class InterestSearchScreen extends StatefulWidget {
       {Key? key,
       required this.interest,
       required this.events,
-      required this.userdocid,
       required this.curruser})
       : super(key: key);
   String interest;
   List<Event> events;
-  String userdocid;
   AppUser curruser;
 
   @override
@@ -27,28 +25,42 @@ class InterestSearchScreen extends StatefulWidget {
 class _InterestSearchScreenState extends State<InterestSearchScreen> {
   db_conn db = db_conn();
 
+  Future<void> updatecurruser() async {
+    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+    setState(() {
+      widget.curruser = updateduser;
+    });
+  }
+
+  Future interactfav(Event event) async {
+    try {
+      if (widget.curruser.favorites.contains(event.docid)) {
+        await db.remFromFav(widget.curruser.docid, event.docid);
+      } else {
+        await db.addToFav(widget.curruser.docid, event.docid);
+      }
+    } catch (e) {
+      print("Could not interact");
+    } finally {
+      updatecurruser();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<void> _navigate(Event event, int index) async {
-      List pfpurls = [];
-      List usernames = [];
-      for (int i = 0; i < event.participants.length; i++) {
-        AppUser temp = await db.getUserFromDocID(event.participants[i]);
-        setState(() {
-          pfpurls.add(temp.pfp_url);
-          usernames.add(temp.username);
-        });
-      }
+      List<AppUser> participants = [
+        for (String x in event.participants) await db.getUserFromDocID(x)
+      ];
 
       Event newevent = await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => EventDetailScreen(
                     event: event,
-                    pfp_urls: pfpurls,
-                    userdocid: widget.userdocid,
                     curruser: widget.curruser,
-                    usernames: usernames,
+                    participants: participants,
+                    interactfav: interactfav,
                   )));
       try {
         int index = widget.events.indexWhere((element) => element == event);
@@ -99,6 +111,8 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
               onTap: _navigate,
               scrollable: true,
               leftpadding: false,
+              curruser: widget.curruser,
+              interactfav: interactfav,
             )
           ],
         ),

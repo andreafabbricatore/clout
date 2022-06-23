@@ -9,8 +9,6 @@ class ProfileTopContainer extends StatelessWidget {
       required this.user,
       required this.curruser,
       required this.iscurruser,
-      required this.curruserdocid,
-      required this.userdocid,
       required this.follow,
       required this.editprofile,
       required this.followerscreen,
@@ -18,8 +16,6 @@ class ProfileTopContainer extends StatelessWidget {
       : super(key: key);
   AppUser user;
   AppUser curruser;
-  String curruserdocid;
-  String userdocid;
   bool iscurruser;
   final VoidCallback follow;
   final VoidCallback editprofile;
@@ -124,7 +120,7 @@ class ProfileTopContainer extends StatelessWidget {
                         },
                         child: Container(
                           height: screenheight * 0.03,
-                          width: curruser.following.contains(userdocid)
+                          width: curruser.following.contains(user.docid)
                               ? screenwidth * 0.3
                               : screenwidth * 0.2,
                           decoration: BoxDecoration(
@@ -134,7 +130,7 @@ class ProfileTopContainer extends StatelessWidget {
                                   color: Color.fromARGB(161, 158, 158, 158))),
                           child: Center(
                               child: Text(
-                            curruser.following.contains(userdocid)
+                            curruser.following.contains(user.docid)
                                 ? "Stop Following"
                                 : "Follow",
                             style: TextStyle(fontSize: 15),

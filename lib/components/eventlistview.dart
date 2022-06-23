@@ -1,4 +1,6 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/user.dart';
+import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -10,15 +12,20 @@ class EventListView extends StatelessWidget {
   final List<Event> eventList;
   bool scrollable;
   bool leftpadding;
+  AppUser curruser;
+  final Function(Event event) interactfav;
   EventListView(
       {Key? key,
       this.isHorizontal = true,
       this.onTap,
       required this.eventList,
       required this.scrollable,
-      required this.leftpadding})
+      required this.leftpadding,
+      required this.curruser,
+      required this.interactfav})
       : super(key: key);
 
+  db_conn db = db_conn();
   Widget _eventImage(String image) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15.0),
@@ -31,7 +38,10 @@ class EventListView extends StatelessWidget {
     );
   }
 
-  Widget _listViewItem(Event event, int index) {
+  Widget _listViewItem(
+    Event event,
+    int index,
+  ) {
     Widget widget;
     widget = isHorizontal == true
         ? Column(
@@ -91,7 +101,15 @@ class EventListView extends StatelessWidget {
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black)),
-                          Icon(Icons.bookmark_border),
+                          InkWell(
+                            onTap: () async {
+                              await interactfav(event);
+                              print("Done");
+                            },
+                            child: Icon(curruser.favorites.contains(event.docid)
+                                ? Icons.bookmark
+                                : Icons.bookmark_border),
+                          ),
                         ],
                       ),
                       Text(event.interest,

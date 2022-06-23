@@ -14,12 +14,10 @@ class SearchBarListView extends StatefulWidget {
       required this.searchevents,
       required this.eventres,
       required this.userres,
-      required this.userdocid,
       required this.curruser});
   bool searchevents;
   List<Event> eventres;
   List<AppUser> userres;
-  String userdocid;
   AppUser curruser;
   @override
   State<SearchBarListView> createState() => _SearchBarListViewState();
@@ -28,29 +26,44 @@ class SearchBarListView extends StatefulWidget {
 class _SearchBarListViewState extends State<SearchBarListView> {
   db_conn db = db_conn();
 
+  Future<void> updatecurruser() async {
+    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+    setState(() {
+      widget.curruser = updateduser;
+    });
+  }
+
+  Future interactfav(Event event) async {
+    try {
+      if (widget.curruser.favorites.contains(event.docid)) {
+        await db.remFromFav(widget.curruser.docid, event.docid);
+      } else {
+        await db.addToFav(widget.curruser.docid, event.docid);
+      }
+    } catch (e) {
+      print("Could not interact");
+    } finally {
+      updatecurruser();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     Future<void> _eventnavigate(Event event, int index) async {
-      List pfpurls = [];
-      List usernames = [];
-      for (int i = 0; i < event.participants.length; i++) {
-        AppUser temp = await db.getUserFromDocID(event.participants[i]);
-        setState(() {
-          pfpurls.add(temp.pfp_url);
-          usernames.add(temp.username);
-        });
-      }
+      List<AppUser> participants = [
+        for (String x in event.participants) await db.getUserFromDocID(x)
+      ];
+
       Event newevent = await Navigator.push(
           context,
-          CupertinoPageRoute(
+          MaterialPageRoute(
               builder: (_) => EventDetailScreen(
                     event: event,
-                    pfp_urls: pfpurls,
-                    userdocid: widget.userdocid,
                     curruser: widget.curruser,
-                    usernames: usernames,
+                    participants: participants,
+                    interactfav: interactfav,
                   )));
 
       try {
@@ -83,6 +96,8 @@ class _SearchBarListViewState extends State<SearchBarListView> {
             isHorizontal: false,
             scrollable: true,
             leftpadding: false,
+            curruser: widget.curruser,
+            interactfav: interactfav,
           )
         : UserListView(
             userres: widget.userres,

@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 class HomeScreen extends StatefulWidget {
-  String docid;
   List interests = [];
   List<Event> eventlist = [];
   List<Event> interestevents = [];
@@ -18,7 +17,6 @@ class HomeScreen extends StatefulWidget {
   AppUser curruser;
   HomeScreen(
       {Key? key,
-      required this.docid,
       required this.interests,
       required this.eventlist,
       required this.interestevents,
@@ -31,7 +29,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   db_conn db = db_conn();
-  String userdocid = "";
   List<Event> generaleventlist = [];
   List<Event> interesteventlist = [];
   List userinterests = [];
@@ -60,10 +57,39 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> updatecurruser() async {
+    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+    setState(() {
+      widget.curruser = updateduser;
+    });
+  }
+
+  Future interactfav(Event event) async {
+    try {
+      if (widget.curruser.favorites.contains(event.docid)) {
+        await db.remFromFav(widget.curruser.docid, event.docid);
+      } else {
+        await db.addToFav(widget.curruser.docid, event.docid);
+      }
+    } catch (e) {
+      print("Could not interact");
+    } finally {
+      updatecurruser();
+    }
+  }
+
+  Future<void> refresh() async {
+    try {
+      await updatecurruser();
+      await refreshevents();
+    } catch (e) {
+      print("error");
+    }
+  }
+
   @override
   void initState() {
     generaleventlist = widget.eventlist;
-    userdocid = widget.docid;
     userinterests = widget.interests;
     interesteventlist = widget.interestevents;
     if (generaleventlist.isEmpty) {
@@ -73,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
       getInterestEventsList(userinterests);
     }
     if (widget.updatehome) {
-      refreshevents();
+      refresh();
     }
     super.initState();
   }
@@ -84,25 +110,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     Future<void> _navigate(Event event, int index) async {
-      List pfpurls = [];
-      List usernames = [];
-      for (int i = 0; i < event.participants.length; i++) {
-        AppUser temp = await db.getUserFromDocID(event.participants[i]);
-        setState(() {
-          pfpurls.add(temp.pfp_url);
-          usernames.add(temp.username);
-        });
-      }
+      List<AppUser> participants = [
+        for (String x in event.participants) await db.getUserFromDocID(x)
+      ];
 
       Event newevent = await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => EventDetailScreen(
                     event: event,
-                    pfp_urls: pfpurls,
-                    userdocid: widget.docid,
                     curruser: widget.curruser,
-                    usernames: usernames,
+                    participants: participants,
+                    interactfav: interactfav,
                   )));
       refreshevents();
     }
@@ -124,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           InkWell(
             onTap: () {
-              refreshevents();
+              refresh();
             },
             child: Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
@@ -144,15 +163,15 @@ class _HomeScreenState extends State<HomeScreen> {
             InkWell(
               onTap: () async {
                 await db.createevent(
-                    "HIIT",
-                    "Working out till we can",
-                    "Dance",
-                    "McFit",
+                    "Baking",
+                    "Making cakes then eating them",
+                    "Food",
+                    "Cracco restaurant duomo",
                     widget.curruser.username,
                     DateTime(2022, 9, 7, 17, 30),
                     3,
                     widget.curruser,
-                    widget.docid);
+                    widget.curruser.docid);
               },
               child: Text(
                 "Suggested",
@@ -169,6 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: _navigate,
               scrollable: true,
               leftpadding: false,
+              curruser: widget.curruser,
+              interactfav: interactfav,
             ),
             Text("Popular",
                 style: TextStyle(
@@ -182,6 +203,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: _navigate,
               scrollable: true,
               leftpadding: false,
+              curruser: widget.curruser,
+              interactfav: interactfav,
             )
           ],
         ),

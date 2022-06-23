@@ -40,6 +40,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       birthday: "",
       followers: [],
       following: [],
+      favorites: [],
+      docid: "",
       clout: 0);
   @override
   Widget build(BuildContext context) {

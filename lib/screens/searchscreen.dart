@@ -9,13 +9,8 @@ import 'package:getwidget/getwidget.dart';
 import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen(
-      {super.key,
-      required this.interestpics,
-      required this.userdocid,
-      required this.curruser});
+  SearchScreen({super.key, required this.interestpics, required this.curruser});
   List interestpics;
-  String userdocid;
   AppUser curruser;
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -78,7 +73,6 @@ class _SearchScreenState extends State<SearchScreen> {
               builder: (_) => InterestSearchScreen(
                     interest: interest,
                     events: res,
-                    userdocid: widget.userdocid,
                     curruser: widget.curruser,
                   )));
     }
@@ -209,7 +203,6 @@ class _SearchScreenState extends State<SearchScreen> {
                   searchevents: searchevents,
                   eventres: searchedevents,
                   userres: searchedusers,
-                  userdocid: widget.userdocid,
                   curruser: widget.curruser,
                 )
               : SearchGridView(

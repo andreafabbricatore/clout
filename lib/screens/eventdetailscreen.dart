@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/auth.dart';
@@ -16,16 +17,13 @@ class EventDetailScreen extends StatefulWidget {
   EventDetailScreen(
       {super.key,
       required this.event,
-      required this.pfp_urls,
-      required this.userdocid,
       required this.curruser,
-      required this.usernames});
+      required this.participants,
+      required this.interactfav});
   Event event;
-  List pfp_urls;
-  String userdocid;
   AppUser curruser;
-  List usernames;
-
+  List<AppUser> participants;
+  final Function(Event event) interactfav;
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
 }
@@ -33,51 +31,65 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
-  String? eventid;
+
   String error = "Error";
   String joinedval = "Join";
+
+  Future<void> updatecurruser() async {
+    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+    setState(() {
+      widget.curruser = updateduser;
+    });
+  }
+
   void checkifjoined() async {
-    if (widget.event.participants.contains(widget.curruser.username)) {
+    bool found = false;
+    for (int i = 0; i < widget.participants.length; i++) {
+      if (widget.participants[i].username == widget.curruser.username) {
+        setState(() {
+          found = true;
+          joined = true;
+        });
+      }
+    }
+    if (found) {
       if (widget.curruser.username == widget.event.host) {
         setState(() {
-          joined = true;
-          joinedval = "Delete event";
+          joinedval = "Delete Event";
         });
       } else {
         setState(() {
-          joined = true;
           joinedval = "Leave";
         });
       }
     } else {
-      if (widget.event.participants.length == widget.event.maxparticipants) {
+      setState(() {
+        joined = false;
+      });
+      if (widget.event.maxparticipants == widget.participants.length) {
         setState(() {
-          joined = false;
           joinedval = "Full";
         });
       } else {
         setState(() {
-          joined = false;
           joinedval = "Join";
         });
       }
     }
   }
 
-  void datagetter() async {
-    eventid = await db.geteventdocid(widget.event);
-  }
-
   void updatescreen(eventid) async {
     Event updatedevent = await db.getEventfromDocId(eventid);
-    List urls = [
-      for (String x in updatedevent.participants)
-        await db.getUserPFPfromUsername(x)
-    ];
     setState(() {
       widget.event = updatedevent;
-      widget.pfp_urls = urls;
     });
+    List<AppUser> temp = [
+      for (String x in widget.event.participants) await db.getUserFromDocID(x)
+    ];
+    setState(() {
+      widget.participants = temp;
+    });
+
     checkifjoined();
   }
 
@@ -88,8 +100,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
     if (!joined && joinedval == "Join") {
       try {
-        await db.joinevent(
-            widget.event, widget.curruser, widget.userdocid, eventid);
+        await db.joinevent(widget.event, widget.curruser, widget.curruser.docid,
+            widget.event.docid);
       } catch (e) {
         setState(() {
           error = e.toString();
@@ -97,13 +109,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await Future.delayed(Duration(milliseconds: 400));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } finally {
-        updatescreen(eventid);
+        updatescreen(widget.event.docid);
       }
     } else if (!joined && joinedval == "Full") {
       print("full");
-    } else if (joined && joinedval == "Delete event") {
+    } else if (joined && joinedval == "Delete Event") {
       try {
-        await db.deleteevent(widget.userdocid, eventid, widget.event.host);
+        await db.deleteevent(
+            widget.curruser.docid, widget.event.docid, widget.event.host);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) => LoadingScreen(
@@ -119,12 +132,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         });
         await Future.delayed(Duration(milliseconds: 400));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        updatescreen(eventid);
+        updatescreen(widget.event.docid);
       }
     } else {
       try {
-        await db.leaveevent(
-            widget.event, widget.curruser, widget.userdocid, eventid);
+        await db.leaveevent(widget.event, widget.curruser,
+            widget.curruser.docid, widget.event.docid);
       } catch (e) {
         setState(() {
           error = e.toString();
@@ -132,7 +145,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await Future.delayed(Duration(seconds: 1));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } finally {
-        updatescreen(eventid);
+        updatescreen(widget.event.docid);
       }
     }
   }
@@ -140,53 +153,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    datagetter();
     checkifjoined();
     super.initState();
-  }
-
-  Widget _listviewitem(String username, String pfp_url, String docid) {
-    return InkWell(
-      onTap: () async {
-        AppUser user = await db.getUserFromDocID(docid);
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-                builder: (_) => ProfileScreen(
-                      user: user,
-                      curruser: widget.curruser,
-                      visit: true,
-                      interestpics: [],
-                      interests: [],
-                    )));
-      },
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
-            child: SizedBox(
-              height: 30,
-              width: 30,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(100.0),
-                child: Image.network(
-                  pfp_url,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-          Text(
-            "@$username",
-            style: TextStyle(
-                fontSize: 18,
-                color: widget.curruser.username == username
-                    ? Color.fromARGB(255, 255, 48, 117)
-                    : Colors.black),
-          )
-        ],
-      ),
-    );
   }
 
   @override
@@ -194,6 +162,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     print(joined);
+    Future<void> _usernavigate(AppUser user, int index) async {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => ProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    interestpics: [],
+                    interests: [],
+                  )));
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -208,6 +189,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             color: Color.fromARGB(255, 255, 48, 117),
           ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: () async {
+              await widget.interactfav(widget.event);
+              updatecurruser();
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+              child: Icon(
+                widget.curruser.favorites.contains(widget.event.docid)
+                    ? Icons.bookmark
+                    : Icons.bookmark_border,
+                color: Colors.black,
+              ),
+            ),
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -252,7 +250,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     fontWeight: FontWeight.bold),
               ),
               InkWell(
-                onTap: () {},
+                onTap: () async {
+                  String hostdocid =
+                      await db.getUserDocIDfromUsername(widget.event.host);
+                  AppUser eventhost = await db.getUserFromDocID(hostdocid);
+                  _usernavigate(eventhost, 0);
+                },
                 child: Text(
                   "@${widget.event.host}",
                   style: TextStyle(
@@ -303,17 +306,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           SizedBox(
             height: screenheight * 0.01,
           ),
-          ListView.builder(
-              shrinkWrap: true,
-              itemCount: widget.event.participants.length,
-              itemBuilder: (_, index) {
-                return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-                  child: _listviewitem(widget.usernames[index],
-                      widget.pfp_urls[index], widget.event.participants[index]),
-                );
-              }),
+          SizedBox(
+            height: screenheight * 0.09 * widget.participants.length,
+            width: screenwidth,
+            child: Column(
+              children: [
+                UserListView(
+                  userres: widget.participants,
+                  curruser: widget.curruser,
+                  onTap: _usernavigate,
+                ),
+              ],
+            ),
+          ),
           SizedBox(
             height: screenheight * 0.02,
           ),
