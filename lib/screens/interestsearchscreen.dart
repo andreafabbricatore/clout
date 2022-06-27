@@ -58,6 +58,27 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
     }
   }
 
+  Future<void> refreshevents() async {
+    try {
+      List<Event> interestevents =
+          await db.getInterestEvents([widget.interest]);
+      setState(() {
+        widget.events = interestevents;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh events");
+    }
+  }
+
+  Future<void> refresh() async {
+    try {
+      await updatecurruser();
+      await refreshevents();
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<void> _navigate(Event event, int index) async {
@@ -75,14 +96,10 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                       participants: participants,
                       interactfav: interactfav,
                     )));
-
-        int index = widget.events.indexWhere((element) => element == event);
-        setState(() {
-          widget.events[index] = newevent;
-        });
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
+      refresh();
     }
 
     return Scaffold(

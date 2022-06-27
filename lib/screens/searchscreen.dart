@@ -29,6 +29,13 @@ class _SearchScreenState extends State<SearchScreen> {
     "Art"
   ];
 
+  Future<void> updatecurruser() async {
+    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+    setState(() {
+      widget.curruser = updateduser;
+    });
+  }
+
   List<Event> searchedevents = [];
   List<AppUser> searchedusers = [];
   TextEditingController searchcontroller = TextEditingController();
@@ -111,6 +118,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     setState(() {
                       searchedevents = res;
                     });
+                    updatecurruser();
                   } catch (e) {
                     displayErrorSnackBar("Could not search events");
                   }
@@ -120,6 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     setState(() {
                       searchedusers = res;
                     });
+                    updatecurruser();
                   } catch (e) {
                     displayErrorSnackBar("Could not search users");
                   }
@@ -130,12 +139,17 @@ class _SearchScreenState extends State<SearchScreen> {
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   suffixIcon: InkWell(
                       onTap: () {
-                        setState(() {
-                          searching = false;
-                          suffixiconcolor = Colors.white;
-                        });
-                        searchcontroller.clear();
-                        FocusScope.of(context).unfocus();
+                        if (searchcontroller.text.isNotEmpty) {
+                          searchcontroller.clear();
+                        } else {
+                          setState(() {
+                            searching = false;
+                            suffixiconcolor = Colors.white;
+                            searchedusers = [];
+                            searchedevents = [];
+                          });
+                          FocusScope.of(context).unfocus();
+                        }
                       },
                       child: Icon(Icons.close, color: suffixiconcolor)),
                   contentPadding: const EdgeInsets.all(20),
@@ -168,6 +182,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           setState(() {
                             searchedevents = res;
                           });
+                          updatecurruser();
                         } catch (e) {
                           displayErrorSnackBar("Could not search events");
                         }
@@ -201,6 +216,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           setState(() {
                             searchedusers = res;
                           });
+                          updatecurruser();
                         } catch (e) {
                           displayErrorSnackBar("Could not search users");
                         }
@@ -231,6 +247,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   eventres: searchedevents,
                   userres: searchedusers,
                   curruser: widget.curruser,
+                  query: searchcontroller.text,
                 )
               : SearchGridView(
                   interests: interests,

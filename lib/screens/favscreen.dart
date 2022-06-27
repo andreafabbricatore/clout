@@ -82,7 +82,7 @@ class _FavScreenState extends State<FavScreen> {
           for (String x in event.participants) await db.getUserFromDocID(x)
         ];
 
-        Event newevent = await Navigator.push(
+        await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (_) => EventDetailScreen(

@@ -5,6 +5,42 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
+extension FirestoreDocumentExtension on DocumentReference {
+  Future<DocumentSnapshot> getSavy() async {
+    try {
+      DocumentSnapshot ds = await this.get(GetOptions(source: Source.cache));
+      if (ds == null) {
+        print("server");
+        return this.get(GetOptions(source: Source.server));
+      } else {
+        print("cache");
+      }
+      return ds;
+    } catch (_) {
+      return this.get(GetOptions(source: Source.server));
+    }
+  }
+}
+
+// https://github.com/furkansarihan/firestore_collection/blob/master/lib/firestore_query.dart
+extension FirestoreQueryExtension on Query {
+  Future<QuerySnapshot> getSavy() async {
+    try {
+      QuerySnapshot qs = await this.get(GetOptions(source: Source.cache));
+
+      if (qs.docs.isEmpty) {
+        print("server");
+        return this.get(GetOptions(source: Source.server));
+      } else {
+        print("cache");
+      }
+      return qs;
+    } catch (_) {
+      return this.get(GetOptions(source: Source.server));
+    }
+  }
+}
+
 class db_conn {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection('users');
@@ -305,7 +341,7 @@ class db_conn {
   Future<String> getUserPFPfromUsername(String username) async {
     String pfp_url = "";
     try {
-      await users.get().then((QuerySnapshot querySnapshot) => {
+      await users.getSavy().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
               if (doc["username"] == username) {
                 pfp_url = doc["pfp_url"];
@@ -440,7 +476,7 @@ class db_conn {
     try {
       QuerySnapshot querySnapshot = await events
           .where('searchfield', arrayContains: searchquery.toLowerCase())
-          .get();
+          .getSavy();
       List<Event> eventsearchres = [];
       querySnapshot.docs.forEach((element) {
         eventsearchres.add(Event.fromJson(element.data(), element.id));
@@ -455,7 +491,7 @@ class db_conn {
     try {
       QuerySnapshot querySnapshot = await users
           .where('searchfield', arrayContains: searchquery.toLowerCase())
-          .get();
+          .getSavy();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
         usersearches.add(AppUser.fromJson(element.data(), element.id));

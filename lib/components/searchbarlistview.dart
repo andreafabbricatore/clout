@@ -14,11 +14,13 @@ class SearchBarListView extends StatefulWidget {
       required this.searchevents,
       required this.eventres,
       required this.userres,
-      required this.curruser});
+      required this.curruser,
+      required this.query});
   bool searchevents;
   List<Event> eventres;
   List<AppUser> userres;
   AppUser curruser;
+  String query;
   @override
   State<SearchBarListView> createState() => _SearchBarListViewState();
 }
@@ -42,6 +44,34 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     });
   }
 
+  Future<void> refresh() async {
+    try {
+      await updatecurruser();
+      await refreshsearch();
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh");
+    }
+  }
+
+  Future<void> refreshsearch() async {
+    try {
+      await updatecurruser();
+      if (widget.searchevents) {
+        List<Event> temp = await db.searchEvents(widget.query);
+        setState(() {
+          widget.eventres = temp;
+        });
+      } else {
+        List<AppUser> temp = await db.searchUsers(widget.query);
+        setState(() {
+          widget.userres = temp;
+        });
+      }
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh events");
+    }
+  }
+
   Future interactfav(Event event) async {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
@@ -57,32 +87,33 @@ class _SearchBarListViewState extends State<SearchBarListView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     Future<void> _eventnavigate(Event event, int index) async {
-      List<AppUser> participants = [
-        for (String x in event.participants) await db.getUserFromDocID(x)
-      ];
-
-      Event newevent = await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => EventDetailScreen(
-                    event: event,
-                    curruser: widget.curruser,
-                    participants: participants,
-                    interactfav: interactfav,
-                  )));
-
       try {
-        int index = widget.eventres.indexWhere((element) => element == event);
-        setState(() {
-          widget.eventres[index] = newevent;
-        });
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromDocID(x)
+        ];
+
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => EventDetailScreen(
+                      event: event,
+                      curruser: widget.curruser,
+                      participants: participants,
+                      interactfav: interactfav,
+                    )));
       } catch (e) {
         displayErrorSnackBar("Could not refresh");
       }
+      refresh();
     }
 
     Future<void> _usernavigate(AppUser user, int index) async {
