@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "755358505825",
+    "project_id": "clout-1108",
+    "storage_bucket": "clout-1108.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755358505825:android:91cf638d4c85a2977e8320",
+        "android_client_info": {
+          "package_name": "com.clout.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755358505825-lfrsn6fugcmr8uq7kqchnvoenahe4lcs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6tMw-OTKZi-fi0vLxuGs2uHTi8GBpEQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755358505825-lfrsn6fugcmr8uq7kqchnvoenahe4lcs.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "755358505825-32atog8tihoku0f09uii3ju2f8gv05fr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.clout.com"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
