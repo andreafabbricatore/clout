@@ -26,10 +26,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _index = 0;
-  List Page = [];
+  List page = [];
 
   void parampasser(bool updatehome) {
-    Page = [
+    page = [
       HomeScreen(
         curruser: widget.curruser,
         interests: widget.interests,
@@ -64,7 +64,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Page[_index],
+      body: page[_index],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: (newIndex) {
@@ -77,7 +77,7 @@ class _MainScreenState extends State<MainScreen> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         unselectedItemColor: Colors.grey,
-        selectedItemColor: Color.fromARGB(255, 255, 48, 117),
+        selectedItemColor: const Color.fromARGB(255, 255, 48, 117),
         items: const [
           BottomNavigationBarItem(
               icon: Icon(

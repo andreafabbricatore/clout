@@ -1,4 +1,3 @@
-import 'package:clout/main.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,7 @@ class SetttingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Settings",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
@@ -25,7 +24,7 @@ class SetttingsScreen extends StatelessWidget {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
@@ -47,14 +46,14 @@ class SetttingsScreen extends StatelessWidget {
                 height: 50,
                 width: screenwidth * 0.6,
                 child: Container(
-                  child: Center(
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 255, 48, 117),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: const Center(
                       child: Text(
                     "Sign Out",
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   )),
-                  decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 255, 48, 117),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
                 )),
           ),
         ),

@@ -32,9 +32,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
-    Future<void> _navigate(Event event, int index) async {
+    Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
           for (String x in event.participants) await db.getUserFromDocID(x)
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Clout",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               refresh();
             },
-            child: Padding(
+            child: const Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
               child: Icon(
                 Icons.refresh,
@@ -186,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             InkWell(
               onTap: () async {},
-              child: Text(
+              child: const Text(
                 "Suggested",
                 style: TextStyle(
                     fontSize: 30,
@@ -198,13 +198,13 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: screenheight * 0.02),
             EventListView(
               eventList: interesteventlist,
-              onTap: _navigate,
+              onTap: navigate,
               scrollable: true,
               leftpadding: false,
               curruser: widget.curruser,
               interactfav: interactfav,
             ),
-            Text("Popular",
+            const Text("Popular",
                 style: TextStyle(
                     fontSize: 30,
                     color: Colors.black,
@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
             EventListView(
               isHorizontal: false,
               eventList: generaleventlist,
-              onTap: _navigate,
+              onTap: navigate,
               scrollable: true,
               leftpadding: false,
               curruser: widget.curruser,

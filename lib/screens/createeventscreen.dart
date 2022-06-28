@@ -1,6 +1,8 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:intl/intl.dart';
 
 class CreateEventScreen extends StatefulWidget {
   CreateEventScreen({super.key, required this.curruser});
@@ -20,7 +22,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       host: "",
       maxparticipants: 0,
       participants: [],
-      datetime: DateTime.now(),
+      datetime: DateTime(0, 0, 0),
       docid: "",
       lat: 0,
       lng: 0);
@@ -41,6 +43,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   String selectedinterest = "Sports";
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
+  TextEditingController maxpartcontroller = TextEditingController();
+  DateTime eventdate = DateTime(0, 0, 0);
 
   @override
   void initState() {
@@ -51,6 +55,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   void dispose() {
     titlecontroller.dispose();
+    desccontroller.dispose();
+    maxpartcontroller.dispose();
+    eventdate = DateTime(0, 0, 0);
     super.dispose();
   }
 
@@ -61,7 +68,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Create Event",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -86,12 +93,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 fontWeight: FontWeight.bold,
                 fontSize: 30,
               ),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
                         BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
                 hintText: "Event Name",
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 30,
                 ),
@@ -126,7 +133,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   value: items,
                   child: Text(
                     items,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.black, fontWeight: FontWeight.w300),
                   ),
                 );
@@ -142,12 +149,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 fontWeight: FontWeight.w300,
                 fontSize: 15,
               ),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
                         BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
                 hintText: "Description",
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 15,
                 ),
@@ -159,6 +166,68 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               keyboardType: TextInputType.text,
               minLines: 1,
               maxLines: 5,
+            ),
+          ),
+          SizedBox(height: screenheight * 0.02),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
+            child: TextField(
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w300,
+                  fontSize: 15,
+                ),
+                decoration: const InputDecoration(
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                  hintText: "Max. Number of Participants",
+                  hintStyle: TextStyle(
+                    color: Color.fromARGB(39, 0, 0, 0),
+                    fontSize: 15,
+                  ),
+                ),
+                textAlign: TextAlign.start,
+                enableSuggestions: true,
+                autocorrect: true,
+                controller: maxpartcontroller,
+                keyboardType: TextInputType.number),
+          ),
+          SizedBox(height: screenheight * 0.02),
+          InkWell(
+            onTap: () {
+              DatePicker.showDateTimePicker(context,
+                  showTitleActions: true,
+                  minTime: DateTime.now(),
+                  onChanged: (date) {}, onConfirm: (date) {
+                setState(() {
+                  eventdate = date;
+                });
+                print(eventdate);
+              }, currentTime: DateTime.now());
+            },
+            child: Container(
+              height: screenwidth * 0.13,
+              width: screenwidth * 0.6,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: Colors.black)),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text(
+                  eventdate == DateTime(0, 0, 0)
+                      ? "Date and Time"
+                      : "${DateFormat.MMMd().format(eventdate)} @ ${DateFormat('hh:mm a').format(eventdate)}",
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                const Icon(
+                  Icons.date_range,
+                  size: 15,
+                )
+              ]),
             ),
           ),
         ]),

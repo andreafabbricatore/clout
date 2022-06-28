@@ -73,9 +73,9 @@ class db_conn {
 
   Future createevent(Event newevent, AppUser curruser) async {
     try {
-      String banner_url = await downloadBannerUrl(newevent.interest);
-      List joined_events = curruser.joined_events;
-      List hosted_events = curruser.hosted_events;
+      String bannerUrl = await downloadBannerUrl(newevent.interest);
+      List joinedEvents = curruser.joinedEvents;
+      List hostedEvents = curruser.hostedEvents;
       String eventid = "";
       bool unique = await eventUnique(
           newevent.title,
@@ -105,16 +105,16 @@ class db_conn {
           'time': newevent.datetime,
           'maxparticipants': newevent.maxparticipants,
           'participants': [curruser.docid],
-          'image': banner_url,
+          'image': bannerUrl,
           'searchfield': searchfield
         }).then((value) {
           eventid = value.id;
         });
-        joined_events.add(eventid);
-        hosted_events.add(eventid);
+        joinedEvents.add(eventid);
+        hostedEvents.add(eventid);
         return users.doc(curruser.docid).update({
-          'joined_events': joined_events,
-          'hosted_events': hosted_events
+          'joined_events': joinedEvents,
+          'hosted_events': hostedEvents
         }).catchError((error) {
           throw Exception("Could not host event");
         });
@@ -129,13 +129,13 @@ class db_conn {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
-      List joined_events = curruser.joined_events;
+      List joinedEvents = curruser.joinedEvents;
       if (participants.length + 1 > event.maxparticipants) {
         throw Exception("Too many participants");
       } else {
-        joined_events.add(eventid);
+        joinedEvents.add(eventid);
         participants.add(userdocid);
-        users.doc(userdocid).update({'joined_events': joined_events});
+        users.doc(userdocid).update({'joined_events': joinedEvents});
         events.doc(eventid).update({'participants': participants});
       }
     } catch (e) {
@@ -148,13 +148,13 @@ class db_conn {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
-      List joined_events = curruser.joined_events;
+      List joinedEvents = curruser.joinedEvents;
       if (participants.length == 1) {
         throw Exception("Cannot leave event");
       } else {
-        joined_events.removeWhere((element) => element == eventid);
+        joinedEvents.removeWhere((element) => element == eventid);
         participants.removeWhere((element) => element == userdocid);
-        users.doc(userdocid).update({'joined_events': joined_events});
+        users.doc(userdocid).update({'joined_events': joinedEvents});
         events.doc(eventid).update({'participants': participants});
       }
     } catch (e) {
@@ -169,14 +169,14 @@ class db_conn {
       String hostdocid = await getUserDocIDfromUsername(host);
       for (String x in participants) {
         DocumentSnapshot documentSnapshot = await users.doc(x).get();
-        List joined_events = documentSnapshot['joined_events'];
+        List joinedEvents = documentSnapshot['joined_events'];
         if (x == hostdocid) {
-          List hosted_events = documentSnapshot['hosted_events'];
-          hosted_events.removeWhere((element) => element == eventid);
-          users.doc(x).update({'hosted_events': hosted_events});
+          List hostedEvents = documentSnapshot['hosted_events'];
+          hostedEvents.removeWhere((element) => element == eventid);
+          users.doc(x).update({'hosted_events': hostedEvents});
         }
-        joined_events.removeWhere((element) => element == eventid);
-        users.doc(x).update({'joined_events': joined_events});
+        joinedEvents.removeWhere((element) => element == eventid);
+        users.doc(x).update({'joined_events': joinedEvents});
       }
       await events.doc(eventid).delete();
     } catch (e) {
@@ -187,12 +187,12 @@ class db_conn {
   Future changepfp(File filePath, String uid) async {
     try {
       await uploadFile(filePath, uid);
-      String photo_url = await downloadURL(uid);
+      String photoUrl = await downloadURL(uid);
       String id = "";
       await getUserDocID(uid).then((value) => id = value);
       return users
           .doc(id)
-          .update({'pfp_url': photo_url})
+          .update({'pfp_url': photoUrl})
           .then((value) => print("changed pfp"))
           .catchError((error) {
             throw Exception("Could not upload pfp");
@@ -336,20 +336,20 @@ class db_conn {
   }
 
   Future<String> getUserPFPfromUsername(String username) async {
-    String pfp_url = "";
+    String pfpUrl = "";
     try {
       await users.getSavy().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
               if (doc["username"] == username) {
-                pfp_url = doc["pfp_url"];
+                pfpUrl = doc["pfp_url"];
               }
             })
           });
     } catch (e) {
       throw Exception("Error with user pfp");
     }
-    if (pfp_url != "") {
-      return pfp_url;
+    if (pfpUrl != "") {
+      return pfpUrl;
     } else {
       throw Exception("Error with user pfp");
     }
@@ -520,7 +520,7 @@ class db_conn {
     }
   }
 
-  Future<void> Follow(String curruserdocid, String userdocid) async {
+  Future<void> follow(String curruserdocid, String userdocid) async {
     try {
       DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
       DocumentSnapshot userdoc = await users.doc(userdocid).get();

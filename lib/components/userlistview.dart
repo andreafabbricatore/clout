@@ -28,7 +28,7 @@ class UserListView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100.0),
               child: Image.network(
-                user.pfp_url,
+                user.pfpurl,
                 fit: BoxFit.cover,
               ),
             ),

@@ -6,10 +6,10 @@ Widget datetextfield(double screenwidth, String hinttext,
     padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
     child: TextField(
       decoration: InputDecoration(
-          focusedBorder: UnderlineInputBorder(
+          focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
           hintText: hinttext,
-          hintStyle: TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
+          hintStyle: const TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
       textAlign: TextAlign.start,
       enableSuggestions: false,
       autocorrect: false,

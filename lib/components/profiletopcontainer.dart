@@ -26,7 +26,7 @@ class ProfileTopContainer extends StatelessWidget {
     final screenheight = MediaQuery.of(context).size.height;
     return Container(
       height: screenheight * 0.2,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           border: Border(
               bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158)))),
       child: Column(
@@ -43,7 +43,7 @@ class ProfileTopContainer extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: Image.network(
-                    user.pfp_url,
+                    user.pfpurl,
                     height: screenheight * 0.1,
                     width: screenheight * 0.1,
                     fit: BoxFit.cover,
@@ -94,7 +94,8 @@ class ProfileTopContainer extends StatelessWidget {
                 Text(
                   user.fullname,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w300),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w300),
                 ),
                 iscurruser
                     ? GestureDetector(
@@ -106,10 +107,11 @@ class ProfileTopContainer extends StatelessWidget {
                           width: screenheight * 0.1,
                           decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
+                                  const BorderRadius.all(Radius.circular(5)),
                               border: Border.all(
-                                  color: Color.fromARGB(161, 158, 158, 158))),
-                          child: Center(child: Text("Edit Profile")),
+                                  color: const Color.fromARGB(
+                                      161, 158, 158, 158))),
+                          child: const Center(child: Text("Edit Profile")),
                         ),
                       )
                     : GestureDetector(
@@ -123,15 +125,16 @@ class ProfileTopContainer extends StatelessWidget {
                               : screenwidth * 0.2,
                           decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
+                                  const BorderRadius.all(Radius.circular(5)),
                               border: Border.all(
-                                  color: Color.fromARGB(161, 158, 158, 158))),
+                                  color: const Color.fromARGB(
+                                      161, 158, 158, 158))),
                           child: Center(
                               child: Text(
                             curruser.following.contains(user.docid)
                                 ? "Stop Following"
                                 : "Follow",
-                            style: TextStyle(fontSize: 15),
+                            style: const TextStyle(fontSize: 15),
                           )),
                         ),
                       )

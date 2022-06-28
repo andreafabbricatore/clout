@@ -27,9 +27,9 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -81,13 +81,13 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _navigate(Event event, int index) async {
+    Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
           for (String x in event.participants) await db.getUserFromDocID(x)
         ];
 
-        Event newevent = await Navigator.push(
+        await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (_) => EventDetailScreen(
@@ -107,7 +107,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
       appBar: AppBar(
         title: Text(
           "${widget.interest} events",
-          style: TextStyle(
+          style: const TextStyle(
               color: Color.fromARGB(
                 255,
                 255,
@@ -124,7 +124,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back_ios,
             color: Color.fromARGB(255, 255, 48, 117),
           ),
@@ -138,7 +138,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
             EventListView(
               isHorizontal: false,
               eventList: widget.events,
-              onTap: _navigate,
+              onTap: navigate,
               scrollable: true,
               leftpadding: false,
               curruser: widget.curruser,

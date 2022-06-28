@@ -24,10 +24,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   AppUser curruser = AppUser(
       username: "",
       uid: "",
-      pfp_url: "",
+      pfpurl: "",
       nationality: "",
-      joined_events: [],
-      hosted_events: [],
+      joinedEvents: [],
+      hostedEvents: [],
       interests: [],
       gender: "",
       fullname: "",
@@ -42,9 +42,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -56,7 +56,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "CLOUT",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -70,7 +70,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             onTap: () {
               Navigator.pop(context);
             },
-            child: Icon(Icons.arrow_back,
+            child: const Icon(Icons.arrow_back,
                 color: Color.fromARGB(255, 255, 48, 117))),
       ),
       body: SingleChildScrollView(
@@ -80,7 +80,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(
               height: screenheight * 0.2,
             ),
-            Center(
+            const Center(
                 child: Text(
               "Email Address",
               style: TextStyle(
@@ -92,7 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                               color: Color.fromARGB(255, 255, 48, 117))),
@@ -107,7 +107,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             SizedBox(height: screenheight * 0.02),
-            Center(
+            const Center(
                 child: Text(
               "Password",
               style: TextStyle(
@@ -119,7 +119,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                               color: Color.fromARGB(255, 255, 48, 117))),
@@ -157,14 +157,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: 50,
                   width: screenwidth * 0.5,
                   child: Container(
-                    child: Center(
+                    decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 255, 48, 117),
+                        borderRadius: BorderRadius.all(Radius.circular(20))),
+                    child: const Center(
                         child: Text(
                       "Sign Up",
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     )),
-                    decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 255, 48, 117),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
                   )),
             ),
             SizedBox(height: screenheight * 0.02),
@@ -191,9 +191,9 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -205,7 +205,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Who are you",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -243,14 +243,15 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                             width: screenheight * 0.2,
                           )
                         : Container(
-                            color: Color.fromARGB(255, 255, 48, 117),
+                            color: const Color.fromARGB(255, 255, 48, 117),
+                            height: screenheight * 0.2,
+                            width: screenheight * 0.2,
                             child: Icon(
                               Icons.account_circle_outlined,
                               color: Colors.white,
                               size: screenheight * 0.18,
                             ),
-                            height: screenheight * 0.2,
-                            width: screenheight * 0.2),
+                          ),
                   ))),
           SizedBox(height: screenheight * 0.05),
           textdatafield(screenwidth, "Full Name", fullnamecontroller),
@@ -282,8 +283,8 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
               displayErrorSnackBar("Error with profile picture or full name");
             }
           },
-          backgroundColor: Color.fromARGB(255, 255, 48, 117),
-          child: Icon(
+          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+          child: const Icon(
             Icons.arrow_circle_right_outlined,
             size: 60,
           ),
@@ -313,9 +314,9 @@ class _UsernameScreenState extends State<UsernameScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -327,7 +328,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Username",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -377,8 +378,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
               );
             }
           },
-          backgroundColor: Color.fromARGB(255, 255, 48, 117),
-          child: Icon(
+          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+          child: const Icon(
             Icons.arrow_circle_right_outlined,
             size: 60,
           ),
@@ -421,13 +422,13 @@ class _MiscScreenState extends State<MiscScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  var maskFormatter = new MaskTextInputFormatter(
+  var maskFormatter = MaskTextInputFormatter(
       mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
   var genders = ['Male', 'Female', 'Non-Binary'];
   var nations = [
@@ -683,7 +684,6 @@ class _MiscScreenState extends State<MiscScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -695,7 +695,7 @@ class _MiscScreenState extends State<MiscScreen> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Other info",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -715,7 +715,7 @@ class _MiscScreenState extends State<MiscScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
                           color: Color.fromARGB(255, 255, 48, 117)))),
@@ -742,7 +742,7 @@ class _MiscScreenState extends State<MiscScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
                           color: Color.fromARGB(255, 255, 48, 117)))),
@@ -798,8 +798,8 @@ class _MiscScreenState extends State<MiscScreen> {
               displayErrorSnackBar("Please fill all fields correctly");
             }
           },
-          backgroundColor: Color.fromARGB(255, 255, 48, 117),
-          child: Icon(
+          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+          child: const Icon(
             Icons.arrow_circle_right_outlined,
             size: 60,
           ),
@@ -836,7 +836,8 @@ class _InterestScreenState extends State<InterestScreen> {
     "Food",
     "Art"
   ];
-  List<Color> textcolors = List.filled(10, Color.fromARGB(255, 255, 48, 117));
+  List<Color> textcolors =
+      List.filled(10, const Color.fromARGB(255, 255, 48, 117));
   List<Color> cardcolors = List.filled(10, Colors.white);
   List selectedinterests = [];
   db_conn db = db_conn();
@@ -844,9 +845,9 @@ class _InterestScreenState extends State<InterestScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -864,30 +865,31 @@ class _InterestScreenState extends State<InterestScreen> {
         }
       },
       child: Container(
-          child: Center(
-              child: Text(
-            interest,
-            style: TextStyle(
-                fontSize: 35,
-                fontWeight: FontWeight.bold,
-                color: selectedinterests.contains(interest)
-                    ? Color.fromARGB(255, 255, 48, 117)
-                    : Colors.white),
-          )),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15.0),
-            border: Border.all(
-                width: selectedinterests.contains(interest) ? 2 : 0,
-                color: selectedinterests.contains(interest)
-                    ? Color.fromARGB(255, 255, 48, 117)
-                    : Colors.black),
-            image: DecorationImage(
-                opacity: selectedinterests.contains(interest) ? 0.8 : 1,
-                image: NetworkImage(
-                  "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
-                ),
-                fit: BoxFit.cover),
-          )),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+          border: Border.all(
+              width: selectedinterests.contains(interest) ? 2 : 0,
+              color: selectedinterests.contains(interest)
+                  ? const Color.fromARGB(255, 255, 48, 117)
+                  : Colors.black),
+          image: DecorationImage(
+              opacity: selectedinterests.contains(interest) ? 0.8 : 1,
+              image: NetworkImage(
+                "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
+              ),
+              fit: BoxFit.cover),
+        ),
+        child: Center(
+            child: Text(
+          interest,
+          style: TextStyle(
+              fontSize: 35,
+              fontWeight: FontWeight.bold,
+              color: selectedinterests.contains(interest)
+                  ? const Color.fromARGB(255, 255, 48, 117)
+                  : Colors.white),
+        )),
+      ),
     );
   }
 

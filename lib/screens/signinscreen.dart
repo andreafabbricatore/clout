@@ -25,7 +25,7 @@ class _SignInScreenState extends State<SignInScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "CLOUT",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -39,7 +39,7 @@ class _SignInScreenState extends State<SignInScreen> {
             onTap: () {
               Navigator.pop(context);
             },
-            child: Icon(Icons.arrow_back,
+            child: const Icon(Icons.arrow_back,
                 color: Color.fromARGB(255, 255, 48, 117))),
       ),
       body: SingleChildScrollView(
@@ -49,7 +49,7 @@ class _SignInScreenState extends State<SignInScreen> {
             SizedBox(
               height: screenheight * 0.2,
             ),
-            Center(
+            const Center(
                 child: Text(
               "Email Address",
               style: TextStyle(
@@ -61,7 +61,7 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                               color: Color.fromARGB(255, 255, 48, 117))),
@@ -76,7 +76,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
             ),
             SizedBox(height: screenheight * 0.02),
-            Center(
+            const Center(
                 child: Text(
               "Password",
               style: TextStyle(
@@ -88,7 +88,7 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                               color: Color.fromARGB(255, 255, 48, 117))),
@@ -135,14 +135,14 @@ class _SignInScreenState extends State<SignInScreen> {
                   height: 50,
                   width: screenwidth * 0.5,
                   child: Container(
-                    child: Center(
+                    decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 255, 48, 117),
+                        borderRadius: BorderRadius.all(Radius.circular(20))),
+                    child: const Center(
                         child: Text(
                       "Sign In",
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     )),
-                    decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 255, 48, 117),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
                   )),
             ),
             SizedBox(height: screenheight * 0.02),

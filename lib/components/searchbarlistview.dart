@@ -31,9 +31,9 @@ class _SearchBarListViewState extends State<SearchBarListView> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -95,7 +95,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> _eventnavigate(Event event, int index) async {
+    Future<void> eventnavigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
           for (String x in event.participants) await db.getUserFromDocID(x)
@@ -116,7 +116,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
       refresh();
     }
 
-    Future<void> _usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user, int index) async {
       Navigator.push(
           context,
           CupertinoPageRoute(
@@ -124,14 +124,14 @@ class _SearchBarListViewState extends State<SearchBarListView> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: [],
+                    interests: const [],
                   )));
     }
 
     return widget.searchevents
         ? EventListView(
             eventList: widget.eventres,
-            onTap: _eventnavigate,
+            onTap: eventnavigate,
             isHorizontal: false,
             scrollable: true,
             leftpadding: false,
@@ -140,7 +140,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
           )
         : UserListView(
             userres: widget.userres,
-            onTap: _usernavigate,
+            onTap: usernavigate,
             curruser: widget.curruser,
           );
   }

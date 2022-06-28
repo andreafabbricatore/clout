@@ -76,7 +76,7 @@ class _FavScreenState extends State<FavScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _navigate(Event event, int index) async {
+    Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
           for (String x in event.participants) await db.getUserFromDocID(x)
@@ -100,7 +100,7 @@ class _FavScreenState extends State<FavScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Favorites",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
@@ -120,7 +120,7 @@ class _FavScreenState extends State<FavScreen> {
           leftpadding: true,
           curruser: widget.curruser,
           interactfav: interactfav,
-          onTap: _navigate,
+          onTap: navigate,
         )
       ]),
     );

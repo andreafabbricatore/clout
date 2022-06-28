@@ -46,22 +46,10 @@ class _SearchScreenState extends State<SearchScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  Widget _listviewitem(String banner, String interest) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15.0),
-      child: Image.network(
-        banner,
-        width: 150,
-        height: 150,
-        fit: BoxFit.cover,
-      ),
-    );
   }
 
   @override
@@ -77,7 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
-    Future<void> _searchnav(String interest) async {
+    Future<void> searchnav(String interest) async {
       try {
         List<Event> res = await db.getInterestEvents([interest]);
         print(res);
@@ -154,11 +142,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   contentPadding: const EdgeInsets.all(20),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    borderSide:
+                        const BorderSide(color: Colors.grey, width: 1.0),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    borderSide:
+                        const BorderSide(color: Colors.grey, width: 1.0),
                   )),
             ),
           ),
@@ -196,10 +186,10 @@ class _SearchScreenState extends State<SearchScreen> {
                             border: Border.all(
                                 width: 1,
                                 color: searchevents
-                                    ? Color.fromARGB(255, 255, 48, 117)
+                                    ? const Color.fromARGB(255, 255, 48, 117)
                                     : Colors.black),
                           ),
-                          child: Center(child: Text("Events")),
+                          child: const Center(child: Text("Events")),
                         ),
                       ),
                     ),
@@ -231,9 +221,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                 width: 1,
                                 color: searchevents
                                     ? Colors.black
-                                    : Color.fromARGB(255, 255, 48, 117)),
+                                    : const Color.fromARGB(255, 255, 48, 117)),
                           ),
-                          child: Center(child: Text("Users")),
+                          child: const Center(child: Text("Users")),
                         ),
                       ),
                     ),
@@ -250,7 +240,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 )
               : SearchGridView(
                   interests: interests,
-                  onTap: _searchnav,
+                  onTap: searchnav,
                 )
         ]),
       ),

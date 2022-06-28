@@ -1,10 +1,10 @@
 class AppUser {
   String username;
   String uid;
-  String pfp_url;
+  String pfpurl;
   String nationality;
-  List joined_events;
-  List hosted_events;
+  List joinedEvents;
+  List hostedEvents;
   List interests;
   String gender;
   String fullname;
@@ -19,10 +19,10 @@ class AppUser {
   AppUser(
       {required this.username,
       required this.uid,
-      required this.pfp_url,
+      required this.pfpurl,
       required this.nationality,
-      required this.joined_events,
-      required this.hosted_events,
+      required this.joinedEvents,
+      required this.hostedEvents,
       required this.interests,
       required this.gender,
       required this.fullname,
@@ -38,10 +38,10 @@ class AppUser {
     return AppUser(
         username: json['username'],
         uid: json['uid'],
-        pfp_url: json['pfp_url'],
+        pfpurl: json['pfp_url'],
         nationality: json['nationality'],
-        joined_events: json['joined_events'] as List,
-        hosted_events: json['hosted_events'] as List,
+        joinedEvents: json['joined_events'] as List,
+        hostedEvents: json['hosted_events'] as List,
         interests: json['interests'] as List,
         gender: json['gender'],
         fullname: json['fullname'],

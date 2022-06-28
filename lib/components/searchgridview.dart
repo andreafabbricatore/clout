@@ -9,20 +9,21 @@ class SearchGridView extends StatelessWidget {
 
   Widget _listviewitem(String interest) {
     Widget widget = Container(
-        child: Center(
-            child: Text(
-          interest,
-          style: TextStyle(
-              fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),
-        )),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.0),
-          image: DecorationImage(
-              image: AssetImage(
-                "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
-              ),
-              fit: BoxFit.cover),
-        ));
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15.0),
+        image: DecorationImage(
+            image: AssetImage(
+              "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
+            ),
+            fit: BoxFit.cover),
+      ),
+      child: Center(
+          child: Text(
+        interest,
+        style: const TextStyle(
+            fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),
+      )),
+    );
 
     return GestureDetector(
       onTap: () => onTap?.call(interest),
@@ -34,9 +35,9 @@ class SearchGridView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: GridView.builder(
-        padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
+        padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
         gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         shrinkWrap: true,
         itemCount: interests.length,
         itemBuilder: ((context, index) {

@@ -33,15 +33,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   db_conn db = db_conn();
 
   bool joinedevents = true;
-  List<Event> joined_events = [];
-  List<Event> hosted_events = [];
+  List<Event> joinedEvents = [];
+  List<Event> hostedEvents = [];
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -49,8 +49,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       updateuser();
       updatecurruser();
-      geteventlist(widget.user.joined_events, true);
-      geteventlist(widget.user.hosted_events, false);
+      geteventlist(widget.user.joinedEvents, true);
+      geteventlist(widget.user.hostedEvents, false);
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
     }
@@ -87,11 +87,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
       if (joined) {
         setState(() {
-          joined_events = temp;
+          joinedEvents = temp;
         });
       } else {
         setState(() {
-          hosted_events = temp;
+          hostedEvents = temp;
         });
       }
     } catch (e) {
@@ -112,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void settings() async {
     await Navigator.push(
-        context, MaterialPageRoute(builder: (_) => SetttingsScreen()));
+        context, MaterialPageRoute(builder: (_) => const SetttingsScreen()));
     refresh();
   }
 
@@ -144,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> follow() async {
     try {
-      await db.Follow(widget.curruser.docid, widget.user.docid);
+      await db.follow(widget.curruser.docid, widget.user.docid);
       refresh();
     } catch (e) {
       displayErrorSnackBar("Could not follow @${widget.user.username}");
@@ -177,8 +177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> init() async {
     updateuser();
     updatecurruser();
-    geteventlist(widget.user.joined_events, true);
-    geteventlist(widget.user.hosted_events, false);
+    geteventlist(widget.user.joinedEvents, true);
+    geteventlist(widget.user.hostedEvents, false);
   }
 
   @override
@@ -193,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
-    Future<void> _navigate(Event event, int index) async {
+    Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
           for (String x in event.participants) await db.getUserFromDocID(x)
@@ -222,15 +222,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Icon(
                     Icons.arrow_back_ios,
                     color: Color.fromARGB(255, 255, 48, 117),
                   ),
                 ),
               )
-            : SizedBox(
+            : const SizedBox(
                 width: 0,
                 height: 0,
               ),
@@ -252,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     refresh();
                   },
-                  child: Padding(
+                  child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(
                       Icons.refresh,
@@ -264,7 +264,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     settings();
                   },
-                  child: Padding(
+                  child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(
                       Icons.settings,
@@ -278,7 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     refresh();
                   },
-                  child: Padding(
+                  child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(
                       Icons.refresh,
@@ -287,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ],
-        shape: Border(
+        shape: const Border(
             bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
       ),
       body: Column(children: [
@@ -312,13 +312,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 });
               },
               child: Container(
-                child: Center(
-                    child: Text(
-                  "Joined Events",
-                  style: TextStyle(
-                      fontWeight:
-                          joinedevents ? FontWeight.bold : FontWeight.normal),
-                )),
                 height: screenheight * 0.045,
                 width: screenwidth * 0.5,
                 decoration: BoxDecoration(
@@ -326,9 +319,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         bottom: BorderSide(
                             color: joinedevents
                                 ? Colors.black
-                                : Color.fromARGB(55, 158, 158, 158)),
-                        right: BorderSide(
+                                : const Color.fromARGB(55, 158, 158, 158)),
+                        right: const BorderSide(
                             color: Color.fromARGB(55, 158, 158, 158)))),
+                child: Center(
+                    child: Text(
+                  "Joined Events",
+                  style: TextStyle(
+                      fontWeight:
+                          joinedevents ? FontWeight.bold : FontWeight.normal),
+                )),
               ),
             ),
             InkWell(
@@ -338,6 +338,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 });
               },
               child: Container(
+                height: screenheight * 0.045,
+                width: screenwidth * 0.5,
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: joinedevents
+                                ? const Color.fromARGB(55, 158, 158, 158)
+                                : Colors.black),
+                        left: const BorderSide(color: Colors.white))),
                 child: Center(
                     child: Text(
                   "Hosted Events",
@@ -345,23 +354,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontWeight:
                           joinedevents ? FontWeight.normal : FontWeight.bold),
                 )),
-                height: screenheight * 0.045,
-                width: screenwidth * 0.5,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            color: joinedevents
-                                ? Color.fromARGB(55, 158, 158, 158)
-                                : Colors.black),
-                        left: BorderSide(color: Colors.white))),
               ),
             )
           ],
         ),
         EventListView(
-          eventList: joinedevents ? joined_events : hosted_events,
+          eventList: joinedevents ? joinedEvents : hostedEvents,
           isHorizontal: false,
-          onTap: _navigate,
+          onTap: navigate,
           scrollable: true,
           leftpadding: true,
           curruser: widget.curruser,

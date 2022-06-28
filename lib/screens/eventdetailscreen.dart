@@ -37,9 +37,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -152,7 +152,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     checkifjoined();
     super.initState();
   }
@@ -161,7 +160,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> _usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user, int index) async {
       Navigator.push(
           context,
           CupertinoPageRoute(
@@ -169,7 +168,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: [],
+                    interests: const [],
                   )));
     }
 
@@ -182,7 +181,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           onTap: () {
             Navigator.pop(context, widget.event);
           },
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back_ios,
             color: Color.fromARGB(255, 255, 48, 117),
           ),
@@ -227,7 +226,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           Text(
             widget.event.title,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 40,
                 color: Colors.black,
                 fontFamily: "Poppins",
@@ -241,7 +240,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             children: [
               Text(
                 widget.event.interest,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 25,
                     color: Color.fromARGB(255, 255, 48, 117),
                     fontFamily: "Poppins",
@@ -253,14 +252,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     String hostdocid =
                         await db.getUserDocIDfromUsername(widget.event.host);
                     AppUser eventhost = await db.getUserFromDocID(hostdocid);
-                    _usernavigate(eventhost, 0);
+                    usernavigate(eventhost, 0);
                   } catch (e) {
                     displayErrorSnackBar("Could not retrieve host information");
                   }
                 },
                 child: Text(
                   "@${widget.event.host}",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     color: Color.fromARGB(255, 255, 48, 117),
                     fontFamily: "Poppins",
@@ -275,7 +274,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           Text(
             "At ${widget.event.location}, ${DateFormat.MMMd().format(widget.event.datetime)} @ ${DateFormat('hh:mm a').format(widget.event.datetime)}",
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 15,
                 color: Colors.black,
                 fontFamily: "Poppins",
@@ -308,7 +307,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     MarkerLayerOptions(markers: [
                       Marker(
                           point: LatLng(widget.event.lat, widget.event.lng),
-                          builder: ((context) => Icon(
+                          builder: ((context) => const Icon(
                                 Icons.location_pin,
                                 color: Color.fromARGB(255, 255, 48, 117),
                                 size: 18,
@@ -322,8 +321,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     height: screenheight * 0.05,
                     width: screenheight * 0.05,
                     child: FloatingActionButton(
-                      backgroundColor: Color.fromARGB(255, 255, 48, 117),
-                      child: Center(child: Icon(Icons.map_rounded)),
+                      backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+                      child: const Center(child: Icon(Icons.map_rounded)),
                       onPressed: () {
                         MapsLauncher.launchQuery(
                             "${widget.event.lat},${widget.event.lng}");
@@ -339,7 +338,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           Text(
             widget.event.description,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 15,
                 color: Colors.black,
                 fontFamily: "Poppins",
@@ -352,7 +351,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             widget.event.participants.length != widget.event.maxparticipants
                 ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
                 : "Participant number reached",
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 20,
                 color: Colors.black,
                 fontFamily: "Poppins",
@@ -369,7 +368,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 UserListView(
                   userres: widget.participants,
                   curruser: widget.curruser,
-                  onTap: _usernavigate,
+                  onTap: usernavigate,
                 ),
               ],
             ),
@@ -385,14 +384,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 height: 50,
                 width: screenwidth * 0.5,
                 child: Container(
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 255, 48, 117),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
                   child: Center(
                       child: Text(
                     joinedval,
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+                    style: const TextStyle(fontSize: 20, color: Colors.white),
                   )),
-                  decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 255, 48, 117),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
                 )),
           )
         ]),

@@ -26,7 +26,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   TextEditingController fullnamecontroller = TextEditingController();
   TextEditingController usernamecontroller = TextEditingController();
   TextEditingController birthdaycontroller = TextEditingController();
-  var maskFormatter = new MaskTextInputFormatter(
+  var maskFormatter = MaskTextInputFormatter(
       mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
   var genders = ['Male', 'Female', 'Non-Binary'];
   var nations = [
@@ -285,9 +285,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -317,7 +317,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
@@ -345,7 +345,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 borderRadius: BorderRadius.circular(100),
                 child: imagepath == null
                     ? Image.network(
-                        widget.curruser.pfp_url,
+                        widget.curruser.pfpurl,
                         height: screenheight * 0.2,
                         width: screenheight * 0.2,
                         fit: BoxFit.cover,
@@ -362,7 +362,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Text(
+          const Text(
             "Change Profile Picture",
             style: TextStyle(fontSize: 15),
           ),
@@ -380,7 +380,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
                           color: Color.fromARGB(255, 255, 48, 117)))),
@@ -409,7 +409,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
                           color: Color.fromARGB(255, 255, 48, 117)))),
@@ -460,20 +460,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               width: screenwidth * 0.6,
               decoration: BoxDecoration(
                   border: Border.all(width: 1, color: Colors.black)),
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(
-                  "Interests",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  width: 3,
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 15,
-                )
-              ]),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      "Interests",
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: 3,
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 15,
+                    )
+                  ]),
             ),
           ),
           SizedBox(
@@ -514,14 +516,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 height: 50,
                 width: screenwidth * 0.6,
                 child: Container(
-                  child: Center(
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 255, 48, 117),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: const Center(
                       child: Text(
                     "Update Profile",
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   )),
-                  decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 255, 48, 117),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
                 )),
           )
         ]),

@@ -31,9 +31,9 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -72,7 +72,6 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     refresh();
     super.initState();
   }
@@ -81,7 +80,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> _usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user, int index) async {
       Navigator.push(
           context,
           CupertinoPageRoute(
@@ -89,7 +88,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: [],
+                    interests: const [],
                   )));
     }
 
@@ -98,7 +97,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
         centerTitle: true,
         title: Text(
           widget.user.username,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
         ),
         backgroundColor: Colors.white,
@@ -108,7 +107,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back_ios,
             color: Colors.black,
           ),
@@ -125,6 +124,16 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                 });
               },
               child: Container(
+                height: screenheight * 0.045,
+                width: screenwidth * 0.5,
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: widget.onfollowers
+                                ? Colors.black
+                                : const Color.fromARGB(55, 158, 158, 158)),
+                        right: const BorderSide(
+                            color: Color.fromARGB(55, 158, 158, 158)))),
                 child: Center(
                     child: Text(
                   "Followers",
@@ -133,16 +142,6 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                           ? FontWeight.bold
                           : FontWeight.normal),
                 )),
-                height: screenheight * 0.045,
-                width: screenwidth * 0.5,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            color: widget.onfollowers
-                                ? Colors.black
-                                : Color.fromARGB(55, 158, 158, 158)),
-                        right: BorderSide(
-                            color: Color.fromARGB(55, 158, 158, 158)))),
               ),
             ),
             InkWell(
@@ -152,6 +151,15 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                 });
               },
               child: Container(
+                height: screenheight * 0.045,
+                width: screenwidth * 0.5,
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: widget.onfollowers
+                                ? const Color.fromARGB(55, 158, 158, 158)
+                                : Colors.black),
+                        left: const BorderSide(color: Colors.white))),
                 child: Center(
                     child: Text(
                   "Following",
@@ -160,22 +168,13 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                           ? FontWeight.normal
                           : FontWeight.bold),
                 )),
-                height: screenheight * 0.045,
-                width: screenwidth * 0.5,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            color: widget.onfollowers
-                                ? Color.fromARGB(55, 158, 158, 158)
-                                : Colors.black),
-                        left: BorderSide(color: Colors.white))),
               ),
             )
           ],
         ),
         UserListView(
           userres: widget.onfollowers ? followers : following,
-          onTap: _usernavigate,
+          onTap: usernavigate,
           curruser: widget.curruser,
         )
       ]),
