@@ -12,12 +12,8 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class EditProfileScreen extends StatefulWidget {
   EditProfileScreen(
-      {super.key,
-      required this.curruser,
-      required this.interestpics,
-      required this.interests});
+      {super.key, required this.curruser, required this.interests});
   AppUser curruser;
-  List interestpics;
   List interests;
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -452,7 +448,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   MaterialPageRoute(
                       builder: (_) => UpdateInterests(
                             curruser: widget.curruser,
-                            interestpics: widget.interestpics,
                             interests: widget.interests,
                           )));
               setState(() {

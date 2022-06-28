@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({super.key, required this.interestpics, required this.curruser});
-  List interestpics;
+  SearchScreen({super.key, required this.curruser});
   AppUser curruser;
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -251,7 +250,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 )
               : SearchGridView(
                   interests: interests,
-                  interestpics: widget.interestpics,
                   onTap: _searchnav,
                 )
         ]),

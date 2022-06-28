@@ -20,7 +20,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   List interests = [];
   List<Event> eventlist = [];
   List<Event> interesteventlist = [];
-  List interestpics = [];
   List allinterests = [
     "Sports",
     "Nature",
@@ -40,10 +39,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
       interests = curruser.interests;
       eventlist = await db.getEvents(interests);
       interesteventlist = await db.getInterestEvents(interests);
-      interestpics = [
-        for (String x in allinterests)
-          await db.downloadBannerUrl(x.toLowerCase())
-      ];
 
       Navigator.pushReplacement(
         context,
@@ -52,7 +47,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
               interests: interests,
               eventlist: eventlist,
               interesteventlist: interesteventlist,
-              interestpics: interestpics,
               curruser: curruser),
         ),
       );

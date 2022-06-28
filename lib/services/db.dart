@@ -71,43 +71,40 @@ class db_conn {
     }
   }
 
-  Future createevent(
-      String title,
-      String description,
-      String interest,
-      String location,
-      String host,
-      DateTime time,
-      int maxparticipants,
-      AppUser curruser,
-      String id) async {
+  Future createevent(Event newevent, AppUser curruser) async {
     try {
-      String banner_url = await downloadBannerUrl(interest);
+      String banner_url = await downloadBannerUrl(newevent.interest);
       List joined_events = curruser.joined_events;
       List hosted_events = curruser.hosted_events;
       String eventid = "";
-      String userdocid = await getUserDocID(curruser.uid);
-      bool unique = await eventUnique(title, description, interest, location,
-          host, time, maxparticipants, [userdocid]);
+      bool unique = await eventUnique(
+          newevent.title,
+          newevent.description,
+          newevent.interest,
+          newevent.location,
+          newevent.host,
+          newevent.datetime,
+          newevent.maxparticipants,
+          [curruser.docid]);
       print(unique);
       List searchfield = [];
       String temp = "";
-      for (int i = 0; i < title.length; i++) {
-        temp = temp + title[i];
+      for (int i = 0; i < newevent.title.length; i++) {
+        temp = temp + newevent.title[i];
         searchfield.add(temp.toLowerCase());
       }
       if (!unique) {
         throw Exception("Event already exists");
       } else {
         await events.add({
-          'title': title,
-          'description': description,
-          'interest': interest,
-          'location': location,
-          'host': host,
-          'time': time,
-          'maxparticipants': maxparticipants,
-          'participants': [userdocid],
+          'title': newevent.title,
+          'description': newevent.description,
+          'interest': newevent.interest,
+          'location': newevent.location,
+          'host': newevent.host,
+          'time': newevent.datetime,
+          'maxparticipants': newevent.maxparticipants,
+          'participants': [curruser.docid],
           'image': banner_url,
           'searchfield': searchfield
         }).then((value) {
@@ -115,7 +112,7 @@ class db_conn {
         });
         joined_events.add(eventid);
         hosted_events.add(eventid);
-        return users.doc(id).update({
+        return users.doc(curruser.docid).update({
           'joined_events': joined_events,
           'hosted_events': hosted_events
         }).catchError((error) {

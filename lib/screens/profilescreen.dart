@@ -15,14 +15,12 @@ class ProfileScreen extends StatefulWidget {
   AppUser curruser;
   bool visit;
   bool iscurruser = false;
-  List interestpics;
   List interests;
   ProfileScreen({
     super.key,
     required this.user,
     required this.curruser,
     required this.visit,
-    required this.interestpics,
     required this.interests,
     iscurruser,
   });
@@ -107,7 +105,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         MaterialPageRoute(
             builder: (_) => EditProfileScreen(
                   curruser: widget.curruser,
-                  interestpics: widget.interestpics,
                   interests: widget.interests,
                 )));
     refresh();

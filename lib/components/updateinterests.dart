@@ -2,14 +2,12 @@ import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
 class UpdateInterests extends StatefulWidget {
-  UpdateInterests(
-      {Key? key,
-      required this.curruser,
-      required this.interests,
-      required this.interestpics})
-      : super(key: key);
+  UpdateInterests({
+    Key? key,
+    required this.curruser,
+    required this.interests,
+  }) : super(key: key);
   List interests;
-  List interestpics;
   AppUser curruser;
   @override
   State<UpdateInterests> createState() => _UpdateInterestsState();
@@ -28,7 +26,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
     "Food",
     "Art"
   ];
-  Widget _listviewitem(String banner, String interest) {
+  Widget _listviewitem(String interest) {
     Widget thiswidget = Container(
         child: Center(
             child: Text(
@@ -49,8 +47,8 @@ class _UpdateInterestsState extends State<UpdateInterests> {
                   : Colors.black),
           image: DecorationImage(
               opacity: widget.interests.contains(interest) ? 0.8 : 1,
-              image: NetworkImage(
-                banner,
+              image: AssetImage(
+                "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
               ),
               fit: BoxFit.cover),
         ));
@@ -110,8 +108,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
                 itemBuilder: ((context, index) {
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                    child: _listviewitem(
-                        widget.interestpics[index], allinterests[index]),
+                    child: _listviewitem(allinterests[index]),
                   );
                 }),
               ),

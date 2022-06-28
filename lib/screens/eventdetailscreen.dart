@@ -7,8 +7,12 @@ import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:maps_launcher/maps_launcher.dart';
+import 'package:latlong2/latlong.dart';
 
 class EventDetailScreen extends StatefulWidget {
   EventDetailScreen(
@@ -157,7 +161,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    print(joined);
     Future<void> _usernavigate(AppUser user, int index) async {
       Navigator.push(
           context,
@@ -166,7 +169,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interestpics: [],
                     interests: [],
                   )));
     }
@@ -278,6 +280,59 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 color: Colors.black,
                 fontFamily: "Poppins",
                 fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          SizedBox(
+            width: screenwidth,
+            height: screenheight * 0.2,
+            child: Stack(
+              alignment: AlignmentDirectional.bottomEnd,
+              children: [
+                FlutterMap(
+                  options: MapOptions(
+                    center: LatLng(widget.event.lat, widget.event.lng),
+                    zoom: 15.0,
+                    maxZoom: 20.0,
+                    minZoom: 13.0,
+                  ),
+                  layers: [
+                    TileLayerOptions(
+                        additionalOptions: {
+                          'accessToken': dotenv.get('MAPBOX_ACCESS_TOKEN'),
+                          'id': 'mapbox.mapbox-streets-v8'
+                        },
+                        urlTemplate:
+                            "https://api.mapbox.com/styles/v1/andreaf1108/cl4y4djy6005f15obfxs5i0bb/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmVhZjExMDgiLCJhIjoiY2w0cjBxamlzMGFwZjNqcGRodm9nczA5biJ9.qXRB_MLgHmifo6DYtCYirw"),
+                    MarkerLayerOptions(markers: [
+                      Marker(
+                          point: LatLng(widget.event.lat, widget.event.lng),
+                          builder: ((context) => Icon(
+                                Icons.location_pin,
+                                color: Color.fromARGB(255, 255, 48, 117),
+                                size: 18,
+                              )))
+                    ])
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: SizedBox(
+                    height: screenheight * 0.05,
+                    width: screenheight * 0.05,
+                    child: FloatingActionButton(
+                      backgroundColor: Color.fromARGB(255, 255, 48, 117),
+                      child: Center(child: Icon(Icons.map_rounded)),
+                      onPressed: () {
+                        MapsLauncher.launchQuery(
+                            "${widget.event.lat},${widget.event.lng}");
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           SizedBox(
             height: screenheight * 0.02,

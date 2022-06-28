@@ -12,14 +12,12 @@ class MainScreen extends StatefulWidget {
   List interests;
   List<Event> eventlist;
   List<Event> interesteventlist;
-  List interestpics;
   AppUser curruser;
   MainScreen(
       {Key? key,
       required this.interests,
       required this.eventlist,
       required this.interesteventlist,
-      required this.interestpics,
       required this.curruser})
       : super(key: key);
   @override
@@ -40,10 +38,11 @@ class _MainScreenState extends State<MainScreen> {
         updatehome: updatehome,
       ),
       SearchScreen(
-        interestpics: widget.interestpics,
         curruser: widget.curruser,
       ),
-      CreateEventScreen(),
+      CreateEventScreen(
+        curruser: widget.curruser,
+      ),
       FavScreen(
         curruser: widget.curruser,
       ),
@@ -51,7 +50,6 @@ class _MainScreenState extends State<MainScreen> {
         user: widget.curruser,
         curruser: widget.curruser,
         visit: false,
-        interestpics: widget.interestpics,
         interests: widget.interests,
       )
     ];

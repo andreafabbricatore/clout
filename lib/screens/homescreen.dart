@@ -185,18 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
-              onTap: () async {
-                await db.createevent(
-                    "Baking",
-                    "Making cakes then eating them",
-                    "Food",
-                    "Cracco restaurant duomo",
-                    widget.curruser.username,
-                    DateTime(2022, 9, 7, 17, 30),
-                    3,
-                    widget.curruser,
-                    widget.curruser.docid);
-              },
+              onTap: () async {},
               child: Text(
                 "Suggested",
                 style: TextStyle(

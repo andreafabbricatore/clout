@@ -418,7 +418,6 @@ class _MiscScreenState extends State<MiscScreen> {
     "Food",
     "Art"
   ];
-  List interestpics = [];
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
@@ -681,19 +680,10 @@ class _MiscScreenState extends State<MiscScreen> {
     'Zambia',
     'Zimbabwe'
   ];
-  Future<void> getinterestpics() async {
-    List temp = [
-      for (String x in allinterests) await db.downloadBannerUrl(x.toLowerCase())
-    ];
-    setState(() {
-      interestpics = temp;
-    });
-  }
 
   @override
   void initState() {
     // TODO: implement initState
-    getinterestpics();
     super.initState();
   }
 
@@ -799,7 +789,6 @@ class _MiscScreenState extends State<MiscScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (BuildContext context) => InterestScreen(
-                      interestpics: interestpics,
                       curruser: widget.curruser,
                       imagepath: widget.imagepath,
                       psw: widget.psw),
@@ -821,16 +810,14 @@ class _MiscScreenState extends State<MiscScreen> {
 }
 
 class InterestScreen extends StatefulWidget {
-  InterestScreen(
-      {Key? key,
-      required this.curruser,
-      required this.imagepath,
-      required this.psw,
-      required this.interestpics})
-      : super(key: key);
+  InterestScreen({
+    Key? key,
+    required this.curruser,
+    required this.imagepath,
+    required this.psw,
+  }) : super(key: key);
   AppUser curruser;
   String psw;
-  List interestpics;
   var imagepath;
   @override
   State<InterestScreen> createState() => _InterestScreenState();
@@ -863,7 +850,7 @@ class _InterestScreenState extends State<InterestScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Widget _listviewitem(String banner, String interest) {
+  Widget _listviewitem(String interest) {
     return GestureDetector(
       onTap: () {
         if (selectedinterests.contains(interest)) {
@@ -897,7 +884,7 @@ class _InterestScreenState extends State<InterestScreen> {
             image: DecorationImage(
                 opacity: selectedinterests.contains(interest) ? 0.8 : 1,
                 image: NetworkImage(
-                  banner,
+                  "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
                 ),
                 fit: BoxFit.cover),
           )),
@@ -946,8 +933,7 @@ class _InterestScreenState extends State<InterestScreen> {
                 itemBuilder: ((context, index) {
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                    child: _listviewitem(
-                        widget.interestpics[index], allinterests[index]),
+                    child: _listviewitem(allinterests[index]),
                   );
                 }),
               ),

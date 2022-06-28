@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SearchGridView extends StatelessWidget {
-  SearchGridView(
-      {Key? key,
-      required this.interests,
-      required this.interestpics,
-      required this.onTap})
+  SearchGridView({Key? key, required this.interests, required this.onTap})
       : super(key: key);
   List interests;
-  List interestpics;
+
   final Function(String interest)? onTap;
 
-  Widget _listviewitem(String banner, String interest) {
+  Widget _listviewitem(String interest) {
     Widget widget = Container(
         child: Center(
             child: Text(
@@ -22,8 +18,8 @@ class SearchGridView extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
           image: DecorationImage(
-              image: NetworkImage(
-                banner,
+              image: AssetImage(
+                "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
               ),
               fit: BoxFit.cover),
         ));
@@ -46,7 +42,7 @@ class SearchGridView extends StatelessWidget {
         itemBuilder: ((context, index) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
-            child: _listviewitem(interestpics[index], interests[index]),
+            child: _listviewitem(interests[index]),
           );
         }),
       ),
