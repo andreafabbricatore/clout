@@ -106,6 +106,8 @@ class db_conn {
           'maxparticipants': newevent.maxparticipants,
           'participants': [curruser.docid],
           'image': bannerUrl,
+          'lat': newevent.lat,
+          'lng': newevent.lng,
           'searchfield': searchfield
         }).then((value) {
           eventid = value.id;

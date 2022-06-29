@@ -88,6 +88,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         });
       }
     }
+
+    if (widget.event.datetime.isBefore(DateTime.now())) {
+      setState(() {
+        joinedval = "Finished";
+      });
+    }
   }
 
   void updatescreen(eventid) async {
@@ -119,8 +125,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       } finally {
         updatescreen(widget.event.docid);
       }
-    } else if (!joined && joinedval == "Full") {
-      print("full");
+    } else if ((!joined && joinedval == "Full") || joinedval == "Finished") {
+      print(joinedval);
     } else if (joined && joinedval == "Delete Event") {
       try {
         await db.deleteevent(

@@ -1,8 +1,16 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
+import 'package:clout/components/searchlocation.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/loading.dart';
+import 'package:clout/services/db.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 
 class CreateEventScreen extends StatefulWidget {
   CreateEventScreen({super.key, required this.curruser});
@@ -40,15 +48,42 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     "Art"
   ];
 
+  db_conn db = db_conn();
   String selectedinterest = "Sports";
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
   DateTime eventdate = DateTime(0, 0, 0);
+  Location chosenLocation =
+      Location(address: "", city: "", country: "", center: [0.0, 0.0]);
+  bool emptylocation = true;
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: const Duration(seconds: 2),
+    );
+    await Future.delayed(const Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void checklocationempty() {
+    if (chosenLocation.address == "" &&
+        chosenLocation.city == "" &&
+        chosenLocation.country == "" &&
+        listEquals(chosenLocation.center, [0.0, 0.0])) {
+      setState(() {
+        emptylocation = true;
+      });
+    } else {
+      setState(() {
+        emptylocation = false;
+      });
+    }
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -229,6 +264,137 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 )
               ]),
             ),
+          ),
+          SizedBox(height: screenheight * 0.02),
+          InkWell(
+            onTap: () async {
+              Location chosen = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchLocation(),
+                  ));
+              setState(() {
+                chosenLocation = chosen;
+              });
+              checklocationempty();
+            },
+            child: Container(
+              height: screenwidth * 0.13,
+              width: screenwidth * 0.6,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: Colors.black)),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text(
+                  emptylocation ? "Location" : "Change Location",
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                const Icon(
+                  Icons.map_rounded,
+                  size: 15,
+                )
+              ]),
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          emptylocation
+              ? const SizedBox()
+              : SizedBox(
+                  height: screenheight * 0.2,
+                  width: screenwidth * 0.6,
+                  child: FlutterMap(
+                    options: MapOptions(
+                      center: LatLng(
+                          chosenLocation.center[1], chosenLocation.center[0]),
+                      zoom: 15.0,
+                      maxZoom: 20.0,
+                      minZoom: 13.0,
+                    ),
+                    layers: [
+                      TileLayerOptions(
+                          additionalOptions: {
+                            'accessToken': dotenv.get('MAPBOX_ACCESS_TOKEN'),
+                            'id': 'mapbox.mapbox-streets-v8'
+                          },
+                          urlTemplate:
+                              "https://api.mapbox.com/styles/v1/andreaf1108/cl4y4djy6005f15obfxs5i0bb/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmVhZjExMDgiLCJhIjoiY2w0cjBxamlzMGFwZjNqcGRodm9nczA5biJ9.qXRB_MLgHmifo6DYtCYirw"),
+                      MarkerLayerOptions(markers: [
+                        Marker(
+                            point: LatLng(chosenLocation.center[1],
+                                chosenLocation.center[0]),
+                            builder: ((context) => const Icon(
+                                  Icons.location_pin,
+                                  color: Color.fromARGB(255, 255, 48, 117),
+                                  size: 18,
+                                )))
+                      ])
+                    ],
+                  ),
+                ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          InkWell(
+            onTap: () async {
+              if (titlecontroller.text.trim().isEmpty) {
+                displayErrorSnackBar("Please enter a name for your event");
+              } else if (desccontroller.text.trim().isEmpty) {
+                displayErrorSnackBar("Please enter a description");
+              } else if (int.parse(maxpartcontroller.text) <= 1) {
+                displayErrorSnackBar(
+                    "Please enter a max number of participants");
+              } else if (eventdate.isAtSameMomentAs(DateTime(0, 0, 0))) {
+                displayErrorSnackBar("Please choose a date for your event");
+              } else if (emptylocation) {
+                displayErrorSnackBar("Please choose a location for your event");
+              } else {
+                setState(() {
+                  event.title = titlecontroller.text.trim();
+                  event.description = desccontroller.text.trim();
+                  event.maxparticipants = int.parse(maxpartcontroller.text);
+                  event.interest = selectedinterest;
+                  event.datetime = eventdate;
+                  event.location = chosenLocation.address;
+                  event.host = widget.curruser.username;
+                  event.lat = chosenLocation.center[1];
+                  event.lng = chosenLocation.center[0];
+                });
+                try {
+                  await db.createevent(event, widget.curruser);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => LoadingScreen(
+                          uid: widget.curruser.uid, signup: false),
+                    ),
+                  );
+                } catch (e) {
+                  displayErrorSnackBar("Could not create event");
+                }
+              }
+            },
+            child: SizedBox(
+                height: 50,
+                width: screenwidth * 0.6,
+                child: Container(
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 255, 48, 117),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: const Center(
+                      child: Text(
+                    "Create Event",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  )),
+                )),
+          ),
+          SizedBox(
+            height: screenheight * 0.04,
           ),
         ]),
       ),
