@@ -2,9 +2,12 @@ import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/datetextfield.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/main.dart';
+import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -874,7 +877,7 @@ class _InterestScreenState extends State<InterestScreen> {
                   : Colors.black),
           image: DecorationImage(
               opacity: selectedinterests.contains(interest) ? 0.8 : 1,
-              image: NetworkImage(
+              image: AssetImage(
                 "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
               ),
               fit: BoxFit.cover),
@@ -954,11 +957,9 @@ class _InterestScreenState extends State<InterestScreen> {
                   widget.curruser.interests = selectedinterests;
                 });
 
-                await context
-                    .read<AuthenticationService>()
-                    .signUp(email: widget.curruser.email, password: widget.psw);
-                String uid =
-                    context.read<AuthenticationService>().getuid().toString();
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: widget.curruser.email, password: widget.psw);
+                String uid = FirebaseAuth.instance.currentUser!.uid;
                 await db.createuserinstance(widget.curruser.email, uid);
                 await db.changepfp(widget.imagepath, uid);
                 await db.changeusername(widget.curruser.username, uid);
@@ -975,8 +976,7 @@ class _InterestScreenState extends State<InterestScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        LoadingScreen(uid: uid, signup: true),
+                    builder: (BuildContext context) => AuthenticationWrapper(),
                   ),
                 );
               } else {

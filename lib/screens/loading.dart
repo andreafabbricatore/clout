@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingScreen extends StatefulWidget {
-  bool signup = false;
-  LoadingScreen({Key? key, required this.uid, signup}) : super(key: key);
+  LoadingScreen({Key? key, required this.uid}) : super(key: key);
   final String uid;
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -33,34 +32,22 @@ class _LoadingScreenState extends State<LoadingScreen> {
     "Art"
   ];
   void appinit() async {
-    try {
-      docid = await db.getUserDocID(widget.uid);
-      AppUser curruser = await db.getUserFromDocID(docid);
-      interests = curruser.interests;
-      eventlist = await db.getEvents(interests);
-      interesteventlist = await db.getInterestEvents(interests);
+    docid = await db.getUserDocID(widget.uid);
+    AppUser curruser = await db.getUserFromDocID(docid);
+    interests = curruser.interests;
+    eventlist = await db.getEvents(interests);
+    interesteventlist = await db.getInterestEvents(interests);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => MainScreen(
-              interests: interests,
-              eventlist: eventlist,
-              interesteventlist: interesteventlist,
-              curruser: curruser),
-        ),
-      );
-    } catch (e) {
-      if (widget.signup) {
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => const AuthScreen(),
-          ),
-        );
-      }
-    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => MainScreen(
+            interests: interests,
+            eventlist: eventlist,
+            interesteventlist: interesteventlist,
+            curruser: curruser),
+      ),
+    );
   }
 
   @override

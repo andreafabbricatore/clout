@@ -71,6 +71,35 @@ class db_conn {
     }
   }
 
+  Future deleteuser(AppUser curruser) async {
+    try {
+      DocumentSnapshot userSnapshot = await users.doc(curruser.docid).get();
+      List joinedEvents = userSnapshot['joined_events'];
+      List hostedEvents = userSnapshot['hosted_events'];
+      List followers = userSnapshot['followers'];
+      List following = userSnapshot['following'];
+      for (String eventid in joinedEvents) {
+        await leaveevent(curruser, eventid);
+      }
+      print("left events");
+      for (String eventid in hostedEvents) {
+        await deleteevent(eventid, curruser.username);
+      }
+      print("deleted events");
+      for (String userid in following) {
+        await unFollow(curruser.docid, userid);
+      }
+      print("removed following");
+      for (String userid in followers) {
+        await unFollow(userid, curruser.docid);
+      }
+      print("removed followers");
+      return users.doc(curruser.docid).delete();
+    } catch (e) {
+      throw Exception("Could not delete user");
+    }
+  }
+
   Future createevent(Event newevent, AppUser curruser) async {
     try {
       String bannerUrl = await downloadBannerUrl(newevent.interest);
@@ -126,8 +155,7 @@ class db_conn {
     }
   }
 
-  Future joinevent(
-      Event event, AppUser curruser, String userdocid, String? eventid) async {
+  Future joinevent(Event event, AppUser curruser, String? eventid) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
@@ -136,8 +164,8 @@ class db_conn {
         throw Exception("Too many participants");
       } else {
         joinedEvents.add(eventid);
-        participants.add(userdocid);
-        users.doc(userdocid).update({'joined_events': joinedEvents});
+        participants.add(curruser.docid);
+        users.doc(curruser.docid).update({'joined_events': joinedEvents});
         events.doc(eventid).update({'participants': participants});
       }
     } catch (e) {
@@ -145,8 +173,7 @@ class db_conn {
     }
   }
 
-  Future leaveevent(
-      Event event, AppUser curruser, String userdocid, String? eventid) async {
+  Future leaveevent(AppUser curruser, String? eventid) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
@@ -155,8 +182,8 @@ class db_conn {
         throw Exception("Cannot leave event");
       } else {
         joinedEvents.removeWhere((element) => element == eventid);
-        participants.removeWhere((element) => element == userdocid);
-        users.doc(userdocid).update({'joined_events': joinedEvents});
+        participants.removeWhere((element) => element == curruser.docid);
+        users.doc(curruser.docid).update({'joined_events': joinedEvents});
         events.doc(eventid).update({'participants': participants});
       }
     } catch (e) {
@@ -164,7 +191,7 @@ class db_conn {
     }
   }
 
-  Future deleteevent(String userdocid, String? eventid, String host) async {
+  Future deleteevent(String? eventid, String host) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
       List participants = eventSnapshot['participants'];
@@ -548,7 +575,7 @@ class db_conn {
       users.doc(curruserdocid).update({'following': following});
       users.doc(userdocid).update({'followers': followers});
     } catch (e) {
-      throw Exception("Could not follow");
+      throw Exception("Could not unfollow");
     }
   }
 

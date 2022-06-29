@@ -118,8 +118,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void interactevent(context) async {
     if (!joined && joinedval == "Join") {
       try {
-        await db.joinevent(widget.event, widget.curruser, widget.curruser.docid,
-            widget.event.docid);
+        await db.joinevent(widget.event, widget.curruser, widget.event.docid);
       } catch (e) {
         displayErrorSnackBar("Could not join event");
       } finally {
@@ -129,8 +128,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       print(joinedval);
     } else if (joined && joinedval == "Delete Event") {
       try {
-        await db.deleteevent(
-            widget.curruser.docid, widget.event.docid, widget.event.host);
+        await db.deleteevent(widget.event.docid, widget.event.host);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) => LoadingScreen(
@@ -146,8 +144,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       }
     } else {
       try {
-        await db.leaveevent(widget.event, widget.curruser,
-            widget.curruser.docid, widget.event.docid);
+        await db.leaveevent(widget.curruser, widget.event.docid);
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {

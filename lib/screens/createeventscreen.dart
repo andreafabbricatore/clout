@@ -370,8 +370,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => LoadingScreen(
-                          uid: widget.curruser.uid, signup: false),
+                      builder: (BuildContext context) =>
+                          LoadingScreen(uid: widget.curruser.uid),
                     ),
                   );
                 } catch (e) {

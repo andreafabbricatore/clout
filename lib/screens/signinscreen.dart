@@ -1,6 +1,9 @@
+import 'package:clout/main.dart';
+import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -106,29 +109,18 @@ class _SignInScreenState extends State<SignInScreen> {
             SizedBox(height: screenheight * 0.02),
             InkWell(
               onTap: () async {
-                String? res = await context
-                    .read<AuthenticationService>()
-                    .signIn(
-                        email: emailController.text.trim(),
-                        password: pswController.text.trim());
-                if (res == "Yes") {
-                  setState(() {
-                    error = "";
-                    errorcolor = Colors.white;
-                  });
-                  String uid =
-                      context.read<AuthenticationService>().getuid().toString();
+                try {
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: emailController.text.trim(),
+                      password: pswController.text.trim());
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            LoadingScreen(uid: uid)),
+                            AuthenticationWrapper()),
                   );
-                } else {
-                  setState(() {
-                    error = res;
-                    errorcolor = Colors.red;
-                  });
+                } catch (e) {
+                  print("error could not sign in");
                 }
               },
               child: SizedBox(

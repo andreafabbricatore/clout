@@ -7,29 +7,37 @@ class AuthenticationService {
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  Future<void> signOut() async {
-    await _firebaseAuth.signOut();
-  }
-
-  Future<String?> signIn(
-      {required String email, required String password}) async {
+  Future? signOut() async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      return "Yes";
-    } on FirebaseAuthException catch (e) {
-      return e.message;
+      return _firebaseAuth.signOut();
+    } catch (e) {
+      throw Exception("Could not sign out");
     }
   }
 
-  Future<String?> signUp(
-      {required String email, required String password}) async {
+  Future? signIn({required String email, required String password}) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      return _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-      return "Yes";
-    } on FirebaseAuthException catch (e) {
-      return e.message;
+    } catch (e) {
+      throw Exception("could not sign in");
+    }
+  }
+
+  Future? verifyEmail() {
+    try {
+      return _firebaseAuth.currentUser?.sendEmailVerification();
+    } catch (e) {
+      throw Exception("Could not send verification email");
+    }
+  }
+
+  Future? signUp({required String email, required String password}) async {
+    try {
+      return _firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
+    } catch (e) {
+      throw Exception("Could not signup");
     }
   }
 

@@ -1,11 +1,17 @@
+import 'package:clout/components/user.dart';
+import 'package:clout/main.dart';
+import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
+import 'package:clout/services/db.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SetttingsScreen extends StatelessWidget {
-  const SetttingsScreen({Key? key}) : super(key: key);
-
+  SetttingsScreen({Key? key, required this.curruser}) : super(key: key);
+  AppUser curruser;
+  db_conn db = db_conn();
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -30,34 +36,106 @@ class SetttingsScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Center(
-          child: InkWell(
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 8.0),
+        child: ListView(children: [
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          Row(
+            children: const [
+              Icon(Icons.email_outlined, size: 30),
+              SizedBox(
+                width: 6,
+              ),
+              Text(
+                "Update Email Address",
+                style: TextStyle(fontSize: 20),
+              )
+            ],
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          Row(
+            children: const [
+              Icon(Icons.lock_outline, size: 30),
+              SizedBox(
+                width: 6,
+              ),
+              Text(
+                "Update Password",
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: screenheight * 0.04,
+          ),
+          GestureDetector(
             onTap: () async {
-              await context.read<AuthenticationService>().signOut();
+              await FirebaseAuth.instance.signOut();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => LoadingScreen(uid: ""),
-                ),
+                    builder: (BuildContext context) => AuthenticationWrapper()),
               );
             },
-            child: SizedBox(
-                height: 50,
-                width: screenwidth * 0.6,
-                child: Container(
-                  decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 255, 48, 117),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: const Center(
-                      child: Text(
-                    "Sign Out",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  )),
-                )),
+            child: const Text(
+              "Log out",
+              style: TextStyle(
+                  fontSize: 20, color: Color.fromARGB(255, 255, 48, 117)),
+            ),
           ),
-        ),
-      ]),
+          SizedBox(
+            height: screenheight * 0.6,
+          ),
+          GestureDetector(
+            onTap: () {
+              AlertDialog alert = AlertDialog(
+                title: const Text("Delete Account"),
+                content: const Text(
+                    "Are you sure you want to permanently delete your account?"),
+                actions: [
+                  TextButton(
+                    child: const Text("Delete Account"),
+                    onPressed: () async {
+                      try {
+                        await FirebaseAuth.instance.currentUser!.delete();
+                        await db.deleteuser(curruser);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  AuthenticationWrapper()),
+                        );
+                      } catch (e) {}
+                    },
+                  ),
+                  TextButton(
+                    child: const Text("Cancel"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return alert;
+                  });
+            },
+            child: const Center(
+              child: Text(
+                "Delete Account",
+                style: TextStyle(
+                    fontSize: 20, color: Color.fromARGB(255, 255, 48, 117)),
+              ),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }

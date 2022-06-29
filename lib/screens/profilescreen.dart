@@ -112,7 +112,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void settings() async {
     await Navigator.push(
-        context, MaterialPageRoute(builder: (_) => const SetttingsScreen()));
+        context,
+        MaterialPageRoute(
+            builder: (_) => SetttingsScreen(
+                  curruser: widget.curruser,
+                )));
     refresh();
   }
 
