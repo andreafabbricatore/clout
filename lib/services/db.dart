@@ -94,6 +94,10 @@ class db_conn {
         await unFollow(userid, curruser.docid);
       }
       print("removed followers");
+      await FirebaseStorage.instance
+          .ref('/user_pfp/${curruser.uid}.jpg')
+          .delete();
+      print("deleted pfp");
       return users.doc(curruser.docid).delete();
     } catch (e) {
       throw Exception("Could not delete user");
@@ -240,6 +244,18 @@ class db_conn {
         .then((value) => print("changed $attribute"))
         .catchError((error) {
           throw Exception("Could not change $attribute");
+        });
+  }
+
+  Future changebirthday(DateTime value, String uid) async {
+    String id = "";
+    await getUserDocID(uid).then((value) => id = value);
+    return users
+        .doc(id)
+        .update({'birthday': value})
+        .then((value) => print("changed birthday"))
+        .catchError((error) {
+          throw Exception("Could not change birthday");
         });
   }
 

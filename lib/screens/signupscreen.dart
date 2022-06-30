@@ -3,15 +3,14 @@ import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/datetextfield.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
-import 'package:clout/screens/authscreen.dart';
-import 'package:clout/screens/loading.dart';
-import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key? key}) : super(key: key);
@@ -35,7 +34,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       gender: "",
       fullname: "",
       email: "",
-      birthday: "",
+      birthday: DateTime(0, 0, 0),
       followers: [],
       following: [],
       favorites: [],
@@ -406,7 +405,7 @@ class MiscScreen extends StatefulWidget {
 }
 
 class _MiscScreenState extends State<MiscScreen> {
-  final birthdaycontroller = TextEditingController();
+  DateTime birthday = DateTime(0, 0, 0);
   String gender = 'Male';
   String nationality = 'Australia';
   db_conn db = db_conn();
@@ -711,80 +710,118 @@ class _MiscScreenState extends State<MiscScreen> {
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(height: screenheight * 0.2),
-          SizedBox(
-            width: screenwidth * 0.6,
-            child: DropdownButtonFormField(
-              decoration: const InputDecoration(
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 48, 117)))),
-              value: gender,
-              onChanged: (String? newValue) {
-                setState(() {
-                  gender = newValue!;
-                });
-              },
-              onSaved: (String? newValue) {
-                setState(() {
-                  gender = newValue!;
-                });
-              },
-              items: genders.map((String items) {
-                return DropdownMenuItem(
-                  value: items,
-                  child: Text(items),
-                );
-              }).toList(),
+          child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(height: screenheight * 0.2),
+            SizedBox(
+              width: screenwidth * 0.6,
+              child: DropdownButtonFormField(
+                decoration: const InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromARGB(255, 255, 48, 117)))),
+                value: gender,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    gender = newValue!;
+                  });
+                },
+                onSaved: (String? newValue) {
+                  setState(() {
+                    gender = newValue!;
+                  });
+                },
+                items: genders.map((String items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-          SizedBox(height: screenheight * 0.02),
-          SizedBox(
-            width: screenwidth * 0.6,
-            child: DropdownButtonFormField(
-              decoration: const InputDecoration(
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 48, 117)))),
-              value: nationality,
-              onChanged: (String? newValue) {
-                setState(() {
-                  nationality = newValue!;
-                });
-              },
-              onSaved: (String? newValue) {
-                setState(() {
-                  nationality = newValue!;
-                });
-              },
-              items: nations.map((String items) {
-                return DropdownMenuItem(
-                  value: items,
-                  child: Text(items),
-                );
-              }).toList(),
-              isExpanded: true,
+            SizedBox(height: screenheight * 0.02),
+            SizedBox(
+              width: screenwidth * 0.6,
+              child: DropdownButtonFormField(
+                decoration: const InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromARGB(255, 255, 48, 117)))),
+                value: nationality,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    nationality = newValue!;
+                  });
+                },
+                onSaved: (String? newValue) {
+                  setState(() {
+                    nationality = newValue!;
+                  });
+                },
+                items: nations.map((String items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items),
+                  );
+                }).toList(),
+                isExpanded: true,
+              ),
             ),
-          ),
-          SizedBox(height: screenheight * 0.02),
-          datetextfield(
-              screenwidth, "dd/mm/yyyy", birthdaycontroller, maskFormatter),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-        ],
+            SizedBox(height: screenheight * 0.02),
+            InkWell(
+              onTap: () {
+                DatePicker.showDatePicker(context,
+                    showTitleActions: true,
+                    minTime: DateTime(1950, 1, 1),
+                    maxTime: DateTime(
+                        DateTime.now().year - 16, DateTime.december, 31),
+                    onChanged: (date) {}, onConfirm: (date) {
+                  setState(() {
+                    birthday = date;
+                  });
+                  print(birthday);
+                }, currentTime: DateTime.now());
+              },
+              child: Container(
+                height: screenwidth * 0.13,
+                width: screenwidth * 0.6,
+                decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black)),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Text(
+                    birthday == DateTime(0, 0, 0)
+                        ? "Enter birthday"
+                        : DateFormat('dd MMMM yyyy').format(birthday),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  const Icon(
+                    Icons.date_range,
+                    size: 15,
+                  )
+                ]),
+              ),
+            ),
+            SizedBox(
+              height: screenheight * 0.02,
+            ),
+          ],
+        ),
       )),
       floatingActionButton: SizedBox(
         height: 70,
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            if (birthdaycontroller.text.isNotEmpty) {
+            if (birthday != DateTime(0, 0, 0)) {
               setState(() {
-                widget.curruser.birthday = birthdaycontroller.text;
+                widget.curruser.birthday = birthday;
                 widget.curruser.nationality = nationality;
                 widget.curruser.gender = gender;
               });
@@ -968,8 +1005,7 @@ class _InterestScreenState extends State<InterestScreen> {
                 await db.changeattribute('gender', widget.curruser.gender, uid);
                 await db.changeattribute(
                     'nationality', widget.curruser.nationality, uid);
-                await db.changeattribute(
-                    'birthday', widget.curruser.birthday, uid);
+                await db.changebirthday(widget.curruser.birthday, uid);
                 await db.changeinterests(
                     'interests', widget.curruser.interests, uid);
 

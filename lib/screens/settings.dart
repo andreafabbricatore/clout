@@ -1,3 +1,4 @@
+import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
@@ -12,10 +13,79 @@ class SetttingsScreen extends StatelessWidget {
   SetttingsScreen({Key? key, required this.curruser}) : super(key: key);
   AppUser curruser;
   db_conn db = db_conn();
+  TextEditingController psw = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
+    AlertDialog pswalert = AlertDialog(
+      title: const Text("Re-enter password"),
+      content: SizedBox(
+        height: screenheight * 0.15,
+        child: Center(
+          child: Column(
+            children: [
+              const Text("In order to delete account, re-enter password"),
+              SizedBox(
+                height: screenheight * 0.02,
+              ),
+              textdatafield(screenwidth * 0.4, "Password", psw)
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: const Text("Delete Account"),
+          onPressed: () async {
+            try {
+              await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: curruser.email, password: psw.text.trim());
+              await FirebaseAuth.instance.currentUser!.delete();
+              await db.deleteuser(curruser);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => AuthenticationWrapper()),
+              );
+            } catch (e) {
+              print(e);
+            }
+          },
+        ),
+        TextButton(
+          child: const Text("Cancel"),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+    AlertDialog alert = AlertDialog(
+      title: const Text("Delete Account"),
+      content: const Text(
+          "Are you sure you want to permanently delete your account?"),
+      actions: [
+        TextButton(
+          child: const Text("Delete Account"),
+          onPressed: () async {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return pswalert;
+                });
+          },
+        ),
+        TextButton(
+          child: const Text("Cancel"),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -92,34 +162,6 @@ class SetttingsScreen extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              AlertDialog alert = AlertDialog(
-                title: const Text("Delete Account"),
-                content: const Text(
-                    "Are you sure you want to permanently delete your account?"),
-                actions: [
-                  TextButton(
-                    child: const Text("Delete Account"),
-                    onPressed: () async {
-                      try {
-                        await FirebaseAuth.instance.currentUser!.delete();
-                        await db.deleteuser(curruser);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  AuthenticationWrapper()),
-                        );
-                      } catch (e) {}
-                    },
-                  ),
-                  TextButton(
-                    child: const Text("Cancel"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              );
               showDialog(
                   context: context,
                   builder: (BuildContext context) {

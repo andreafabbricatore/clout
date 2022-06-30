@@ -6,8 +6,10 @@ import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -25,9 +27,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   var imagepath;
   TextEditingController fullnamecontroller = TextEditingController();
   TextEditingController usernamecontroller = TextEditingController();
-  TextEditingController birthdaycontroller = TextEditingController();
-  var maskFormatter = MaskTextInputFormatter(
-      mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
+  //DateTime birthday = DateTime(0, 0, 0);
+
   var genders = ['Male', 'Female', 'Non-Binary'];
   var nations = [
     'Afghanistan',
@@ -298,7 +299,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       usernamecontroller.text = widget.curruser.username;
       gender = widget.curruser.gender;
       nationality = widget.curruser.nationality;
-      birthdaycontroller.text = widget.curruser.birthday;
+      //birthday = widget.curruser.birthday;
     });
     super.initState();
   }
@@ -436,11 +437,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          datetextfield(
-              screenwidth, "dd/mm/yyyy", birthdaycontroller, maskFormatter),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
           InkWell(
             onTap: () async {
               List updatedinterests = await Navigator.push(
@@ -500,10 +496,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 await db.changeattribute('gender', gender, widget.curruser.uid);
                 await db.changeattribute(
                     'nationality', nationality, widget.curruser.uid);
-                if (birthdaycontroller.text.isNotEmpty) {
-                  await db.changeattribute(
-                      'birthday', birthdaycontroller.text, widget.curruser.uid);
-                }
                 await db.changeinterests(
                     'interests', widget.interests, widget.curruser.uid);
               } catch (e) {

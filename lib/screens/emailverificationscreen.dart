@@ -67,36 +67,48 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         : Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Sent verification email\nIf you havent received it press below to send again",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: screenheight * 0.02,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      sendverificationemail();
-                    },
-                    child: SizedBox(
-                        height: 50,
-                        width: screenwidth * 0.6,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              color: Color.fromARGB(255, 255, 48, 117),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          child: const Center(
-                              child: Text(
-                            "Resend Email",
-                            style: TextStyle(fontSize: 20, color: Colors.white),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Sent verification email to: \n${FirebaseAuth.instance.currentUser!.email}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.02,
+                    ),
+                    const Text(
+                      "Press below to send again",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.02,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        sendverificationemail();
+                      },
+                      child: SizedBox(
+                          height: 50,
+                          width: screenwidth * 0.6,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 48, 117),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: const Center(
+                                child: Text(
+                              "Resend Email",
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
+                            )),
                           )),
-                        )),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );

@@ -9,7 +9,7 @@ class AppUser {
   String gender;
   String fullname;
   String email;
-  String birthday;
+  DateTime birthday;
   List followers;
   List following;
   List favorites;
@@ -46,7 +46,7 @@ class AppUser {
         gender: json['gender'],
         fullname: json['fullname'],
         email: json['email'],
-        birthday: json['birthday'],
+        birthday: json['birthday'].toDate(),
         followers: json['followers'] as List,
         following: json['following'] as List,
         clout: json['clout'] as int,
