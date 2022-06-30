@@ -1,3 +1,4 @@
+import 'package:clout/components/location.dart';
 import 'package:clout/components/searchbarlistview.dart';
 import 'package:clout/components/searchgridview.dart';
 import 'package:clout/components/user.dart';
@@ -7,8 +8,9 @@ import 'package:flutter/material.dart';
 import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({super.key, required this.curruser});
+  SearchScreen({super.key, required this.curruser, required this.userlocation});
   AppUser curruser;
+  AppLocation userlocation;
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
@@ -27,6 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
     "Food",
     "Art"
   ];
+  String city = "";
 
   Future<void> updatecurruser() async {
     AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
@@ -54,6 +57,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
+    setState(() {
+      city = widget.userlocation.city.split(" ").last;
+    });
     focusNode.addListener(() {
       print('1:  ${focusNode.hasFocus}');
     });
@@ -67,18 +73,26 @@ class _SearchScreenState extends State<SearchScreen> {
 
     Future<void> searchnav(String interest) async {
       try {
-        List<Event> res = await db.getInterestEvents([interest]);
-        print(res);
+        List<Event> currcityeventlist = await db.getCurrCityEvents(city);
+        List<Event> interesteventlist = [];
+        for (int i = 0; i < currcityeventlist.length; i++) {
+          if (interest == currcityeventlist[i].interest) {
+            setState(() {
+              interesteventlist.add(currcityeventlist[i]);
+            });
+          }
+        }
+        print(interesteventlist);
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (_) => InterestSearchScreen(
-                      interest: interest,
-                      events: res,
-                      curruser: widget.curruser,
-                    )));
+                    interest: interest,
+                    events: interesteventlist,
+                    curruser: widget.curruser,
+                    city: city)));
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        displayErrorSnackBar("Could not display events");
       }
     }
 

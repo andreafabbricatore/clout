@@ -114,7 +114,8 @@ class db_conn {
           newevent.title,
           newevent.description,
           newevent.interest,
-          newevent.location,
+          newevent.address,
+          newevent.city,
           newevent.host,
           newevent.datetime,
           newevent.maxparticipants,
@@ -133,7 +134,8 @@ class db_conn {
           'title': newevent.title,
           'description': newevent.description,
           'interest': newevent.interest,
-          'location': newevent.location,
+          'address': newevent.address,
+          'city': newevent.city,
           'host': newevent.host,
           'time': newevent.datetime,
           'maxparticipants': newevent.maxparticipants,
@@ -338,7 +340,8 @@ class db_conn {
               if (doc["title"] == event.title &&
                   doc['description'] == event.description &&
                   doc['interest'] == event.interest &&
-                  doc['location'] == event.location &&
+                  doc['address'] == event.address &&
+                  doc['city'] == event.city &&
                   doc['host'] == event.host &&
                   doc['maxparticipants'] == event.maxparticipants &&
                   listEquals(doc['participants'], event.participants) &&
@@ -424,7 +427,8 @@ class db_conn {
       String title,
       String description,
       String interest,
-      String location,
+      String address,
+      String city,
       String host,
       DateTime time,
       int maxparticipants,
@@ -436,7 +440,8 @@ class db_conn {
               if (doc["title"] == title &&
                   doc['description'] == description &&
                   doc['interest'] == interest &&
-                  doc['location'] == location &&
+                  doc['address'] == address &&
+                  doc['city'] == city &&
                   doc['host'] == host &&
                   doc['maxparticipants'] == maxparticipants &&
                   listEquals(doc['participants'], participants) &&
@@ -469,6 +474,20 @@ class db_conn {
     try {
       QuerySnapshot querySnapshot =
           await events.where('interest', whereNotIn: interests).get();
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        eventlist.add(Event.fromJson(element.data(), element.id));
+      });
+      return eventlist;
+    } catch (e) {
+      throw Exception("Could not connect");
+    }
+  }
+
+  Future<List<Event>> getCurrCityEvents(String city) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await events.where('city', isEqualTo: city).get();
       List<Event> eventlist = [];
       querySnapshot.docs.forEach((element) {
         eventlist.add(Event.fromJson(element.data(), element.id));

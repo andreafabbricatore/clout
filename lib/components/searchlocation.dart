@@ -16,9 +16,9 @@ class _SearchLocationState extends State<SearchLocation> {
   TextEditingController searchcontroller = TextEditingController();
   String accessToken = dotenv.get('MAPBOX_ACCESS_TOKEN');
   Dio _dio = Dio();
-  List<Location> res = [];
-  Location chosenLocation =
-      Location(address: "", city: "", country: "", center: [0.0, 0.0]);
+  List<AppLocation> res = [];
+  AppLocation chosenLocation =
+      AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -29,7 +29,7 @@ class _SearchLocationState extends State<SearchLocation> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Widget _listviewitem(Location location) {
+  Widget _listviewitem(AppLocation location) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 16.0, 8.0, 0),
       child: InkWell(
@@ -101,9 +101,9 @@ class _SearchLocationState extends State<SearchLocation> {
                 try {
                   _dio.options.contentType = Headers.jsonContentType;
                   final responseData = await _dio.get(url);
-                  List<Location> response =
+                  List<AppLocation> response =
                       (responseData.data['features'] as List)
-                          .map((e) => Location.fromJson(e))
+                          .map((e) => AppLocation.fromJson(e))
                           .toList();
                   setState(() {
                     res = response;

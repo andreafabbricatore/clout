@@ -1,9 +1,12 @@
+import 'package:clout/components/location.dart';
+
 class Event {
   String title;
   String description;
   String interest;
   String image;
-  String location;
+  String address;
+  String city;
   double lat;
   double lng;
   DateTime datetime;
@@ -17,7 +20,8 @@ class Event {
       required this.description,
       required this.interest,
       required this.image,
-      required this.location,
+      required this.address,
+      required this.city,
       required this.host,
       required this.maxparticipants,
       required this.participants,
@@ -32,7 +36,8 @@ class Event {
         description: json['description'],
         interest: json['interest'],
         image: json['image'],
-        location: json['location'],
+        address: json['address'],
+        city: json['city'],
         host: json['host'],
         maxparticipants: json['maxparticipants'] as int,
         participants: json['participants'] as List,

@@ -1,24 +1,30 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/favscreen.dart';
 import 'package:clout/screens/homescreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/screens/searchscreen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:location/location.dart';
 
 class MainScreen extends StatefulWidget {
   List interests;
   List<Event> eventlist;
   List<Event> interesteventlist;
   AppUser curruser;
+  AppLocation userlocation;
   MainScreen(
       {Key? key,
       required this.interests,
       required this.eventlist,
       required this.interesteventlist,
-      required this.curruser})
+      required this.curruser,
+      required this.userlocation})
       : super(key: key);
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -31,15 +37,14 @@ class _MainScreenState extends State<MainScreen> {
   void parampasser(bool updatehome) {
     page = [
       HomeScreen(
-        curruser: widget.curruser,
-        interests: widget.interests,
-        eventlist: widget.eventlist,
-        interestevents: widget.interesteventlist,
-        updatehome: updatehome,
-      ),
+          curruser: widget.curruser,
+          interests: widget.interests,
+          eventlist: widget.eventlist,
+          interestevents: widget.interesteventlist,
+          updatehome: updatehome,
+          userlocation: widget.userlocation),
       SearchScreen(
-        curruser: widget.curruser,
-      ),
+          curruser: widget.curruser, userlocation: widget.userlocation),
       CreateEventScreen(
         curruser: widget.curruser,
       ),

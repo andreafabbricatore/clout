@@ -26,7 +26,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       description: "",
       interest: "",
       image: "",
-      location: "",
+      address: "",
+      city: "",
       host: "",
       maxparticipants: 0,
       participants: [],
@@ -54,8 +55,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
   DateTime eventdate = DateTime(0, 0, 0);
-  Location chosenLocation =
-      Location(address: "", city: "", country: "", center: [0.0, 0.0]);
+  AppLocation chosenLocation =
+      AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
   bool emptylocation = true;
 
   void displayErrorSnackBar(String error) async {
@@ -268,7 +269,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(height: screenheight * 0.02),
           InkWell(
             onTap: () async {
-              Location chosen = await Navigator.push(
+              AppLocation chosen = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => SearchLocation(),
@@ -360,7 +361,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   event.maxparticipants = int.parse(maxpartcontroller.text);
                   event.interest = selectedinterest;
                   event.datetime = eventdate;
-                  event.location = chosenLocation.address;
+                  event.address = chosenLocation.address;
+                  event.city = chosenLocation.city.split(" ")[0];
                   event.host = widget.curruser.username;
                   event.lat = chosenLocation.center[1];
                   event.lng = chosenLocation.center[0];

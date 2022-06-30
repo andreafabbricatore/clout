@@ -59,7 +59,7 @@ class EventListView extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 255, 48, 117))),
               Text(
-                "${event.location}",
+                "${event.address}",
                 style: const TextStyle(
                     fontFamily: "Poppins",
                     fontSize: 12,
@@ -118,7 +118,7 @@ class EventListView extends StatelessWidget {
                               color: Color.fromARGB(255, 255, 48, 117))),
                       const SizedBox(height: 5),
                       Text(
-                        "${event.location}",
+                        "${event.address}",
                         style: const TextStyle(
                             fontFamily: "Poppins",
                             fontSize: 12,

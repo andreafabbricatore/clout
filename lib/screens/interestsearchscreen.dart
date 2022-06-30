@@ -11,12 +11,13 @@ class InterestSearchScreen extends StatefulWidget {
       {Key? key,
       required this.interest,
       required this.events,
-      required this.curruser})
+      required this.curruser,
+      required this.city})
       : super(key: key);
   String interest;
   List<Event> events;
   AppUser curruser;
-
+  String city;
   @override
   State<InterestSearchScreen> createState() => _InterestSearchScreenState();
 }
@@ -60,10 +61,17 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
 
   Future<void> refreshevents() async {
     try {
-      List<Event> interestevents =
-          await db.getInterestEvents([widget.interest]);
+      List<Event> currcityeventlist = await db.getCurrCityEvents(widget.city);
+      List<Event> interesteventlist = [];
+      for (int i = 0; i < currcityeventlist.length; i++) {
+        if (widget.interest == currcityeventlist[i].interest) {
+          setState(() {
+            interesteventlist.add(currcityeventlist[i]);
+          });
+        }
+      }
       setState(() {
-        widget.events = interestevents;
+        widget.events = interesteventlist;
       });
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");

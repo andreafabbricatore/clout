@@ -1,10 +1,15 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:location/location.dart';
 
 class LoadingScreen extends StatefulWidget {
   LoadingScreen({Key? key, required this.uid}) : super(key: key);
@@ -14,9 +19,16 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  late bool _serviceEnabled;
+  late PermissionStatus _permissionGranted;
+  LocationData? _userLocation;
+  AppLocation curruserlocation =
+      AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
+  Dio _dio = Dio();
   db_conn db = db_conn();
   String docid = "";
   List interests = [];
+  List<Event> currcityeventlist = [];
   List<Event> eventlist = [];
   List<Event> interesteventlist = [];
   List allinterests = [
@@ -31,23 +43,89 @@ class _LoadingScreenState extends State<LoadingScreen> {
     "Food",
     "Art"
   ];
-  void appinit() async {
-    docid = await db.getUserDocID(widget.uid);
-    AppUser curruser = await db.getUserFromDocID(docid);
-    interests = curruser.interests;
-    eventlist = await db.getEvents(interests);
-    interesteventlist = await db.getInterestEvents(interests);
+  Future<void> _getUserLocation() async {
+    Location location = Location();
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => MainScreen(
-            interests: interests,
-            eventlist: eventlist,
-            interesteventlist: interesteventlist,
-            curruser: curruser),
-      ),
-    );
+    // Check if location service is enable
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    // Check if permission is granted
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      print("need location");
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    final _locationData = await location.getLocation();
+    setState(() {
+      _userLocation = _locationData;
+    });
+  }
+
+  Future<void> getUserAppLocation() async {
+    String searchquery =
+        "${_userLocation?.longitude},${_userLocation?.latitude}";
+    String accessToken = dotenv.get('MAPBOX_ACCESS_TOKEN');
+    String url =
+        'https://api.mapbox.com/geocoding/v5/mapbox.places/$searchquery.json?limit=1&types=poi%2Caddress&access_token=$accessToken';
+    url = Uri.parse(url).toString();
+    //print(url);
+
+    _dio.options.contentType = Headers.jsonContentType;
+    final responseData = await _dio.get(url);
+    List<AppLocation> response = (responseData.data['features'] as List)
+        .map((e) => AppLocation.fromJson(e))
+        .toList();
+    setState(() {
+      curruserlocation = response[0];
+    });
+  }
+
+  void appinit() async {
+    await _getUserLocation();
+    await getUserAppLocation();
+    if (curruserlocation.address != "" &&
+        curruserlocation.city != "" &&
+        curruserlocation.country != "" &&
+        !listEquals(curruserlocation.center, [0.0, 0.0])) {
+      docid = await db.getUserDocID(widget.uid);
+      AppUser curruser = await db.getUserFromDocID(docid);
+      interests = curruser.interests;
+      String city = curruserlocation.city.split(" ").last;
+      currcityeventlist = await db.getCurrCityEvents(city);
+      for (int i = 0; i < currcityeventlist.length; i++) {
+        if (interests.contains(currcityeventlist[i].interest)) {
+          setState(() {
+            interesteventlist.add(currcityeventlist[i]);
+          });
+        } else {
+          setState(() {
+            eventlist.add(currcityeventlist[i]);
+          });
+        }
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => MainScreen(
+              interests: interests,
+              eventlist: eventlist,
+              interesteventlist: interesteventlist,
+              curruser: curruser,
+              userlocation: curruserlocation),
+        ),
+      );
+    } else {}
   }
 
   @override

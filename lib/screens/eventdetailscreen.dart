@@ -276,7 +276,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             height: screenheight * 0.02,
           ),
           Text(
-            "At ${widget.event.location}, ${DateFormat.MMMd().format(widget.event.datetime)} @ ${DateFormat('hh:mm a').format(widget.event.datetime)}",
+            "At ${widget.event.address}, ${DateFormat.MMMd().format(widget.event.datetime)} @ ${DateFormat('hh:mm a').format(widget.event.datetime)}",
             style: const TextStyle(
                 fontSize: 15,
                 color: Colors.black,

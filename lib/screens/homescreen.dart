@@ -1,9 +1,12 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 class HomeScreen extends StatefulWidget {
   List interests = [];
@@ -11,13 +14,15 @@ class HomeScreen extends StatefulWidget {
   List<Event> interestevents = [];
   bool updatehome;
   AppUser curruser;
+  AppLocation userlocation;
   HomeScreen(
       {Key? key,
       required this.interests,
       required this.eventlist,
       required this.interestevents,
       required this.updatehome,
-      required this.curruser})
+      required this.curruser,
+      required this.userlocation})
       : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -28,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> generaleventlist = [];
   List<Event> interesteventlist = [];
   List userinterests = [];
+  String city = "";
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -60,14 +66,36 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void getSortedCurrCityEventsList(interests) async {
+    try {
+      interesteventlist = [];
+      generaleventlist = [];
+      List<Event> currcityeventlist = await db.getCurrCityEvents(city);
+      for (int i = 0; i < currcityeventlist.length; i++) {
+        if (interests.contains(currcityeventlist[i].interest)) {
+          setState(() {
+            interesteventlist.add(currcityeventlist[i]);
+          });
+        } else {
+          setState(() {
+            generaleventlist.add(currcityeventlist[i]);
+          });
+        }
+      }
+    } catch (e) {
+      displayErrorSnackBar("Could not get events in $city");
+    }
+  }
+
   Future<void> refreshevents() async {
     try {
-      List<Event> events = await db.getEvents(userinterests);
-      List<Event> interestevents = await db.getInterestEvents(userinterests);
-      setState(() {
-        generaleventlist = events;
-        interesteventlist = interestevents;
-      });
+      //List<Event> events = await db.getEvents(userinterests);
+      //List<Event> interestevents = await db.getInterestEvents(userinterests);
+      //setState(() {
+      //  generaleventlist = events;
+      //  interesteventlist = interestevents;
+      //});
+      getSortedCurrCityEventsList(userinterests);
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");
     }
@@ -109,14 +137,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    setState(() {
+      city = widget.userlocation.city.split(" ").last;
+    });
     generaleventlist = widget.eventlist;
     userinterests = widget.interests;
     interesteventlist = widget.interestevents;
-    if (generaleventlist.isEmpty) {
-      getEventsList(userinterests);
-    }
-    if (interesteventlist.isEmpty) {
-      getInterestEventsList(userinterests);
+    if (generaleventlist.isEmpty || interesteventlist.isEmpty) {
+      getSortedCurrCityEventsList(userinterests);
     }
     if (widget.updatehome) {
       refresh();
@@ -128,7 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-
     Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
@@ -153,9 +180,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Clout",
-          style: TextStyle(
+        title: Text(
+          "Clout - $city",
+          style: const TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
               fontWeight: FontWeight.bold,
               fontSize: 30),
