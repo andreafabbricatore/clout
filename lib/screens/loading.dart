@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
@@ -22,6 +24,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
   LocationData? _userLocation;
+  bool error = false;
   AppLocation curruserlocation =
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
   Dio _dio = Dio();
@@ -51,7 +54,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
-        return;
+        throw Exception();
       }
     }
 
@@ -59,9 +62,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     _permissionGranted = await location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
-      print("need location");
       if (_permissionGranted != PermissionStatus.granted) {
-        return;
+        throw Exception();
       }
     }
 
@@ -91,41 +93,50 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void appinit() async {
-    await _getUserLocation();
-    await getUserAppLocation();
-    if (curruserlocation.address != "" &&
-        curruserlocation.city != "" &&
-        curruserlocation.country != "" &&
-        !listEquals(curruserlocation.center, [0.0, 0.0])) {
-      docid = await db.getUserDocID(widget.uid);
-      AppUser curruser = await db.getUserFromDocID(docid);
-      interests = curruser.interests;
-      String city = curruserlocation.city.split(" ").last;
-      currcityeventlist = await db.getCurrCityEvents(city);
-      for (int i = 0; i < currcityeventlist.length; i++) {
-        if (interests.contains(currcityeventlist[i].interest)) {
-          setState(() {
-            interesteventlist.add(currcityeventlist[i]);
-          });
-        } else {
-          setState(() {
-            eventlist.add(currcityeventlist[i]);
-          });
+    try {
+      setState(() {
+        error = false;
+      });
+      await _getUserLocation();
+      await getUserAppLocation();
+      if (curruserlocation.address != "" &&
+          curruserlocation.city != "" &&
+          curruserlocation.country != "" &&
+          !listEquals(curruserlocation.center, [0.0, 0.0])) {
+        docid = await db.getUserDocID(widget.uid);
+        AppUser curruser = await db.getUserFromDocID(docid);
+        interests = curruser.interests;
+        String city = curruserlocation.city.split(" ").last;
+        currcityeventlist = await db.getCurrCityEvents(city);
+        for (int i = 0; i < currcityeventlist.length; i++) {
+          if (interests.contains(currcityeventlist[i].interest)) {
+            setState(() {
+              interesteventlist.add(currcityeventlist[i]);
+            });
+          } else {
+            setState(() {
+              eventlist.add(currcityeventlist[i]);
+            });
+          }
         }
-      }
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => MainScreen(
-              interests: interests,
-              eventlist: eventlist,
-              interesteventlist: interesteventlist,
-              curruser: curruser,
-              userlocation: curruserlocation),
-        ),
-      );
-    } else {}
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => MainScreen(
+                interests: interests,
+                eventlist: eventlist,
+                interesteventlist: interesteventlist,
+                curruser: curruser,
+                userlocation: curruserlocation),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        error = true;
+      });
+    }
   }
 
   @override
@@ -137,34 +148,70 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     final screenheight = MediaQuery.of(context).size.height;
+    final screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Clout",
-              style: TextStyle(
-                  color: Color.fromARGB(255, 255, 48, 117),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 60),
-            ),
-            Text(
-              "Go Out",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 40),
-            ),
-            SizedBox(
-              height: screenheight * 0.1,
-            ),
-            SpinKitFadingFour(
-              color: Color.fromARGB(255, 255, 48, 117),
-            ),
-          ],
-        ),
+        child: error
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Please make sure Location Services are enabled\nor\nCheck your internet connection",
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.02,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        appinit();
+                      },
+                      child: SizedBox(
+                          height: 50,
+                          width: screenwidth * 0.6,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 48, 117),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: const Center(
+                                child: Text(
+                              "Refresh",
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
+                            )),
+                          )),
+                    ),
+                  ],
+                ),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Clout",
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 255, 48, 117),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 60),
+                  ),
+                  Text(
+                    "Go Out",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 40),
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.1,
+                  ),
+                  SpinKitFadingFour(
+                    color: Color.fromARGB(255, 255, 48, 117),
+                  ),
+                ],
+              ),
       ),
     );
   }
