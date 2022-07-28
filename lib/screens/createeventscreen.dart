@@ -362,7 +362,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   event.interest = selectedinterest;
                   event.datetime = eventdate;
                   event.address = chosenLocation.address;
-                  event.city = chosenLocation.city.split(" ")[0];
+                  event.city = chosenLocation.city;
                   event.host = widget.curruser.username;
                   event.lat = chosenLocation.center[1];
                   event.lng = chosenLocation.center[0];

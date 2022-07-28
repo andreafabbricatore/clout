@@ -31,7 +31,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   db_conn db = db_conn();
   String docid = "";
   List interests = [];
-  List<Event> currcityeventlist = [];
+  List<Event> currloceventlist = [];
   List<Event> eventlist = [];
   List<Event> interesteventlist = [];
   List allinterests = [
@@ -106,20 +106,19 @@ class _LoadingScreenState extends State<LoadingScreen> {
         docid = await db.getUserDocID(widget.uid);
         AppUser curruser = await db.getUserFromDocID(docid);
         interests = curruser.interests;
-        String city = curruserlocation.city.split(" ").last;
-        currcityeventlist = await db.getCurrCityEvents(city);
-        for (int i = 0; i < currcityeventlist.length; i++) {
-          if (interests.contains(currcityeventlist[i].interest)) {
+        currloceventlist = await db.getLngLatEvents(
+            curruserlocation.center[0], curruserlocation.center[1]);
+        for (int i = 0; i < currloceventlist.length; i++) {
+          if (interests.contains(currloceventlist[i].interest)) {
             setState(() {
-              interesteventlist.add(currcityeventlist[i]);
+              interesteventlist.add(currloceventlist[i]);
             });
           } else {
             setState(() {
-              eventlist.add(currcityeventlist[i]);
+              eventlist.add(currloceventlist[i]);
             });
           }
         }
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

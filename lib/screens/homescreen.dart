@@ -33,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> generaleventlist = [];
   List<Event> interesteventlist = [];
   List userinterests = [];
-  String city = "";
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -66,24 +65,25 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void getSortedCurrCityEventsList(interests) async {
+  void getSortedCurrLocEventsList(interests) async {
     try {
       interesteventlist = [];
       generaleventlist = [];
-      List<Event> currcityeventlist = await db.getCurrCityEvents(city);
-      for (int i = 0; i < currcityeventlist.length; i++) {
-        if (interests.contains(currcityeventlist[i].interest)) {
+      List<Event> currloceventlist = await db.getLngLatEvents(
+          widget.userlocation.center[0], widget.userlocation.center[1]);
+      for (int i = 0; i < currloceventlist.length; i++) {
+        if (interests.contains(currloceventlist[i].interest)) {
           setState(() {
-            interesteventlist.add(currcityeventlist[i]);
+            interesteventlist.add(currloceventlist[i]);
           });
         } else {
           setState(() {
-            generaleventlist.add(currcityeventlist[i]);
+            generaleventlist.add(currloceventlist[i]);
           });
         }
       }
     } catch (e) {
-      displayErrorSnackBar("Could not get events in $city");
+      displayErrorSnackBar("Could not get events around you");
     }
   }
 
@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //  generaleventlist = events;
       //  interesteventlist = interestevents;
       //});
-      getSortedCurrCityEventsList(userinterests);
+      getSortedCurrLocEventsList(userinterests);
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");
     }
@@ -137,14 +137,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    setState(() {
-      city = widget.userlocation.city.split(" ").last;
-    });
     generaleventlist = widget.eventlist;
     userinterests = widget.interests;
     interesteventlist = widget.interestevents;
     if (generaleventlist.isEmpty || interesteventlist.isEmpty) {
-      getSortedCurrCityEventsList(userinterests);
+      getSortedCurrLocEventsList(userinterests);
     }
     if (widget.updatehome) {
       refresh();
@@ -181,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Clout - $city",
+          "Clout",
           style: const TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
               fontWeight: FontWeight.bold,
@@ -211,13 +208,20 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Suggested",
-              style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.black,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.w600),
+            InkWell(
+              onTap: () async {
+                List<Event> test = await db.getLngLatEvents(
+                    widget.userlocation.center[0],
+                    widget.userlocation.center[1]);
+              },
+              child: const Text(
+                "Suggested",
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.black,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.w600),
+              ),
             ),
             SizedBox(height: screenheight * 0.02),
             EventListView(

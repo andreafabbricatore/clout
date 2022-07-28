@@ -1,4 +1,5 @@
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
@@ -12,12 +13,12 @@ class InterestSearchScreen extends StatefulWidget {
       required this.interest,
       required this.events,
       required this.curruser,
-      required this.city})
+      required this.userlocation})
       : super(key: key);
   String interest;
   List<Event> events;
   AppUser curruser;
-  String city;
+  AppLocation userlocation;
   @override
   State<InterestSearchScreen> createState() => _InterestSearchScreenState();
 }
@@ -61,12 +62,13 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
 
   Future<void> refreshevents() async {
     try {
-      List<Event> currcityeventlist = await db.getCurrCityEvents(widget.city);
+      List<Event> currloceventlist = await await db.getLngLatEvents(
+          widget.userlocation.center[0], widget.userlocation.center[1]);
       List<Event> interesteventlist = [];
-      for (int i = 0; i < currcityeventlist.length; i++) {
-        if (widget.interest == currcityeventlist[i].interest) {
+      for (int i = 0; i < currloceventlist.length; i++) {
+        if (widget.interest == currloceventlist[i].interest) {
           setState(() {
-            interesteventlist.add(currcityeventlist[i]);
+            interesteventlist.add(currloceventlist[i]);
           });
         }
       }

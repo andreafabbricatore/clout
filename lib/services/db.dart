@@ -498,6 +498,30 @@ class db_conn {
     }
   }
 
+  Future<List<Event>> getLngLatEvents(double lng, double lat) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await events.orderBy('time').startAfter([DateTime.now()]).get();
+      List<Event> tempeventlist = [];
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        tempeventlist.add(Event.fromJson(element.data(), element.id));
+      });
+
+      for (int i = 0; i < tempeventlist.length; i++) {
+        if ((tempeventlist[i].lat < lat + 0.03 &&
+            tempeventlist[i].lat > lat - 0.03 &&
+            tempeventlist[i].lng < lng + 0.03 &&
+            tempeventlist[i].lng > lng - 0.03)) {
+          eventlist.add(tempeventlist[i]);
+        }
+      }
+      return eventlist;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<Event>> getFavEvents(AppUser user) async {
     try {
       List<Event> favEvents = [
@@ -536,8 +560,10 @@ class db_conn {
   Future<List<Event>> searchEvents(String searchquery) async {
     try {
       QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
           .where('searchfield', arrayContains: searchquery.toLowerCase())
-          .getSavy();
+          .get();
       List<Event> eventsearchres = [];
       querySnapshot.docs.forEach((element) {
         eventsearchres.add(Event.fromJson(element.data(), element.id));

@@ -29,7 +29,6 @@ class _SearchScreenState extends State<SearchScreen> {
     "Food",
     "Art"
   ];
-  String city = "";
 
   Future<void> updatecurruser() async {
     AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
@@ -57,9 +56,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
-    setState(() {
-      city = widget.userlocation.city.split(" ").last;
-    });
     focusNode.addListener(() {
       print('1:  ${focusNode.hasFocus}');
     });
@@ -73,12 +69,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
     Future<void> searchnav(String interest) async {
       try {
-        List<Event> currcityeventlist = await db.getCurrCityEvents(city);
+        List<Event> currloceventlist = await db.getLngLatEvents(
+            widget.userlocation.center[0], widget.userlocation.center[1]);
         List<Event> interesteventlist = [];
-        for (int i = 0; i < currcityeventlist.length; i++) {
-          if (interest == currcityeventlist[i].interest) {
+        for (int i = 0; i < currloceventlist.length; i++) {
+          if (interest == currloceventlist[i].interest) {
             setState(() {
-              interesteventlist.add(currcityeventlist[i]);
+              interesteventlist.add(currloceventlist[i]);
             });
           }
         }
@@ -90,7 +87,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     interest: interest,
                     events: interesteventlist,
                     curruser: widget.curruser,
-                    city: city)));
+                    userlocation: widget.userlocation)));
       } catch (e) {
         displayErrorSnackBar("Could not display events");
       }
