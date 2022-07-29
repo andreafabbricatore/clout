@@ -9,11 +9,31 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SetttingsScreen extends StatelessWidget {
+class SetttingsScreen extends StatefulWidget {
   SetttingsScreen({Key? key, required this.curruser}) : super(key: key);
   AppUser curruser;
+
+  @override
+  State<SetttingsScreen> createState() => _SetttingsScreenState();
+}
+
+class _SetttingsScreenState extends State<SetttingsScreen> {
   db_conn db = db_conn();
+
   TextEditingController psw = TextEditingController();
+
+  TextEditingController newpsw = TextEditingController();
+
+  TextEditingController emailaddress = TextEditingController();
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: const Duration(seconds: 2),
+    );
+    await Future.delayed(const Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,16 +61,16 @@ class SetttingsScreen extends StatelessWidget {
           onPressed: () async {
             try {
               await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: curruser.email, password: psw.text.trim());
+                  email: widget.curruser.email, password: psw.text.trim());
               await FirebaseAuth.instance.currentUser!.delete();
-              await db.deleteuser(curruser);
+              await db.deleteuser(widget.curruser);
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                     builder: (BuildContext context) => AuthenticationWrapper()),
               );
             } catch (e) {
-              print(e);
+              displayErrorSnackBar("Invalid Action, try again");
             }
           },
         ),
@@ -58,6 +78,102 @@ class SetttingsScreen extends StatelessWidget {
           child: const Text("Cancel"),
           onPressed: () {
             Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+    AlertDialog changeEmail = AlertDialog(
+      title: const Text("Update Email Address"),
+      content: SizedBox(
+        height: screenheight * 0.25,
+        child: Center(
+          child: Column(
+            children: [
+              const Text(
+                  "In order to change email address,\nenter new address and re-enter password"),
+              SizedBox(
+                height: screenheight * 0.02,
+              ),
+              textdatafield(screenwidth * 0.4, "New Email", emailaddress),
+              textdatafield(screenwidth * 0.4, "Password", psw)
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: const Text("Update"),
+          onPressed: () async {
+            try {
+              await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: widget.curruser.email, password: psw.text.trim());
+              if (emailaddress.text.trim().isEmpty) {
+                throw Exception("Please enter new email address");
+              }
+              await FirebaseAuth.instance.currentUser!
+                  .updateEmail(emailaddress.text.trim());
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => AuthenticationWrapper()),
+              );
+            } catch (e) {
+              displayErrorSnackBar("Invalid Action, try again");
+            }
+          },
+        ),
+        TextButton(
+          child: const Text("Cancel"),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+    AlertDialog changePsw = AlertDialog(
+      title: const Text("Update Password"),
+      content: SizedBox(
+        height: screenheight * 0.25,
+        child: Center(
+          child: Column(
+            children: [
+              const Text(
+                  "In order to change password,\nenter old and new password"),
+              SizedBox(
+                height: screenheight * 0.02,
+              ),
+              textdatafield(screenwidth * 0.4, "Old Password", psw),
+              textdatafield(screenwidth * 0.4, "New Password", newpsw)
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: const Text("Update"),
+          onPressed: () async {
+            try {
+              await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: widget.curruser.email, password: psw.text.trim());
+              if (newpsw.text.trim().isEmpty) {
+                throw Exception("Please enter new password");
+              }
+              await FirebaseAuth.instance.currentUser!
+                  .updatePassword(newpsw.text.trim());
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => AuthenticationWrapper()),
+              );
+            } catch (e) {
+              displayErrorSnackBar("Invalid Action, try again");
+            }
+          },
+        ),
+        TextButton(
+          child: const Text("Cancel"),
+          onPressed: () {
             Navigator.pop(context);
           },
         ),
@@ -112,32 +228,50 @@ class SetttingsScreen extends StatelessWidget {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Row(
-            children: const [
-              Icon(Icons.email_outlined, size: 30),
-              SizedBox(
-                width: 6,
-              ),
-              Text(
-                "Update Email Address",
-                style: TextStyle(fontSize: 20),
-              )
-            ],
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return changeEmail;
+                  });
+            },
+            child: Row(
+              children: const [
+                Icon(Icons.email_outlined, size: 30),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  "Update Email Address",
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
           ),
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Row(
-            children: const [
-              Icon(Icons.lock_outline, size: 30),
-              SizedBox(
-                width: 6,
-              ),
-              Text(
-                "Update Password",
-                style: TextStyle(fontSize: 20),
-              ),
-            ],
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return changePsw;
+                  });
+            },
+            child: Row(
+              children: const [
+                Icon(Icons.lock_outline, size: 30),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  "Update Password",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ],
+            ),
           ),
           SizedBox(
             height: screenheight * 0.04,
