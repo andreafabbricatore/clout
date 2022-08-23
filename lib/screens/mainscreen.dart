@@ -1,12 +1,19 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/createeventscreen.dart';
+import 'package:clout/screens/deeplinkeventdetailscreen.dart';
+import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/favscreen.dart';
 import 'package:clout/screens/homescreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/screens/searchscreen.dart';
+import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -33,15 +40,20 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _index = 0;
   List page = [];
+  PendingDynamicLinkData? initialLink;
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
+  String deeplink = "";
+  db_conn db = db_conn();
 
-  void parampasser(bool updatehome) {
+  void parampasser(bool firstsetup) {
     page = [
       HomeScreen(
           curruser: widget.curruser,
           interests: widget.interests,
           eventlist: widget.eventlist,
           interestevents: widget.interesteventlist,
-          updatehome: updatehome,
+          firstsetup: firstsetup,
           userlocation: widget.userlocation),
       SearchScreen(
           curruser: widget.curruser, userlocation: widget.userlocation),
@@ -60,9 +72,48 @@ class _MainScreenState extends State<MainScreen> {
     ];
   }
 
+  Future<void> initDeepLinks() async {
+    _appLinks = AppLinks();
+    // Check initial link if app was in cold state (terminated)
+    final appLink = await _appLinks.getInitialAppLink();
+    if (appLink != null) {
+      print('getInitialAppLink: $appLink');
+      openAppLink(appLink);
+    }
+
+    // Handle link when app is in warm state (front or background)
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      print('onAppLink: $uri');
+      openAppLink(uri);
+    });
+  }
+
+  void openAppLink(Uri uri) async {
+    print(uri.toString().split("/").last);
+    //print(uri.queryParameters['link']);
+    try {
+      Event chosenEvent =
+          await db.getEventfromDocId(uri.toString().split("/").last);
+      List<AppUser> participants = [
+        for (String x in chosenEvent.participants) await db.getUserFromDocID(x)
+      ];
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => DeepLinkEventDetailScreen(
+                    event: chosenEvent,
+                    curruser: widget.curruser,
+                    participants: participants,
+                  )));
+    } catch (e) {
+      print("error with link");
+    }
+  }
+
   @override
   void initState() {
-    parampasser(false);
+    initDeepLinks();
+    parampasser(true);
     super.initState();
   }
 
@@ -74,7 +125,7 @@ class _MainScreenState extends State<MainScreen> {
         type: BottomNavigationBarType.fixed,
         onTap: (newIndex) {
           if (newIndex == 0) {
-            parampasser(true);
+            parampasser(false);
           }
           setState(() => _index = newIndex);
         },

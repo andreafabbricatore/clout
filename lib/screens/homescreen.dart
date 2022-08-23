@@ -12,7 +12,7 @@ class HomeScreen extends StatefulWidget {
   List interests = [];
   List<Event> eventlist = [];
   List<Event> interestevents = [];
-  bool updatehome;
+  bool firstsetup;
   AppUser curruser;
   AppLocation userlocation;
   HomeScreen(
@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
       required this.interests,
       required this.eventlist,
       required this.interestevents,
-      required this.updatehome,
+      required this.firstsetup,
       required this.curruser,
       required this.userlocation})
       : super(key: key);
@@ -137,15 +137,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    generaleventlist = widget.eventlist;
     userinterests = widget.interests;
-    interesteventlist = widget.interestevents;
+    if (!widget.firstsetup) {
+      generaleventlist = widget.eventlist;
+      interesteventlist = widget.interestevents;
+    }
     if (generaleventlist.isEmpty || interesteventlist.isEmpty) {
       getSortedCurrLocEventsList(userinterests);
     }
-    if (widget.updatehome) {
-      refresh();
-    }
+
     super.initState();
   }
 
@@ -155,15 +155,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenheight = MediaQuery.of(context).size.height;
     Future<void> navigate(Event event, int index) async {
       try {
+        Event chosenEvent = await db.getEventfromDocId(event.docid);
         List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromDocID(x)
+          for (String x in chosenEvent.participants)
+            await db.getUserFromDocID(x)
         ];
 
         await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (_) => EventDetailScreen(
-                      event: event,
+                      event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,

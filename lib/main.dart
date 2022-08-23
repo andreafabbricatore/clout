@@ -4,10 +4,10 @@ import 'package:clout/screens/loading.dart';
 import 'package:clout/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,23 +20,14 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  PendingDynamicLinkData? initialLink;
+  MyApp({super.key, initialLink});
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider<AuthenticationService>(
-          create: (_) => AuthenticationService(FirebaseAuth.instance),
-        ),
-        StreamProvider(
-            create: (context) =>
-                context.read<AuthenticationService>().authStateChanges,
-            initialData: null)
-      ],
-      child: MaterialApp(
-        title: 'clout',
-        debugShowCheckedModeBanner: false,
-        home: AuthenticationWrapper(),
-      ),
+    return MaterialApp(
+      title: 'clout',
+      debugShowCheckedModeBanner: false,
+      home: AuthenticationWrapper(),
     );
   }
 }

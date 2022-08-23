@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:755358505825:android:91cf638d4c85a2977e8320",
+        "mobilesdk_app_id": "1:755358505825:android:aaf5071966187e6d7e8320",
         "android_client_info": {
-          "package_name": "com.clout.com"
+          "package_name": "com.outwithclout.clout"
         }
       },
       "oauth_client": [
