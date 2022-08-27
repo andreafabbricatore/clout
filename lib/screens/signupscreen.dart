@@ -1012,8 +1012,9 @@ class _InterestScreenState extends State<InterestScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper(),
-                  ),
+                      builder: (BuildContext context) =>
+                          AuthenticationWrapper(),
+                      fullscreenDialog: true),
                 );
               } else {
                 displayErrorSnackBar("Choose at least 3 interests");

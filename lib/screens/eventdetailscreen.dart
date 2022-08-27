@@ -5,6 +5,7 @@ import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:share_plus/share_plus.dart';
 
 class EventDetailScreen extends StatefulWidget {
   EventDetailScreen(
@@ -153,6 +155,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  Future<String> createShareLink() async {
+    final dynamicLinkParams = DynamicLinkParameters(
+      link: Uri.parse("https://outwithclout.com/${widget.event.docid}"),
+      uriPrefix: "https://outwithclout.page.link",
+      androidParameters:
+          const AndroidParameters(packageName: "com.outwithclout.app.android"),
+      iosParameters: const IOSParameters(bundleId: "com.outwithclout.app.ios"),
+    );
+    final dynamicLink =
+        await FirebaseDynamicLinks.instance.buildLink(dynamicLinkParams);
+
+    return dynamicLink.toString();
+  }
+
   @override
   void initState() {
     checkifjoined();
@@ -175,6 +191,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   )));
     }
 
+    void shareevent(String link) async {
+      final box = context.findRenderObject() as RenderBox?;
+      await Share.share(
+        link,
+        subject: "Join this event on Clout!",
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -190,6 +215,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
         ),
         actions: [
+          GestureDetector(
+            onTap: () async {
+              String link = await createShareLink();
+              print(link);
+              shareevent(link);
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+              child: Icon(
+                Icons.ios_share,
+                color: Colors.black,
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: () async {
               await widget.interactfav(widget.event);

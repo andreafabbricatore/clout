@@ -72,6 +72,15 @@ class _MainScreenState extends State<MainScreen> {
     ];
   }
 
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: const Duration(seconds: 2),
+    );
+    await Future.delayed(const Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> initDeepLinks() async {
     _appLinks = AppLinks();
     // Check initial link if app was in cold state (terminated)
@@ -91,6 +100,9 @@ class _MainScreenState extends State<MainScreen> {
   void openAppLink(Uri uri) async {
     print(uri.toString().split("/").last);
     //print(uri.queryParameters['link']);
+    //String docid =
+    //uri.toString().replaceAll("https://outwithclout.com/?link=", "");
+    //docid.replaceAll("&amv=0&efr=0", "");
     try {
       Event chosenEvent =
           await db.getEventfromDocId(uri.toString().split("/").last);
@@ -106,7 +118,8 @@ class _MainScreenState extends State<MainScreen> {
                     participants: participants,
                   )));
     } catch (e) {
-      print("error with link");
+      displayErrorSnackBar(
+          "Could not open event, might have been deleted or url is invalid.");
     }
   }
 

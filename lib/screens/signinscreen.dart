@@ -117,7 +117,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            AuthenticationWrapper()),
+                            AuthenticationWrapper(),
+                        fullscreenDialog: true),
                   );
                 } catch (e) {
                   print("error could not sign in");

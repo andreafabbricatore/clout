@@ -141,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!widget.firstsetup) {
       generaleventlist = widget.eventlist;
       interesteventlist = widget.interestevents;
+      updatecurruser();
     }
     if (generaleventlist.isEmpty || interesteventlist.isEmpty) {
       getSortedCurrLocEventsList(userinterests);

@@ -122,13 +122,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (BuildContext context) => MainScreen(
-                interests: interests,
-                eventlist: eventlist,
-                interesteventlist: interesteventlist,
-                curruser: curruser,
-                userlocation: curruserlocation),
-          ),
+              builder: (BuildContext context) => MainScreen(
+                  interests: interests,
+                  eventlist: eventlist,
+                  interesteventlist: interesteventlist,
+                  curruser: curruser,
+                  userlocation: curruserlocation),
+              fullscreenDialog: true),
         );
       }
     } catch (e) {

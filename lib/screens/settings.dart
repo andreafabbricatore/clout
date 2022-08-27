@@ -282,7 +282,8 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper()),
+                    builder: (BuildContext context) => AuthenticationWrapper(),
+                    fullscreenDialog: true),
               );
             },
             child: const Text(
