@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
-import 'package:clout/components/datetextfield.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/services/db.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key? key}) : super(key: key);
@@ -781,7 +779,7 @@ class _MiscScreenState extends State<MiscScreen> {
                   setState(() {
                     birthday = date;
                   });
-                  print(birthday);
+                  //print(birthday);
                 }, currentTime: DateTime.now());
               },
               child: Container(

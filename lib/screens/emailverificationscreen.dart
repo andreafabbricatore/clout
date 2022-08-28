@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import 'package:clout/main.dart';
-import 'package:clout/screens/authscreen.dart';
-import 'package:clout/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({Key? key}) : super(key: key);
@@ -23,7 +20,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     try {
       await FirebaseAuth.instance.currentUser!.sendEmailVerification();
     } catch (e) {
-      print("error with sending email");
+      displayErrorSnackBar("Could not send email, please try again later");
     }
   }
 
@@ -33,13 +30,23 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       try {
         isemailverified = FirebaseAuth.instance.currentUser!.emailVerified;
       } catch (e) {
-        print("error here");
+        displayErrorSnackBar(
+            "Email could not be verified, please try again later");
       }
     });
 
     if (isemailverified) {
       timer?.cancel();
     }
+  }
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: const Duration(seconds: 2),
+    );
+    await Future.delayed(const Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override

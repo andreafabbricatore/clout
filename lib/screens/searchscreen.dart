@@ -57,7 +57,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     focusNode.addListener(() {
-      print('1:  ${focusNode.hasFocus}');
+      //print('1:  ${focusNode.hasFocus}');
     });
     super.initState();
   }
@@ -79,7 +79,7 @@ class _SearchScreenState extends State<SearchScreen> {
             });
           }
         }
-        print(interesteventlist);
+        //print(interesteventlist);
         Navigator.push(
             context,
             MaterialPageRoute(

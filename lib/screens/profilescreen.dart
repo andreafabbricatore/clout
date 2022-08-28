@@ -47,8 +47,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> refresh() async {
     try {
-      updateuser();
-      updatecurruser();
+      await updateuser();
+      await updatecurruser();
       geteventlist(widget.user.joinedEvents, true);
       geteventlist(widget.user.hostedEvents, false);
     } catch (e) {
@@ -178,17 +178,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> init() async {
-    updateuser();
-    updatecurruser();
-    geteventlist(widget.user.joinedEvents, true);
-    geteventlist(widget.user.hostedEvents, false);
+  @override
+  void initState() {
+    refresh();
+    super.initState();
   }
 
   @override
-  void initState() {
-    init();
-    super.initState();
+  void dispose() {
+    super.dispose();
   }
 
   @override

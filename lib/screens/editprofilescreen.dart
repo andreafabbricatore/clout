@@ -1,16 +1,12 @@
 import 'dart:io';
 
 import 'package:clout/components/datatextfield.dart';
-import 'package:clout/components/datetextfield.dart';
 import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class EditProfileScreen extends StatefulWidget {
   EditProfileScreen(
@@ -336,7 +332,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     setState(() {
                       imagepath = File(image.path);
                     });
-                    print(imagepath);
+                    //print(imagepath);
                   }
                 } catch (e) {
                   displayErrorSnackBar("Error with profile picture");
@@ -449,7 +445,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               setState(() {
                 widget.interests = updatedinterests;
               });
-              print(widget.interests);
+              //print(widget.interests);
             },
             child: Container(
               height: screenwidth * 0.13,

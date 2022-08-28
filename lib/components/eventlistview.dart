@@ -102,7 +102,6 @@ class EventListView extends StatelessWidget {
                           InkWell(
                             onTap: () async {
                               await interactfav(event);
-                              print("Done");
                             },
                             child: Icon(curruser.favorites.contains(event.docid)
                                 ? Icons.bookmark

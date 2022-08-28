@@ -125,10 +125,10 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         updatescreen(widget.event.docid);
       }
     } else if ((!joined && joinedval == "Full") || joinedval == "Finished") {
-      print(joinedval);
+      //print(joinedval);
     } else if (joined && joinedval == "Delete Event") {
       try {
-        await db.deleteevent(widget.event.docid, widget.event.host);
+        await db.deleteevent(widget.event, widget.curruser);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) => LoadingScreen(
@@ -144,7 +144,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
       }
     } else {
       try {
-        await db.leaveevent(widget.curruser, widget.event.docid);
+        await db.leaveevent(widget.curruser, widget.event);
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {

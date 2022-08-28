@@ -239,7 +239,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 setState(() {
                   eventdate = date;
                 });
-                print(eventdate);
+                //print(eventdate);
               }, currentTime: DateTime.now());
             },
             child: Container(

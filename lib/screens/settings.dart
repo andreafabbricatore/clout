@@ -1,13 +1,9 @@
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
-import 'package:clout/screens/authscreen.dart';
-import 'package:clout/screens/loading.dart';
-import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class SetttingsScreen extends StatefulWidget {
   SetttingsScreen({Key? key, required this.curruser}) : super(key: key);

@@ -1,5 +1,3 @@
-import 'package:clout/components/location.dart';
-
 class Event {
   String title;
   String description;

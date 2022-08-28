@@ -1,11 +1,8 @@
 import 'package:clout/main.dart';
-import 'package:clout/screens/authscreen.dart';
-import 'package:clout/screens/loading.dart';
-import 'package:clout/services/auth.dart';
+import 'package:clout/screens/pswresetscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
   SignInScreen({Key? key}) : super(key: key);
@@ -18,8 +15,16 @@ class _SignInScreenState extends State<SignInScreen> {
   db_conn db = db_conn();
   final emailController = TextEditingController();
   final pswController = TextEditingController();
-  String? error = "";
-  Color errorcolor = Colors.white;
+
+  void displayErrorSnackBar(String error) async {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: const Duration(seconds: 2),
+    );
+    await Future.delayed(const Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -121,7 +126,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         fullscreenDialog: true),
                   );
                 } catch (e) {
-                  print("error could not sign in");
+                  displayErrorSnackBar("Could not Sign in");
                 }
               },
               child: SizedBox(
@@ -139,10 +144,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   )),
             ),
             SizedBox(height: screenheight * 0.02),
-            Center(
-              child: Text(
-                error.toString(),
-                style: TextStyle(color: errorcolor),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => PswResetScreen()),
+                );
+              },
+              child: const Center(
+                child: Text("Forgot password?"),
               ),
             )
           ],

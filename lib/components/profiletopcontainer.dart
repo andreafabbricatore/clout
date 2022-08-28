@@ -1,7 +1,7 @@
 import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
-class ProfileTopContainer extends StatelessWidget {
+class ProfileTopContainer extends StatefulWidget {
   ProfileTopContainer(
       {Key? key,
       required this.user,
@@ -20,6 +20,11 @@ class ProfileTopContainer extends StatelessWidget {
   final VoidCallback followerscreen;
   final VoidCallback followingscreen;
 
+  @override
+  State<ProfileTopContainer> createState() => _ProfileTopContainerState();
+}
+
+class _ProfileTopContainerState extends State<ProfileTopContainer> {
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -43,7 +48,7 @@ class ProfileTopContainer extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: Image.network(
-                    user.pfpurl,
+                    widget.user.pfpurl,
                     height: screenheight * 0.1,
                     width: screenheight * 0.1,
                     fit: BoxFit.cover,
@@ -53,7 +58,7 @@ class ProfileTopContainer extends StatelessWidget {
                   width: screenwidth * 0.15,
                 ),
                 Text(
-                  "${user.clout}\nClout",
+                  "${widget.user.clout}\nClout",
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(
@@ -61,10 +66,10 @@ class ProfileTopContainer extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    followerscreen();
+                    widget.followerscreen();
                   },
                   child: Text(
-                    "${user.followers.length}\nFollowers",
+                    "${widget.user.followers.length}\nFollowers",
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -73,10 +78,10 @@ class ProfileTopContainer extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    followingscreen();
+                    widget.followingscreen();
                   },
                   child: Text(
-                    "${user.following.length}\nFollowing",
+                    "${widget.user.following.length}\nFollowing",
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -92,15 +97,15 @@ class ProfileTopContainer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  user.fullname,
+                  widget.user.fullname,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w300),
                 ),
-                iscurruser
+                widget.iscurruser
                     ? GestureDetector(
                         onTap: () {
-                          editprofile();
+                          widget.editprofile();
                         },
                         child: Container(
                           height: screenheight * 0.025,
@@ -116,11 +121,12 @@ class ProfileTopContainer extends StatelessWidget {
                       )
                     : GestureDetector(
                         onTap: () {
-                          follow();
+                          widget.follow();
                         },
                         child: Container(
                           height: screenheight * 0.03,
-                          width: curruser.following.contains(user.docid)
+                          width: widget.curruser.following
+                                  .contains(widget.user.docid)
                               ? screenwidth * 0.3
                               : screenwidth * 0.2,
                           decoration: BoxDecoration(
@@ -131,7 +137,8 @@ class ProfileTopContainer extends StatelessWidget {
                                       161, 158, 158, 158))),
                           child: Center(
                               child: Text(
-                            curruser.following.contains(user.docid)
+                            widget.curruser.following
+                                    .contains(widget.user.docid)
                                 ? "Stop Following"
                                 : "Follow",
                             style: const TextStyle(fontSize: 15),

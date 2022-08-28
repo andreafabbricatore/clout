@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';

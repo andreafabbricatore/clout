@@ -1,7 +1,6 @@
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/emailverificationscreen.dart';
 import 'package:clout/screens/loading.dart';
-import 'package:clout/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -40,14 +39,14 @@ class AuthenticationWrapper extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: ((context, snapshot) {
           if (snapshot.hasData) {
-            print(FirebaseAuth.instance.currentUser!);
+            //print(FirebaseAuth.instance.currentUser!);
             if (FirebaseAuth.instance.currentUser!.emailVerified) {
               return LoadingScreen(uid: FirebaseAuth.instance.currentUser!.uid);
             } else {
               return const EmailVerificationScreen();
             }
           } else {
-            print("auth");
+            //print("auth");
             return const AuthScreen();
           }
         }),

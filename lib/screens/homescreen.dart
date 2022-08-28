@@ -4,9 +4,7 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 
 class HomeScreen extends StatefulWidget {
   List interests = [];

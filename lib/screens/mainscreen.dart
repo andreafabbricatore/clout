@@ -6,18 +6,14 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/deeplinkeventdetailscreen.dart';
-import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/favscreen.dart';
 import 'package:clout/screens/homescreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/screens/searchscreen.dart';
 import 'package:clout/services/db.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:location/location.dart';
 
 class MainScreen extends StatefulWidget {
   List interests;
@@ -86,19 +82,19 @@ class _MainScreenState extends State<MainScreen> {
     // Check initial link if app was in cold state (terminated)
     final appLink = await _appLinks.getInitialAppLink();
     if (appLink != null) {
-      print('getInitialAppLink: $appLink');
+      //print('getInitialAppLink: $appLink');
       openAppLink(appLink);
     }
 
     // Handle link when app is in warm state (front or background)
     _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
-      print('onAppLink: $uri');
+      //print('onAppLink: $uri');
       openAppLink(uri);
     });
   }
 
   void openAppLink(Uri uri) async {
-    print(uri.toString().split("/").last);
+    //print(uri.toString().split("/").last);
     //print(uri.queryParameters['link']);
     //String docid =
     //uri.toString().replaceAll("https://outwithclout.com/?link=", "");
