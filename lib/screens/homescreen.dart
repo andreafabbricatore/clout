@@ -232,6 +232,8 @@ class _HomeScreenState extends State<HomeScreen> {
               leftpadding: false,
               curruser: widget.curruser,
               interactfav: interactfav,
+              screenheight: screenheight,
+              screenwidth: screenwidth,
             ),
             const Text("Popular",
                 style: TextStyle(
@@ -247,6 +249,8 @@ class _HomeScreenState extends State<HomeScreen> {
               leftpadding: false,
               curruser: widget.curruser,
               interactfav: interactfav,
+              screenheight: screenheight,
+              screenwidth: screenwidth,
             )
           ],
         ),

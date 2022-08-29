@@ -2,14 +2,16 @@ import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
 class UserListView extends StatelessWidget {
-  UserListView({
-    Key? key,
-    required this.userres,
-    required this.onTap,
-    required this.curruser,
-  }) : super(key: key);
+  UserListView(
+      {Key? key,
+      required this.userres,
+      required this.onTap,
+      required this.curruser,
+      required this.screenwidth})
+      : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
+  double screenwidth;
 
   final Function(AppUser user, int index)? onTap;
 
@@ -34,23 +36,30 @@ class UserListView extends StatelessWidget {
             ),
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "@${user.username}",
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: curruser.username == user.username
-                      ? Color.fromARGB(255, 255, 48, 117)
-                      : Colors.black),
-            ),
-            Text(
-              "${user.fullname}",
-              style: TextStyle(fontSize: 15, color: Colors.black),
-            ),
-          ],
+        SizedBox(
+          width: screenwidth * 0.8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "@${user.username}",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: curruser.username == user.username
+                        ? Color.fromARGB(255, 255, 48, 117)
+                        : Colors.black),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                "${user.fullname}",
+                style: TextStyle(fontSize: 15, color: Colors.black),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ],
     );

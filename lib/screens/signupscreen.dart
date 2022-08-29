@@ -926,6 +926,7 @@ class _InterestScreenState extends State<InterestScreen> {
               color: selectedinterests.contains(interest)
                   ? const Color.fromARGB(255, 255, 48, 117)
                   : Colors.white),
+          textScaleFactor: 1.0,
         )),
       ),
     );

@@ -22,6 +22,7 @@ class AuthScreen extends StatelessWidget {
               const Text(
                 "GET\nCLOUT\nGO\nOUT",
                 style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                textScaleFactor: 1.0,
               ),
               SizedBox(height: screenheight * 0.1),
               Row(

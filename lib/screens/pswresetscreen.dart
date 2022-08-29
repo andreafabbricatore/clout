@@ -75,6 +75,7 @@ class PswResetScreen extends StatelessWidget {
                           child: Text(
                         "Send Password Reset Email",
                         style: TextStyle(fontSize: 20, color: Colors.white),
+                        textScaleFactor: 1.1,
                       )),
                     )),
               ),

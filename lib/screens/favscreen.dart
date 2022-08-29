@@ -76,6 +76,8 @@ class _FavScreenState extends State<FavScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
     Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
@@ -121,6 +123,8 @@ class _FavScreenState extends State<FavScreen> {
           curruser: widget.curruser,
           interactfav: interactfav,
           onTap: navigate,
+          screenheight: screenheight,
+          screenwidth: screenwidth,
         )
       ]),
     );

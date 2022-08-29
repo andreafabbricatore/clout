@@ -60,6 +60,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                 Text(
                   "${widget.user.clout}\nClout",
                   textAlign: TextAlign.center,
+                  textScaleFactor: 1.0,
                 ),
                 SizedBox(
                   width: screenwidth * 0.05,
@@ -71,6 +72,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   child: Text(
                     "${widget.user.followers.length}\nFollowers",
                     textAlign: TextAlign.center,
+                    textScaleFactor: 1.0,
                   ),
                 ),
                 SizedBox(
@@ -83,6 +85,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   child: Text(
                     "${widget.user.following.length}\nFollowing",
                     textAlign: TextAlign.center,
+                    textScaleFactor: 1.0,
                   ),
                 ),
               ],
@@ -116,7 +119,11 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                               border: Border.all(
                                   color: const Color.fromARGB(
                                       161, 158, 158, 158))),
-                          child: const Center(child: Text("Edit Profile")),
+                          child: const Center(
+                              child: Text(
+                            "Edit Profile",
+                            textScaleFactor: 1.0,
+                          )),
                         ),
                       )
                     : GestureDetector(
@@ -142,6 +149,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                 ? "Stop Following"
                                 : "Follow",
                             style: const TextStyle(fontSize: 15),
+                            textScaleFactor: 1.0,
                           )),
                         ),
                       )

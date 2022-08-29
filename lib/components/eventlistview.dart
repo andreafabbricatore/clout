@@ -12,6 +12,8 @@ class EventListView extends StatelessWidget {
   bool leftpadding;
   AppUser curruser;
   final Function(Event event) interactfav;
+  double screenwidth;
+  double screenheight;
   EventListView(
       {Key? key,
       this.isHorizontal = true,
@@ -20,7 +22,9 @@ class EventListView extends StatelessWidget {
       required this.scrollable,
       required this.leftpadding,
       required this.curruser,
-      required this.interactfav})
+      required this.interactfav,
+      required this.screenwidth,
+      required this.screenheight})
       : super(key: key);
 
   db_conn db = db_conn();
@@ -46,12 +50,19 @@ class EventListView extends StatelessWidget {
             children: [
               Hero(tag: index, child: _eventImage(event.image)),
               const SizedBox(height: 10),
-              Text(event.title,
+              SizedBox(
+                width: 150,
+                child: Text(
+                  event.title,
                   style: const TextStyle(
                       fontFamily: "Poppins",
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black)),
+                      color: Colors.black),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               Text(event.interest,
                   style: const TextStyle(
                       fontFamily: "Poppins",
@@ -65,8 +76,9 @@ class EventListView extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textScaleFactor: 1.0,
               ),
               Text(
                 "${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}",
@@ -75,8 +87,9 @@ class EventListView extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textScaleFactor: 1.0,
               ),
             ],
           )
@@ -93,12 +106,19 @@ class EventListView extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(event.title,
+                          SizedBox(
+                            width: 150,
+                            child: Text(
+                              event.title,
                               style: const TextStyle(
                                   fontFamily: "Poppins",
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
+                                  color: Colors.black),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           InkWell(
                             onTap: () async {
                               await interactfav(event);
@@ -123,7 +143,7 @@ class EventListView extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Colors.black),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
@@ -133,7 +153,7 @@ class EventListView extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Colors.black),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 5),
@@ -144,7 +164,7 @@ class EventListView extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w300,
                             color: Colors.black),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 5),
@@ -157,7 +177,7 @@ class EventListView extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Colors.black),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],

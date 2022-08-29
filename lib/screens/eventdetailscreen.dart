@@ -411,6 +411,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   userres: widget.participants,
                   curruser: widget.curruser,
                   onTap: usernavigate,
+                  screenwidth: screenwidth,
                 ),
               ],
             ),

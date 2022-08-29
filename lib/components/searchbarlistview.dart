@@ -137,11 +137,14 @@ class _SearchBarListViewState extends State<SearchBarListView> {
             leftpadding: false,
             curruser: widget.curruser,
             interactfav: interactfav,
+            screenheight: screenheight,
+            screenwidth: screenwidth,
           )
         : UserListView(
             userres: widget.userres,
             onTap: usernavigate,
             curruser: widget.curruser,
+            screenwidth: screenwidth,
           );
   }
 }
