@@ -201,6 +201,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
+    print(imagepath == null);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
@@ -220,8 +221,22 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
       body: SingleChildScrollView(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: screenheight * 0.15),
+          SizedBox(height: screenheight * 0.1),
+          const Center(
+            child: Text(
+              "Upload Profile Picture",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20),
+              textScaleFactor: 1.0,
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.03,
+          ),
           Center(
               child: InkWell(
                   onTap: () async {
@@ -247,7 +262,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                             height: screenheight * 0.2,
                             width: screenheight * 0.2,
                             child: Icon(
-                              Icons.account_circle_outlined,
+                              Icons.upload_rounded,
                               color: Colors.white,
                               size: screenheight * 0.18,
                             ),
@@ -265,8 +280,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            if (imagepath.toString().isNotEmpty &&
-                fullnamecontroller.text.isNotEmpty) {
+            if (imagepath != null && fullnamecontroller.text.isNotEmpty) {
               setState(() {
                 widget.curruser.fullname = fullnamecontroller.text.trim();
               });
@@ -365,7 +379,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
               displayErrorSnackBar("Invalid Username");
             } else {
               setState(() {
-                widget.curruser.username = usernamecontroller.text.trim();
+                widget.curruser.username =
+                    usernamecontroller.text.trim().toLowerCase();
               });
               Navigator.pushReplacement(
                 context,
@@ -879,6 +894,7 @@ class _InterestScreenState extends State<InterestScreen> {
   List<Color> cardcolors = List.filled(10, Colors.white);
   List selectedinterests = [];
   db_conn db = db_conn();
+  bool buttonpressed = false;
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -986,42 +1002,56 @@ class _InterestScreenState extends State<InterestScreen> {
         height: 70,
         width: 70,
         child: FloatingActionButton(
-          onPressed: () async {
-            try {
-              if (selectedinterests.length >= 3) {
-                setState(() {
-                  widget.curruser.interests = selectedinterests;
-                });
+          onPressed: buttonpressed
+              ? null
+              : () async {
+                  setState(() {
+                    buttonpressed = true;
+                  });
+                  try {
+                    if (selectedinterests.length >= 3) {
+                      setState(() {
+                        widget.curruser.interests = selectedinterests;
+                      });
 
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                    email: widget.curruser.email, password: widget.psw);
-                String uid = FirebaseAuth.instance.currentUser!.uid;
-                await db.createuserinstance(widget.curruser.email, uid);
-                await db.changepfp(widget.imagepath, uid);
-                await db.changeusername(widget.curruser.username, uid);
-                await db.changeattribute(
-                    'fullname', widget.curruser.fullname, uid);
-                await db.changeattribute('gender', widget.curruser.gender, uid);
-                await db.changeattribute(
-                    'nationality', widget.curruser.nationality, uid);
-                await db.changebirthday(widget.curruser.birthday, uid);
-                await db.changeinterests(
-                    'interests', widget.curruser.interests, uid);
+                      await FirebaseAuth.instance
+                          .createUserWithEmailAndPassword(
+                              email: widget.curruser.email,
+                              password: widget.psw);
+                      String uid = FirebaseAuth.instance.currentUser!.uid;
+                      await db.createuserinstance(widget.curruser.email, uid);
+                      await db.changepfp(widget.imagepath, uid);
+                      await db.changeusername(widget.curruser.username, uid);
+                      await db.changeattribute(
+                          'fullname', widget.curruser.fullname, uid);
+                      await db.changeattribute(
+                          'gender', widget.curruser.gender, uid);
+                      await db.changeattribute(
+                          'nationality', widget.curruser.nationality, uid);
+                      await db.changebirthday(widget.curruser.birthday, uid);
+                      await db.changeinterests(
+                          'interests', widget.curruser.interests, uid);
 
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          AuthenticationWrapper(),
-                      fullscreenDialog: true),
-                );
-              } else {
-                displayErrorSnackBar("Choose at least 3 interests");
-              }
-            } catch (e) {
-              displayErrorSnackBar("Could not create user");
-            }
-          },
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                AuthenticationWrapper(),
+                            fullscreenDialog: true),
+                      );
+                    } else {
+                      displayErrorSnackBar("Choose at least 3 interests");
+                      setState(() {
+                        buttonpressed = false;
+                      });
+                    }
+                  } catch (e) {
+                    displayErrorSnackBar("Could not create user");
+                    setState(() {
+                      buttonpressed = false;
+                    });
+                  }
+                },
           backgroundColor: Color.fromARGB(255, 255, 48, 117),
           child: Icon(
             Icons.arrow_circle_right_outlined,

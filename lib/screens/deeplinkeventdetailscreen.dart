@@ -375,7 +375,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(
-            height: screenheight * 0.01,
+            height: screenheight * 0.005,
           ),
           SizedBox(
             height: screenheight * 0.09 * widget.participants.length,

@@ -17,22 +17,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? timer;
 
   Future<void> sendverificationemail() async {
-    try {
-      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
-    } catch (e) {
-      displayErrorSnackBar("Could not send email, please try again later");
-    }
+    await FirebaseAuth.instance.currentUser!.sendEmailVerification();
   }
 
   Future<void> checkemailverified() async {
     await FirebaseAuth.instance.currentUser!.reload();
     setState(() {
-      try {
-        isemailverified = FirebaseAuth.instance.currentUser!.emailVerified;
-      } catch (e) {
-        displayErrorSnackBar(
-            "Email could not be verified, please try again later");
-      }
+      isemailverified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
 
     if (isemailverified) {

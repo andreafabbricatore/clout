@@ -131,15 +131,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     } else if (joined && joinedval == "Delete Event") {
       try {
         await db.deleteevent(widget.event, widget.curruser);
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => LoadingScreen(
-                      uid: context
-                          .read<AuthenticationService>()
-                          .getuid()
-                          .toString(),
-                    )),
-            (Route<dynamic> route) => false);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => LoadingScreen(
+                    uid: widget.curruser.uid,
+                  ),
+              fullscreenDialog: true),
+        );
       } catch (e) {
         displayErrorSnackBar("Could not delete event");
         updatescreen(widget.event.docid);
@@ -400,7 +398,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(
-            height: screenheight * 0.01,
+            height: screenheight * 0.005,
           ),
           SizedBox(
             height: screenheight * 0.09 * widget.participants.length,

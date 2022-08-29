@@ -63,7 +63,8 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper()),
+                    builder: (BuildContext context) => AuthenticationWrapper(),
+                    fullscreenDialog: true),
               );
             } catch (e) {
               displayErrorSnackBar("Invalid Action, try again");
@@ -112,7 +113,8 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper()),
+                    builder: (BuildContext context) => AuthenticationWrapper(),
+                    fullscreenDialog: true),
               );
             } catch (e) {
               displayErrorSnackBar("Invalid Action, try again");
@@ -160,7 +162,8 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper()),
+                    builder: (BuildContext context) => AuthenticationWrapper(),
+                    fullscreenDialog: true),
               );
             } catch (e) {
               displayErrorSnackBar("Invalid Action, try again");

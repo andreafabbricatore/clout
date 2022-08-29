@@ -112,7 +112,7 @@ class _SearchScreenState extends State<SearchScreen> {
               onChanged: (String searchquery) async {
                 if (searchevents) {
                   try {
-                    List<Event> res = await db.searchEvents(searchquery);
+                    List<Event> res = await db.searchEvents(searchquery.trim());
                     setState(() {
                       searchedevents = res;
                     });
@@ -122,7 +122,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   }
                 } else {
                   try {
-                    List<AppUser> res = await db.searchUsers(searchquery);
+                    List<AppUser> res =
+                        await db.searchUsers(searchquery.trim());
                     setState(() {
                       searchedusers = res;
                     });

@@ -513,10 +513,10 @@ class db_conn {
       });
 
       for (int i = 0; i < tempeventlist.length; i++) {
-        if ((tempeventlist[i].lat < lat + 0.03 &&
-            tempeventlist[i].lat > lat - 0.03 &&
-            tempeventlist[i].lng < lng + 0.03 &&
-            tempeventlist[i].lng > lng - 0.03)) {
+        if ((tempeventlist[i].lat < lat + 0.04 &&
+            tempeventlist[i].lat > lat - 0.04 &&
+            tempeventlist[i].lng < lng + 0.04 &&
+            tempeventlist[i].lng > lng - 0.04)) {
           eventlist.add(tempeventlist[i]);
         }
       }

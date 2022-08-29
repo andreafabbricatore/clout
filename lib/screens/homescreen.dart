@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
+import 'package:clout/screens/loading.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 
@@ -152,6 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
+
     Future<void> navigate(Event event, int index) async {
       try {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
@@ -209,20 +213,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InkWell(
-              onTap: () async {
-                List<Event> test = await db.getLngLatEvents(
-                    widget.userlocation.center[0],
-                    widget.userlocation.center[1]);
-              },
-              child: const Text(
-                "Suggested",
-                style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.black,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w600),
-              ),
+            const Text(
+              "Suggested",
+              style: TextStyle(
+                  fontSize: 30,
+                  color: Colors.black,
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.w600),
             ),
             SizedBox(height: screenheight * 0.02),
             EventListView(

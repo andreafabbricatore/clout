@@ -104,6 +104,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w300),
+                  textScaleFactor: 1.0,
                 ),
                 widget.iscurruser
                     ? GestureDetector(

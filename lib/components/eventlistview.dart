@@ -52,15 +52,17 @@ class EventListView extends StatelessWidget {
               const SizedBox(height: 10),
               SizedBox(
                 width: 150,
-                child: Text(
-                  event.title,
-                  style: const TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Center(
+                  child: Text(
+                    event.title,
+                    style: const TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               Text(event.interest,

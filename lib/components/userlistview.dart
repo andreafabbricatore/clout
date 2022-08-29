@@ -37,7 +37,7 @@ class UserListView extends StatelessWidget {
           ),
         ),
         SizedBox(
-          width: screenwidth * 0.8,
+          width: screenwidth * 0.7,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
