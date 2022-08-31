@@ -1,6 +1,7 @@
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
@@ -144,22 +145,75 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            EventListView(
-              isHorizontal: false,
-              eventList: widget.events,
-              onTap: navigate,
-              scrollable: true,
-              leftpadding: false,
-              curruser: widget.curruser,
-              interactfav: interactfav,
-              screenheight: screenheight,
-              screenwidth: screenwidth,
-            )
-          ],
-        ),
+        child: widget.events.isNotEmpty
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  EventListView(
+                    isHorizontal: false,
+                    eventList: widget.events,
+                    onTap: navigate,
+                    scrollable: true,
+                    leftpadding: false,
+                    curruser: widget.curruser,
+                    interactfav: interactfav,
+                    screenheight: screenheight,
+                    screenwidth: screenwidth,
+                  )
+                ],
+              )
+            : SizedBox(
+                width: screenwidth,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: screenheight * 0.1,
+                    ),
+                    const Text(
+                      "No Events yet :(",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 20,
+                      ),
+                      textScaleFactor: 1.0,
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.03,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                CreateEventScreen(
+                              curruser: widget.curruser,
+                              allowbackarrow: true,
+                              startinterest: widget.interest,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: screenwidth * 0.13,
+                        width: screenwidth * 0.6,
+                        decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: Colors.black)),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Text(
+                                "Create Event",
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                            ]),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }

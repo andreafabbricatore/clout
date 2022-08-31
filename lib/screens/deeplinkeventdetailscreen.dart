@@ -33,6 +33,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
   String joinedval = "Join";
+  bool buttonpressed = false;
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -118,37 +119,53 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   void interactevent(context) async {
     if (!joined && joinedval == "Join") {
       try {
+        setState(() {
+          buttonpressed = true;
+        });
         await db.joinevent(widget.event, widget.curruser, widget.event.docid);
       } catch (e) {
         displayErrorSnackBar("Could not join event");
       } finally {
+        setState(() {
+          buttonpressed = false;
+        });
         updatescreen(widget.event.docid);
       }
     } else if ((!joined && joinedval == "Full") || joinedval == "Finished") {
       //print(joinedval);
     } else if (joined && joinedval == "Delete Event") {
       try {
+        setState(() {
+          buttonpressed = true;
+        });
         await db.deleteevent(widget.event, widget.curruser);
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => LoadingScreen(
-                      uid: context
-                          .read<AuthenticationService>()
-                          .getuid()
-                          .toString(),
-                    )),
-            (Route<dynamic> route) => false);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => LoadingScreen(
+                    uid: widget.curruser.uid,
+                  ),
+              fullscreenDialog: true),
+        );
       } catch (e) {
         displayErrorSnackBar("Could not delete event");
         updatescreen(widget.event.docid);
+        setState(() {
+          buttonpressed = false;
+        });
       }
     } else {
       try {
+        setState(() {
+          buttonpressed = true;
+        });
         await db.leaveevent(widget.curruser, widget.event);
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {
         updatescreen(widget.event.docid);
+        setState(() {
+          buttonpressed = false;
+        });
       }
     }
   }
@@ -396,7 +413,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           ),
           InkWell(
             onTap: () async {
-              interactevent(context);
+              buttonpressed ? null : interactevent(context);
             },
             child: SizedBox(
                 height: 50,

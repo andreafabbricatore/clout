@@ -578,6 +578,33 @@ class db_conn {
     }
   }
 
+  Future<List<Event>> getLngLatEventsFilteredByDate(
+      double lng, double lat, DateTime date) async {
+    try {
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([date]).endBefore(
+              [DateTime(date.year, date.month, date.day + 1)]).get();
+      List<Event> tempeventlist = [];
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        tempeventlist.add(Event.fromJson(element.data(), element.id));
+      });
+
+      for (int i = 0; i < tempeventlist.length; i++) {
+        if ((tempeventlist[i].lat < lat + 0.04 &&
+            tempeventlist[i].lat > lat - 0.04 &&
+            tempeventlist[i].lng < lng + 0.04 &&
+            tempeventlist[i].lng > lng - 0.04)) {
+          eventlist.add(tempeventlist[i]);
+        }
+      }
+      return eventlist;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<AppUser>> searchUsers(String searchquery) async {
     try {
       QuerySnapshot querySnapshot = await users

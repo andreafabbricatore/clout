@@ -35,6 +35,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
   String joinedval = "Join";
+  bool buttonpressed = false;
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -120,16 +121,25 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void interactevent(context) async {
     if (!joined && joinedval == "Join") {
       try {
+        setState(() {
+          buttonpressed = true;
+        });
         await db.joinevent(widget.event, widget.curruser, widget.event.docid);
       } catch (e) {
         displayErrorSnackBar("Could not join event");
       } finally {
+        setState(() {
+          buttonpressed = false;
+        });
         updatescreen(widget.event.docid);
       }
     } else if ((!joined && joinedval == "Full") || joinedval == "Finished") {
       //print(joinedval);
     } else if (joined && joinedval == "Delete Event") {
       try {
+        setState(() {
+          buttonpressed = true;
+        });
         await db.deleteevent(widget.event, widget.curruser);
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -141,14 +151,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       } catch (e) {
         displayErrorSnackBar("Could not delete event");
         updatescreen(widget.event.docid);
+        setState(() {
+          buttonpressed = false;
+        });
       }
     } else {
       try {
+        setState(() {
+          buttonpressed = true;
+        });
         await db.leaveevent(widget.curruser, widget.event);
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {
         updatescreen(widget.event.docid);
+        setState(() {
+          buttonpressed = false;
+        });
       }
     }
   }
@@ -163,7 +182,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
     final dynamicLink =
         await FirebaseDynamicLinks.instance.buildLink(dynamicLinkParams);
-
     return dynamicLink.toString();
   }
 
@@ -205,7 +223,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         elevation: 0.0,
         leading: GestureDetector(
           onTap: () {
-            Navigator.pop(context, widget.event);
+            Navigator.pop(context);
           },
           child: const Icon(
             Icons.arrow_back_ios,
@@ -419,7 +437,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           InkWell(
             onTap: () async {
-              interactevent(context);
+              buttonpressed ? null : interactevent(context);
             },
             child: SizedBox(
                 height: 50,

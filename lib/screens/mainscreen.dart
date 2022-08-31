@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
@@ -55,6 +56,8 @@ class _MainScreenState extends State<MainScreen> {
           curruser: widget.curruser, userlocation: widget.userlocation),
       CreateEventScreen(
         curruser: widget.curruser,
+        allowbackarrow: false,
+        startinterest: "Sports",
       ),
       FavScreen(
         curruser: widget.curruser,
@@ -128,48 +131,58 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: page[_index],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        onTap: (newIndex) {
-          if (newIndex == 0) {
-            parampasser(false);
-          }
-          setState(() => _index = newIndex);
-        },
-        currentIndex: _index,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        unselectedItemColor: Colors.grey,
-        selectedItemColor: const Color.fromARGB(255, 255, 48, 117),
-        items: const [
-          BottomNavigationBarItem(
+        body: page[_index],
+        bottomNavigationBar: BottomNavyBar(
+          items: [
+            BottomNavyBarItem(
               icon: Icon(
                 Icons.home,
               ),
-              label: "Home"),
-          BottomNavigationBarItem(
+              title: Text("Home"),
+              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              inactiveColor: Colors.grey,
+            ),
+            BottomNavyBarItem(
               icon: Icon(
                 Icons.search,
               ),
-              label: "Search"),
-          BottomNavigationBarItem(
+              title: Text("Search"),
+              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              inactiveColor: Colors.grey,
+            ),
+            BottomNavyBarItem(
               icon: Icon(
                 Icons.add,
               ),
-              label: "Create"),
-          BottomNavigationBarItem(
+              title: Text("Create"),
+              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              inactiveColor: Colors.grey,
+            ),
+            BottomNavyBarItem(
               icon: Icon(
                 Icons.bookmark,
               ),
-              label: "Favorites"),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person_crop_circle),
-            label: "Profile",
-          )
-        ],
-        backgroundColor: Colors.white,
-      ),
-    );
+              title: Text("Favorites"),
+              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              inactiveColor: Colors.grey,
+            ),
+            BottomNavyBarItem(
+              icon: Icon(CupertinoIcons.person_crop_circle),
+              title: Text("Profile"),
+              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              inactiveColor: Colors.grey,
+            )
+          ],
+          onItemSelected: (newIndex) {
+            if (newIndex == 0) {
+              parampasser(false);
+            }
+            setState(() => _index = newIndex);
+          },
+          selectedIndex: _index,
+          showElevation: false,
+          iconSize: 33,
+          containerHeight: 60,
+        ));
   }
 }

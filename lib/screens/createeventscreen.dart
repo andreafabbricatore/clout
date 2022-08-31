@@ -13,8 +13,14 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
 class CreateEventScreen extends StatefulWidget {
-  CreateEventScreen({super.key, required this.curruser});
+  CreateEventScreen(
+      {super.key,
+      required this.curruser,
+      required this.allowbackarrow,
+      required this.startinterest});
   AppUser curruser;
+  bool allowbackarrow;
+  String startinterest;
 
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -50,7 +56,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   ];
 
   db_conn db = db_conn();
-  String selectedinterest = "Sports";
+  late String selectedinterest;
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
@@ -99,11 +105,23 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    selectedinterest = widget.startinterest;
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: widget.allowbackarrow
+            ? GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Color.fromARGB(255, 255, 48, 117),
+                ),
+              )
+            : Container(),
         title: const Text(
           "Create Event",
           style: TextStyle(

@@ -80,6 +80,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
           "Interests",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         elevation: 0.0,

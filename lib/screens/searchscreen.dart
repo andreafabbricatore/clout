@@ -2,6 +2,7 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/searchbarlistview.dart';
 import 'package:clout/components/searchgridview.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/calendarsearchscreen.dart';
 import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
@@ -107,66 +108,97 @@ class _SearchScreenState extends State<SearchScreen> {
                 });
               }
             },
-            child: TextField(
-              controller: searchcontroller,
-              onChanged: (String searchquery) async {
-                if (searchevents) {
-                  try {
-                    List<Event> res = await db.searchEvents(searchquery.trim());
-                    setState(() {
-                      searchedevents = res;
-                    });
-                    updatecurruser();
-                  } catch (e) {
-                    displayErrorSnackBar("Could not search events");
-                  }
-                } else {
-                  try {
-                    List<AppUser> res =
-                        await db.searchUsers(searchquery.trim());
-                    setState(() {
-                      searchedusers = res;
-                    });
-                    updatecurruser();
-                  } catch (e) {
-                    displayErrorSnackBar("Could not search users");
-                  }
-                }
-              },
-              decoration: InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  suffixIcon: InkWell(
-                      onTap: () {
-                        if (searchcontroller.text.isNotEmpty) {
-                          searchcontroller.clear();
-                        } else {
+            child: Row(
+              children: [
+                SizedBox(
+                  width: searching ? screenwidth * 0.945 : screenwidth * 0.85,
+                  child: TextField(
+                    controller: searchcontroller,
+                    onChanged: (String searchquery) async {
+                      if (searchevents) {
+                        try {
+                          List<Event> res =
+                              await db.searchEvents(searchquery.trim());
                           setState(() {
-                            searching = false;
-                            suffixiconcolor = Colors.white;
-                            searchedusers = [];
-                            searchedevents = [];
+                            searchedevents = res;
                           });
-                          FocusScope.of(context).unfocus();
+                          updatecurruser();
+                        } catch (e) {
+                          displayErrorSnackBar("Could not search events");
                         }
-                      },
-                      child: Icon(Icons.close, color: suffixiconcolor)),
-                  contentPadding: const EdgeInsets.all(20),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide:
-                        const BorderSide(color: Colors.grey, width: 1.0),
+                      } else {
+                        try {
+                          List<AppUser> res =
+                              await db.searchUsers(searchquery.trim());
+                          setState(() {
+                            searchedusers = res;
+                          });
+                          updatecurruser();
+                        } catch (e) {
+                          displayErrorSnackBar("Could not search users");
+                        }
+                      }
+                    },
+                    decoration: InputDecoration(
+                        hintText: 'Search',
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.grey),
+                        suffixIcon: GestureDetector(
+                            onTap: searching
+                                ? () {
+                                    if (searchcontroller.text.isNotEmpty) {
+                                      searchcontroller.clear();
+                                    } else {
+                                      setState(() {
+                                        searching = false;
+                                        suffixiconcolor = Colors.white;
+                                        searchedusers = [];
+                                        searchedevents = [];
+                                      });
+                                      FocusScope.of(context).unfocus();
+                                    }
+                                  }
+                                : null,
+                            child: Icon(Icons.close, color: suffixiconcolor)),
+                        contentPadding: const EdgeInsets.all(20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide:
+                              const BorderSide(color: Colors.grey, width: 1.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide:
+                              const BorderSide(color: Colors.grey, width: 1.0),
+                        )),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide:
-                        const BorderSide(color: Colors.grey, width: 1.0),
-                  )),
+                ),
+                searching ? Container() : SizedBox(width: screenwidth * 0.02),
+                searching
+                    ? Container()
+                    : GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => CalendarSearchScreen(
+                                        userlocation: widget.userlocation,
+                                        curruser: widget.curruser,
+                                      )));
+                        },
+                        child: SizedBox(
+                          width: screenwidth * 0.05,
+                          child: Icon(Icons.calendar_today_rounded),
+                        ),
+                      )
+              ],
             ),
           ),
-          SizedBox(
-            height: screenheight * 0.01,
-          ),
+          searching
+              ? SizedBox(
+                  height: screenheight * 0.02,
+                )
+              : Container(),
           searching
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
