@@ -6,11 +6,15 @@ import 'package:clout/screens/loading.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'dart:io';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class CreateEventScreen extends StatefulWidget {
   CreateEventScreen(
@@ -57,6 +61,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   db_conn db = db_conn();
   late String selectedinterest;
+  ImagePicker picker = ImagePicker();
+  var imagepath;
+  var compressedimgpath;
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
@@ -64,6 +71,28 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   AppLocation chosenLocation =
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
   bool emptylocation = true;
+  bool buttonpressed = false;
+
+  Future<File> CompressAndGetFile(File file) async {
+    try {
+      final filePath = file.absolute.path;
+      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final splitted = filePath.substring(0, (lastIndex));
+      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+      var result = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 5,
+      );
+
+      //print(file.lengthSync());
+      //print(result!.lengthSync());
+
+      return result!;
+    } catch (e) {
+      throw Exception();
+    }
+  }
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -122,12 +151,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
               )
             : Container(),
-        title: const Text(
-          "Create Event",
-          style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
-              fontWeight: FontWeight.bold,
-              fontSize: 30),
+        title: GestureDetector(
+          onTap: () {
+            CompressAndGetFile(imagepath);
+          },
+          child: const Text(
+            "Create Event",
+            style: TextStyle(
+                color: Color.fromARGB(255, 255, 48, 117),
+                fontWeight: FontWeight.bold,
+                fontSize: 30),
+          ),
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -137,7 +171,54 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       body: SingleChildScrollView(
         child: Column(children: [
           SizedBox(
-            height: screenheight * 0.05,
+            height: screenheight * 0.02,
+          ),
+          InkWell(
+            onTap: () async {
+              try {
+                XFile? image =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (image != null) {
+                  setState(() {
+                    imagepath = File(image.path);
+                  });
+                  //print(imagepath);
+                }
+              } catch (e) {
+                displayErrorSnackBar("Error with profile picture");
+              }
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: imagepath == null
+                  ? Container(
+                      color: const Color.fromARGB(255, 255, 48, 117),
+                      height: screenheight * 0.2,
+                      width: screenheight * 0.2,
+                      child: Icon(
+                        Icons.upload_rounded,
+                        color: Colors.white,
+                        size: screenheight * 0.18,
+                      ),
+                    )
+                  : Image.file(
+                      imagepath,
+                      height: screenheight * 0.2,
+                      width: screenheight * 0.2,
+                      fit: BoxFit.cover,
+                    ),
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.01,
+          ),
+          Text(
+            "Event Cover is Optional",
+            style: TextStyle(color: Color.fromARGB(53, 0, 0, 0)),
+            textScaleFactor: 1.0,
+          ),
+          SizedBox(
+            height: screenheight * 0.01,
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
@@ -225,27 +306,28 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(height: screenheight * 0.02),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
-            child: TextField(
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300,
+            child: TextFormField(
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w300,
+                fontSize: 15,
+              ),
+              decoration: const InputDecoration(
+                focusedBorder: UnderlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                hintText: "Max. Number of Participants",
+                hintStyle: TextStyle(
+                  color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 15,
                 ),
-                decoration: const InputDecoration(
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
-                  hintText: "Max. Number of Participants",
-                  hintStyle: TextStyle(
-                    color: Color.fromARGB(39, 0, 0, 0),
-                    fontSize: 15,
-                  ),
-                ),
-                textAlign: TextAlign.start,
-                enableSuggestions: true,
-                autocorrect: true,
-                controller: maxpartcontroller,
-                keyboardType: TextInputType.number),
+              ),
+              textAlign: TextAlign.start,
+              enableSuggestions: true,
+              autocorrect: true,
+              controller: maxpartcontroller,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
           ),
           SizedBox(height: screenheight * 0.02),
           InkWell(
@@ -273,6 +355,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       : "${DateFormat.MMMd().format(eventdate)} @ ${DateFormat('hh:mm a').format(eventdate)}",
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
+                  textScaleFactor: 1.0,
                 ),
                 const SizedBox(
                   width: 5,
@@ -308,6 +391,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   emptylocation ? "Location" : "Change Location",
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
+                  textScaleFactor: 1.0,
                 ),
                 const SizedBox(
                   width: 5,
@@ -359,46 +443,66 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          InkWell(
-            onTap: () async {
-              if (titlecontroller.text.trim().isEmpty) {
-                displayErrorSnackBar("Please enter a name for your event");
-              } else if (desccontroller.text.trim().isEmpty) {
-                displayErrorSnackBar("Please enter a description");
-              } else if (int.parse(maxpartcontroller.text) <= 1) {
-                displayErrorSnackBar(
-                    "Please enter a max number of participants");
-              } else if (eventdate.isAtSameMomentAs(DateTime(0, 0, 0))) {
-                displayErrorSnackBar("Please choose a date for your event");
-              } else if (emptylocation) {
-                displayErrorSnackBar("Please choose a location for your event");
-              } else {
-                setState(() {
-                  event.title = titlecontroller.text.trim();
-                  event.description = desccontroller.text.trim();
-                  event.maxparticipants = int.parse(maxpartcontroller.text);
-                  event.interest = selectedinterest;
-                  event.datetime = eventdate;
-                  event.address = chosenLocation.address;
-                  event.city = chosenLocation.city;
-                  event.host = widget.curruser.username;
-                  event.lat = chosenLocation.center[1];
-                  event.lng = chosenLocation.center[0];
-                });
-                try {
-                  await db.createevent(event, widget.curruser);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          LoadingScreen(uid: widget.curruser.uid),
-                    ),
-                  );
-                } catch (e) {
-                  displayErrorSnackBar("Could not create event");
-                }
-              }
-            },
+          GestureDetector(
+            onTap: buttonpressed
+                ? null
+                : () async {
+                    setState(() {
+                      buttonpressed = true;
+                    });
+                    if (titlecontroller.text.trim().isEmpty) {
+                      displayErrorSnackBar(
+                          "Please enter a name for your event");
+                    } else if (desccontroller.text.trim().isEmpty) {
+                      displayErrorSnackBar("Please enter a description");
+                    } else if (int.parse(maxpartcontroller.text) <= 1) {
+                      displayErrorSnackBar(
+                          "Please enter a max number of participants");
+                    } else if (eventdate.isAtSameMomentAs(DateTime(0, 0, 0))) {
+                      displayErrorSnackBar(
+                          "Please choose a date for your event");
+                    } else if (emptylocation) {
+                      displayErrorSnackBar(
+                          "Please choose a location for your event");
+                    } else {
+                      setState(() {
+                        event.title = titlecontroller.text.trim();
+                        event.description = desccontroller.text.trim();
+                        event.maxparticipants =
+                            int.parse(maxpartcontroller.text);
+                        event.interest = selectedinterest;
+                        event.datetime = eventdate;
+                        event.address = chosenLocation.address;
+                        event.city = chosenLocation.city;
+                        event.host = widget.curruser.username;
+                        event.lat = chosenLocation.center[1];
+                        event.lng = chosenLocation.center[0];
+                      });
+                      try {
+                        if (imagepath == null) {
+                          compressedimgpath = null;
+                        } else {
+                          compressedimgpath =
+                              await CompressAndGetFile(imagepath);
+                        }
+                        await db.createevent(
+                            event, widget.curruser, compressedimgpath);
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                LoadingScreen(uid: widget.curruser.uid),
+                          ),
+                        );
+                      } catch (e) {
+                        displayErrorSnackBar("Could not create event");
+                      }
+                      setState(() {
+                        buttonpressed = false;
+                      });
+                    }
+                  },
             child: SizedBox(
                 height: 50,
                 width: screenwidth * 0.6,

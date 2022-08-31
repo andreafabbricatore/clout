@@ -106,9 +106,9 @@ class db_conn {
     }
   }
 
-  Future createevent(Event newevent, AppUser curruser) async {
+  Future createevent(Event newevent, AppUser curruser, var imagepath) async {
     try {
-      String bannerUrl = await downloadBannerUrl(newevent.interest);
+      String bannerUrl = "";
       List joinedEvents = curruser.joinedEvents;
       List hostedEvents = curruser.hostedEvents;
       int clout = curruser.clout;
@@ -143,7 +143,7 @@ class db_conn {
           'time': newevent.datetime,
           'maxparticipants': newevent.maxparticipants,
           'participants': [curruser.docid],
-          'image': bannerUrl,
+          'image': "",
           'lat': newevent.lat,
           'lng': newevent.lng,
           'searchfield': searchfield
@@ -152,6 +152,12 @@ class db_conn {
         });
         joinedEvents.add(eventid);
         hostedEvents.add(eventid);
+        if (imagepath == null) {
+          bannerUrl = await downloadBannerUrl(newevent.interest);
+        } else {
+          bannerUrl = await uploadEventThumbnail(imagepath, eventid);
+        }
+        await events.doc(eventid).update({'image': bannerUrl});
         return users.doc(curruser.docid).update({
           'joined_events': joinedEvents,
           'hosted_events': hostedEvents,
@@ -236,6 +242,9 @@ class db_conn {
         joinedEvents.removeWhere((element) => element == event.docid);
         users.doc(x).update({'joined_events': joinedEvents});
       }
+      await FirebaseStorage.instance
+          .ref('/event_thumbnails/${event.docid}.jpg')
+          .delete();
       await events.doc(event.docid).delete();
     } catch (e) {
       throw Exception("Could not delete event");
@@ -244,13 +253,28 @@ class db_conn {
 
   Future changepfp(File filePath, String uid) async {
     try {
-      await uploadFile(filePath, uid);
-      String photoUrl = await downloadURL(uid);
+      await uploadUserPFP(filePath, uid);
+      String photoUrl = await downloadUserPFPURL(uid);
       String id = "";
       await getUserDocID(uid).then((value) => id = value);
       return users.doc(id).update({'pfp_url': photoUrl}).catchError((error) {
         throw Exception("Could not upload pfp");
       });
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<String> uploadEventThumbnail(File filePath, String eventid) async {
+    try {
+      await uploadEventThumb(filePath, eventid);
+      String photoUrl = await downloadEventThumbURL(eventid);
+      return photoUrl;
+      //String id = "";
+      //await getUserDocID(uid).then((value) => id = value);
+      //return users.doc(id).update({'pfp_url': photoUrl}).catchError((error) {
+      //  throw Exception("Could not upload pfp");
+      //});
     } catch (e) {
       throw Exception();
     }
@@ -295,7 +319,7 @@ class db_conn {
     });
   }
 
-  Future uploadFile(File filePath, String uid) async {
+  Future uploadUserPFP(File filePath, String uid) async {
     try {
       await FirebaseStorage.instance
           .ref('/user_pfp/$uid.jpg')
@@ -305,10 +329,31 @@ class db_conn {
     }
   }
 
-  Future<String> downloadURL(String uid) async {
+  Future uploadEventThumb(File filePath, String eventid) async {
+    try {
+      await FirebaseStorage.instance
+          .ref('/event_thumbnails/$eventid.jpg')
+          .putFile(filePath);
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<String> downloadUserPFPURL(String uid) async {
     try {
       String downloadUrl = await FirebaseStorage.instance
           .ref('/user_pfp/$uid.jpg')
+          .getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      throw Exception("Could not get download url");
+    }
+  }
+
+  Future<String> downloadEventThumbURL(String eventid) async {
+    try {
+      String downloadUrl = await FirebaseStorage.instance
+          .ref('/event_thumbnails/$eventid.jpg')
           .getDownloadURL();
       return downloadUrl;
     } catch (e) {

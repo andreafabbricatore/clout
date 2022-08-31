@@ -6,6 +6,7 @@ import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -895,6 +896,28 @@ class _InterestScreenState extends State<InterestScreen> {
   List selectedinterests = [];
   db_conn db = db_conn();
   bool buttonpressed = false;
+  var compressedimgpath;
+
+  Future<File> CompressAndGetFile(File file) async {
+    try {
+      final filePath = file.absolute.path;
+      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final splitted = filePath.substring(0, (lastIndex));
+      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+      var result = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 5,
+      );
+
+      //print(file.lengthSync());
+      //print(result!.lengthSync());
+
+      return result!;
+    } catch (e) {
+      throw Exception();
+    }
+  }
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -1020,7 +1043,9 @@ class _InterestScreenState extends State<InterestScreen> {
                               password: widget.psw);
                       String uid = FirebaseAuth.instance.currentUser!.uid;
                       await db.createuserinstance(widget.curruser.email, uid);
-                      await db.changepfp(widget.imagepath, uid);
+                      compressedimgpath =
+                          await CompressAndGetFile(widget.imagepath);
+                      await db.changepfp(compressedimgpath, uid);
                       await db.changeusername(widget.curruser.username, uid);
                       await db.changeattribute(
                           'fullname', widget.curruser.fullname, uid);

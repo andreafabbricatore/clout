@@ -47,7 +47,7 @@ class AuthenticationWrapper extends StatelessWidget {
             }
           } else {
             //print("auth");
-            return const AuthScreen();
+            return AuthScreen();
           }
         }),
       ),

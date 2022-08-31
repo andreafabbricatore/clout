@@ -5,6 +5,7 @@ import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import 'package:image_picker/image_picker.dart';
 
@@ -21,9 +22,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   db_conn db = db_conn();
   ImagePicker picker = ImagePicker();
   var imagepath;
+  var compressedimgpath;
   TextEditingController fullnamecontroller = TextEditingController();
   TextEditingController usernamecontroller = TextEditingController();
   //DateTime birthday = DateTime(0, 0, 0);
+  bool buttonpressed = false;
 
   var genders = ['Male', 'Female', 'Non-Binary'];
   var nations = [
@@ -288,6 +291,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  Future<File> CompressAndGetFile(File file) async {
+    try {
+      final filePath = file.absolute.path;
+      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final splitted = filePath.substring(0, (lastIndex));
+      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+      var result = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 5,
+      );
+
+      //print(file.lengthSync());
+      //print(result!.lengthSync());
+
+      return result!;
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   @override
   void initState() {
     setState(() {
@@ -474,32 +498,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             height: screenheight * 0.02,
           ),
           InkWell(
-            onTap: () async {
-              try {
-                if (imagepath != null) {
-                  await db.changepfp(imagepath, widget.curruser.uid);
-                }
-                bool unique =
-                    await db.usernameUnique(usernamecontroller.text.trim());
-                if (unique && usernamecontroller.text.isNotEmpty) {
-                  await db.changeusername(
-                      usernamecontroller.text.trim(), widget.curruser.uid);
-                }
-                if (fullnamecontroller.text.isNotEmpty) {
-                  await db.changeattribute('fullname',
-                      fullnamecontroller.text.trim(), widget.curruser.uid);
-                }
-                await db.changeattribute('gender', gender, widget.curruser.uid);
-                await db.changeattribute(
-                    'nationality', nationality, widget.curruser.uid);
-                await db.changeinterests(
-                    'interests', widget.interests, widget.curruser.uid);
-              } catch (e) {
-                displayErrorSnackBar("Could not update profile");
-              } finally {
-                Navigator.pop(context);
-              }
-            },
+            onTap: buttonpressed
+                ? null
+                : () async {
+                    setState(() {
+                      buttonpressed = true;
+                    });
+                    try {
+                      if (imagepath != null) {
+                        compressedimgpath = await CompressAndGetFile(imagepath);
+                        await db.changepfp(
+                            compressedimgpath, widget.curruser.uid);
+                      }
+                      bool unique = await db
+                          .usernameUnique(usernamecontroller.text.trim());
+                      if (unique && usernamecontroller.text.isNotEmpty) {
+                        await db.changeusername(usernamecontroller.text.trim(),
+                            widget.curruser.uid);
+                      }
+                      if (fullnamecontroller.text.isNotEmpty) {
+                        await db.changeattribute(
+                            'fullname',
+                            fullnamecontroller.text.trim(),
+                            widget.curruser.uid);
+                      }
+                      await db.changeattribute(
+                          'gender', gender, widget.curruser.uid);
+                      await db.changeattribute(
+                          'nationality', nationality, widget.curruser.uid);
+                      await db.changeinterests(
+                          'interests', widget.interests, widget.curruser.uid);
+                    } catch (e) {
+                      displayErrorSnackBar("Could not update profile");
+                    } finally {
+                      setState(() {
+                        buttonpressed = false;
+                      });
+                      Navigator.pop(context);
+                    }
+                  },
             child: SizedBox(
                 height: 50,
                 width: screenwidth * 0.6,
