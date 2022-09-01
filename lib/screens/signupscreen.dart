@@ -189,12 +189,12 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   ImagePicker picker = ImagePicker();
   var imagepath;
   db_conn db = db_conn();
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -202,7 +202,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    print(imagepath == null);
+    //print(imagepath == null);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
@@ -326,13 +326,25 @@ class UsernameScreen extends StatefulWidget {
 class _UsernameScreenState extends State<UsernameScreen> {
   final usernamecontroller = TextEditingController();
   db_conn db = db_conn();
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void gotomiscscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => MiscScreen(
+            curruser: widget.curruser,
+            imagepath: widget.imagepath,
+            psw: widget.psw),
+      ),
+    );
   }
 
   @override
@@ -383,15 +395,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
                 widget.curruser.username =
                     usernamecontroller.text.trim().toLowerCase();
               });
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => MiscScreen(
-                      curruser: widget.curruser,
-                      imagepath: widget.imagepath,
-                      psw: widget.psw),
-                ),
-              );
+              gotomiscscreen();
             }
           },
           backgroundColor: const Color.fromARGB(255, 255, 48, 117),
@@ -435,12 +439,12 @@ class _MiscScreenState extends State<MiscScreen> {
     "Food",
     "Art"
   ];
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -832,7 +836,7 @@ class _MiscScreenState extends State<MiscScreen> {
         height: 70,
         width: 70,
         child: FloatingActionButton(
-          onPressed: () async {
+          onPressed: () {
             if (birthday != DateTime(0, 0, 0)) {
               setState(() {
                 widget.curruser.birthday = birthday;
@@ -919,13 +923,22 @@ class _InterestScreenState extends State<InterestScreen> {
     }
   }
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void donesignup() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthenticationWrapper(),
+          fullscreenDialog: true),
+    );
   }
 
   Widget _listviewitem(String interest) {
@@ -973,26 +986,23 @@ class _InterestScreenState extends State<InterestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenwidth = MediaQuery.of(context).size.width;
-    final screenheight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Interests",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
               fontWeight: FontWeight.bold,
               fontSize: 30),
         ),
-        bottom: PreferredSize(
+        bottom: const PreferredSize(
+          preferredSize: Size.zero,
           child: Text(
             "Choose at least 3",
             style: TextStyle(color: Color.fromARGB(255, 255, 48, 117)),
           ),
-          preferredSize: Size.zero,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -1005,8 +1015,8 @@ class _InterestScreenState extends State<InterestScreen> {
           children: [
             Expanded(
               child: GridView.builder(
-                padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2),
                 shrinkWrap: true,
                 itemCount: allinterests.length,
@@ -1057,13 +1067,7 @@ class _InterestScreenState extends State<InterestScreen> {
                       await db.changeinterests(
                           'interests', widget.curruser.interests, uid);
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                AuthenticationWrapper(),
-                            fullscreenDialog: true),
-                      );
+                      donesignup();
                     } else {
                       displayErrorSnackBar("Choose at least 3 interests");
                       setState(() {
@@ -1077,8 +1081,8 @@ class _InterestScreenState extends State<InterestScreen> {
                     });
                   }
                 },
-          backgroundColor: Color.fromARGB(255, 255, 48, 117),
-          child: Icon(
+          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+          child: const Icon(
             Icons.arrow_circle_right_outlined,
             size: 60,
           ),

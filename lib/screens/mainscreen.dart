@@ -71,12 +71,12 @@ class _MainScreenState extends State<MainScreen> {
     ];
   }
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -95,7 +95,21 @@ class _MainScreenState extends State<MainScreen> {
         //print('onAppLink: $uri');
         openAppLink(uri);
       });
-    } catch (e) {}
+    } catch (e) {
+      //nothing
+    }
+  }
+
+  void godeeplinkeventdetailscreen(
+      Event chosenEvent, List<AppUser> participants) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => DeepLinkEventDetailScreen(
+                  event: chosenEvent,
+                  curruser: widget.curruser,
+                  participants: participants,
+                )));
   }
 
   void openAppLink(Uri uri) async {
@@ -110,15 +124,10 @@ class _MainScreenState extends State<MainScreen> {
       List<AppUser> participants = [
         for (String x in chosenEvent.participants) await db.getUserFromDocID(x)
       ];
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => DeepLinkEventDetailScreen(
-                    event: chosenEvent,
-                    curruser: widget.curruser,
-                    participants: participants,
-                  )));
-    } catch (e) {}
+      godeeplinkeventdetailscreen(chosenEvent, participants);
+    } catch (e) {
+      //nothing
+    }
   }
 
   @override
@@ -135,40 +144,40 @@ class _MainScreenState extends State<MainScreen> {
         bottomNavigationBar: BottomNavyBar(
           items: [
             BottomNavyBarItem(
-              icon: Icon(
+              icon: const Icon(
                 Icons.home,
               ),
-              title: Text("Home"),
+              title: const Text("Home"),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
-              icon: Icon(
+              icon: const Icon(
                 Icons.search,
               ),
-              title: Text("Search"),
+              title: const Text("Search"),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
-              icon: Icon(
+              icon: const Icon(
                 Icons.add,
               ),
-              title: Text("Create"),
+              title: const Text("Create"),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
-              icon: Icon(
+              icon: const Icon(
                 Icons.bookmark,
               ),
-              title: Text("Favorites"),
+              title: const Text("Favorites"),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
-              icon: Icon(CupertinoIcons.person_crop_circle),
-              title: Text("Profile"),
+              icon: const Icon(CupertinoIcons.person_crop_circle),
+              title: const Text("Profile"),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             )

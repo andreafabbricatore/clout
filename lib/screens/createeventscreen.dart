@@ -94,12 +94,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -116,6 +116,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         emptylocation = false;
       });
     }
+  }
+
+  void goloadingscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            LoadingScreen(uid: widget.curruser.uid),
+      ),
+    );
   }
 
   @override
@@ -212,7 +222,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(
             height: screenheight * 0.01,
           ),
-          Text(
+          const Text(
             "Event Cover is Optional",
             style: TextStyle(color: Color.fromARGB(53, 0, 0, 0)),
             textScaleFactor: 1.0,
@@ -488,13 +498,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         await db.createevent(
                             event, widget.curruser, compressedimgpath);
 
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                LoadingScreen(uid: widget.curruser.uid),
-                          ),
-                        );
+                        goloadingscreen();
                       } catch (e) {
                         displayErrorSnackBar("Could not create event");
                       }

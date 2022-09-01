@@ -45,15 +45,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
     "Food",
     "Art"
   ];
-  Future<void> _getUserLocation() async {
-    Location location = Location();
-
+  Location location = Location();
+  Future<bool> _getUserLocation() async {
     // Check if location service is enable
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
-        throw Exception();
+        return false;
       }
     }
 
@@ -62,14 +61,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
-        throw Exception();
+        return false;
       }
     }
 
     final _locationData = await location.getLocation();
+
     setState(() {
       _userLocation = _locationData;
     });
+    return true;
   }
 
   Future<void> getUserAppLocation() async {
@@ -91,22 +92,24 @@ class _LoadingScreenState extends State<LoadingScreen> {
     });
   }
 
-  void appinit() async {
+  Future<void> appinit() async {
     try {
       setState(() {
         error = false;
       });
-      await _getUserLocation();
       await getUserAppLocation();
+      print("queried location on mapbox");
       if (curruserlocation.address != "" &&
           curruserlocation.city != "" &&
           curruserlocation.country != "" &&
           !listEquals(curruserlocation.center, [0.0, 0.0])) {
         docid = await db.getUserDocID(widget.uid);
         AppUser curruser = await db.getUserFromDocID(docid);
+        print("got user");
         interests = curruser.interests;
         currloceventlist = await db.getLngLatEvents(
             curruserlocation.center[0], curruserlocation.center[1]);
+        print("got events");
         for (int i = 0; i < currloceventlist.length; i++) {
           if (interests.contains(currloceventlist[i].interest)) {
             setState(() {
@@ -118,17 +121,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
             });
           }
         }
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext context) => MainScreen(
-                  interests: interests,
-                  eventlist: eventlist,
-                  interesteventlist: interesteventlist,
-                  curruser: curruser,
-                  userlocation: curruserlocation),
-              fullscreenDialog: true),
-        );
+        print("organised events");
+        doneLoading(curruser);
+      } else {
+        throw Exception();
       }
     } catch (e) {
       setState(() {
@@ -137,9 +133,51 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
+  void doneLoading(AppUser curruser) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => MainScreen(
+              interests: interests,
+              eventlist: eventlist,
+              interesteventlist: interesteventlist,
+              curruser: curruser,
+              userlocation: curruserlocation),
+          fullscreenDialog: true),
+    );
+  }
+
+  Future<void> ensurelocation() async {
+    try {
+      setState(() {
+        error = false;
+      });
+      bool gotpermissions = false;
+      int counter = 0;
+      while (gotpermissions == false) {
+        gotpermissions = await _getUserLocation();
+        counter += 1;
+        print(counter);
+        if (counter >= 3) {
+          throw Exception();
+        }
+      }
+      print("got location");
+    } catch (e) {
+      setState(() {
+        error = true;
+      });
+    }
+  }
+
+  void loadinglogic() async {
+    await ensurelocation();
+    await appinit();
+  }
+
   @override
   void initState() {
-    appinit();
+    loadinglogic();
     super.initState();
   }
 
@@ -188,14 +226,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Clout",
                     style: TextStyle(
                         color: Color.fromARGB(255, 255, 48, 117),
                         fontWeight: FontWeight.bold,
                         fontSize: 60),
                   ),
-                  Text(
+                  const Text(
                     "Go Out",
                     style: TextStyle(
                         color: Colors.black,
@@ -205,7 +243,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   SizedBox(
                     height: screenheight * 0.1,
                   ),
-                  SpinKitFadingFour(
+                  const SpinKitFadingFour(
                     color: Color.fromARGB(255, 255, 48, 117),
                   ),
                 ],

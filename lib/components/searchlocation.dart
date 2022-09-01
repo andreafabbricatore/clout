@@ -18,12 +18,12 @@ class _SearchLocationState extends State<SearchLocation> {
   AppLocation chosenLocation =
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 

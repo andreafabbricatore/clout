@@ -18,12 +18,12 @@ class _FavScreenState extends State<FavScreen> {
   List<Event> favorites = [];
   db_conn db = db_conn();
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
-    await Future.delayed(Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 

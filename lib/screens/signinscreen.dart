@@ -16,13 +16,22 @@ class _SignInScreenState extends State<SignInScreen> {
   final emailController = TextEditingController();
   final pswController = TextEditingController();
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void donesignin() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthenticationWrapper(),
+          fullscreenDialog: true),
+    );
   }
 
   @override
@@ -118,13 +127,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   await FirebaseAuth.instance.signInWithEmailAndPassword(
                       email: emailController.text.trim(),
                       password: pswController.text.trim());
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            AuthenticationWrapper(),
-                        fullscreenDialog: true),
-                  );
+                  donesignin();
                 } catch (e) {
                   displayErrorSnackBar("Could not Sign in");
                 }

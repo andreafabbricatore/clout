@@ -47,14 +47,14 @@ class UserListView extends StatelessWidget {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: curruser.username == user.username
-                        ? Color.fromARGB(255, 255, 48, 117)
+                        ? const Color.fromARGB(255, 255, 48, 117)
                         : Colors.black),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 "${user.fullname}",
-                style: TextStyle(fontSize: 15, color: Colors.black),
+                style: const TextStyle(fontSize: 15, color: Colors.black),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -72,8 +72,6 @@ class UserListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenwidth = MediaQuery.of(context).size.width;
-    final screenheight = MediaQuery.of(context).size.height;
     return Expanded(
       child: ListView.builder(
           padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),

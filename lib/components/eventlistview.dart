@@ -30,14 +30,15 @@ class EventListView extends StatelessWidget {
   db_conn db = db_conn();
   Widget _eventImage(String image) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(15.0),
-      child: Image.network(
-        image,
-        width: 150,
-        height: 150,
-        fit: BoxFit.cover,
-      ),
-    );
+        borderRadius: BorderRadius.circular(15.0),
+        child: FadeInImage(
+          fadeInDuration: const Duration(milliseconds: 1),
+          height: 150,
+          width: 150,
+          fit: BoxFit.cover,
+          image: NetworkImage(image),
+          placeholder: const AssetImage("assets/images/misc/placeholder.jpeg"),
+        ));
   }
 
   Widget _listViewItem(
@@ -197,7 +198,6 @@ class EventListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
     return isHorizontal == true

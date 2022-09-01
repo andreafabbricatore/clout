@@ -22,13 +22,22 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
 
   TextEditingController emailaddress = TextEditingController();
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void goauthwrapper() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthenticationWrapper(),
+          fullscreenDialog: true),
+    );
   }
 
   @override
@@ -60,12 +69,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                   email: widget.curruser.email, password: psw.text.trim());
               await FirebaseAuth.instance.currentUser!.delete();
               await db.deleteuser(widget.curruser);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper(),
-                    fullscreenDialog: true),
-              );
+              goauthwrapper();
             } catch (e) {
               displayErrorSnackBar("Invalid Action, try again");
             }
@@ -110,12 +114,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               }
               await FirebaseAuth.instance.currentUser!
                   .updateEmail(emailaddress.text.trim());
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper(),
-                    fullscreenDialog: true),
-              );
+              goauthwrapper();
             } catch (e) {
               displayErrorSnackBar("Invalid Action, try again");
             }
@@ -159,12 +158,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               }
               await FirebaseAuth.instance.currentUser!
                   .updatePassword(newpsw.text.trim());
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper(),
-                    fullscreenDialog: true),
-              );
+              goauthwrapper();
             } catch (e) {
               displayErrorSnackBar("Invalid Action, try again");
             }
@@ -278,12 +272,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
           GestureDetector(
             onTap: () async {
               await FirebaseAuth.instance.signOut();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => AuthenticationWrapper(),
-                    fullscreenDialog: true),
-              );
+              goauthwrapper();
             },
             child: const Text(
               "Log out",

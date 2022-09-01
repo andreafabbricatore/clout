@@ -3,7 +3,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
-import 'package:clout/services/auth.dart';
+
 import 'package:clout/services/db.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:share_plus/share_plus.dart';
@@ -37,12 +37,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   String joinedval = "Join";
   bool buttonpressed = false;
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -237,8 +237,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               //print(link);
               shareevent(link);
             },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+            child: const Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
               child: Icon(
                 Icons.ios_share,
                 color: Colors.black,

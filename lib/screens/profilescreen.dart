@@ -36,12 +36,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<Event> joinedEvents = [];
   List<Event> hostedEvents = [];
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 

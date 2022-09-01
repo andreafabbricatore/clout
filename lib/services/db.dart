@@ -111,6 +111,7 @@ class db_conn {
       String bannerUrl = "";
       List joinedEvents = curruser.joinedEvents;
       List hostedEvents = curruser.hostedEvents;
+      bool customimage = false;
       int clout = curruser.clout;
       String eventid = "";
       bool unique = await eventUnique(
@@ -144,6 +145,7 @@ class db_conn {
           'maxparticipants': newevent.maxparticipants,
           'participants': [curruser.docid],
           'image': "",
+          'custom_image': false,
           'lat': newevent.lat,
           'lng': newevent.lng,
           'searchfield': searchfield
@@ -155,9 +157,12 @@ class db_conn {
         if (imagepath == null) {
           bannerUrl = await downloadBannerUrl(newevent.interest);
         } else {
+          customimage = true;
           bannerUrl = await uploadEventThumbnail(imagepath, eventid);
         }
-        await events.doc(eventid).update({'image': bannerUrl});
+        await events
+            .doc(eventid)
+            .update({'image': bannerUrl, 'custom_image': customimage});
         return users.doc(curruser.docid).update({
           'joined_events': joinedEvents,
           'hosted_events': hostedEvents,
@@ -242,9 +247,11 @@ class db_conn {
         joinedEvents.removeWhere((element) => element == event.docid);
         users.doc(x).update({'joined_events': joinedEvents});
       }
-      await FirebaseStorage.instance
-          .ref('/event_thumbnails/${event.docid}.jpg')
-          .delete();
+      if (eventSnapshot['custom_image']) {
+        await FirebaseStorage.instance
+            .ref('/event_thumbnails/${event.docid}.jpg')
+            .delete();
+      } else {}
       await events.doc(event.docid).delete();
     } catch (e) {
       throw Exception("Could not delete event");
@@ -551,6 +558,34 @@ class db_conn {
     try {
       QuerySnapshot querySnapshot =
           await events.orderBy('time').startAfter([DateTime.now()]).get();
+      List<Event> tempeventlist = [];
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        tempeventlist.add(Event.fromJson(element.data(), element.id));
+      });
+
+      for (int i = 0; i < tempeventlist.length; i++) {
+        if ((tempeventlist[i].lat < lat + 0.04 &&
+            tempeventlist[i].lat > lat - 0.04 &&
+            tempeventlist[i].lng < lng + 0.04 &&
+            tempeventlist[i].lng > lng - 0.04)) {
+          eventlist.add(tempeventlist[i]);
+        }
+      }
+      return eventlist;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<List<Event>> getLngLatEventsByInterest(
+      double lng, double lat, interest) async {
+    try {
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
+          .where('interest', isEqualTo: interest)
+          .get();
       List<Event> tempeventlist = [];
       List<Event> eventlist = [];
       querySnapshot.docs.forEach((element) {

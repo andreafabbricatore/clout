@@ -35,12 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> interesteventlist = [];
   List userinterests = [];
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
       duration: const Duration(seconds: 2),
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -182,9 +182,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Clout",
-          style: const TextStyle(
+          style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
               fontWeight: FontWeight.bold,
               fontSize: 30),

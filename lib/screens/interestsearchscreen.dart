@@ -63,16 +63,11 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
 
   Future<void> refreshevents() async {
     try {
-      List<Event> currloceventlist = await await db.getLngLatEvents(
-          widget.userlocation.center[0], widget.userlocation.center[1]);
-      List<Event> interesteventlist = [];
-      for (int i = 0; i < currloceventlist.length; i++) {
-        if (widget.interest == currloceventlist[i].interest) {
-          setState(() {
-            interesteventlist.add(currloceventlist[i]);
-          });
-        }
-      }
+      List<Event> interesteventlist = await db.getLngLatEventsByInterest(
+          widget.userlocation.center[0],
+          widget.userlocation.center[1],
+          widget.interest);
+
       setState(() {
         widget.events = interesteventlist;
       });
@@ -144,7 +139,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(screenheight * 0.02),
         child: widget.events.isNotEmpty
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
