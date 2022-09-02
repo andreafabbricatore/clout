@@ -16,37 +16,22 @@ import 'package:latlong2/latlong.dart';
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-class CreateEventScreen extends StatefulWidget {
-  CreateEventScreen(
+class EditEventScreen extends StatefulWidget {
+  EditEventScreen(
       {super.key,
       required this.curruser,
       required this.allowbackarrow,
-      required this.startinterest});
+      required this.event});
   AppUser curruser;
   bool allowbackarrow;
-  String startinterest;
+
+  Event event;
 
   @override
-  State<CreateEventScreen> createState() => _CreateEventScreenState();
+  State<EditEventScreen> createState() => _EditEventScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> {
-  Event event = Event(
-      title: "",
-      description: "",
-      interest: "",
-      image: "",
-      address: "",
-      city: "",
-      host: "",
-      hostdocid: "",
-      maxparticipants: 0,
-      participants: [],
-      datetime: DateTime(0, 0, 0),
-      docid: "",
-      lat: 0,
-      lng: 0);
-
+class _EditEventScreenState extends State<EditEventScreen> {
   List<String> allinterests = [
     "Sports",
     "Nature",
@@ -68,11 +53,26 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
-  DateTime eventdate = DateTime(0, 0, 0);
+  DateTime eventdate = DateTime(0, 0, 0, 0);
   AppLocation chosenLocation =
-      AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
-  bool emptylocation = true;
+      AppLocation(address: "", city: "", country: "", center: [0, 0]);
+  bool emptylocation = false;
   bool buttonpressed = false;
+
+  void setup() {
+    setState(() {
+      selectedinterest = widget.event.interest;
+      titlecontroller.text = widget.event.title;
+      desccontroller.text = widget.event.description;
+      maxpartcontroller.text = widget.event.maxparticipants.toString();
+      eventdate = widget.event.datetime;
+      chosenLocation = AppLocation(
+          address: widget.event.address,
+          city: widget.event.city,
+          country: "",
+          center: [widget.event.lng, widget.event.lat]);
+    });
+  }
 
   Future<File> CompressAndGetFile(File file) async {
     try {
@@ -131,7 +131,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   void initState() {
-    selectedinterest = widget.startinterest;
+    setup();
     super.initState();
   }
 
@@ -202,15 +202,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: imagepath == null
-                  ? Container(
-                      color: const Color.fromARGB(255, 255, 48, 117),
+                  ? Image.network(
+                      widget.event.image,
                       height: screenheight * 0.2,
                       width: screenheight * 0.2,
-                      child: Icon(
-                        Icons.upload_rounded,
-                        color: Colors.white,
-                        size: screenheight * 0.18,
-                      ),
+                      fit: BoxFit.cover,
                     )
                   : Image.file(
                       imagepath,
@@ -468,7 +464,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       displayErrorSnackBar("Please enter a description");
                     } else if (int.parse(maxpartcontroller.text) <= 1) {
                       displayErrorSnackBar(
-                          "Please enter a max number of participants");
+                          "Please enter a valid max number of participants");
                     } else if (eventdate.isAtSameMomentAs(DateTime(0, 0, 0))) {
                       displayErrorSnackBar(
                           "Please choose a date for your event");
@@ -477,18 +473,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           "Please choose a location for your event");
                     } else {
                       setState(() {
-                        event.title = titlecontroller.text.trim();
-                        event.description = desccontroller.text.trim();
-                        event.maxparticipants =
+                        widget.event.title = titlecontroller.text.trim();
+                        widget.event.description = desccontroller.text.trim();
+                        widget.event.maxparticipants =
                             int.parse(maxpartcontroller.text);
-                        event.interest = selectedinterest;
-                        event.datetime = eventdate;
-                        event.address = chosenLocation.address;
-                        event.city = chosenLocation.city;
-                        event.host = widget.curruser.username;
-                        event.hostdocid = widget.curruser.docid;
-                        event.lat = chosenLocation.center[1];
-                        event.lng = chosenLocation.center[0];
+                        widget.event.interest = selectedinterest;
+                        widget.event.datetime = eventdate;
+                        widget.event.address = chosenLocation.address;
+                        widget.event.city = chosenLocation.city;
+                        widget.event.lat = chosenLocation.center[1];
+                        widget.event.lng = chosenLocation.center[0];
                       });
                       try {
                         if (imagepath == null) {
@@ -497,12 +491,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           compressedimgpath =
                               await CompressAndGetFile(imagepath);
                         }
-                        await db.createevent(
-                            event, widget.curruser, compressedimgpath);
-
+                        await db.updateEvent(widget.event, compressedimgpath);
                         goloadingscreen();
                       } catch (e) {
-                        displayErrorSnackBar("Could not create event");
+                        displayErrorSnackBar("Could not update event");
+                        setState(() {
+                          buttonpressed = false;
+                        });
                       }
                     }
                     setState(() {
@@ -518,7 +513,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(20))),
                   child: const Center(
                       child: Text(
-                    "Create Event",
+                    "Update Event",
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   )),
                 )),

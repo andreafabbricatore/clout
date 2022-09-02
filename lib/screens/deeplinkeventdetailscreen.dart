@@ -1,16 +1,15 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
+import 'package:clout/screens/editeventscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
-import 'package:clout/services/auth.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -221,6 +220,28 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           ),
         ),
         actions: [
+          widget.curruser.username == widget.event.host
+              ? GestureDetector(
+                  onTap: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => EditEventScreen(
+                            curruser: widget.curruser,
+                            allowbackarrow: true,
+                            event: widget.event),
+                      ),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.black,
+                    ),
+                  ),
+                )
+              : Container(),
           GestureDetector(
             onTap: () async {
               await interactfav(widget.event);

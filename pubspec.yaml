@@ -63,6 +63,9 @@ dependencies:
   flutter_launcher_icons: ^0.10.0
   bottom_navy_bar: ^6.0.0
   flutter_image_compress: ^1.1.2
+  firebase_messaging: ^13.0.0
+  flutter_local_notifications: ^9.9.0
+  flutter_app_badger: ^1.4.0
 
 flutter_icons:
   #  image_path: "assets/images/icon-128x128.png"
