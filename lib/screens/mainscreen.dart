@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:app_links/app_links.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:clout/components/event.dart';
@@ -15,6 +14,7 @@ import 'package:clout/services/db.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class MainScreen extends StatefulWidget {
   List interests;
@@ -42,6 +42,22 @@ class _MainScreenState extends State<MainScreen> {
   StreamSubscription<Uri>? _linkSubscription;
   String deeplink = "";
   db_conn db = db_conn();
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  Future<void> requestNotisPermission() async {
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      db.saveDeviceToken(widget.curruser);
+    }
+  }
 
   void parampasser(bool firstsetup) {
     page = [
@@ -132,6 +148,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
+    requestNotisPermission();
     initDeepLinks();
     parampasser(true);
     super.initState();

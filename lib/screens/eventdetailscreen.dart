@@ -1,6 +1,7 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
+import 'package:clout/screens/editeventscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
 
@@ -231,6 +232,28 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
         ),
         actions: [
+          widget.curruser.username == widget.event.host
+              ? GestureDetector(
+                  onTap: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => EditEventScreen(
+                            curruser: widget.curruser,
+                            allowbackarrow: true,
+                            event: widget.event),
+                      ),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.black,
+                    ),
+                  ),
+                )
+              : Container(),
           GestureDetector(
             onTap: () async {
               String link = await createShareLink();

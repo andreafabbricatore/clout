@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -45,6 +46,8 @@ class db_conn {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference events = FirebaseFirestore.instance.collection('events');
+  CollectionReference updates =
+      FirebaseFirestore.instance.collection('updates');
 
   Future createuserinstance(String email, String uid) {
     try {
@@ -141,6 +144,7 @@ class db_conn {
           'address': newevent.address,
           'city': newevent.city,
           'host': newevent.host,
+          'hostdocid': newevent.hostdocid,
           'time': newevent.datetime,
           'maxparticipants': newevent.maxparticipants,
           'participants': [curruser.docid],
@@ -176,11 +180,52 @@ class db_conn {
     }
   }
 
+  Future<void> updateEvent(Event event, var imagepath) async {
+    try {
+      DocumentSnapshot oldEventSnapshot = await events.doc(event.docid).get();
+      String bannerUrl = "";
+      if (imagepath == null) {
+        bannerUrl = event.image;
+      } else {
+        bannerUrl = await uploadEventThumbnail(imagepath, event.docid);
+      }
+      bool custompic = oldEventSnapshot['custom_image'];
+      if (!custompic && imagepath != null) {
+        custompic = true;
+      }
+      List searchfield = [];
+      String temp = "";
+      for (int i = 0; i < event.title.length; i++) {
+        temp = temp + event.title[i];
+        searchfield.add(temp.toLowerCase());
+      }
+      List participants = oldEventSnapshot['participants'];
+      if (event.maxparticipants < participants.length) {
+        throw Exception();
+      }
+      return events.doc(event.docid).update({
+        'title': event.title,
+        'description': event.description,
+        'interest': event.interest,
+        'address': event.address,
+        'city': event.city,
+        'time': event.datetime,
+        'maxparticipants': event.maxparticipants,
+        'custom_image': custompic,
+        'image': bannerUrl,
+        'lat': event.lat,
+        'lng': event.lng,
+        'searchfield': searchfield
+      });
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   Future joinevent(Event event, AppUser curruser, String? eventid) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
-      String hostdocid = await getUserDocIDfromUsername(event.host);
-      AppUser host = await getUserFromDocID(hostdocid);
+      AppUser host = await getUserFromDocID(event.hostdocid);
       List participants = eventSnapshot['participants'];
       List joinedEvents = curruser.joinedEvents;
       if (participants.length + 1 > event.maxparticipants) {
@@ -189,7 +234,7 @@ class db_conn {
         joinedEvents.add(eventid);
         participants.add(curruser.docid);
         users.doc(curruser.docid).update({'joined_events': joinedEvents});
-        users.doc(hostdocid).update({'clout': host.clout + 5});
+        users.doc(event.hostdocid).update({'clout': host.clout + 5});
         users.doc(curruser.docid).update({'clout': curruser.clout + 10});
         events.doc(eventid).update({'participants': participants});
       }
@@ -200,6 +245,17 @@ class db_conn {
       List participants = eventSnapshot['participants'];
       if (participants.length > event.maxparticipants) {
         await leaveevent(curruser, event);
+      } else {
+        try {
+          updates.add({
+            'target': event.hostdocid,
+            'title': 'Clout',
+            'description':
+                '${curruser.fullname} joined your your event: ${event.title}'
+          });
+        } catch (e) {
+          throw Exception();
+        }
       }
       throw Exception("Could not join, please try again");
     }
@@ -208,8 +264,7 @@ class db_conn {
   Future leaveevent(AppUser curruser, Event event) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
-      String hostdocid = await getUserDocIDfromUsername(event.host);
-      AppUser host = await getUserFromDocID(hostdocid);
+      AppUser host = await getUserFromDocID(event.hostdocid);
       List participants = eventSnapshot['participants'];
       List joinedEvents = curruser.joinedEvents;
       if (participants.length == 1) {
@@ -218,7 +273,7 @@ class db_conn {
         joinedEvents.removeWhere((element) => element == event.docid);
         participants.removeWhere((element) => element == curruser.docid);
         users.doc(curruser.docid).update({'joined_events': joinedEvents});
-        users.doc(hostdocid).update({'clout': host.clout - 5});
+        users.doc(event.hostdocid).update({'clout': host.clout - 5});
         users.doc(curruser.docid).update({'clout': curruser.clout - 10});
         events.doc(event.docid).update({'participants': participants});
       }
@@ -731,6 +786,15 @@ class db_conn {
       followers.add(curruserdocid);
       users.doc(curruserdocid).update({'following': following});
       users.doc(userdocid).update({'followers': followers});
+      try {
+        updates.add({
+          'target': userdocid,
+          'title': "Clout",
+          'description': "${curruserdoc['fullname']} started following you"
+        });
+      } catch (e) {
+        throw Exception();
+      }
     } catch (e) {
       throw Exception("Could not follow");
     }
@@ -770,6 +834,20 @@ class db_conn {
       users.doc(curruserdocid).update({'favorites': favorites});
     } catch (e) {
       throw Exception("Could not remove from favorites");
+    }
+  }
+
+  saveDeviceToken(AppUser curruser) async {
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+    if (fcmToken != null) {
+      var tokenRef =
+          users.doc(curruser.docid).collection('tokens').doc(fcmToken);
+      await tokenRef.set({
+        'token': fcmToken,
+        'createdAt': FieldValue.serverTimestamp(),
+        'platform': Platform.operatingSystem
+      });
     }
   }
 }

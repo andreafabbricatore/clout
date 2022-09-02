@@ -11,6 +11,7 @@ class Event {
   int maxparticipants;
   List participants;
   String host;
+  String hostdocid;
   String docid;
 
   Event(
@@ -21,6 +22,7 @@ class Event {
       required this.address,
       required this.city,
       required this.host,
+      required this.hostdocid,
       required this.maxparticipants,
       required this.participants,
       required this.datetime,
@@ -37,6 +39,7 @@ class Event {
         address: json['address'],
         city: json['city'],
         host: json['host'],
+        hostdocid: json['hostdocid'],
         maxparticipants: json['maxparticipants'] as int,
         participants: json['participants'] as List,
         datetime: json['time'].toDate(),
