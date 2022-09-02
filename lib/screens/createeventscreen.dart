@@ -130,6 +130,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   void initState() {
+    selectedinterest = widget.startinterest;
     super.initState();
   }
 
@@ -144,7 +145,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    selectedinterest = widget.startinterest;
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
