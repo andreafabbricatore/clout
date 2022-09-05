@@ -37,6 +37,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       interest: "",
       image: "",
       address: "",
+      country: "",
       city: [],
       host: "",
       hostdocid: "",
@@ -484,6 +485,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         event.interest = selectedinterest;
                         event.datetime = eventdate;
                         event.address = chosenLocation.address;
+                        event.country = chosenLocation.country.toLowerCase();
                         event.city =
                             chosenLocation.city.toLowerCase().split(" ");
                         event.host = widget.curruser.username;

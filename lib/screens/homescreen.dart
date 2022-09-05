@@ -71,12 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
       interesteventlist = [];
       generaleventlist = [];
       List<Event> currloceventlist = [];
-      if (widget.userlocation.country.toLowerCase() == "england") {
-        currloceventlist = await db.getLngLatEvents(
-            widget.userlocation.center[0], widget.userlocation.center[1]);
-      } else {
-        currloceventlist = await db.getCurrCityEvents(widget.userlocation.city);
-      }
+      currloceventlist = await db.getLngLatEvents(widget.userlocation.center[0],
+          widget.userlocation.center[1], widget.userlocation.country);
       for (int i = 0; i < currloceventlist.length; i++) {
         if (interests.contains(currloceventlist[i].interest)) {
           setState(() {

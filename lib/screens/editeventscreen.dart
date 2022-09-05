@@ -69,7 +69,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
       chosenLocation = AppLocation(
           address: widget.event.address,
           city: widget.event.city.join(" "),
-          country: "",
+          country: widget.event.country,
           center: [widget.event.lng, widget.event.lat]);
     });
   }
@@ -479,6 +479,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
                             int.parse(maxpartcontroller.text);
                         widget.event.interest = selectedinterest;
                         widget.event.datetime = eventdate;
+                        widget.event.country =
+                            chosenLocation.country.toLowerCase();
                         widget.event.address = chosenLocation.address;
                         widget.event.city =
                             chosenLocation.city.toLowerCase().split(" ");

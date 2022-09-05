@@ -127,12 +127,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
           curruserlocation.city = city;
         });
         print(city);
-        if (curruserlocation.country.toLowerCase() == "england") {
-          currloceventlist = await db.getLngLatEvents(
-              curruserlocation.center[0], curruserlocation.center[1]);
-        } else {
-          currloceventlist = await db.getCurrCityEvents(curruserlocation.city);
-        }
+        currloceventlist = await db.getLngLatEvents(curruserlocation.center[0],
+            curruserlocation.center[1], curruserlocation.country);
         print("got events");
         for (int i = 0; i < currloceventlist.length; i++) {
           if (interests.contains(currloceventlist[i].interest)) {

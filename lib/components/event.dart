@@ -3,6 +3,7 @@ class Event {
   String description;
   String interest;
   String image;
+  String country;
   String address;
   List city;
   double lat;
@@ -20,6 +21,7 @@ class Event {
       required this.interest,
       required this.image,
       required this.address,
+      required this.country,
       required this.city,
       required this.host,
       required this.hostdocid,
@@ -37,6 +39,7 @@ class Event {
         interest: json['interest'],
         image: json['image'],
         address: json['address'],
+        country: json['country'],
         city: json['city'] as List,
         host: json['host'],
         hostdocid: json['hostdocid'],

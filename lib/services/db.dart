@@ -121,6 +121,7 @@ class db_conn {
           newevent.title,
           newevent.description,
           newevent.interest,
+          newevent.country,
           newevent.address,
           newevent.city,
           newevent.host,
@@ -142,6 +143,7 @@ class db_conn {
           'description': newevent.description,
           'interest': newevent.interest,
           'address': newevent.address,
+          'country': newevent.country,
           'city': newevent.city,
           'host': newevent.host,
           'hostdocid': newevent.hostdocid,
@@ -207,6 +209,7 @@ class db_conn {
         'title': event.title,
         'description': event.description,
         'interest': event.interest,
+        'country': event.country,
         'address': event.address,
         'city': event.city,
         'time': event.datetime,
@@ -537,6 +540,7 @@ class db_conn {
       String title,
       String description,
       String interest,
+      String country,
       String address,
       List city,
       String host,
@@ -551,6 +555,7 @@ class db_conn {
                   doc['description'] == description &&
                   doc['interest'] == interest &&
                   doc['address'] == address &&
+                  doc['country'] == country &&
                   listEquals(doc['city'], city) &&
                   doc['host'] == host &&
                   doc['maxparticipants'] == maxparticipants &&
@@ -599,7 +604,7 @@ class db_conn {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
           .startAfter([DateTime.now()])
-          .where('city', arrayContains: city.toLowerCase())
+          .where('city', arrayContainsAny: city.toLowerCase().split(" "))
           .get();
       List<Event> eventlist = [];
       querySnapshot.docs.forEach((element) {
@@ -617,7 +622,7 @@ class db_conn {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
           .startAfter([DateTime.now()])
-          .where('city', arrayContains: city.toLowerCase())
+          .where('city', arrayContainsAny: city.toLowerCase().split(" "))
           .where('interest', isEqualTo: interest)
           .get();
       List<Event> eventlist = [];
@@ -649,10 +654,15 @@ class db_conn {
     }
   }
 
-  Future<List<Event>> getLngLatEvents(double lng, double lat) async {
+  Future<List<Event>> getLngLatEvents(
+      double lng, double lat, String country) async {
     try {
-      QuerySnapshot querySnapshot =
-          await events.orderBy('time').startAfter([DateTime.now()]).get();
+      print(country);
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
+          .where('country', isEqualTo: country.toLowerCase())
+          .get();
       List<Event> tempeventlist = [];
       List<Event> eventlist = [];
       querySnapshot.docs.forEach((element) {
@@ -674,11 +684,12 @@ class db_conn {
   }
 
   Future<List<Event>> getLngLatEventsByInterest(
-      double lng, double lat, interest) async {
+      double lng, double lat, String interest, String country) async {
     try {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
           .startAfter([DateTime.now()])
+          .where('country', isEqualTo: country.toLowerCase())
           .where('interest', isEqualTo: interest)
           .get();
       List<Event> tempeventlist = [];
@@ -754,12 +765,14 @@ class db_conn {
   }
 
   Future<List<Event>> getLngLatEventsFilteredByDate(
-      double lng, double lat, DateTime date) async {
+      double lng, double lat, DateTime date, String country) async {
     try {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
-          .startAfter([date]).endBefore(
-              [DateTime(date.year, date.month, date.day + 1)]).get();
+          .startAfter([date])
+          .endBefore([DateTime(date.year, date.month, date.day + 1)])
+          .where('country', isEqualTo: country.toLowerCase())
+          .get();
       List<Event> tempeventlist = [];
       List<Event> eventlist = [];
       querySnapshot.docs.forEach((element) {
