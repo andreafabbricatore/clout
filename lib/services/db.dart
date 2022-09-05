@@ -241,23 +241,22 @@ class db_conn {
     } catch (e) {
       throw Exception("Could not join event");
     } finally {
-      DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
-      List participants = eventSnapshot['participants'];
-      if (participants.length > event.maxparticipants) {
-        await leaveevent(curruser, event);
-      } else {
-        try {
+      try {
+        DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
+        List participants = eventSnapshot['participants'];
+        if (participants.length > event.maxparticipants) {
+          await leaveevent(curruser, event);
+        } else {
           updates.add({
             'target': event.hostdocid,
             'title': 'Clout',
             'description':
                 '${curruser.fullname} joined your your event: ${event.title}'
           });
-        } catch (e) {
-          throw Exception();
         }
+      } catch (e) {
+        throw Exception("Could not notify host that you joined");
       }
-      throw Exception("Could not join, please try again");
     }
   }
 
@@ -539,7 +538,7 @@ class db_conn {
       String description,
       String interest,
       String address,
-      String city,
+      List city,
       String host,
       DateTime time,
       int maxparticipants,
@@ -552,7 +551,7 @@ class db_conn {
                   doc['description'] == description &&
                   doc['interest'] == interest &&
                   doc['address'] == address &&
-                  doc['city'] == city &&
+                  listEquals(doc['city'], city) &&
                   doc['host'] == host &&
                   doc['maxparticipants'] == maxparticipants &&
                   listEquals(doc['participants'], participants) &&
@@ -597,8 +596,49 @@ class db_conn {
 
   Future<List<Event>> getCurrCityEvents(String city) async {
     try {
-      QuerySnapshot querySnapshot =
-          await events.where('city', isEqualTo: city).get();
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
+          .where('city', arrayContains: city.toLowerCase())
+          .get();
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        eventlist.add(Event.fromJson(element.data(), element.id));
+      });
+      return eventlist;
+    } catch (e) {
+      throw Exception("Could not connect");
+    }
+  }
+
+  Future<List<Event>> getCurrCityEventsByInterest(
+      String city, String interest) async {
+    try {
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
+          .where('city', arrayContains: city.toLowerCase())
+          .where('interest', isEqualTo: interest)
+          .get();
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        eventlist.add(Event.fromJson(element.data(), element.id));
+      });
+      return eventlist;
+    } catch (e) {
+      throw Exception("Could not connect");
+    }
+  }
+
+  Future<List<Event>> getCurrCityEventsByDate(
+      String city, DateTime date) async {
+    try {
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([date])
+          .endBefore([DateTime(date.year, date.month, date.day + 1)])
+          .where('city', arrayContains: city.toLowerCase())
+          .get();
       List<Event> eventlist = [];
       querySnapshot.docs.forEach((element) {
         eventlist.add(Event.fromJson(element.data(), element.id));

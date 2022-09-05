@@ -25,9 +25,9 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true,
+    alert: false,
     badge: true,
-    sound: true,
+    sound: false,
   );
 
   SystemChrome.setPreferredOrientations([

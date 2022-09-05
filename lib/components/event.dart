@@ -4,7 +4,7 @@ class Event {
   String interest;
   String image;
   String address;
-  String city;
+  List city;
   double lat;
   double lng;
   DateTime datetime;
@@ -37,7 +37,7 @@ class Event {
         interest: json['interest'],
         image: json['image'],
         address: json['address'],
-        city: json['city'],
+        city: json['city'] as List,
         host: json['host'],
         hostdocid: json['hostdocid'],
         maxparticipants: json['maxparticipants'] as int,

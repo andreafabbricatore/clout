@@ -63,10 +63,16 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
 
   Future<void> refreshevents() async {
     try {
-      List<Event> interesteventlist = await db.getLngLatEventsByInterest(
-          widget.userlocation.center[0],
-          widget.userlocation.center[1],
-          widget.interest);
+      List<Event> interesteventlist = [];
+      if (widget.userlocation.country.toLowerCase() == "england") {
+        interesteventlist = await db.getLngLatEventsByInterest(
+            widget.userlocation.center[0],
+            widget.userlocation.center[1],
+            widget.interest);
+      } else {
+        interesteventlist = await db.getCurrCityEventsByInterest(
+            widget.userlocation.city, widget.interest);
+      }
 
       setState(() {
         widget.events = interesteventlist;

@@ -92,6 +92,20 @@ class _LoadingScreenState extends State<LoadingScreen> {
     });
   }
 
+  Future<String> getcitywithoutnums(String city) async {
+    List splittext = city.split(" ");
+    List res = [];
+    for (int i = 0; i < splittext.length; i++) {
+      try {
+        int.parse(splittext[i]);
+      } catch (e) {
+        res.add(splittext[i]);
+      }
+    }
+    String newcity = res.join(" ");
+    return newcity;
+  }
+
   Future<void> appinit() async {
     try {
       setState(() {
@@ -107,8 +121,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
         AppUser curruser = await db.getUserFromDocID(docid);
         print("got user");
         interests = curruser.interests;
-        currloceventlist = await db.getLngLatEvents(
-            curruserlocation.center[0], curruserlocation.center[1]);
+        String city =
+            await getcitywithoutnums(curruserlocation.city.toLowerCase());
+        setState(() {
+          curruserlocation.city = city;
+        });
+        print(city);
+        if (curruserlocation.country.toLowerCase() == "england") {
+          currloceventlist = await db.getLngLatEvents(
+              curruserlocation.center[0], curruserlocation.center[1]);
+        } else {
+          currloceventlist = await db.getCurrCityEvents(curruserlocation.city);
+        }
         print("got events");
         for (int i = 0; i < currloceventlist.length; i++) {
           if (interests.contains(currloceventlist[i].interest)) {
@@ -230,15 +254,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     "Clout",
                     style: TextStyle(
                         color: Color.fromARGB(255, 255, 48, 117),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 60),
+                        fontFamily: "Kristi",
+                        fontWeight: FontWeight.w500,
+                        fontSize: 80),
                   ),
                   const Text(
                     "Go Out",
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
-                        fontSize: 40),
+                        fontSize: 30),
                   ),
                   SizedBox(
                     height: screenheight * 0.1,

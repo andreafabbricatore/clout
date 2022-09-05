@@ -58,11 +58,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          "CLOUT",
+          "Clout",
           style: TextStyle(
               color: Color.fromARGB(255, 255, 48, 117),
-              fontWeight: FontWeight.bold,
-              fontSize: 30),
+              fontFamily: "Kristi",
+              fontWeight: FontWeight.w500,
+              fontSize: 50),
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,

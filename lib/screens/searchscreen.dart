@@ -70,10 +70,16 @@ class _SearchScreenState extends State<SearchScreen> {
 
     Future<void> searchnav(String interest) async {
       try {
-        List<Event> interesteventlist = await db.getLngLatEventsByInterest(
-            widget.userlocation.center[0],
-            widget.userlocation.center[1],
-            interest);
+        List<Event> interesteventlist = [];
+        if (widget.userlocation.country.toLowerCase() == "england") {
+          interesteventlist = await db.getLngLatEventsByInterest(
+              widget.userlocation.center[0],
+              widget.userlocation.center[1],
+              interest);
+        } else {
+          interesteventlist = await db.getCurrCityEventsByInterest(
+              widget.userlocation.city, interest);
+        }
         //print(interesteventlist);
         Navigator.push(
             context,
