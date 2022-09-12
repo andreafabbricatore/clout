@@ -190,6 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontFamily: "Kristi",
               fontWeight: FontWeight.w500,
               fontSize: 50),
+          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -224,6 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.black,
                     fontFamily: "Poppins",
                     fontWeight: FontWeight.w600),
+                textScaleFactor: 1.2,
               ),
             ),
             SizedBox(height: screenheight * 0.02),
@@ -237,12 +239,15 @@ class _HomeScreenState extends State<HomeScreen> {
               screenheight: screenheight,
               screenwidth: screenwidth,
             ),
-            const Text("Popular",
-                style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.black,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w600)),
+            const Text(
+              "Popular",
+              style: TextStyle(
+                  fontSize: 30,
+                  color: Colors.black,
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.w600),
+              textScaleFactor: 1.2,
+            ),
             EventListView(
               isHorizontal: false,
               eventList: generaleventlist,

@@ -176,7 +176,10 @@ class _MainScreenState extends State<MainScreen> {
               icon: const Icon(
                 Icons.home,
               ),
-              title: const Text("Home"),
+              title: const Text(
+                "Home",
+                textScaleFactor: 1.0,
+              ),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
@@ -184,7 +187,10 @@ class _MainScreenState extends State<MainScreen> {
               icon: const Icon(
                 Icons.search,
               ),
-              title: const Text("Search"),
+              title: const Text(
+                "Search",
+                textScaleFactor: 1.0,
+              ),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
@@ -192,7 +198,10 @@ class _MainScreenState extends State<MainScreen> {
               icon: const Icon(
                 Icons.add,
               ),
-              title: const Text("Create"),
+              title: const Text(
+                "Create",
+                textScaleFactor: 1.0,
+              ),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
@@ -200,13 +209,19 @@ class _MainScreenState extends State<MainScreen> {
               icon: const Icon(
                 Icons.bookmark,
               ),
-              title: const Text("Favorites"),
+              title: const Text(
+                "Favorites",
+                textScaleFactor: 1.0,
+              ),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
               icon: const Icon(CupertinoIcons.person_crop_circle),
-              title: const Text("Profile"),
+              title: const Text(
+                "Profile",
+                textScaleFactor: 1.0,
+              ),
               activeColor: const Color.fromARGB(255, 255, 48, 117),
               inactiveColor: Colors.grey,
             )

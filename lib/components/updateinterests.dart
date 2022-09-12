@@ -51,6 +51,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
             color: widget.interests.contains(interest)
                 ? const Color.fromARGB(255, 255, 48, 117)
                 : Colors.white),
+        textScaleFactor: 1.0,
       )),
     );
 

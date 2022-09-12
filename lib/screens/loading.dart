@@ -253,6 +253,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                         fontFamily: "Kristi",
                         fontWeight: FontWeight.w500,
                         fontSize: 80),
+                    textScaleFactor: 1.0,
                   ),
                   const Text(
                     "Go Out",

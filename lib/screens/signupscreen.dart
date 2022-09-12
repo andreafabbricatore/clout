@@ -64,6 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               fontFamily: "Kristi",
               fontWeight: FontWeight.w500,
               fontSize: 50),
+          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,

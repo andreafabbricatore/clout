@@ -114,6 +114,9 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               }
               await FirebaseAuth.instance.currentUser!
                   .updateEmail(emailaddress.text.trim());
+
+              await db.changeattribute('email', emailaddress.text.trim(),
+                  FirebaseAuth.instance.currentUser!.uid);
               goauthwrapper();
             } catch (e) {
               displayErrorSnackBar("Invalid Action, try again");

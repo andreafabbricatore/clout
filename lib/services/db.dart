@@ -205,7 +205,7 @@ class db_conn {
       if (event.maxparticipants < participants.length) {
         throw Exception();
       }
-      return events.doc(event.docid).update({
+      events.doc(event.docid).update({
         'title': event.title,
         'description': event.description,
         'interest': event.interest,
@@ -220,6 +220,16 @@ class db_conn {
         'lng': event.lng,
         'searchfield': searchfield
       });
+      for (int i = 0; i < event.participants.length; i++) {
+        if (event.participants[i] == event.hostdocid) {
+        } else {
+          updates.add({
+            'target': event.participants[i],
+            'title': 'Clout',
+            'description': '${event.title} was modified. Check out the changes!'
+          });
+        }
+      }
     } catch (e) {
       throw Exception();
     }

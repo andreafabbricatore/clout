@@ -123,7 +123,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                           child: const Center(
                               child: Text(
                             "Edit Profile",
-                            textScaleFactor: 1.0,
+                            textScaleFactor: 0.9,
                           )),
                         ),
                       )
