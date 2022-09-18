@@ -7,11 +7,13 @@ class UserListView extends StatelessWidget {
       required this.userres,
       required this.onTap,
       required this.curruser,
-      required this.screenwidth})
+      required this.screenwidth,
+      required this.showcloutscore})
       : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
   double screenwidth;
+  bool showcloutscore;
 
   final Function(AppUser user, int index)? onTap;
 
@@ -61,6 +63,13 @@ class UserListView extends StatelessWidget {
             ],
           ),
         ),
+        showcloutscore
+            ? Text(
+                "${user.clout}",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.right,
+              )
+            : Container()
       ],
     );
 

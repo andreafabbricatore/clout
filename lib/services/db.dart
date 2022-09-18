@@ -819,6 +819,21 @@ class db_conn {
     }
   }
 
+  Future<List<AppUser>> getAllUsersRankedByCloutScore() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await users.orderBy('clout', descending: true).getSavy();
+      List<AppUser> usersearches = [];
+      querySnapshot.docs.forEach((element) {
+        usersearches.add(AppUser.fromJson(element.data(), element.id));
+      });
+
+      return usersearches;
+    } catch (e) {
+      throw Exception("Could not search for users");
+    }
+  }
+
   Future<String> downloadBannerUrl(String interest) async {
     try {
       String downloadBannerUrl = await FirebaseStorage.instance

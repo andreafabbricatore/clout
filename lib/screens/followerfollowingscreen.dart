@@ -177,6 +177,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
           onTap: usernavigate,
           curruser: widget.curruser,
           screenwidth: screenwidth,
+          showcloutscore: false,
         )
       ]),
     );

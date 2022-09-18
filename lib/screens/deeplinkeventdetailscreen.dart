@@ -425,6 +425,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                   curruser: widget.curruser,
                   onTap: usernavigate,
                   screenwidth: screenwidth,
+                  showcloutscore: false,
                 ),
               ],
             ),

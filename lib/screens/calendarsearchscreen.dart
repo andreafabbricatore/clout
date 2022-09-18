@@ -73,14 +73,20 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
 
   Future<void> getEventList() async {
     List<Event> res = [];
+    filteredEventList = [];
     res = await db.getLngLatEventsFilteredByDate(
         widget.userlocation.center[0],
         widget.userlocation.center[1],
         selectedDate,
         widget.userlocation.country);
-    setState(() {
-      filteredEventList = res;
-    });
+    for (int i = 0; i < res.length; i++) {
+      if (widget.curruser.following.contains(res[i].hostdocid)) {
+        filteredEventList.insert(0, res[i]);
+      } else {
+        filteredEventList.add(res[i]);
+      }
+    }
+    setState(() {});
   }
 
   Future<void> refresh() async {

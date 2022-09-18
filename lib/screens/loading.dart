@@ -67,9 +67,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     final _locationData = await location.getLocation();
 
-    setState(() {
-      _userLocation = _locationData;
-    });
+    _userLocation = _locationData;
+
     return true;
   }
 
@@ -87,9 +86,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     List<AppLocation> response = (responseData.data['features'] as List)
         .map((e) => AppLocation.fromJson(e))
         .toList();
-    setState(() {
-      curruserlocation = response[0];
-    });
+
+    curruserlocation = response[0];
   }
 
   Future<String> getcitywithoutnums(String city) async {
@@ -123,22 +121,26 @@ class _LoadingScreenState extends State<LoadingScreen> {
         interests = curruser.interests;
         String city =
             await getcitywithoutnums(curruserlocation.city.toLowerCase());
-        setState(() {
-          curruserlocation.city = city;
-        });
+
+        curruserlocation.city = city;
+
         print(city);
         currloceventlist = await db.getLngLatEvents(curruserlocation.center[0],
             curruserlocation.center[1], curruserlocation.country);
         print("got events");
         for (int i = 0; i < currloceventlist.length; i++) {
           if (interests.contains(currloceventlist[i].interest)) {
-            setState(() {
+            if (curruser.following.contains(currloceventlist[i].hostdocid)) {
+              interesteventlist.insert(0, currloceventlist[i]);
+            } else {
               interesteventlist.add(currloceventlist[i]);
-            });
+            }
           } else {
-            setState(() {
+            if (curruser.following.contains(currloceventlist[i].hostdocid)) {
+              interesteventlist.insert(0, currloceventlist[i]);
+            } else {
               eventlist.add(currloceventlist[i]);
-            });
+            }
           }
         }
         print("organised events");

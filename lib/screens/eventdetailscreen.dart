@@ -451,6 +451,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   curruser: widget.curruser,
                   onTap: usernavigate,
                   screenwidth: screenwidth,
+                  showcloutscore: false,
                 ),
               ],
             ),

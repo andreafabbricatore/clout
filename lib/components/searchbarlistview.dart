@@ -145,6 +145,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
             onTap: usernavigate,
             curruser: widget.curruser,
             screenwidth: screenwidth,
+            showcloutscore: false,
           );
   }
 }

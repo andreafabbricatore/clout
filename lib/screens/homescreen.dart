@@ -74,16 +74,23 @@ class _HomeScreenState extends State<HomeScreen> {
       currloceventlist = await db.getLngLatEvents(widget.userlocation.center[0],
           widget.userlocation.center[1], widget.userlocation.country);
       for (int i = 0; i < currloceventlist.length; i++) {
-        if (interests.contains(currloceventlist[i].interest)) {
-          setState(() {
+        if (userinterests.contains(currloceventlist[i].interest)) {
+          if (widget.curruser.following
+              .contains(currloceventlist[i].hostdocid)) {
+            interesteventlist.insert(0, currloceventlist[i]);
+          } else {
             interesteventlist.add(currloceventlist[i]);
-          });
+          }
         } else {
-          setState(() {
+          if (widget.curruser.following
+              .contains(currloceventlist[i].hostdocid)) {
+            interesteventlist.insert(0, currloceventlist[i]);
+          } else {
             generaleventlist.add(currloceventlist[i]);
-          });
+          }
         }
       }
+      setState(() {});
     } catch (e) {
       displayErrorSnackBar("Could not get events around you");
     }
@@ -216,17 +223,14 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {},
-              child: const Text(
-                "Suggested",
-                style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.black,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w600),
-                textScaleFactor: 1.2,
-              ),
+            const Text(
+              "Suggested",
+              style: TextStyle(
+                  fontSize: 30,
+                  color: Colors.black,
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.w600),
+              textScaleFactor: 1.2,
             ),
             SizedBox(height: screenheight * 0.02),
             EventListView(

@@ -10,7 +10,8 @@ class ProfileTopContainer extends StatefulWidget {
       required this.follow,
       required this.editprofile,
       required this.followerscreen,
-      required this.followingscreen})
+      required this.followingscreen,
+      required this.cloutscreen})
       : super(key: key);
   AppUser user;
   AppUser curruser;
@@ -19,6 +20,7 @@ class ProfileTopContainer extends StatefulWidget {
   final VoidCallback editprofile;
   final VoidCallback followerscreen;
   final VoidCallback followingscreen;
+  final VoidCallback cloutscreen;
 
   @override
   State<ProfileTopContainer> createState() => _ProfileTopContainerState();
@@ -57,10 +59,17 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                 SizedBox(
                   width: screenwidth * 0.15,
                 ),
-                Text(
-                  "${widget.user.clout}\nClout",
-                  textAlign: TextAlign.center,
-                  textScaleFactor: 1.0,
+                GestureDetector(
+                  onTap: widget.iscurruser
+                      ? () {
+                          widget.cloutscreen();
+                        }
+                      : () {},
+                  child: Text(
+                    "${widget.user.clout}\nClout",
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 1.0,
+                  ),
                 ),
                 SizedBox(
                   width: screenwidth * 0.05,

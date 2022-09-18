@@ -1,6 +1,7 @@
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/profiletopcontainer.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/cloutscorescreen.dart';
 import 'package:clout/screens/editprofilescreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/followerfollowingscreen.dart';
@@ -35,6 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool joinedevents = true;
   List<Event> joinedEvents = [];
   List<Event> hostedEvents = [];
+  List<AppUser> globalrankedusers = [];
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -51,9 +53,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await updatecurruser();
       geteventlist(widget.user.joinedEvents, true);
       geteventlist(widget.user.hostedEvents, false);
+      getglobalrankedusers();
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
     }
+  }
+
+  void getglobalrankedusers() async {
+    globalrankedusers = await db.getAllUsersRankedByCloutScore();
   }
 
   Future<void> updateuser() async {
@@ -142,6 +149,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   curruser: widget.curruser,
                   iscurruser: widget.iscurruser,
                   onfollowers: false,
+                )));
+    refresh();
+  }
+
+  void cloutscreen() async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => CloutScoreScreen(
+                  curruser: widget.curruser,
+                  globalrankedusers: globalrankedusers,
                 )));
     refresh();
   }
@@ -301,6 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           editprofile: editprofile,
           followerscreen: followerscreen,
           followingscreen: followingscreen,
+          cloutscreen: cloutscreen,
           follow: widget.curruser.following.contains(widget.user.docid)
               ? unfollow
               : follow,
