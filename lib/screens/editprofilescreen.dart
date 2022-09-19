@@ -25,6 +25,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   var compressedimgpath;
   TextEditingController fullnamecontroller = TextEditingController();
   TextEditingController usernamecontroller = TextEditingController();
+  TextEditingController biocontroller = TextEditingController();
   //DateTime birthday = DateTime(0, 0, 0);
   bool buttonpressed = false;
 
@@ -281,6 +282,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   ];
   String gender = "";
   String nationality = "";
+  String bio = "";
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -317,8 +319,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       fullnamecontroller.text = widget.curruser.fullname;
       usernamecontroller.text = widget.curruser.username;
+      biocontroller.text = widget.curruser.bio;
       gender = widget.curruser.gender;
       nationality = widget.curruser.nationality;
+
       //birthday = widget.curruser.birthday;
     });
     super.initState();
@@ -395,6 +399,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             height: screenheight * 0.02,
           ),
           textdatafield(screenwidth, "username", usernamecontroller),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          textdatafield(screenwidth, "bio: socials, intro ...", biocontroller),
           SizedBox(
             height: screenheight * 0.02,
           ),
@@ -512,7 +520,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       }
                       bool unique = await db
                           .usernameUnique(usernamecontroller.text.trim());
-                      if (unique && usernamecontroller.text.isNotEmpty) {
+                      if (unique &&
+                          usernamecontroller.text.isNotEmpty &&
+                          RegExp(r'^[a-zA-Z0-9&%=]+$')
+                              .hasMatch(usernamecontroller.text.trim())) {
                         await db.changeusername(usernamecontroller.text.trim(),
                             widget.curruser.uid);
                       }
@@ -528,6 +539,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           'nationality', nationality, widget.curruser.uid);
                       await db.changeinterests(
                           'interests', widget.interests, widget.curruser.uid);
+                      await db.changeattribute('bio', biocontroller.text.trim(),
+                          widget.curruser.uid);
                     } catch (e) {
                       displayErrorSnackBar("Could not update profile");
                     } finally {

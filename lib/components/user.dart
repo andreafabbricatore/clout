@@ -15,6 +15,7 @@ class AppUser {
   List favorites;
   int clout;
   String docid;
+  String bio;
 
   AppUser(
       {required this.username,
@@ -32,7 +33,8 @@ class AppUser {
       required this.following,
       required this.clout,
       required this.favorites,
-      required this.docid});
+      required this.docid,
+      required this.bio});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -51,6 +53,7 @@ class AppUser {
         following: json['following'] as List,
         clout: json['clout'] as int,
         favorites: json['favorites'] as List,
-        docid: docid);
+        docid: docid,
+        bio: json['bio']);
   }
 }

@@ -79,7 +79,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
     String url =
         'https://api.mapbox.com/geocoding/v5/mapbox.places/$searchquery.json?limit=1&types=poi%2Caddress&access_token=$accessToken';
     url = Uri.parse(url).toString();
-    //print(url);
 
     _dio.options.contentType = Headers.jsonContentType;
     final responseData = await _dio.get(url);
@@ -110,24 +109,20 @@ class _LoadingScreenState extends State<LoadingScreen> {
         error = false;
       });
       await getUserAppLocation();
-      print("queried location on mapbox");
       if (curruserlocation.address != "" &&
           curruserlocation.city != "" &&
           curruserlocation.country != "" &&
           !listEquals(curruserlocation.center, [0.0, 0.0])) {
         docid = await db.getUserDocID(widget.uid);
         AppUser curruser = await db.getUserFromDocID(docid);
-        print("got user");
         interests = curruser.interests;
         String city =
             await getcitywithoutnums(curruserlocation.city.toLowerCase());
 
         curruserlocation.city = city;
 
-        print(city);
         currloceventlist = await db.getLngLatEvents(curruserlocation.center[0],
             curruserlocation.center[1], curruserlocation.country);
-        print("got events");
         for (int i = 0; i < currloceventlist.length; i++) {
           if (interests.contains(currloceventlist[i].interest)) {
             if (curruser.following.contains(currloceventlist[i].hostdocid)) {
@@ -143,7 +138,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
             }
           }
         }
-        print("organised events");
         doneLoading(curruser);
       } else {
         throw Exception();
@@ -179,12 +173,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       while (gotpermissions == false) {
         gotpermissions = await _getUserLocation();
         counter += 1;
-        print(counter);
         if (counter >= 3) {
           throw Exception();
         }
       }
-      print("got location");
     } catch (e) {
       setState(() {
         error = true;

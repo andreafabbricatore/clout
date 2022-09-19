@@ -67,7 +67,8 @@ class db_conn {
         'searchfield': [],
         'followers': [],
         'following': [],
-        'favorites': []
+        'favorites': [],
+        'bio': ''
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -289,6 +290,30 @@ class db_conn {
         users.doc(curruser.docid).update({'clout': curruser.clout - 10});
         events.doc(event.docid).update({'participants': participants});
       }
+    } catch (e) {
+      throw Exception("Could not leave event");
+    }
+  }
+
+  Future removeparticipant(AppUser user, Event event) async {
+    try {
+      DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
+      AppUser host = await getUserFromDocID(event.hostdocid);
+      AppUser usertorem = await getUserFromDocID(user.docid);
+      List participants = eventSnapshot['participants'];
+      List joinedEvents = usertorem.joinedEvents;
+
+      joinedEvents.removeWhere((element) => element == event.docid);
+      participants.removeWhere((element) => element == user.docid);
+      users.doc(user.docid).update({'joined_events': joinedEvents});
+      events.doc(event.docid).update({'participants': participants});
+      users.doc(event.hostdocid).update({'clout': host.clout - 5});
+      users.doc(user.docid).update({'clout': usertorem.clout - 10});
+      updates.add({
+        'target': user.docid,
+        'title': 'Clout',
+        'description': 'You were kicked out of the event: ${event.title}'
+      });
     } catch (e) {
       throw Exception("Could not leave event");
     }
@@ -667,7 +692,7 @@ class db_conn {
   Future<List<Event>> getLngLatEvents(
       double lng, double lat, String country) async {
     try {
-      print(country);
+      //print(country);
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
           .startAfter([DateTime.now()])

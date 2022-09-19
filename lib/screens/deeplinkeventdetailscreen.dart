@@ -205,6 +205,15 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                   )));
     }
 
+    Future<void> remuser(AppUser user, int index) async {
+      try {
+        await db.removeparticipant(user, widget.event);
+        updatescreen(widget.event.docid);
+      } catch (e) {
+        displayErrorSnackBar("Could not remove participant, please try again");
+      }
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -220,7 +229,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           ),
         ),
         actions: [
-          widget.curruser.username == widget.event.host
+          widget.curruser.docid == widget.event.hostdocid
               ? GestureDetector(
                   onTap: () async {
                     Navigator.push(
@@ -426,6 +435,9 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                   onTap: usernavigate,
                   screenwidth: screenwidth,
                   showcloutscore: false,
+                  showrembutton:
+                      widget.curruser.docid == widget.event.hostdocid,
+                  removeUser: remuser,
                 ),
               ],
             ),

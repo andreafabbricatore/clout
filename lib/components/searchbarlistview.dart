@@ -146,6 +146,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
             curruser: widget.curruser,
             screenwidth: screenwidth,
             showcloutscore: false,
+            showrembutton: false,
           );
   }
 }

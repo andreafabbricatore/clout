@@ -178,6 +178,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
           curruser: widget.curruser,
           screenwidth: screenwidth,
           showcloutscore: false,
+          showrembutton: false,
         )
       ]),
     );

@@ -208,6 +208,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   )));
     }
 
+    Future<void> remuser(AppUser user, int index) async {
+      try {
+        await db.removeparticipant(user, widget.event);
+        updatescreen(widget.event.docid);
+      } catch (e) {
+        displayErrorSnackBar("Could not remove participant, please try again");
+      }
+    }
+
     void shareevent(String link) async {
       final box = context.findRenderObject() as RenderBox?;
       await Share.share(
@@ -232,7 +241,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
         ),
         actions: [
-          widget.curruser.username == widget.event.host
+          widget.curruser.docid == widget.event.hostdocid
               ? GestureDetector(
                   onTap: () async {
                     Navigator.push(
@@ -452,6 +461,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   onTap: usernavigate,
                   screenwidth: screenwidth,
                   showcloutscore: false,
+                  showrembutton:
+                      widget.curruser.docid == widget.event.hostdocid,
+                  removeUser: remuser,
                 ),
               ],
             ),

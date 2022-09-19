@@ -1,3 +1,4 @@
+import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
@@ -8,14 +9,18 @@ class UserListView extends StatelessWidget {
       required this.onTap,
       required this.curruser,
       required this.screenwidth,
-      required this.showcloutscore})
+      required this.showcloutscore,
+      required this.showrembutton,
+      this.removeUser})
       : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
   double screenwidth;
   bool showcloutscore;
+  bool showrembutton;
 
   final Function(AppUser user, int index)? onTap;
+  final Function(AppUser user, int index)? removeUser;
 
   Widget _listviewitem(
     AppUser user,
@@ -68,6 +73,17 @@ class UserListView extends StatelessWidget {
                 "${user.clout}",
                 style: const TextStyle(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.right,
+              )
+            : Container(),
+        showrembutton && user.docid != curruser.docid
+            ? GestureDetector(
+                onTap: () {
+                  removeUser?.call(user, index);
+                },
+                child: const Icon(
+                  Icons.remove_circle_outline,
+                  color: Color.fromARGB(255, 255, 48, 117),
+                ),
               )
             : Container()
       ],

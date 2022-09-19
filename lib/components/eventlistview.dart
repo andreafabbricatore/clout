@@ -29,7 +29,6 @@ class EventListView extends StatelessWidget {
 
   db_conn db = db_conn();
   Widget _eventImage(String image) {
-    print(image);
     return ClipRRect(
         borderRadius: BorderRadius.circular(15.0),
         child: FadeInImage(

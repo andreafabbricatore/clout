@@ -38,7 +38,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       following: [],
       favorites: [],
       docid: "",
-      clout: 0);
+      clout: 0,
+      bio: "");
 
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -392,6 +393,9 @@ class _UsernameScreenState extends State<UsernameScreen> {
               });
             } else if (usernamecontroller.text.isEmpty) {
               displayErrorSnackBar("Invalid Username");
+            } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
+                .hasMatch(usernamecontroller.text.trim())) {
+              displayErrorSnackBar("Please only enter alphanumeric characters");
             } else {
               setState(() {
                 widget.curruser.username =

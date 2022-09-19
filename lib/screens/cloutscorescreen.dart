@@ -5,16 +5,35 @@ import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class CloutScoreScreen extends StatelessWidget {
-  CloutScoreScreen(
-      {Key? key, required this.curruser, required this.globalrankedusers})
-      : super(key: key);
+class CloutScoreScreen extends StatefulWidget {
+  CloutScoreScreen({
+    Key? key,
+    required this.curruser,
+  }) : super(key: key);
   AppUser curruser;
-  List<AppUser> globalrankedusers;
 
+  @override
+  State<CloutScoreScreen> createState() => _CloutScoreScreenState();
+}
+
+class _CloutScoreScreenState extends State<CloutScoreScreen> {
   List<AppUser> globalrankusers = [];
 
   db_conn db = db_conn();
+
+  Future<void> getglobalrankedusers() async {
+    List<AppUser> globalrankedusers = await db.getAllUsersRankedByCloutScore();
+
+    setState(() {
+      globalrankusers = globalrankedusers;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getglobalrankedusers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +45,7 @@ class CloutScoreScreen extends StatelessWidget {
           CupertinoPageRoute(
               builder: (_) => ProfileScreen(
                     user: user,
-                    curruser: curruser,
+                    curruser: widget.curruser,
                     visit: true,
                     interests: const [],
                   )));
@@ -120,12 +139,16 @@ class CloutScoreScreen extends StatelessWidget {
                     fontSize: 30),
                 textScaleFactor: 1.0,
               ),
+              SizedBox(
+                height: screenheight * 0.01,
+              ),
               UserListView(
-                userres: globalrankedusers,
+                userres: globalrankusers,
                 onTap: usernavigate,
-                curruser: curruser,
+                curruser: widget.curruser,
                 screenwidth: screenwidth,
                 showcloutscore: true,
+                showrembutton: false,
               ),
               SizedBox(
                 height: screenheight * 0.02,

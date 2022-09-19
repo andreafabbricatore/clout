@@ -7,6 +7,7 @@ import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/followerfollowingscreen.dart';
 import 'package:clout/screens/settings.dart';
 import 'package:clout/services/db.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../components/event.dart';
@@ -53,14 +54,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await updatecurruser();
       geteventlist(widget.user.joinedEvents, true);
       geteventlist(widget.user.hostedEvents, false);
-      getglobalrankedusers();
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
     }
-  }
-
-  void getglobalrankedusers() async {
-    globalrankedusers = await db.getAllUsersRankedByCloutScore();
   }
 
   Future<void> updateuser() async {
@@ -130,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void followerscreen() async {
     await Navigator.push(
         context,
-        MaterialPageRoute(
+        CupertinoPageRoute(
             builder: (_) => FollowerFollowingScreen(
                   user: widget.user,
                   curruser: widget.curruser,
@@ -143,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void followingscreen() async {
     await Navigator.push(
         context,
-        MaterialPageRoute(
+        CupertinoPageRoute(
             builder: (_) => FollowerFollowingScreen(
                   user: widget.user,
                   curruser: widget.curruser,
@@ -154,14 +150,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void cloutscreen() async {
-    await Navigator.push(
+    Navigator.push(
         context,
-        MaterialPageRoute(
+        CupertinoPageRoute(
             builder: (_) => CloutScoreScreen(
                   curruser: widget.curruser,
-                  globalrankedusers: globalrankedusers,
                 )));
-    refresh();
   }
 
   Future<void> follow() async {
