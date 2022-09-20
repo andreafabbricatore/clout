@@ -436,7 +436,8 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                   screenwidth: screenwidth,
                   showcloutscore: false,
                   showrembutton:
-                      widget.curruser.docid == widget.event.hostdocid,
+                      (widget.curruser.docid == widget.event.hostdocid) &&
+                          (joinedval != "Finished"),
                   removeUser: remuser,
                 ),
               ],

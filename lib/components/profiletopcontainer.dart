@@ -27,6 +27,25 @@ class ProfileTopContainer extends StatefulWidget {
 }
 
 class _ProfileTopContainerState extends State<ProfileTopContainer> {
+  bool buttonpressed = false;
+
+  calculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    int month1 = currentDate.month;
+    int month2 = birthDate.month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      int day1 = currentDate.day;
+      int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -113,7 +132,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   SizedBox(
                     width: screenwidth * 0.55,
                     child: Text(
-                      widget.user.fullname,
+                      "${widget.user.fullname},${calculateAge(widget.user.birthday)}",
                       textAlign: TextAlign.start,
                       style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w500),
@@ -144,7 +163,13 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                         )
                       : GestureDetector(
                           onTap: () {
-                            widget.follow();
+                            setState(() {
+                              buttonpressed = true;
+                            });
+                            buttonpressed ? null : widget.follow();
+                            setState(() {
+                              buttonpressed = false;
+                            });
                           },
                           child: Container(
                             height: screenheight * 0.03,

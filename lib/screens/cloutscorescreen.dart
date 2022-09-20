@@ -6,10 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CloutScoreScreen extends StatefulWidget {
-  CloutScoreScreen({
-    Key? key,
-    required this.curruser,
-  }) : super(key: key);
+  CloutScoreScreen({Key? key, required this.curruser}) : super(key: key);
   AppUser curruser;
 
   @override
@@ -17,22 +14,34 @@ class CloutScoreScreen extends StatefulWidget {
 }
 
 class _CloutScoreScreenState extends State<CloutScoreScreen> {
-  List<AppUser> globalrankusers = [];
+  List<AppUser> globalrankedusers = [];
 
   db_conn db = db_conn();
 
-  Future<void> getglobalrankedusers() async {
-    List<AppUser> globalrankedusers = await db.getAllUsersRankedByCloutScore();
+  void displayErrorSnackBar(String error) {
+    final snackBar = SnackBar(
+      content: Text(error),
+      duration: const Duration(seconds: 2),
+    );
+    Future.delayed(const Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
-    setState(() {
-      globalrankusers = globalrankedusers;
-    });
+  Future<void> getUserList() async {
+    try {
+      List<AppUser> temp = await db.getAllUsersRankedByCloutScore();
+      setState(() {
+        globalrankedusers = temp;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not get user rankings");
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    getglobalrankedusers();
+    getUserList();
   }
 
   @override
@@ -143,7 +152,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 height: screenheight * 0.01,
               ),
               UserListView(
-                userres: globalrankusers,
+                userres: globalrankedusers,
                 onTap: usernavigate,
                 curruser: widget.curruser,
                 screenwidth: screenwidth,

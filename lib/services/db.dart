@@ -48,6 +48,7 @@ class db_conn {
   CollectionReference events = FirebaseFirestore.instance.collection('events');
   CollectionReference updates =
       FirebaseFirestore.instance.collection('updates');
+  CollectionReference report = FirebaseFirestore.instance.collection('report');
 
   Future createuserinstance(String email, String uid) {
     try {
@@ -951,6 +952,14 @@ class db_conn {
         'createdAt': FieldValue.serverTimestamp(),
         'platform': Platform.operatingSystem
       });
+    }
+  }
+
+  Future<void> reportUser(AppUser user) async {
+    try {
+      report.add({"docid": user.docid});
+    } catch (e) {
+      throw Exception();
     }
   }
 }

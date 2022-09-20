@@ -30,15 +30,14 @@ class EventListView extends StatelessWidget {
   db_conn db = db_conn();
   Widget _eventImage(String image) {
     return ClipRRect(
-        borderRadius: BorderRadius.circular(15.0),
-        child: FadeInImage(
-          fadeInDuration: const Duration(milliseconds: 2),
-          height: 150,
-          width: 150,
-          fit: BoxFit.cover,
-          image: NetworkImage(image),
-          placeholder: const AssetImage("assets/images/misc/placeholder.jpeg"),
-        ));
+      borderRadius: BorderRadius.circular(15.0),
+      child: Image.network(
+        image,
+        fit: BoxFit.cover,
+        height: 150,
+        width: 150,
+      ),
+    );
   }
 
   Widget _listViewItem(
