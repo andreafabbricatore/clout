@@ -217,10 +217,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       }
     }
 
-    void shareevent(String link) async {
+    void shareevent(String text) async {
       final box = context.findRenderObject() as RenderBox?;
       await Share.share(
-        link,
+        text,
         subject: "Join this event on Clout!",
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
@@ -267,7 +267,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             onTap: () async {
               String link = await createShareLink();
               //print(link);
-              shareevent(link);
+              String text = "Join ${widget.event.title} on Clout!\n$link";
+              shareevent(text);
             },
             child: const Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
