@@ -22,6 +22,10 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
 
   TextEditingController emailaddress = TextEditingController();
 
+  bool deletebuttonpressed = false;
+  bool updatepswbuttonpressed = false;
+  bool updateemailbuttonpressed = false;
+
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
       content: Text(error),
@@ -62,19 +66,28 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
       ),
       actions: [
         TextButton(
-          child: const Text("Delete Account"),
-          onPressed: () async {
-            try {
-              await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: widget.curruser.email, password: psw.text.trim());
-              await FirebaseAuth.instance.currentUser!.delete();
-              await db.deleteuser(widget.curruser);
-              goauthwrapper();
-            } catch (e) {
-              displayErrorSnackBar("Invalid Action, try again");
-            }
-          },
-        ),
+            onPressed: deletebuttonpressed
+                ? null
+                : () async {
+                    setState(() {
+                      deletebuttonpressed = true;
+                    });
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: widget.curruser.email,
+                          password: psw.text.trim());
+                      await FirebaseAuth.instance.currentUser!.delete();
+                      await db.deleteuser(widget.curruser);
+                      goauthwrapper();
+                    } catch (e) {
+                      displayErrorSnackBar("Invalid Action, try again");
+                    } finally {
+                      setState(() {
+                        deletebuttonpressed = false;
+                      });
+                    }
+                  },
+            child: const Text("Delete Account")),
         TextButton(
           child: const Text("Cancel"),
           onPressed: () {
@@ -104,25 +117,34 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
       ),
       actions: [
         TextButton(
-          child: const Text("Update"),
-          onPressed: () async {
-            try {
-              await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: widget.curruser.email, password: psw.text.trim());
-              if (emailaddress.text.trim().isEmpty) {
-                throw Exception("Please enter new email address");
-              }
-              await FirebaseAuth.instance.currentUser!
-                  .updateEmail(emailaddress.text.trim());
+            onPressed: updateemailbuttonpressed
+                ? null
+                : () async {
+                    setState(() {
+                      updateemailbuttonpressed = true;
+                    });
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: widget.curruser.email,
+                          password: psw.text.trim());
+                      if (emailaddress.text.trim().isEmpty) {
+                        throw Exception("Please enter new email address");
+                      }
+                      await FirebaseAuth.instance.currentUser!
+                          .updateEmail(emailaddress.text.trim());
 
-              await db.changeattribute('email', emailaddress.text.trim(),
-                  FirebaseAuth.instance.currentUser!.uid);
-              goauthwrapper();
-            } catch (e) {
-              displayErrorSnackBar("Invalid Action, try again");
-            }
-          },
-        ),
+                      await db.changeattribute(
+                          'email',
+                          emailaddress.text.trim(),
+                          FirebaseAuth.instance.currentUser!.uid);
+                      goauthwrapper();
+                    } catch (e) {
+                      displayErrorSnackBar("Invalid Action, try again");
+                    } finally {
+                      updateemailbuttonpressed = false;
+                    }
+                  },
+            child: const Text("Update")),
         TextButton(
           child: const Text("Cancel"),
           onPressed: () {
@@ -151,22 +173,31 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
       ),
       actions: [
         TextButton(
-          child: const Text("Update"),
-          onPressed: () async {
-            try {
-              await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: widget.curruser.email, password: psw.text.trim());
-              if (newpsw.text.trim().isEmpty) {
-                throw Exception("Please enter new password");
-              }
-              await FirebaseAuth.instance.currentUser!
-                  .updatePassword(newpsw.text.trim());
-              goauthwrapper();
-            } catch (e) {
-              displayErrorSnackBar("Invalid Action, try again");
-            }
-          },
-        ),
+            onPressed: updatepswbuttonpressed
+                ? null
+                : () async {
+                    setState(() {
+                      updatepswbuttonpressed = true;
+                    });
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: widget.curruser.email,
+                          password: psw.text.trim());
+                      if (newpsw.text.trim().isEmpty) {
+                        throw Exception("Please enter new password");
+                      }
+                      await FirebaseAuth.instance.currentUser!
+                          .updatePassword(newpsw.text.trim());
+                      goauthwrapper();
+                    } catch (e) {
+                      displayErrorSnackBar("Invalid Action, try again");
+                    } finally {
+                      setState(() {
+                        updatepswbuttonpressed = false;
+                      });
+                    }
+                  },
+            child: const Text("Update")),
         TextButton(
           child: const Text("Cancel"),
           onPressed: () {

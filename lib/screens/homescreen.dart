@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';

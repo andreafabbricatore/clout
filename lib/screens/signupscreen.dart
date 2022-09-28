@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
+import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/services/db.dart';
@@ -221,6 +222,21 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
+        bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: Row(
+              children: [
+                Container(
+                  width: screenwidth * 0.25,
+                  color: const Color.fromARGB(255, 255, 48, 117),
+                  height: 4.0,
+                ),
+                SizedBox(
+                  width: screenwidth * 0.75,
+                  height: 4.0,
+                )
+              ],
+            )),
       ),
       body: SingleChildScrollView(
           child: Column(
@@ -369,6 +385,21 @@ class _UsernameScreenState extends State<UsernameScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
+        bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: Row(
+              children: [
+                Container(
+                  width: screenwidth * 0.5,
+                  color: const Color.fromARGB(255, 255, 48, 117),
+                  height: 4.0,
+                ),
+                SizedBox(
+                  width: screenwidth * 0.5,
+                  height: 4.0,
+                )
+              ],
+            )),
       ),
       body: SingleChildScrollView(
           child: Column(
@@ -732,6 +763,21 @@ class _MiscScreenState extends State<MiscScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
+        bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: Row(
+              children: [
+                Container(
+                  width: screenwidth * 0.75,
+                  color: const Color.fromARGB(255, 255, 48, 117),
+                  height: 4.0,
+                ),
+                SizedBox(
+                  width: screenwidth * 0.25,
+                  height: 4.0,
+                )
+              ],
+            )),
       ),
       body: SingleChildScrollView(
           child: Center(
@@ -992,108 +1038,119 @@ class _InterestScreenState extends State<InterestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          "Interests",
-          style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
-              fontWeight: FontWeight.bold,
-              fontSize: 30),
-        ),
-        bottom: const PreferredSize(
-          preferredSize: Size.zero,
-          child: Text(
-            "Choose at least 3",
-            style: TextStyle(color: Color.fromARGB(255, 255, 48, 117)),
-          ),
-        ),
-        backgroundColor: Colors.white,
-        shadowColor: Colors.white,
-        elevation: 0.0,
-        automaticallyImplyLeading: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2),
-                shrinkWrap: true,
-                itemCount: allinterests.length,
-                itemBuilder: ((context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                    child: _listviewitem(allinterests[index]),
-                  );
-                }),
+    final screenwidth = MediaQuery.of(context).size.width;
+    return buttonpressed
+        ? LoadingOverlay(text: "Creating your account...")
+        : Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              title: const Text(
+                "What are your interests?",
+                style: TextStyle(
+                    color: Color.fromARGB(255, 255, 48, 117),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
               ),
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: SizedBox(
-        height: 70,
-        width: 70,
-        child: FloatingActionButton(
-          onPressed: buttonpressed
-              ? null
-              : () async {
-                  setState(() {
-                    buttonpressed = true;
-                  });
-                  try {
-                    if (selectedinterests.length >= 3) {
-                      setState(() {
-                        widget.curruser.interests = selectedinterests;
-                      });
+              bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(4.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: screenwidth,
+                        color: const Color.fromARGB(255, 255, 48, 117),
+                        height: 4.0,
+                      ),
+                    ],
+                  )),
+              backgroundColor: Colors.white,
+              shadowColor: Colors.white,
+              elevation: 0.0,
+              automaticallyImplyLeading: false,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
+                      shrinkWrap: true,
+                      itemCount: allinterests.length,
+                      itemBuilder: ((context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                          child: _listviewitem(allinterests[index]),
+                        );
+                      }),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            floatingActionButton: SizedBox(
+              height: 70,
+              width: 70,
+              child: FloatingActionButton(
+                onPressed: buttonpressed
+                    ? null
+                    : () async {
+                        setState(() {
+                          buttonpressed = true;
+                        });
+                        try {
+                          if (selectedinterests.length >= 3) {
+                            setState(() {
+                              widget.curruser.interests = selectedinterests;
+                            });
 
-                      await FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
-                              email: widget.curruser.email,
-                              password: widget.psw);
-                      String uid = FirebaseAuth.instance.currentUser!.uid;
-                      await db.createuserinstance(widget.curruser.email, uid);
-                      compressedimgpath =
-                          await CompressAndGetFile(widget.imagepath);
-                      await db.changepfp(compressedimgpath, uid);
-                      await db.changeusername(widget.curruser.username, uid);
-                      await db.changeattribute(
-                          'fullname', widget.curruser.fullname, uid);
-                      await db.changeattribute(
-                          'gender', widget.curruser.gender, uid);
-                      await db.changeattribute(
-                          'nationality', widget.curruser.nationality, uid);
-                      await db.changebirthday(widget.curruser.birthday, uid);
-                      await db.changeinterests(
-                          'interests', widget.curruser.interests, uid);
+                            await FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(
+                                    email: widget.curruser.email,
+                                    password: widget.psw);
+                            String uid = FirebaseAuth.instance.currentUser!.uid;
+                            await db.createuserinstance(
+                                widget.curruser.email, uid);
+                            compressedimgpath =
+                                await CompressAndGetFile(widget.imagepath);
+                            await db.changepfp(compressedimgpath, uid);
+                            await db.changeusername(
+                                widget.curruser.username, uid);
+                            await db.changeattribute(
+                                'fullname', widget.curruser.fullname, uid);
+                            await db.changeattribute(
+                                'gender', widget.curruser.gender, uid);
+                            await db.changeattribute('nationality',
+                                widget.curruser.nationality, uid);
+                            await db.changebirthday(
+                                widget.curruser.birthday, uid);
+                            await db.changeinterests(
+                                'interests', widget.curruser.interests, uid);
 
-                      donesignup();
-                    } else {
-                      displayErrorSnackBar("Choose at least 3 interests");
-                      setState(() {
-                        buttonpressed = false;
-                      });
-                    }
-                  } catch (e) {
-                    displayErrorSnackBar("Could not create user");
-                    setState(() {
-                      buttonpressed = false;
-                    });
-                  }
-                },
-          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
-          child: const Icon(
-            Icons.arrow_circle_right_outlined,
-            size: 60,
-          ),
-        ),
-      ),
-    );
+                            donesignup();
+                          } else {
+                            displayErrorSnackBar("Choose at least 3 interests");
+                            setState(() {
+                              buttonpressed = false;
+                            });
+                          }
+                        } catch (e) {
+                          displayErrorSnackBar("Could not create user");
+                          setState(() {
+                            buttonpressed = false;
+                          });
+                        }
+                      },
+                backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+                child: const Icon(
+                  Icons.arrow_circle_right_outlined,
+                  size: 60,
+                ),
+              ),
+            ),
+          );
   }
 }

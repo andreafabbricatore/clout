@@ -162,15 +162,17 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                           ),
                         )
                       : GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              buttonpressed = true;
-                            });
-                            buttonpressed ? null : widget.follow();
-                            setState(() {
-                              buttonpressed = false;
-                            });
-                          },
+                          onTap: buttonpressed
+                              ? null
+                              : () {
+                                  setState(() {
+                                    buttonpressed = true;
+                                  });
+                                  widget.follow();
+                                  setState(() {
+                                    buttonpressed = false;
+                                  });
+                                },
                           child: Container(
                             height: screenheight * 0.03,
                             width: widget.curruser.following
