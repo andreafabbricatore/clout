@@ -1,4 +1,5 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/editeventscreen.dart';
@@ -37,6 +38,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool joined = false;
   String joinedval = "Join";
   bool buttonpressed = false;
+  bool deleteeventpressed = false;
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -140,6 +142,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       try {
         setState(() {
           buttonpressed = true;
+          deleteeventpressed = true;
         });
         await db.deleteevent(widget.event, widget.curruser);
         Navigator.of(context).push(
@@ -154,6 +157,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         updatescreen(widget.event.docid);
         setState(() {
           buttonpressed = false;
+          deleteeventpressed = false;
         });
       }
     } else {
@@ -226,273 +230,287 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(
-            Icons.arrow_back_ios,
-            color: Color.fromARGB(255, 255, 48, 117),
-          ),
-        ),
-        actions: [
-          widget.curruser.docid == widget.event.hostdocid
-              ? GestureDetector(
+    return deleteeventpressed
+        ? LoadingOverlay(
+            text: "Deleting your event...",
+            color: Colors.black,
+          )
+        : Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0.0,
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Color.fromARGB(255, 255, 48, 117),
+                ),
+              ),
+              actions: [
+                widget.curruser.docid == widget.event.hostdocid
+                    ? GestureDetector(
+                        onTap: () async {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  EditEventScreen(
+                                      curruser: widget.curruser,
+                                      allowbackarrow: true,
+                                      event: widget.event),
+                            ),
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                    : Container(),
+                GestureDetector(
                   onTap: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => EditEventScreen(
-                            curruser: widget.curruser,
-                            allowbackarrow: true,
-                            event: widget.event),
-                      ),
-                    );
+                    String link = await createShareLink();
+                    //print(link);
+                    String text = "Join ${widget.event.title} on Clout!\n$link";
+                    shareevent(text);
                   },
                   child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
                     child: Icon(
-                      Icons.edit,
+                      Icons.ios_share,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    await widget.interactfav(widget.event);
+                    updatecurruser();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+                    child: Icon(
+                      widget.curruser.favorites.contains(widget.event.docid)
+                          ? Icons.bookmark
+                          : Icons.bookmark_border,
                       color: Colors.black,
                     ),
                   ),
                 )
-              : Container(),
-          GestureDetector(
-            onTap: () async {
-              String link = await createShareLink();
-              //print(link);
-              String text = "Join ${widget.event.title} on Clout!\n$link";
-              shareevent(text);
-            },
-            child: const Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
-              child: Icon(
-                Icons.ios_share,
-                color: Colors.black,
-              ),
+              ],
             ),
-          ),
-          GestureDetector(
-            onTap: () async {
-              await widget.interactfav(widget.event);
-              updatecurruser();
-            },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
-              child: Icon(
-                widget.curruser.favorites.contains(widget.event.docid)
-                    ? Icons.bookmark
-                    : Icons.bookmark_border,
-                color: Colors.black,
-              ),
-            ),
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: ListView(children: [
-          SizedBox(
-            height: screenheight * 0.3,
-            width: screenwidth * 0.7,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15.0),
-                child: Image.network(
-                  widget.event.image,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-          Text(
-            widget.event.title,
-            style: const TextStyle(
-                fontSize: 40,
-                color: Colors.black,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: screenheight * 0.005,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.event.interest,
-                style: const TextStyle(
-                    fontSize: 25,
-                    color: Color.fromARGB(255, 255, 48, 117),
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.bold),
-              ),
-              InkWell(
-                onTap: () async {
-                  try {
-                    String hostdocid =
-                        await db.getUserDocIDfromUsername(widget.event.host);
-                    AppUser eventhost = await db.getUserFromDocID(hostdocid);
-                    usernavigate(eventhost, 0);
-                  } catch (e) {
-                    displayErrorSnackBar("Could not retrieve host information");
-                  }
-                },
-                child: Text(
-                  "@${widget.event.host}",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Color.fromARGB(255, 255, 48, 117),
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-          Text(
-            "At ${widget.event.address}, ${DateFormat.MMMd().format(widget.event.datetime)} @ ${DateFormat('hh:mm a').format(widget.event.datetime)}",
-            style: const TextStyle(
-                fontSize: 15,
-                color: Colors.black,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-          SizedBox(
-            width: screenwidth,
-            height: screenheight * 0.2,
-            child: Stack(
-              alignment: AlignmentDirectional.bottomEnd,
-              children: [
-                FlutterMap(
-                  options: MapOptions(
-                    center: LatLng(widget.event.lat, widget.event.lng),
-                    zoom: 15.0,
-                    maxZoom: 20.0,
-                    minZoom: 13.0,
-                  ),
-                  layers: [
-                    TileLayerOptions(
-                        additionalOptions: {
-                          'accessToken': dotenv.get('MAPBOX_ACCESS_TOKEN'),
-                          'id': 'mapbox.mapbox-streets-v8'
-                        },
-                        urlTemplate:
-                            "https://api.mapbox.com/styles/v1/andreaf1108/cl4y4djy6005f15obfxs5i0bb/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmVhZjExMDgiLCJhIjoiY2w0cjBxamlzMGFwZjNqcGRodm9nczA5biJ9.qXRB_MLgHmifo6DYtCYirw"),
-                    MarkerLayerOptions(markers: [
-                      Marker(
-                          point: LatLng(widget.event.lat, widget.event.lng),
-                          builder: ((context) => const Icon(
-                                Icons.location_pin,
-                                color: Color.fromARGB(255, 255, 48, 117),
-                                size: 18,
-                              )))
-                    ])
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(3.0),
-                  child: SizedBox(
-                    height: screenheight * 0.05,
-                    width: screenheight * 0.05,
-                    child: FloatingActionButton(
-                      backgroundColor: const Color.fromARGB(255, 255, 48, 117),
-                      child: const Center(child: Icon(Icons.map_rounded)),
-                      onPressed: () {
-                        MapsLauncher.launchQuery(
-                            "${widget.event.lat},${widget.event.lng}");
-                      },
+            body: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: ListView(children: [
+                SizedBox(
+                  height: screenheight * 0.3,
+                  width: screenwidth * 0.7,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15.0),
+                      child: Image.network(
+                        widget.event.image,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-          Text(
-            widget.event.description,
-            style: const TextStyle(
-                fontSize: 15,
-                color: Colors.black,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.w400),
-          ),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-          Text(
-            widget.event.participants.length != widget.event.maxparticipants
-                ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
-                : "Participant number reached",
-            style: const TextStyle(
-                fontSize: 20,
-                color: Colors.black,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: screenheight * 0.005,
-          ),
-          SizedBox(
-            height: screenheight * 0.09 * widget.participants.length,
-            width: screenwidth,
-            child: Column(
-              children: [
-                UserListView(
-                  userres: widget.participants,
-                  curruser: widget.curruser,
-                  onTap: usernavigate,
-                  screenwidth: screenwidth,
-                  showcloutscore: false,
-                  showrembutton:
-                      (widget.curruser.docid == widget.event.hostdocid) &&
-                          (joinedval != "Finished"),
-                  removeUser: remuser,
+                SizedBox(
+                  height: screenheight * 0.02,
                 ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-          InkWell(
-            onTap: () async {
-              buttonpressed ? null : interactevent(context);
-            },
-            child: SizedBox(
-                height: 50,
-                width: screenwidth * 0.5,
-                child: Container(
-                  decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 255, 48, 117),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: Center(
+                Text(
+                  widget.event.title,
+                  style: const TextStyle(
+                      fontSize: 40,
+                      color: Colors.black,
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: screenheight * 0.005,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.event.interest,
+                      style: const TextStyle(
+                          fontSize: 25,
+                          color: Color.fromARGB(255, 255, 48, 117),
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.bold),
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        try {
+                          String hostdocid = await db
+                              .getUserDocIDfromUsername(widget.event.host);
+                          AppUser eventhost =
+                              await db.getUserFromDocID(hostdocid);
+                          usernavigate(eventhost, 0);
+                        } catch (e) {
+                          displayErrorSnackBar(
+                              "Could not retrieve host information");
+                        }
+                      },
                       child: Text(
-                    joinedval,
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
-                  )),
-                )),
-          )
-        ]),
-      ),
-    );
+                        "@${widget.event.host}",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Color.fromARGB(255, 255, 48, 117),
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                Text(
+                  "At ${widget.event.address}, ${DateFormat.MMMd().format(widget.event.datetime)} @ ${DateFormat('hh:mm a').format(widget.event.datetime)}",
+                  style: const TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                SizedBox(
+                  width: screenwidth,
+                  height: screenheight * 0.2,
+                  child: Stack(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    children: [
+                      FlutterMap(
+                        options: MapOptions(
+                          center: LatLng(widget.event.lat, widget.event.lng),
+                          zoom: 15.0,
+                          maxZoom: 20.0,
+                          minZoom: 13.0,
+                        ),
+                        layers: [
+                          TileLayerOptions(
+                              additionalOptions: {
+                                'accessToken':
+                                    dotenv.get('MAPBOX_ACCESS_TOKEN'),
+                                'id': 'mapbox.mapbox-streets-v8'
+                              },
+                              urlTemplate:
+                                  "https://api.mapbox.com/styles/v1/andreaf1108/cl4y4djy6005f15obfxs5i0bb/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmVhZjExMDgiLCJhIjoiY2w0cjBxamlzMGFwZjNqcGRodm9nczA5biJ9.qXRB_MLgHmifo6DYtCYirw"),
+                          MarkerLayerOptions(markers: [
+                            Marker(
+                                point:
+                                    LatLng(widget.event.lat, widget.event.lng),
+                                builder: ((context) => const Icon(
+                                      Icons.location_pin,
+                                      color: Color.fromARGB(255, 255, 48, 117),
+                                      size: 18,
+                                    )))
+                          ])
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: SizedBox(
+                          height: screenheight * 0.05,
+                          width: screenheight * 0.05,
+                          child: FloatingActionButton(
+                            backgroundColor:
+                                const Color.fromARGB(255, 255, 48, 117),
+                            child: const Center(child: Icon(Icons.map_rounded)),
+                            onPressed: () {
+                              MapsLauncher.launchQuery(
+                                  "${widget.event.lat},${widget.event.lng}");
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                Text(
+                  widget.event.description,
+                  style: const TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.w400),
+                ),
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                Text(
+                  widget.event.participants.length !=
+                          widget.event.maxparticipants
+                      ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
+                      : "Participant number reached",
+                  style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: screenheight * 0.005,
+                ),
+                SizedBox(
+                  height: screenheight * 0.09 * widget.participants.length,
+                  width: screenwidth,
+                  child: Column(
+                    children: [
+                      UserListView(
+                        userres: widget.participants,
+                        curruser: widget.curruser,
+                        onTap: usernavigate,
+                        screenwidth: screenwidth,
+                        showcloutscore: false,
+                        showrembutton:
+                            (widget.curruser.docid == widget.event.hostdocid) &&
+                                (joinedval != "Finished"),
+                        removeUser: remuser,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                InkWell(
+                  onTap: () async {
+                    buttonpressed ? null : interactevent(context);
+                  },
+                  child: SizedBox(
+                      height: 50,
+                      width: screenwidth * 0.5,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 255, 48, 117),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        child: Center(
+                            child: Text(
+                          joinedval,
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white),
+                        )),
+                      )),
+                )
+              ]),
+            ),
+          );
   }
 }

@@ -1040,7 +1040,9 @@ class _InterestScreenState extends State<InterestScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     return buttonpressed
-        ? LoadingOverlay(text: "Creating your account...")
+        ? LoadingOverlay(
+            text: "Creating your account...",
+            color: const Color.fromARGB(255, 255, 48, 117))
         : Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.white,

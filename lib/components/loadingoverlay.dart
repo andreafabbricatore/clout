@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 class LoadingOverlay extends StatelessWidget {
-  LoadingOverlay({Key? key, required this.text}) : super(key: key);
+  LoadingOverlay({Key? key, required this.text, required this.color})
+      : super(key: key);
   String text;
+  Color color;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,8 +13,8 @@ class LoadingOverlay extends StatelessWidget {
         child: Center(
           child: Text(
             text,
-            style: const TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+            style: TextStyle(
+              color: color,
               fontSize: 50,
               fontFamily: "Kristi",
               fontWeight: FontWeight.w500,
