@@ -5,12 +5,14 @@ import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key? key}) : super(key: key);
@@ -41,7 +43,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       docid: "",
       clout: 0,
       bio: "");
-
+  bool checkedboxval = false;
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
       content: Text(error),
@@ -101,7 +103,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                               color: Color.fromARGB(255, 255, 48, 117))),
-                      hintText: 'e.g. timcook@gmail.com',
+                      hintText: 'e.g. example@example.com',
                       hintStyle: TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -171,6 +173,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     )),
                   )),
+            ),
+            SizedBox(height: screenheight * 0.3),
+            SizedBox(
+              width: screenwidth * 0.6,
+              child: RichText(
+                textAlign: TextAlign.justify,
+                textScaleFactor: 1.0,
+                text: TextSpan(
+                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    children: [
+                      const TextSpan(
+                          text: "By continuing you are agreeing to the "),
+                      TextSpan(
+                          text: "End User License Agreement",
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 255, 48, 117)),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              launchUrl(Uri.parse(
+                                  "https://termify.io/eula/1664706776"));
+                            }),
+                      const TextSpan(text: " and "),
+                      TextSpan(
+                          text: "the Privacy Statement",
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 255, 48, 117)),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              launchUrl(Uri.parse(
+                                  "https://termify.io/privacy-policy/1664707655"));
+                            }),
+                      const TextSpan(text: "."),
+                    ]),
+              ),
             ),
             SizedBox(height: screenheight * 0.02),
           ],

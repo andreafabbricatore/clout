@@ -957,7 +957,15 @@ class db_conn {
 
   Future<void> reportUser(AppUser user) async {
     try {
-      report.add({"docid": user.docid});
+      report.add({"docid": user.docid, "type": "user"});
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> reportEvent(Event event) async {
+    try {
+      report.add({"docid": event.docid, "type": "event"});
     } catch (e) {
       throw Exception();
     }

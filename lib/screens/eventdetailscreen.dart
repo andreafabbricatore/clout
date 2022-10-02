@@ -49,6 +49,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  Future<void> reportevent(Event event) async {
+    try {
+      await db.reportEvent(event);
+      displayErrorSnackBar("Reported ${event.title}");
+    } catch (e) {
+      displayErrorSnackBar("Could not report, please try again");
+    }
+  }
+
   Future<void> updatecurruser() async {
     try {
       AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
@@ -302,7 +311,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       color: Colors.black,
                     ),
                   ),
-                )
+                ),
+                widget.curruser.docid != widget.event.hostdocid
+                    ? InkWell(
+                        onTap: () {
+                          reportevent(widget.event);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                          child: Icon(
+                            Icons.flag_outlined,
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                    : Container(),
               ],
             ),
             body: Padding(

@@ -317,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(
-                      Icons.report_outlined,
+                      Icons.flag_outlined,
                       color: Colors.black,
                     ),
                   ),

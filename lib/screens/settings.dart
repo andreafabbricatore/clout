@@ -1,6 +1,7 @@
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
+import 'package:clout/screens/authscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,15 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void goauthscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthScreen(),
+          fullscreenDialog: true),
+    );
   }
 
   void goauthwrapper() {

@@ -64,7 +64,7 @@ class AuthenticationWrapper extends StatelessWidget {
               return const EmailVerificationScreen();
             }
           } else {
-            //print("auth");
+            print("auth");
             return AuthScreen();
           }
         }),
