@@ -42,7 +42,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       favorites: [],
       docid: "",
       clout: 0,
-      bio: "");
+      bio: "",
+      blockedusers: [],
+      blockedby: []);
   bool checkedboxval = false;
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -144,9 +146,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(height: screenheight * 0.02),
             InkWell(
               onTap: () async {
+                bool emailunique =
+                    await db.emailUnique(emailController.text.trim());
                 if (emailController.text.isNotEmpty &&
                     RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                         .hasMatch(emailController.text.trim()) &&
+                    emailunique &&
                     pswController.text.length >= 8) {
                   setState(() {
                     curruser.email = emailController.text.trim();
@@ -163,6 +168,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                           .hasMatch(emailController.text.trim())) {
                     displayErrorSnackBar("Invalid email address");
+                  } else if (!emailunique) {
+                    displayErrorSnackBar(
+                        "An account is already associated with this email");
                   } else if (pswController.text.length < 8) {
                     displayErrorSnackBar(
                         "Password has to be at least 8 characters");
@@ -890,8 +898,8 @@ class _MiscScreenState extends State<MiscScreen> {
                 DatePicker.showDatePicker(context,
                     showTitleActions: true,
                     minTime: DateTime(1950, 1, 1),
-                    maxTime: DateTime(
-                        DateTime.now().year - 16, DateTime.december, 31),
+                    maxTime: DateTime(DateTime.now().year - 18,
+                        DateTime.now().month, DateTime.now().day),
                     onChanged: (date) {}, onConfirm: (date) {
                   setState(() {
                     birthday = date;

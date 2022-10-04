@@ -2,6 +2,7 @@ import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
+import 'package:clout/screens/blockedusersscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -146,7 +147,6 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                           FirebaseAuth.instance.currentUser!.uid);
                       await FirebaseAuth.instance.currentUser!
                           .updateEmail(emailaddress.text.trim());
-
                       goauthwrapper();
                     } catch (e) {
                       displayErrorSnackBar("Invalid Action, try again");
@@ -311,6 +311,32 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
             ),
           ),
           SizedBox(
+            height: screenheight * 0.02,
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => BlockedUsersScreen(
+                          curruser: widget.curruser,
+                        )),
+              );
+            },
+            child: Row(
+              children: const [
+                Icon(Icons.block, size: 30),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  "Blocked Users",
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
             height: screenheight * 0.04,
           ),
           GestureDetector(
@@ -325,7 +351,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
             ),
           ),
           SizedBox(
-            height: screenheight * 0.6,
+            height: screenheight * 0.55,
           ),
           GestureDetector(
             onTap: () {

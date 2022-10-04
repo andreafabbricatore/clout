@@ -69,7 +69,9 @@ class db_conn {
         'followers': [],
         'following': [],
         'favorites': [],
-        'bio': ''
+        'bio': '',
+        'blocked_users': [],
+        'blocked_by': []
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -553,20 +555,32 @@ class db_conn {
   }
 
   Future<bool> usernameUnique(String username) async {
-    int instances = 0;
+    bool unique = true;
     try {
       await users.get().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
               if (doc["username"] == username) {
-                instances = instances + 1;
+                unique = false;
               }
             })
           });
-      if (instances == 0) {
-        return true;
-      } else {
-        return false;
-      }
+      return unique;
+    } catch (e) {
+      throw Exception("Could not connect");
+    }
+  }
+
+  Future<bool> emailUnique(String email) async {
+    bool unique = true;
+    try {
+      await users.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["email"] == email) {
+                unique = false;
+              }
+            })
+          });
+      return unique;
     } catch (e) {
       throw Exception("Could not connect");
     }
@@ -691,7 +705,7 @@ class db_conn {
   }
 
   Future<List<Event>> getLngLatEvents(
-      double lng, double lat, String country) async {
+      double lng, double lat, String country, AppUser curruser) async {
     try {
       //print(country);
       QuerySnapshot querySnapshot = await events
@@ -706,6 +720,9 @@ class db_conn {
       });
 
       for (int i = 0; i < tempeventlist.length; i++) {
+        if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
+          continue;
+        }
         if ((tempeventlist[i].lat < lat + 0.04 &&
             tempeventlist[i].lat > lat - 0.04 &&
             tempeventlist[i].lng < lng + 0.04 &&
@@ -719,8 +736,8 @@ class db_conn {
     }
   }
 
-  Future<List<Event>> getLngLatEventsByInterest(
-      double lng, double lat, String interest, String country) async {
+  Future<List<Event>> getLngLatEventsByInterest(double lng, double lat,
+      String interest, String country, AppUser curruser) async {
     try {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
@@ -735,6 +752,9 @@ class db_conn {
       });
 
       for (int i = 0; i < tempeventlist.length; i++) {
+        if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
+          continue;
+        }
         if ((tempeventlist[i].lat < lat + 0.04 &&
             tempeventlist[i].lat > lat - 0.04 &&
             tempeventlist[i].lng < lng + 0.04 &&
@@ -783,7 +803,7 @@ class db_conn {
     }
   }
 
-  Future<List<Event>> searchEvents(String searchquery) async {
+  Future<List<Event>> searchEvents(String searchquery, AppUser curruser) async {
     try {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
@@ -792,7 +812,10 @@ class db_conn {
           .get();
       List<Event> eventsearchres = [];
       querySnapshot.docs.forEach((element) {
-        eventsearchres.add(Event.fromJson(element.data(), element.id));
+        Event event = Event.fromJson(element.data(), element.id);
+        if (!curruser.blockedusers.contains(event.hostdocid)) {
+          eventsearchres.add(event);
+        }
       });
       return eventsearchres;
     } catch (e) {
@@ -800,8 +823,8 @@ class db_conn {
     }
   }
 
-  Future<List<Event>> getLngLatEventsFilteredByDate(
-      double lng, double lat, DateTime date, String country) async {
+  Future<List<Event>> getLngLatEventsFilteredByDate(double lng, double lat,
+      DateTime date, String country, AppUser curruser) async {
     try {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
@@ -816,6 +839,9 @@ class db_conn {
       });
 
       for (int i = 0; i < tempeventlist.length; i++) {
+        if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
+          continue;
+        }
         if ((tempeventlist[i].lat < lat + 0.04 &&
             tempeventlist[i].lat > lat - 0.04 &&
             tempeventlist[i].lng < lng + 0.04 &&
@@ -829,14 +855,17 @@ class db_conn {
     }
   }
 
-  Future<List<AppUser>> searchUsers(String searchquery) async {
+  Future<List<AppUser>> searchUsers(
+      String searchquery, AppUser curruser) async {
     try {
       QuerySnapshot querySnapshot = await users
           .where('searchfield', arrayContains: searchquery.toLowerCase())
           .getSavy();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
-        usersearches.add(AppUser.fromJson(element.data(), element.id));
+        if (!curruser.blockedusers.contains(element.id)) {
+          usersearches.add(AppUser.fromJson(element.data(), element.id));
+        }
       });
 
       return usersearches;
@@ -956,16 +985,116 @@ class db_conn {
   }
 
   Future<void> reportUser(AppUser user) async {
+    bool unique = true;
+    String? docid;
+    int? instances;
     try {
-      report.add({"docid": user.docid, "type": "user"});
+      await report.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["docid"] == user.docid && doc["type"] == "user") {
+                unique = false;
+                docid = doc.id;
+                instances = doc["instances"];
+              }
+            })
+          });
+      if (unique) {
+        report.add({"docid": user.docid, "type": "user", "instances": 1});
+      } else {
+        report.doc(docid!).update({"instances": instances! + 1});
+      }
     } catch (e) {
       throw Exception();
     }
   }
 
   Future<void> reportEvent(Event event) async {
+    bool unique = true;
+    String? docid;
+    int? instances;
     try {
-      report.add({"docid": event.docid, "type": "event"});
+      await report.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (doc["docid"] == event.docid && doc["type"] == "event") {
+                unique = false;
+                docid = doc.id;
+                instances = doc["instances"];
+              }
+            })
+          });
+      if (unique) {
+        report.add({"docid": event.docid, "type": "event", "instances": 1});
+      } else {
+        report.doc(docid!).update({"instances": instances! + 1});
+      }
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> blockUser(String curruserdocid, String userdocid) async {
+    try {
+      DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
+      DocumentSnapshot userdoc = await users.doc(userdocid).get();
+      List blockedusers = curruserdoc['blocked_users'];
+      List blockedby = userdoc['blocked_by'];
+      List curruserfollowers = curruserdoc['followers'];
+      List curruserfollowing = curruserdoc['following'];
+      List userfollowers = userdoc['followers'];
+      List userfollowing = userdoc['following'];
+      List curruserjoinedevents = curruserdoc['joined_events'];
+      List curruserhostedevents = curruserdoc['hosted_events'];
+      List userjoinedevents = userdoc['joined_events'];
+      List userhostedevents = userdoc['hosted_events'];
+      blockedusers.add(userdocid);
+      blockedby.add(curruserdocid);
+      curruserfollowers.removeWhere((element) => element == userdocid);
+      curruserfollowing.removeWhere((element) => element == userdocid);
+      userfollowers.removeWhere((element) => element == curruserdocid);
+      userfollowing.removeWhere((element) => element == curruserdocid);
+      AppUser user = AppUser.fromJson(userdoc, userdocid);
+      for (int i = 0; i < curruserhostedevents.length; i++) {
+        if (userjoinedevents.contains(curruserhostedevents[i])) {
+          DocumentSnapshot eventdoc =
+              await events.doc(curruserhostedevents[i]).get();
+          Event event = Event.fromJson(eventdoc, curruserhostedevents[i]);
+          removeparticipant(user, event);
+        }
+      }
+      AppUser curruser = AppUser.fromJson(curruserdoc, userdocid);
+      for (int i = 0; i < curruserjoinedevents.length; i++) {
+        if (userhostedevents.contains(curruserjoinedevents[i])) {
+          DocumentSnapshot eventdoc =
+              await events.doc(curruserjoinedevents[i]).get();
+          Event event = Event.fromJson(eventdoc, curruserhostedevents[i]);
+          leaveevent(curruser, event);
+        }
+      }
+      users.doc(curruserdocid).update({
+        'blocked_users': blockedusers,
+        'followers': curruserfollowers,
+        'following': curruserfollowing
+      });
+      users.doc(userdocid).update({
+        'blocked_by': blockedby,
+        'followers': userfollowers,
+        'following': userfollowing
+      });
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> unblockUser(String curruserdocid, String userdocid) async {
+    try {
+      DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
+      DocumentSnapshot userdoc = await users.doc(userdocid).get();
+      List blockedusers = curruserdoc['blocked_users'];
+      List blockedby = userdoc['blocked_by'];
+      blockedusers.removeWhere((element) => element == userdocid);
+      blockedby.removeWhere((element) => element == curruserdocid);
+      users.doc(curruserdocid).update({'blocked_users': blockedusers});
+      users.doc(userdocid).update({'blocked_by': blockedby});
     } catch (e) {
       throw Exception();
     }

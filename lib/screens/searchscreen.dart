@@ -75,7 +75,8 @@ class _SearchScreenState extends State<SearchScreen> {
             widget.userlocation.center[0],
             widget.userlocation.center[1],
             interest,
-            widget.userlocation.country);
+            widget.userlocation.country,
+            widget.curruser);
         //print(interesteventlist);
         Navigator.push(
             context,
@@ -113,8 +114,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     onChanged: (String searchquery) async {
                       if (searchevents) {
                         try {
-                          List<Event> res =
-                              await db.searchEvents(searchquery.trim());
+                          List<Event> res = await db.searchEvents(
+                              searchquery.trim(), widget.curruser);
                           setState(() {
                             searchedevents = res;
                           });
@@ -124,8 +125,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         }
                       } else {
                         try {
-                          List<AppUser> res =
-                              await db.searchUsers(searchquery.trim());
+                          List<AppUser> res = await db.searchUsers(
+                              searchquery.trim(), widget.curruser);
                           setState(() {
                             searchedusers = res;
                           });
@@ -206,8 +207,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           searchevents = true;
                         });
                         try {
-                          List<Event> res =
-                              await db.searchEvents(searchcontroller.text);
+                          List<Event> res = await db.searchEvents(
+                              searchcontroller.text, widget.curruser);
                           setState(() {
                             searchedevents = res;
                           });
@@ -240,8 +241,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           searchevents = false;
                         });
                         try {
-                          List<AppUser> res =
-                              await db.searchUsers(searchcontroller.text);
+                          List<AppUser> res = await db.searchUsers(
+                              searchcontroller.text, widget.curruser);
                           setState(() {
                             searchedusers = res;
                           });

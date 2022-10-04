@@ -57,12 +57,13 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     try {
       await updatecurruser();
       if (widget.searchevents) {
-        List<Event> temp = await db.searchEvents(widget.query);
+        List<Event> temp = await db.searchEvents(widget.query, widget.curruser);
         setState(() {
           widget.eventres = temp;
         });
       } else {
-        List<AppUser> temp = await db.searchUsers(widget.query);
+        List<AppUser> temp =
+            await db.searchUsers(widget.query, widget.curruser);
         setState(() {
           widget.userres = temp;
         });

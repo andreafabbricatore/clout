@@ -72,8 +72,11 @@ class _HomeScreenState extends State<HomeScreen> {
       interesteventlist = [];
       generaleventlist = [];
       List<Event> currloceventlist = [];
-      currloceventlist = await db.getLngLatEvents(widget.userlocation.center[0],
-          widget.userlocation.center[1], widget.userlocation.country);
+      currloceventlist = await db.getLngLatEvents(
+          widget.userlocation.center[0],
+          widget.userlocation.center[1],
+          widget.userlocation.country,
+          widget.curruser);
       for (int i = 0; i < currloceventlist.length; i++) {
         if (userinterests.contains(currloceventlist[i].interest)) {
           if (widget.curruser.following

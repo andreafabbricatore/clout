@@ -122,7 +122,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         curruserlocation.city = city;
 
         currloceventlist = await db.getLngLatEvents(curruserlocation.center[0],
-            curruserlocation.center[1], curruserlocation.country);
+            curruserlocation.center[1], curruserlocation.country, curruser);
         for (int i = 0; i < currloceventlist.length; i++) {
           if (interests.contains(currloceventlist[i].interest)) {
             if (curruser.following.contains(currloceventlist[i].hostdocid)) {

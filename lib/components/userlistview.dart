@@ -11,13 +11,15 @@ class UserListView extends StatelessWidget {
       required this.screenwidth,
       required this.showcloutscore,
       required this.showrembutton,
-      this.removeUser})
+      this.removeUser,
+      this.removebuttonblack = false})
       : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
   double screenwidth;
   bool showcloutscore;
   bool showrembutton;
+  bool removebuttonblack;
 
   final Function(AppUser user, int index)? onTap;
   final Function(AppUser user, int index)? removeUser;
@@ -80,9 +82,11 @@ class UserListView extends StatelessWidget {
                 onTap: () {
                   removeUser?.call(user, index);
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.remove_circle_outline,
-                  color: Color.fromARGB(255, 255, 48, 117),
+                  color: removebuttonblack
+                      ? Colors.black
+                      : const Color.fromARGB(255, 255, 48, 117),
                 ),
               )
             : Container()

@@ -237,6 +237,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
       refresh();
     }
 
+    AlertDialog alert = AlertDialog(
+      title: const Text("Block Account"),
+      content: const Text("Would you also like to block this account?"),
+      actions: [
+        TextButton(
+          child: const Text("Block Account"),
+          onPressed: () async {
+            await db.blockUser(widget.curruser.docid, widget.user.docid);
+            displayErrorSnackBar(
+                "Blocked User! To unblock, please visit Settings.");
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: const Text("Cancel"),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -311,8 +333,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {
-                    reportuser(widget.user);
+                  onTap: () async {
+                    await reportuser(widget.user);
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return alert;
+                        });
                   },
                   child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
