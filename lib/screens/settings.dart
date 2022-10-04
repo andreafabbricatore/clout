@@ -86,8 +86,8 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                       await FirebaseAuth.instance.signInWithEmailAndPassword(
                           email: widget.curruser.email,
                           password: psw.text.trim());
-                      await FirebaseAuth.instance.currentUser!.delete();
                       await db.deleteuser(widget.curruser);
+                      await FirebaseAuth.instance.currentUser!.delete();
                       goauthwrapper();
                     } catch (e) {
                       displayErrorSnackBar("Invalid Action, try again");
@@ -140,13 +140,13 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                       if (emailaddress.text.trim().isEmpty) {
                         throw Exception("Please enter new email address");
                       }
-                      await FirebaseAuth.instance.currentUser!
-                          .updateEmail(emailaddress.text.trim());
-
                       await db.changeattribute(
                           'email',
                           emailaddress.text.trim(),
                           FirebaseAuth.instance.currentUser!.uid);
+                      await FirebaseAuth.instance.currentUser!
+                          .updateEmail(emailaddress.text.trim());
+
                       goauthwrapper();
                     } catch (e) {
                       displayErrorSnackBar("Invalid Action, try again");

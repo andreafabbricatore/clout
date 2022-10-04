@@ -145,7 +145,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             InkWell(
               onTap: () async {
                 if (emailController.text.isNotEmpty &&
-                    pswController.text.isNotEmpty) {
+                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        .hasMatch(emailController.text.trim()) &&
+                    pswController.text.length >= 8) {
                   setState(() {
                     curruser.email = emailController.text.trim();
                   });
@@ -157,7 +159,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   );
                 } else {
-                  displayErrorSnackBar("Invalid email and/or password");
+                  if (emailController.text.isEmpty ||
+                      !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          .hasMatch(emailController.text.trim())) {
+                    displayErrorSnackBar("Invalid email address");
+                  } else if (pswController.text.length < 8) {
+                    displayErrorSnackBar(
+                        "Password has to be at least 8 characters");
+                  }
                 }
               },
               child: SizedBox(

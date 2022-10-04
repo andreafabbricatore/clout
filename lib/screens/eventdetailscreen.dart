@@ -190,9 +190,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final dynamicLinkParams = DynamicLinkParameters(
       link: Uri.parse("https://outwithclout.com/${widget.event.docid}"),
       uriPrefix: "https://outwithclout.page.link",
-      androidParameters:
-          const AndroidParameters(packageName: "com.outwithclout.app.android"),
-      iosParameters: const IOSParameters(bundleId: "com.outwithclout.app.ios"),
     );
     final dynamicLink =
         await FirebaseDynamicLinks.instance.buildLink(dynamicLinkParams);
@@ -286,7 +283,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   onTap: () async {
                     String link = await createShareLink();
                     //print(link);
-                    String text = "Join ${widget.event.title} on Clout!\n$link";
+                    String text =
+                        "Join ${widget.event.title} on Clout!\n\n$link";
                     shareevent(text);
                   },
                   child: const Padding(
