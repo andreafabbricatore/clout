@@ -113,6 +113,11 @@ class db_conn {
     }
   }
 
+  Future cancelsignup(String uid, String docid) async {
+    await FirebaseStorage.instance.ref('/user_pfp/${uid}.jpg').delete();
+    return users.doc(docid).delete();
+  }
+
   Future createevent(Event newevent, AppUser curruser, var imagepath) async {
     try {
       String bannerUrl = "";
@@ -534,6 +539,29 @@ class db_conn {
     }
   }
 
+  Future<String> getUserDocIDfromUID(String uid) async {
+    String docID = "";
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .get()
+          .then((QuerySnapshot querySnapshot) => {
+                querySnapshot.docs.forEach((doc) {
+                  if (doc["uid"] == uid) {
+                    docID = doc.id;
+                  }
+                })
+              });
+    } catch (e) {
+      throw Exception("Error with userdocid");
+    }
+    if (docID != "") {
+      return docID;
+    } else {
+      throw Exception("Error with userdocid");
+    }
+  }
+
   Future<String> getUserPFPfromUsername(String username) async {
     String pfpUrl = "";
     try {
@@ -903,6 +931,15 @@ class db_conn {
   Future<AppUser> getUserFromDocID(String docid) async {
     try {
       DocumentSnapshot documentSnapshot = await users.doc(docid).get();
+      return AppUser.fromJson(documentSnapshot.data(), docid);
+    } catch (e) {
+      throw Exception("Could not retrieve user");
+    }
+  }
+
+  Future<AppUser> getUserFromDocIDSavy(String docid) async {
+    try {
+      DocumentSnapshot documentSnapshot = await users.doc(docid).getSavy();
       return AppUser.fromJson(documentSnapshot.data(), docid);
     } catch (e) {
       throw Exception("Could not retrieve user");

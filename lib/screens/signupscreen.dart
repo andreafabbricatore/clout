@@ -353,7 +353,8 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            if (imagepath != null && fullnamecontroller.text.isNotEmpty) {
+            if (imagepath != null &&
+                fullnamecontroller.text.trim().isNotEmpty) {
               setState(() {
                 widget.curruser.fullname = fullnamecontroller.text.trim();
               });
@@ -366,8 +367,12 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                       psw: widget.psw),
                 ),
               );
+            } else if (imagepath == null) {
+              displayErrorSnackBar("Please upload Profile Picture");
+            } else if (fullnamecontroller.text.trim().isEmpty) {
+              displayErrorSnackBar("Please enter your full name");
             } else {
-              displayErrorSnackBar("Error with profile picture or full name");
+              displayErrorSnackBar("Error with full name or profile picture");
             }
           },
           backgroundColor: const Color.fromARGB(255, 255, 48, 117),

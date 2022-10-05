@@ -41,7 +41,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
     followers = [];
     try {
       for (int i = 0; i < widget.user.followers.length; i++) {
-        AppUser temp = await db.getUserFromDocID(widget.user.followers[i]);
+        AppUser temp = await db.getUserFromDocIDSavy(widget.user.followers[i]);
         setState(() {
           followers.add(temp);
         });
@@ -55,7 +55,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
     following = [];
     try {
       for (int i = 0; i < widget.user.following.length; i++) {
-        AppUser temp = await db.getUserFromDocID(widget.user.following[i]);
+        AppUser temp = await db.getUserFromDocIDSavy(widget.user.following[i]);
         setState(() {
           following.add(temp);
         });
