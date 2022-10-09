@@ -44,7 +44,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       clout: 0,
       bio: "",
       blockedusers: [],
-      blockedby: []);
+      blockedby: [],
+      chats: []);
   bool checkedboxval = false;
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(

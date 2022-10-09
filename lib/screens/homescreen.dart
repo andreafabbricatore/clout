@@ -5,6 +5,7 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/db.dart';
@@ -35,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> generaleventlist = [];
   List<Event> interesteventlist = [];
   List userinterests = [];
+  List<Event> totaleventlist = [];
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -94,7 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
       }
-      setState(() {});
+      setState(() {
+        totaleventlist = interesteventlist + generaleventlist;
+      });
     } catch (e) {
       displayErrorSnackBar("Could not get events around you");
     }
@@ -207,67 +211,47 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
+        centerTitle: true,
         actions: [
           InkWell(
-            onTap: () {
-              refresh();
+            onTap: () async {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          ChatListScreen(curruser: widget.curruser)));
             },
             child: const Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
               child: Icon(
-                Icons.refresh,
+                Icons.chat_bubble_outline,
                 color: Colors.black,
               ),
             ),
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(screenheight * 0.02),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Suggested",
-              style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.black,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.w600),
-              textScaleFactor: 1.2,
-            ),
-            SizedBox(height: screenheight * 0.02),
-            EventListView(
-              eventList: interesteventlist,
-              onTap: navigate,
-              scrollable: true,
-              leftpadding: false,
-              curruser: widget.curruser,
-              interactfav: interactfav,
-              screenheight: screenheight,
-              screenwidth: screenwidth,
-            ),
-            const Text(
-              "Popular",
-              style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.black,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.w600),
-              textScaleFactor: 1.2,
-            ),
-            EventListView(
-              isHorizontal: false,
-              eventList: generaleventlist,
-              onTap: navigate,
-              scrollable: true,
-              leftpadding: false,
-              curruser: widget.curruser,
-              interactfav: interactfav,
-              screenheight: screenheight,
-              screenwidth: screenwidth,
-            )
-          ],
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        color: const Color.fromARGB(255, 255, 48, 117),
+        child: Padding(
+          padding: EdgeInsets.all(screenheight * 0.02),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              EventListView(
+                isHorizontal: false,
+                eventList: totaleventlist,
+                onTap: navigate,
+                scrollable: true,
+                leftpadding: false,
+                curruser: widget.curruser,
+                interactfav: interactfav,
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+              )
+            ],
+          ),
         ),
       ),
     );

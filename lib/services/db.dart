@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -49,6 +50,7 @@ class db_conn {
   CollectionReference updates =
       FirebaseFirestore.instance.collection('updates');
   CollectionReference report = FirebaseFirestore.instance.collection('report');
+  CollectionReference chats = FirebaseFirestore.instance.collection('chats');
 
   Future createuserinstance(String email, String uid) {
     try {
@@ -71,7 +73,8 @@ class db_conn {
         'favorites': [],
         'bio': '',
         'blocked_users': [],
-        'blocked_by': []
+        'blocked_by': [],
+        'chats': []
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -107,6 +110,21 @@ class db_conn {
           .ref('/user_pfp/${curruser.uid}.jpg')
           .delete();
       //print("deleted pfp");
+      try {
+        final instance = FirebaseFirestore.instance;
+        final batch = instance.batch();
+        var collection = instance
+            .collection('users')
+            .doc(curruser.docid)
+            .collection('tokens');
+        var snapshots = await collection.get();
+        for (var doc in snapshots.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      } catch (e) {
+        //print("Nothing")
+      }
       return users.doc(curruser.docid).delete();
     } catch (e) {
       throw Exception("Could not delete user");
@@ -123,6 +141,7 @@ class db_conn {
       String bannerUrl = "";
       List joinedEvents = curruser.joinedEvents;
       List hostedEvents = curruser.hostedEvents;
+      List chatlist = curruser.chats;
       bool customimage = false;
       int clout = curruser.clout;
       String eventid = "";
@@ -167,8 +186,10 @@ class db_conn {
         }).then((value) {
           eventid = value.id;
         });
+
         joinedEvents.add(eventid);
         hostedEvents.add(eventid);
+        chatlist.add(eventid);
         if (imagepath == null) {
           bannerUrl = await downloadBannerUrl(newevent.interest);
         } else {
@@ -178,9 +199,22 @@ class db_conn {
         await events
             .doc(eventid)
             .update({'image': bannerUrl, 'custom_image': customimage});
+        chats.doc(eventid).set({
+          "eventid": eventid,
+          "participants": [curruser.docid],
+          "chatname": newevent.title,
+          "iconurl": bannerUrl,
+          "mostrecentmessage": "${newevent.title} was just created!"
+        });
+        chats.doc(eventid).collection('messages').add({
+          'content': "${newevent.title} was just created!",
+          'sender': 'server',
+          'timestamp': DateTime.now()
+        });
         return users.doc(curruser.docid).update({
           'joined_events': joinedEvents,
           'hosted_events': hostedEvents,
+          'chats': chatlist,
           'clout': clout + 20
         }).catchError((error) {
           throw Exception("Could not host event");
@@ -250,6 +284,7 @@ class db_conn {
       AppUser host = await getUserFromDocID(event.hostdocid);
       List participants = eventSnapshot['participants'];
       List joinedEvents = curruser.joinedEvents;
+
       if (participants.length + 1 > event.maxparticipants) {
         throw Exception("Too many participants");
       } else {
@@ -265,7 +300,12 @@ class db_conn {
     } finally {
       try {
         DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
+        DocumentSnapshot chatSnapshot = await chats.doc(eventid).get();
         List participants = eventSnapshot['participants'];
+        List chatparticipants = chatSnapshot['participants'];
+        List chatlist = curruser.chats;
+        chatparticipants.add(curruser.docid);
+        chatlist.add(event.docid);
         if (participants.length > event.maxparticipants) {
           await leaveevent(curruser, event);
         } else {
@@ -275,6 +315,15 @@ class db_conn {
             'description':
                 '${curruser.fullname} joined your your event: ${event.title}'
           });
+          users.doc(curruser.docid).update({'chats': chatlist});
+          chats.doc(event.docid).update({'participants': chatparticipants});
+          chats.doc(event.docid).collection('messages').add({
+            'content': "${curruser.username} joined the event",
+            'sender': 'server',
+            'timestamp': DateTime.now()
+          });
+          chats.doc(event.docid).update(
+              {'mostrecentmessage': "${curruser.username} joined the event"});
         }
       } catch (e) {
         throw Exception("Could not notify host that you joined");
@@ -285,18 +334,32 @@ class db_conn {
   Future leaveevent(AppUser curruser, Event event) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
+      DocumentSnapshot chatSnapshot = await chats.doc(event.docid).get();
       AppUser host = await getUserFromDocID(event.hostdocid);
       List participants = eventSnapshot['participants'];
+      List chatparticipants = chatSnapshot['participants'];
       List joinedEvents = curruser.joinedEvents;
+      List chatlist = curruser.chats;
       if (participants.length == 1) {
         throw Exception("Cannot leave event");
       } else {
         joinedEvents.removeWhere((element) => element == event.docid);
         participants.removeWhere((element) => element == curruser.docid);
+        chatparticipants.removeWhere((element) => element == curruser.docid);
+        chatlist.removeWhere((element) => element == event.docid);
         users.doc(curruser.docid).update({'joined_events': joinedEvents});
         users.doc(event.hostdocid).update({'clout': host.clout - 5});
         users.doc(curruser.docid).update({'clout': curruser.clout - 10});
+        users.doc(curruser.docid).update({'chats': chatlist});
         events.doc(event.docid).update({'participants': participants});
+        chats.doc(event.docid).update({'participants': chatparticipants});
+        chats.doc(event.docid).collection('messages').add({
+          'content': "${curruser.username} left the event",
+          'sender': 'server',
+          'timestamp': DateTime.now()
+        });
+        chats.doc(event.docid).update(
+            {'mostrecentmessage': "${curruser.username} left the event"});
       }
     } catch (e) {
       throw Exception("Could not leave event");
@@ -306,17 +369,30 @@ class db_conn {
   Future removeparticipant(AppUser user, Event event) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
+      DocumentSnapshot chatSnapshot = await chats.doc(event.docid).get();
       AppUser host = await getUserFromDocID(event.hostdocid);
       AppUser usertorem = await getUserFromDocID(user.docid);
       List participants = eventSnapshot['participants'];
       List joinedEvents = usertorem.joinedEvents;
-
+      List chatlist = usertorem.chats;
+      List chatparticipants = chatSnapshot['participants'];
       joinedEvents.removeWhere((element) => element == event.docid);
       participants.removeWhere((element) => element == user.docid);
+      chatparticipants.removeWhere((element) => element == user.docid);
+      chatlist.removeWhere((element) => element == event.docid);
       users.doc(user.docid).update({'joined_events': joinedEvents});
       events.doc(event.docid).update({'participants': participants});
       users.doc(event.hostdocid).update({'clout': host.clout - 5});
       users.doc(user.docid).update({'clout': usertorem.clout - 10});
+      users.doc(user.docid).update({'chats': chatlist});
+      chats.doc(event.docid).update({'participants': chatparticipants});
+      chats.doc(event.docid).collection('messages').add({
+        'content': "${user.username} was removed from the event",
+        'sender': 'server',
+        'timestamp': DateTime.now()
+      });
+      chats.doc(event.docid).update(
+          {'mostrecentmessage': "${user.username} was removed from the event"});
       updates.add({
         'target': user.docid,
         'title': 'Clout',
@@ -337,8 +413,11 @@ class db_conn {
         int clout = documentSnapshot['clout'];
         if (x == host.docid) {
           List hostedEvents = documentSnapshot['hosted_events'];
+          List chatlist = documentSnapshot['chats'];
           hostedEvents.removeWhere((element) => element == event.docid);
+          chatlist.removeWhere((element) => element == event.docid);
           users.doc(x).update({'hosted_events': hostedEvents});
+          users.doc(x).update({'chats': chatlist});
           int decrease = (participants.length - 1) * 5 + 20;
           users.doc(x).update({'clout': clout - decrease});
         } else {
@@ -352,6 +431,16 @@ class db_conn {
             .ref('/event_thumbnails/${event.docid}.jpg')
             .delete();
       } else {}
+      final instance = FirebaseFirestore.instance;
+      final batch = instance.batch();
+      var collection =
+          instance.collection('chats').doc(event.docid).collection('messages');
+      var snapshots = await collection.get();
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      await chats.doc(event.docid).delete();
       await events.doc(event.docid).delete();
     } catch (e) {
       throw Exception("Could not delete event");
@@ -817,6 +906,16 @@ class db_conn {
     }
   }
 
+  Future<Chat> getChatfromDocId(String chatid) async {
+    try {
+      DocumentSnapshot documentSnapshot = await chats.doc(chatid).getSavy();
+      Chat chat = Chat.fromJson(documentSnapshot.data(), chatid);
+      return chat;
+    } catch (e) {
+      throw Exception("Could not get chat");
+    }
+  }
+
   Future<List<Event>> getInterestEvents(List interests) async {
     try {
       QuerySnapshot querySnapshot =
@@ -1135,5 +1234,39 @@ class db_conn {
     } catch (e) {
       throw Exception();
     }
+  }
+
+  Future<void> addAttributetoAllDocuments() async {
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) {
+              var docRef = FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(element.id);
+
+              docRef.update({'chats': []});
+            },
+          ),
+        );
+  }
+
+  Future sendmessage(String content, String sender, String docid) async {
+    try {
+      await chats.doc(docid).collection('messages').add(
+          {'content': content, 'sender': sender, 'timestamp': DateTime.now()});
+      return chats
+          .doc(docid)
+          .update({'mostrecentmessage': '$sender: $content'});
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Stream<QuerySnapshot> retrievemessages(String docid) {
+    return chats
+        .doc(docid)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
   }
 }

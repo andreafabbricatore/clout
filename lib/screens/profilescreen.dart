@@ -353,8 +353,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: const Border(
             bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
       ),
-      body: SizedBox(
-        width: screenwidth,
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        color: const Color.fromARGB(255, 255, 48, 117),
         child: Column(children: [
           ProfileTopContainer(
             user: widget.user,
@@ -428,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             eventList: joinedevents ? joinedEvents : hostedEvents,
             isHorizontal: false,
             onTap: navigate,
-            scrollable: true,
+            scrollable: false,
             leftpadding: true,
             curruser: widget.curruser,
             interactfav: interactfav,
