@@ -8,7 +8,9 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/loading.dart';
+import 'package:clout/screens/notificationscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -213,7 +215,23 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         actions: [
-          InkWell(
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          NotificationScreen(curruser: widget.curruser)));
+            },
+            child: const Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+              child: Icon(
+                CupertinoIcons.heart,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          GestureDetector(
             onTap: () async {
               Navigator.push(
                   context,

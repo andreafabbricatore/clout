@@ -1244,7 +1244,7 @@ class db_conn {
                   .collection('users')
                   .doc(element.id);
 
-              docRef.update({'chats': []});
+              docRef.update({'notifications': []});
             },
           ),
         );
