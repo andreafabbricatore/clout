@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import {firestore} from "firebase-admin";
 admin.initializeApp();
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -27,7 +28,10 @@ export const sendToDevice = functions.firestore.document("updates/{id}").onCreat
     },
   };
 
+  await db.collection("users").doc(noti.target).set({"notifications": firestore.FieldValue.arrayUnion({"notification": noti.notification, "type": noti.type, "time": firestore.Timestamp.now()})}, {merge: true});
+
   await db.collection("updates").doc(snapshot.id).delete();
 
   return fcm.sendToDevice(tokens, payload);
 });
+
