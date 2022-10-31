@@ -18,10 +18,68 @@ class NotificationsListView extends StatelessWidget {
     NotificationElement notification,
     int index,
   ) {
-    List<String> text = notification.notification.split(" ");
-    String username = text[0];
-    text.removeAt(0);
-    String action = text.join(" ");
+    late InlineSpan finaltext;
+    if (notification.type == "followed") {
+      List<String> text = notification.notification.split(" ");
+      String username = text[0];
+      finaltext = TextSpan(
+          style: const TextStyle(color: Colors.black, fontSize: 19),
+          children: [
+            TextSpan(
+                text: username,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+                recognizer: TapGestureRecognizer()..onTap = () {}),
+            const TextSpan(text: " started following you"),
+          ]);
+    } else if (notification.type == "modified") {
+      List<String> text = notification.notification.split("was");
+      String eventitle = text[0].toString().trim();
+      finaltext = TextSpan(
+          style: const TextStyle(color: Colors.black, fontSize: 19),
+          children: [
+            TextSpan(
+                text: eventitle,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+                recognizer: TapGestureRecognizer()..onTap = () {}),
+            const TextSpan(text: " was modified. Check out the changes!"),
+          ]);
+    } else if (notification.type == "kicked") {
+      List<String> text = notification.notification.split(":");
+      String eventtitle = text.last.toString().trim();
+      finaltext = TextSpan(
+          style: const TextStyle(color: Colors.black, fontSize: 19),
+          children: [
+            const TextSpan(text: "You were kicked out of the event: "),
+            TextSpan(
+                text: eventtitle,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+                recognizer: TapGestureRecognizer()..onTap = () {}),
+          ]);
+    } else if (notification.type == "joined") {
+      List<String> text = notification.notification.split(" ");
+      String username = text[0];
+      text = notification.notification.split(":");
+      String eventtitle = text.last.toString().trim();
+      finaltext = TextSpan(
+          style: const TextStyle(color: Colors.black, fontSize: 19),
+          children: [
+            TextSpan(
+                text: username,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+                recognizer: TapGestureRecognizer()..onTap = () {}),
+            const TextSpan(text: " joined your event: "),
+            TextSpan(
+                text: eventtitle,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+                recognizer: TapGestureRecognizer()..onTap = () {}),
+          ]);
+    } else {}
+
     Duration diff = DateTime.now().difference(notification.time);
     String timediff = "";
     if (diff.inDays > 1) {
@@ -45,25 +103,9 @@ class NotificationsListView extends StatelessWidget {
                 SizedBox(
                   width: screenwidth * 0.8,
                   child: RichText(
-                    textAlign: TextAlign.justify,
-                    textScaleFactor: 1.0,
-                    text: TextSpan(
-                        style:
-                            const TextStyle(color: Colors.black, fontSize: 19),
-                        children: [
-                          TextSpan(
-                              text: username,
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  onTapUsername(notification.userdocid, index);
-                                }),
-                          const TextSpan(text: " "),
-                          TextSpan(text: action),
-                        ]),
-                  ),
+                      textAlign: TextAlign.justify,
+                      textScaleFactor: 1.0,
+                      text: finaltext),
                 ),
                 SizedBox(
                   width: screenwidth * 0.1,

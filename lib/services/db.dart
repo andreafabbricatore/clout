@@ -269,7 +269,11 @@ class db_conn {
           updates.add({
             'target': event.participants[i],
             'title': 'Clout',
-            'description': '${event.title} was modified. Check out the changes!'
+            'description':
+                '${event.title} was modified. Check out the changes!',
+            'notification':
+                '${event.title} was modified. Check out the changes!',
+            'type': 'modified'
           });
         }
       }
@@ -313,7 +317,10 @@ class db_conn {
             'target': event.hostdocid,
             'title': 'Clout',
             'description':
-                '${curruser.fullname} joined your your event: ${event.title}'
+                '${curruser.fullname} joined your your event: ${event.title}',
+            'notification':
+                '@${curruser.username} joined your your event: ${event.title}',
+            'type': 'joined'
           });
           users.doc(curruser.docid).update({'chats': chatlist});
           chats.doc(event.docid).update({'participants': chatparticipants});
@@ -396,7 +403,9 @@ class db_conn {
       updates.add({
         'target': user.docid,
         'title': 'Clout',
-        'description': 'You were kicked out of the event: ${event.title}'
+        'description': 'You were kicked out of the event: ${event.title}',
+        'notification': 'You were kicked out of the event: ${event.title}',
+        'type': 'kicked'
       });
     } catch (e) {
       throw Exception("Could not leave event");
@@ -1059,7 +1068,9 @@ class db_conn {
         updates.add({
           'target': userdocid,
           'title': "Clout",
-          'description': "${curruserdoc['fullname']} started following you"
+          'description': "${curruserdoc['fullname']} started following you",
+          'notification': "@${curruserdoc['username']} started following you",
+          'type': 'followed'
         });
       } catch (e) {
         throw Exception();
@@ -1268,5 +1279,11 @@ class db_conn {
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots();
+  }
+
+  Future<void> clearnotis(String docid) async {
+    return users.doc(docid).update({"notifications": []}).catchError((error) {
+      throw Exception();
+    });
   }
 }

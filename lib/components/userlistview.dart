@@ -12,7 +12,8 @@ class UserListView extends StatelessWidget {
       required this.showcloutscore,
       required this.showrembutton,
       this.removeUser,
-      this.removebuttonblack = false})
+      this.removebuttonblack = false,
+      this.physics = const AlwaysScrollableScrollPhysics()})
       : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
@@ -20,6 +21,7 @@ class UserListView extends StatelessWidget {
   bool showcloutscore;
   bool showrembutton;
   bool removebuttonblack;
+  var physics;
 
   final Function(AppUser user, int index)? onTap;
   final Function(AppUser user, int index)? removeUser;
@@ -103,6 +105,7 @@ class UserListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: ListView.builder(
+          physics: physics,
           padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
           shrinkWrap: true,
           itemCount: userres.length,
