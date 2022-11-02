@@ -23,7 +23,7 @@ export const sendToDevice = functions.firestore.document("updates/{id}").onCreat
 
   const payload: admin.messaging.MessagingPayload = {
     notification: {
-      title: noti.title,
+      title: "Clout",
       body: noti.description,
     },
   };
@@ -35,3 +35,32 @@ export const sendToDevice = functions.firestore.document("updates/{id}").onCreat
   return fcm.sendToDevice(tokens, payload);
 });
 
+export const chatsendToDevices = functions.firestore.document("chats/{chatid}/messages/{id}").onCreate(async (snapshot, context) => {
+  const chat = snapshot.data();
+
+  if (chat.sender != "server") {
+    const chatid = context.params.chatid;
+
+    const chatdataSnapshot = await db.collection("chats").doc(chatid).get();
+
+    const participants:string[] = chatdataSnapshot.data()?.participants;
+
+    const querySnapshot = await db.collection("users").where("docid", "in", participants).get();
+
+    // console.log(querySnapshot);
+    let finaltokens:string[] = [];
+
+    querySnapshot.docs.map((snap) => finaltokens = finaltokens.concat(snap.data()?.tokens));
+
+    const payload: admin.messaging.MessagingPayload = {
+      notification: {
+        title: "Clout - " + chat.chatname,
+        body: chat.notification,
+      },
+    };
+
+    return fcm.sendToDevice(finaltokens, payload);
+  } else {
+    return;
+  }
+});

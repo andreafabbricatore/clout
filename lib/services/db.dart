@@ -52,9 +52,10 @@ class db_conn {
   CollectionReference report = FirebaseFirestore.instance.collection('report');
   CollectionReference chats = FirebaseFirestore.instance.collection('chats');
 
-  Future createuserinstance(String email, String uid) {
+  Future createuserinstance(String email, String uid) async {
     try {
-      return users.add({
+      String docid = "";
+      await users.add({
         'fullname': '',
         'email': email,
         'username': '',
@@ -74,8 +75,11 @@ class db_conn {
         'bio': '',
         'blocked_users': [],
         'blocked_by': [],
-        'chats': []
-      });
+        'chats': [],
+        'docid': "",
+        'tokens': []
+      }).then((value) => docid = value.id);
+      return users.doc(docid).update({"docid": docid});
     } catch (e) {
       throw Exception("Could not create user");
     }
@@ -153,9 +157,7 @@ class db_conn {
           newevent.address,
           newevent.city,
           newevent.host,
-          newevent.datetime,
-          newevent.maxparticipants,
-          [curruser.docid]);
+          newevent.datetime);
       //print(unique);
       List searchfield = [];
       String temp = "";
@@ -268,7 +270,6 @@ class db_conn {
         } else {
           updates.add({
             'target': event.participants[i],
-            'title': 'Clout',
             'description':
                 '${event.title} was modified. Check out the changes!',
             'notification':
@@ -315,7 +316,6 @@ class db_conn {
         } else {
           updates.add({
             'target': event.hostdocid,
-            'title': 'Clout',
             'description':
                 '${curruser.fullname} joined your your event: ${event.title}',
             'notification':
@@ -402,7 +402,6 @@ class db_conn {
           {'mostrecentmessage': "${user.username} was removed from the event"});
       updates.add({
         'target': user.docid,
-        'title': 'Clout',
         'description': 'You were kicked out of the event: ${event.title}',
         'notification': 'You were kicked out of the event: ${event.title}',
         'type': 'kicked'
@@ -713,16 +712,15 @@ class db_conn {
   }
 
   Future<bool> eventUnique(
-      String title,
-      String description,
-      String interest,
-      String country,
-      String address,
-      List city,
-      String host,
-      DateTime time,
-      int maxparticipants,
-      List participants) async {
+    String title,
+    String description,
+    String interest,
+    String country,
+    String address,
+    List city,
+    String host,
+    DateTime time,
+  ) async {
     int instances = 0;
     try {
       await events.get().then((QuerySnapshot querySnapshot) => {
@@ -734,8 +732,6 @@ class db_conn {
                   doc['country'] == country &&
                   listEquals(doc['city'], city) &&
                   doc['host'] == host &&
-                  doc['maxparticipants'] == maxparticipants &&
-                  listEquals(doc['participants'], participants) &&
                   doc['time'].toDate() == time) {
                 instances = instances + 1;
               }
@@ -1067,7 +1063,6 @@ class db_conn {
       try {
         updates.add({
           'target': userdocid,
-          'title': "Clout",
           'description': "${curruserdoc['fullname']} started following you",
           'notification': "@${curruserdoc['username']} started following you",
           'type': 'followed'
@@ -1128,6 +1123,9 @@ class db_conn {
         'createdAt': FieldValue.serverTimestamp(),
         'platform': Platform.operatingSystem
       });
+      await users.doc(curruser.docid).set({
+        "tokens": FieldValue.arrayUnion([fcmToken])
+      }, SetOptions(merge: true));
     }
   }
 
@@ -1250,12 +1248,20 @@ class db_conn {
   Future<void> addAttributetoAllDocuments() async {
     await users.get().then(
           (value) => value.docs.forEach(
-            (element) {
+            (element) async {
               var docRef = FirebaseFirestore.instance
                   .collection('users')
                   .doc(element.id);
 
-              docRef.update({'notifications': []});
+              QuerySnapshot query =
+                  await users.doc(element.id).collection("tokens").get();
+              List tokens = [];
+              query.docs.forEach((element) {
+                tokens.add(element.id);
+              });
+              await users.doc(element.id).set(
+                  {"tokens": FieldValue.arrayUnion(tokens)},
+                  SetOptions(merge: true));
             },
           ),
         );
@@ -1263,8 +1269,12 @@ class db_conn {
 
   Future sendmessage(String content, String sender, String docid) async {
     try {
-      await chats.doc(docid).collection('messages').add(
-          {'content': content, 'sender': sender, 'timestamp': DateTime.now()});
+      await chats.doc(docid).collection('messages').add({
+        'content': content,
+        'sender': sender,
+        'timestamp': DateTime.now(),
+        'notification': '$sender: $content'
+      });
       return chats
           .doc(docid)
           .update({'mostrecentmessage': '$sender: $content'});
