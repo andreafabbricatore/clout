@@ -4,6 +4,7 @@ import 'package:clout/components/chatbubble.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
+import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   TextEditingController _textmessage = TextEditingController();
   db_conn db = db_conn();
   late Stream<QuerySnapshot> chatmessages;
+  String chatname = "";
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -57,10 +59,21 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     }
   }
 
+  void setupnames() async {
+    if (widget.chatinfo.type == "user") {
+      List temp = widget.chatinfo.chatname;
+      temp.removeWhere((element) => element == widget.curruser.username);
+      chatname = temp[0];
+    } else {
+      chatname = widget.chatinfo.chatname[0];
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    chatmessages = db.retrievemessages(widget.chatinfo.eventid);
+    chatmessages = db.retrievemessages(widget.chatinfo.chatid);
+    setupnames();
   }
 
   @override
@@ -73,9 +86,21 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         centerTitle: true,
         title: GestureDetector(
           onTap: () async {
-            try {
+            if (widget.chatinfo.type == "user") {
+              List temp = widget.chatinfo.connectedid;
+              temp.removeWhere((element) => element == widget.curruser.docid);
+              AppUser otheruser = await db.getUserFromDocID(temp[0]);
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (_) => ProfileScreen(
+                            user: otheruser,
+                            curruser: widget.curruser,
+                            visit: true,
+                          )));
+            } else {
               Event chosenEvent =
-                  await db.getEventfromDocId(widget.chatinfo.eventid);
+                  await db.getEventfromDocId(widget.chatinfo.connectedid[0]);
               List<AppUser> participants = [
                 for (String x in chosenEvent.participants)
                   await db.getUserFromDocID(x)
@@ -90,12 +115,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                             participants: participants,
                             interactfav: interactfav,
                           )));
-            } catch (e) {
-              displayErrorSnackBar("Could not display event");
             }
           },
           child: Text(
-            widget.chatinfo.chatname,
+            chatname,
             textScaleFactor: 1.0,
             style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
@@ -195,7 +218,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       ),
                       onPressed: () {
                         db.sendmessage(_textmessage.text.trim(),
-                            widget.curruser.username, widget.chatinfo.eventid);
+                            widget.curruser.username, widget.chatinfo.chatid);
                         _textmessage.clear();
                       },
                     )),

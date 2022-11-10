@@ -17,14 +17,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class MainScreen extends StatefulWidget {
-  List interests;
   List<Event> eventlist;
   List<Event> interesteventlist;
   AppUser curruser;
   AppLocation userlocation;
   MainScreen(
       {Key? key,
-      required this.interests,
       required this.eventlist,
       required this.interesteventlist,
       required this.curruser,
@@ -63,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
     page = [
       HomeScreen(
           curruser: widget.curruser,
-          interests: widget.interests,
+          interests: widget.curruser.interests,
           eventlist: widget.eventlist,
           interestevents: widget.interesteventlist,
           firstsetup: firstsetup,
@@ -82,7 +80,6 @@ class _MainScreenState extends State<MainScreen> {
         user: widget.curruser,
         curruser: widget.curruser,
         visit: false,
-        interests: widget.interests,
       )
     ];
   }

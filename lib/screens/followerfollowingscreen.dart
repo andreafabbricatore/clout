@@ -88,7 +88,6 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: const [],
                   )));
     }
 

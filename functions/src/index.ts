@@ -17,9 +17,11 @@ const fcm = admin.messaging();
 export const sendToDevice = functions.firestore.document("updates/{id}").onCreate(async (snapshot) => {
   const noti = snapshot.data();
 
-  const querySnapshot = await db.collection("users").doc(noti.target).collection("tokens").get();
+  const querySnapshot = await db.collection("users").where("docid", "in", noti.target).get();
 
-  const tokens = querySnapshot.docs.map((snap) => snap.id);
+  let finaltokens:string[] = [];
+
+  querySnapshot.docs.map((snap) => finaltokens = finaltokens.concat(snap.data()?.tokens));
 
   const payload: admin.messaging.MessagingPayload = {
     notification: {
@@ -28,11 +30,13 @@ export const sendToDevice = functions.firestore.document("updates/{id}").onCreat
     },
   };
 
-  await db.collection("users").doc(noti.target).set({"notifications": firestore.FieldValue.arrayUnion({"notification": noti.notification, "type": noti.type, "time": firestore.Timestamp.now()})}, {merge: true});
+  querySnapshot.docs.forEach(async (element) => {
+    await db.collection("users").doc(element.id).set({"notifications": firestore.FieldValue.arrayUnion({"notification": noti.notification, "type": noti.type, "time": firestore.Timestamp.now()})}, {merge: true});
+  });
 
   await db.collection("updates").doc(snapshot.id).delete();
 
-  return fcm.sendToDevice(tokens, payload);
+  return fcm.sendToDevice(finaltokens, payload);
 });
 
 export const chatsendToDevices = functions.firestore.document("chats/{chatid}/messages/{id}").onCreate(async (snapshot, context) => {

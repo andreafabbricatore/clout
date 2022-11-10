@@ -11,10 +11,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  EditProfileScreen(
-      {super.key, required this.curruser, required this.interests});
+  EditProfileScreen({super.key, required this.curruser});
   AppUser curruser;
-  List interests;
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
@@ -284,6 +282,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String gender = "";
   String nationality = "";
   String bio = "";
+  List newinterests = [];
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -479,10 +478,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         MaterialPageRoute(
                             builder: (_) => UpdateInterests(
                                   curruser: widget.curruser,
-                                  interests: widget.interests,
                                 )));
                     setState(() {
-                      widget.interests = updatedinterests;
+                      newinterests = updatedinterests;
                     });
                     //print(widget.interests);
                   },
@@ -546,8 +544,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 'gender', gender, widget.curruser.uid);
                             await db.changeattribute('nationality', nationality,
                                 widget.curruser.uid);
-                            await db.changeinterests('interests',
-                                widget.interests, widget.curruser.uid);
+                            await db.changeinterests(
+                                'interests', newinterests, widget.curruser.uid);
                             await db.changeattribute('bio',
                                 biocontroller.text.trim(), widget.curruser.uid);
                           } catch (e) {

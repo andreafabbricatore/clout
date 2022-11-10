@@ -214,7 +214,6 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: const [],
                   )));
     }
 

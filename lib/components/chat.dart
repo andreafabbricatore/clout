@@ -1,22 +1,29 @@
 class Chat {
   List participants;
-  String chatname;
-  String iconurl;
+  List chatname;
+  List iconurl;
   String mostrecentmessage;
-  String eventid;
+  List connectedid;
+  String chatid;
+  String type;
+
   Chat(
       {required this.participants,
       required this.chatname,
       required this.iconurl,
       required this.mostrecentmessage,
-      required this.eventid});
+      required this.connectedid,
+      required this.chatid,
+      required this.type});
 
   factory Chat.fromJson(dynamic json, String docid) {
     return Chat(
-        participants: json['participants'],
-        chatname: json['chatname'],
-        iconurl: json['iconurl'],
+        participants: json['participants'] as List,
+        chatname: json['chatname'] as List,
+        iconurl: json['iconurl'] as List,
         mostrecentmessage: json['mostrecentmessage'],
-        eventid: json['eventid']);
+        connectedid: json['connectedid'] as List,
+        type: json['type'],
+        chatid: docid);
   }
 }

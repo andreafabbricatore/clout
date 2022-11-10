@@ -214,7 +214,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: const [],
                   )));
     }
 

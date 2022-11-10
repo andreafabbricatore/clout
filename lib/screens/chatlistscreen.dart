@@ -16,6 +16,7 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   List<Chat> chatlist = [];
   db_conn db = db_conn();
+  TextEditingController searchcontroller = TextEditingController();
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -41,10 +42,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
   }
 
+  void setup() async {
+    await getchatlist();
+  }
+
   @override
   void initState() {
     super.initState();
-    getchatlist();
+    setup();
   }
 
   @override
@@ -66,11 +71,18 @@ class _ChatListScreenState extends State<ChatListScreen> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           centerTitle: true,
-          title: Text(
-            widget.curruser.username,
-            textScaleFactor: 1.0,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+          title: GestureDetector(
+            onTap: () async {
+              await db.createuserchat(widget.curruser, "Swds3X740Fju18nULnep");
+            },
+            child: Text(
+              widget.curruser.username,
+              textScaleFactor: 1.0,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25),
+            ),
           ),
           backgroundColor: Colors.white,
           shadowColor: Colors.white,
@@ -89,11 +101,59 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ),
         body: Column(children: [
-          ChatListView(
-            chatlist: chatlist,
-            screenwidth: screenwidth,
-            onTap: chatnavigate,
+          Center(
+            child: SizedBox(
+              width: screenwidth * 0.9,
+              child: TextField(
+                controller: searchcontroller,
+                onChanged: (String searchquery) async {},
+                decoration: InputDecoration(
+                    hintText: 'Search',
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    contentPadding: const EdgeInsets.all(10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
+                    )),
+              ),
+            ),
           ),
+          chatlist.isNotEmpty
+              ? ChatListView(
+                  chatlist: chatlist,
+                  screenwidth: screenwidth,
+                  onTap: chatnavigate,
+                  curruser: widget.curruser,
+                )
+              : SizedBox(
+                  width: screenwidth,
+                  height: screenheight * 0.7,
+                  child: ListView(
+                    children: [
+                      SizedBox(
+                        height: screenheight * 0.1,
+                      ),
+                      const Text(
+                        "No Chats yet :(",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 20,
+                        ),
+                        textScaleFactor: 1.0,
+                      ),
+                      SizedBox(
+                        height: screenheight * 0.03,
+                      ),
+                    ],
+                  ),
+                ),
         ]));
   }
 }

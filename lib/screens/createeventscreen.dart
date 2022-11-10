@@ -47,7 +47,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       datetime: DateTime(0, 0, 0),
       docid: "",
       lat: 0,
-      lng: 0);
+      lng: 0,
+      chatid: "");
 
   List<String> allinterests = [
     "Sports",

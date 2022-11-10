@@ -56,7 +56,6 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: const [],
                   )));
     }
 

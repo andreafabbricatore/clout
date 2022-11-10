@@ -14,6 +14,7 @@ class Event {
   String host;
   String hostdocid;
   String docid;
+  String chatid;
 
   Event(
       {required this.title,
@@ -30,7 +31,8 @@ class Event {
       required this.datetime,
       required this.docid,
       required this.lat,
-      required this.lng});
+      required this.lng,
+      required this.chatid});
 
   factory Event.fromJson(dynamic json, String docid) {
     return Event(
@@ -48,6 +50,7 @@ class Event {
         datetime: json['time'].toDate(),
         docid: docid,
         lat: json['lat'],
-        lng: json['lng']);
+        lng: json['lng'],
+        chatid: json['chatid']);
   }
 }

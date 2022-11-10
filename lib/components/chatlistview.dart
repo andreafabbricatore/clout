@@ -1,4 +1,6 @@
 import 'package:clout/components/chat.dart';
+import 'package:clout/components/user.dart';
+import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 
 class ChatListView extends StatelessWidget {
@@ -6,17 +8,34 @@ class ChatListView extends StatelessWidget {
       {Key? key,
       required this.chatlist,
       required this.screenwidth,
-      required this.onTap})
+      required this.onTap,
+      required this.curruser})
       : super(key: key);
   List<Chat> chatlist;
   double screenwidth;
   final Function(Chat chat, int index)? onTap;
+  AppUser curruser;
+
+  db_conn db = db_conn();
 
   Widget _listviewitem(
     Chat chat,
     int index,
   ) {
+    String chatname = "";
+    String iconurl = "";
     Widget widget;
+    List temp1 = chat.chatname;
+    List temp2 = chat.iconurl;
+    if (chat.type == "user") {
+      temp1.removeWhere((element) => element == curruser.username);
+      chatname = temp1[0];
+      temp2.removeWhere((element) => element == curruser.pfpurl);
+      iconurl = temp2[0];
+    } else {
+      chatname = temp1[0];
+      iconurl = temp2[0];
+    }
     widget = Row(
       children: [
         Padding(
@@ -27,7 +46,7 @@ class ChatListView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100.0),
               child: Image.network(
-                chat.iconurl,
+                iconurl,
                 fit: BoxFit.cover,
               ),
             ),
@@ -39,7 +58,7 @@ class ChatListView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${chat.chatname}",
+                chatname,
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
@@ -77,7 +96,29 @@ class ChatListView extends StatelessWidget {
           itemBuilder: (_, index) {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                child: _listviewitem(chatlist[index], index));
+                child: Dismissible(
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: const Padding(
+                        padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    direction: chatlist[index].type == "user"
+                        ? DismissDirection.horizontal
+                        : DismissDirection.none,
+                    key: Key(chatlist[index].chatid),
+                    onDismissed: chatlist[index].type == "user"
+                        ? (direction) async {
+                            await db.deletechat(chatlist[index].chatid);
+                          }
+                        : (direction) {},
+                    child: _listviewitem(chatlist[index], index)));
           }),
     );
   }

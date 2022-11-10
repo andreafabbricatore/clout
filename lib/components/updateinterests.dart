@@ -5,9 +5,7 @@ class UpdateInterests extends StatefulWidget {
   UpdateInterests({
     Key? key,
     required this.curruser,
-    required this.interests,
   }) : super(key: key);
-  List interests;
   AppUser curruser;
   @override
   State<UpdateInterests> createState() => _UpdateInterestsState();
@@ -31,12 +29,12 @@ class _UpdateInterestsState extends State<UpdateInterests> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.0),
         border: Border.all(
-            width: widget.interests.contains(interest) ? 2 : 0,
-            color: widget.interests.contains(interest)
+            width: widget.curruser.interests.contains(interest) ? 2 : 0,
+            color: widget.curruser.interests.contains(interest)
                 ? const Color.fromARGB(255, 255, 48, 117)
                 : Colors.black),
         image: DecorationImage(
-            opacity: widget.interests.contains(interest) ? 0.8 : 1,
+            opacity: widget.curruser.interests.contains(interest) ? 0.8 : 1,
             image: AssetImage(
               "assets/images/interestbanners/${interest.toLowerCase()}.jpeg",
             ),
@@ -48,7 +46,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
         style: TextStyle(
             fontSize: 35,
             fontWeight: FontWeight.bold,
-            color: widget.interests.contains(interest)
+            color: widget.curruser.interests.contains(interest)
                 ? const Color.fromARGB(255, 255, 48, 117)
                 : Colors.white),
         textScaleFactor: 1.0,
@@ -57,13 +55,14 @@ class _UpdateInterestsState extends State<UpdateInterests> {
 
     return GestureDetector(
       onTap: () {
-        if (widget.interests.contains(interest)) {
+        if (widget.curruser.interests.contains(interest)) {
           setState(() {
-            widget.interests.removeWhere((element) => element == interest);
+            widget.curruser.interests
+                .removeWhere((element) => element == interest);
           });
         } else {
           setState(() {
-            widget.interests.add(interest);
+            widget.curruser.interests.add(interest);
           });
         }
       },
@@ -85,8 +84,8 @@ class _UpdateInterestsState extends State<UpdateInterests> {
         elevation: 0.0,
         leading: GestureDetector(
           onTap: () {
-            if (widget.interests.length >= 3) {
-              Navigator.pop(context, widget.interests);
+            if (widget.curruser.interests.length >= 3) {
+              Navigator.pop(context, widget.curruser.interests);
             }
           },
           child: const Icon(

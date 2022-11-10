@@ -42,7 +42,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
-                    interests: const [],
                   )));
     }
 
