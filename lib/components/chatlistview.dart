@@ -110,7 +110,7 @@ class ChatListView extends StatelessWidget {
                       ),
                     ),
                     direction: chatlist[index].type == "user"
-                        ? DismissDirection.horizontal
+                        ? DismissDirection.endToStart
                         : DismissDirection.none,
                     key: Key(chatlist[index].chatid),
                     onDismissed: chatlist[index].type == "user"

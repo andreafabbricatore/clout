@@ -1346,4 +1346,47 @@ class db_conn {
       "chats": FieldValue.arrayUnion([chatid])
     }, SetOptions(merge: true));
   }
+
+  Future<bool> checkuserchatexists(
+      AppUser curruser, String otheruserdocid) async {
+    int instances = 0;
+    try {
+      await chats.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (listEquals(doc['participants'],
+                      <dynamic>[curruser.docid, otheruserdocid]) ||
+                  listEquals(doc['participants'],
+                          <dynamic>[otheruserdocid, curruser.docid]) &&
+                      (doc['type'] == 'user')) {
+                instances = instances + 1;
+              }
+            })
+          });
+      return (instances == 1);
+    } catch (e) {
+      print(e);
+      throw Exception();
+    }
+  }
+
+  Future<Chat> getUserChatFromParticipants(
+      AppUser curruser, String otheruserdocid) async {
+    try {
+      late Chat userchat;
+      await chats.get().then((QuerySnapshot querySnapshot) => {
+            querySnapshot.docs.forEach((doc) {
+              if (listEquals(doc['participants'],
+                      <dynamic>[curruser.docid, otheruserdocid]) ||
+                  listEquals(doc['participants'],
+                          <dynamic>[otheruserdocid, curruser.docid]) &&
+                      (doc['type'] == 'user')) {
+                userchat = Chat.fromJson(doc.data(), doc.id);
+              }
+            })
+          });
+      return userchat;
+    } catch (e) {
+      throw Exception();
+    }
+  }
 }
