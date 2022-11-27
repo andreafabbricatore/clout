@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
       title: 'clout',
       debugShowCheckedModeBanner: false,
       home: AuthenticationWrapper(),
+      theme: ThemeData(primaryColor: const Color.fromARGB(255, 255, 48, 117)),
     );
   }
 }
@@ -64,7 +65,6 @@ class AuthenticationWrapper extends StatelessWidget {
               return const EmailVerificationScreen();
             }
           } else {
-            print("auth");
             return AuthScreen();
           }
         }),

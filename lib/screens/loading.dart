@@ -6,6 +6,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -113,8 +114,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
           curruserlocation.city != "" &&
           curruserlocation.country != "" &&
           !listEquals(curruserlocation.center, [0.0, 0.0])) {
-        docid = await db.getUserDocID(widget.uid);
-        AppUser curruser = await db.getUserFromDocID(docid);
+        AppUser curruser = await db.getUserFromDocID(widget.uid);
         interests = curruser.interests;
         String city =
             await getcitywithoutnums(curruserlocation.city.toLowerCase());
@@ -146,6 +146,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         error = true;
       });
+      print(e);
+      if (e.toString() == "Exception: Error with userdocid") {
+        FirebaseAuth.instance.signOut();
+      }
     }
   }
 

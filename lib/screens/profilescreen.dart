@@ -9,6 +9,7 @@ import 'package:clout/screens/settings.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 
 import '../components/event.dart';
 
@@ -256,6 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -350,91 +352,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: const Border(
             bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
       ),
-      body: RefreshIndicator(
-        onRefresh: refresh,
-        color: const Color.fromARGB(255, 255, 48, 117),
-        child: Column(children: [
-          ProfileTopContainer(
-            user: widget.user,
-            iscurruser: widget.iscurruser,
-            curruser: widget.curruser,
-            editprofile: editprofile,
-            followerscreen: followerscreen,
-            followingscreen: followingscreen,
-            cloutscreen: cloutscreen,
-            follow: widget.curruser.following.contains(widget.user.docid)
-                ? unfollow
-                : follow,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    joinedevents = true;
-                  });
-                },
-                child: Container(
-                  height: screenheight * 0.045,
-                  width: screenwidth * 0.5,
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                              color: joinedevents
-                                  ? Colors.black
-                                  : const Color.fromARGB(55, 158, 158, 158)),
-                          right: const BorderSide(
-                              color: Color.fromARGB(55, 158, 158, 158)))),
-                  child: Center(
-                      child: Text(
-                    "Joined Events",
-                    style: TextStyle(
-                        fontWeight:
-                            joinedevents ? FontWeight.bold : FontWeight.normal),
-                  )),
-                ),
+      body: Column(children: [
+        ProfileTopContainer(
+          user: widget.user,
+          iscurruser: widget.iscurruser,
+          curruser: widget.curruser,
+          editprofile: editprofile,
+          followerscreen: followerscreen,
+          followingscreen: followingscreen,
+          cloutscreen: cloutscreen,
+          follow: widget.curruser.following.contains(widget.user.docid)
+              ? unfollow
+              : follow,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            InkWell(
+              onTap: () {
+                setState(() {
+                  joinedevents = true;
+                });
+              },
+              child: Container(
+                height: screenheight * 0.045,
+                width: screenwidth * 0.5,
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: joinedevents
+                                ? Colors.black
+                                : const Color.fromARGB(55, 158, 158, 158)),
+                        right: const BorderSide(
+                            color: Color.fromARGB(55, 158, 158, 158)))),
+                child: Center(
+                    child: Text(
+                  "Joined Events",
+                  style: TextStyle(
+                      fontWeight:
+                          joinedevents ? FontWeight.bold : FontWeight.normal),
+                )),
               ),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    joinedevents = false;
-                  });
-                },
-                child: Container(
-                  height: screenheight * 0.045,
-                  width: screenwidth * 0.5,
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                              color: joinedevents
-                                  ? const Color.fromARGB(55, 158, 158, 158)
-                                  : Colors.black),
-                          left: const BorderSide(color: Colors.white))),
-                  child: Center(
-                      child: Text(
-                    "Hosted Events",
-                    style: TextStyle(
-                        fontWeight:
-                            joinedevents ? FontWeight.normal : FontWeight.bold),
-                  )),
-                ),
-              )
-            ],
-          ),
-          EventListView(
-            eventList: joinedevents ? joinedEvents : hostedEvents,
-            isHorizontal: false,
-            onTap: navigate,
-            scrollable: false,
-            leftpadding: true,
-            curruser: widget.curruser,
-            interactfav: interactfav,
-            screenheight: screenheight,
-            screenwidth: screenwidth,
-          ),
-        ]),
-      ),
+            ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  joinedevents = false;
+                });
+              },
+              child: Container(
+                height: screenheight * 0.045,
+                width: screenwidth * 0.5,
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: joinedevents
+                                ? const Color.fromARGB(55, 158, 158, 158)
+                                : Colors.black),
+                        left: const BorderSide(color: Colors.white))),
+                child: Center(
+                    child: Text(
+                  "Hosted Events",
+                  style: TextStyle(
+                      fontWeight:
+                          joinedevents ? FontWeight.normal : FontWeight.bold),
+                )),
+              ),
+            )
+          ],
+        ),
+        EventListView(
+          eventList: joinedevents ? joinedEvents : hostedEvents,
+          isHorizontal: false,
+          onTap: navigate,
+          scrollable: false,
+          leftpadding: true,
+          curruser: widget.curruser,
+          interactfav: interactfav,
+          screenheight: screenheight,
+          screenwidth: screenwidth,
+        ),
+      ]),
     );
   }
 }

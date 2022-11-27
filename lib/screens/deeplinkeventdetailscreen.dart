@@ -8,11 +8,9 @@ import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_map/flutter_map.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:maps_launcher/maps_launcher.dart';
-import 'package:latlong2/latlong.dart';
 
 class DeepLinkEventDetailScreen extends StatefulWidget {
   DeepLinkEventDetailScreen({
@@ -35,6 +33,25 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   String joinedval = "Join";
   bool buttonpressed = false;
   bool deleteeventpressed = false;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+
+  Future _addMarker(LatLng latlang) async {
+    setState(() {
+      final MarkerId markerId = MarkerId("chosenlocation");
+      Marker marker = Marker(
+        markerId: markerId,
+        draggable: true,
+        position:
+            latlang, //With this parameter you automatically obtain latitude and longitude
+        infoWindow: const InfoWindow(
+          title: "Chosen Location",
+        ),
+        icon: BitmapDescriptor.defaultMarker,
+      );
+
+      markers[markerId] = marker;
+    });
+  }
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -199,6 +216,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   @override
   void initState() {
     checkifjoined();
+    _addMarker(LatLng(widget.event.lat, widget.event.lng));
     super.initState();
   }
 
@@ -387,50 +405,15 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                   child: Stack(
                     alignment: AlignmentDirectional.bottomEnd,
                     children: [
-                      FlutterMap(
-                        options: MapOptions(
-                          center: LatLng(widget.event.lat, widget.event.lng),
-                          zoom: 15.0,
-                          maxZoom: 20.0,
-                          minZoom: 13.0,
-                        ),
-                        layers: [
-                          TileLayerOptions(
-                              additionalOptions: {
-                                'accessToken':
-                                    dotenv.get('MAPBOX_ACCESS_TOKEN'),
-                                'id': 'mapbox.mapbox-streets-v8'
-                              },
-                              urlTemplate:
-                                  "https://api.mapbox.com/styles/v1/andreaf1108/cl4y4djy6005f15obfxs5i0bb/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmVhZjExMDgiLCJhIjoiY2w0cjBxamlzMGFwZjNqcGRodm9nczA5biJ9.qXRB_MLgHmifo6DYtCYirw"),
-                          MarkerLayerOptions(markers: [
-                            Marker(
-                                point:
-                                    LatLng(widget.event.lat, widget.event.lng),
-                                builder: ((context) => const Icon(
-                                      Icons.location_pin,
-                                      color: Color.fromARGB(255, 255, 48, 117),
-                                      size: 18,
-                                    )))
-                          ])
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: SizedBox(
-                          height: screenheight * 0.05,
-                          width: screenheight * 0.05,
-                          child: FloatingActionButton(
-                            backgroundColor:
-                                const Color.fromARGB(255, 255, 48, 117),
-                            child: const Center(child: Icon(Icons.map_rounded)),
-                            onPressed: () {
-                              MapsLauncher.launchQuery(
-                                  "${widget.event.lat},${widget.event.lng}");
-                            },
-                          ),
-                        ),
-                      ),
+                      GoogleMap(
+                          markers: Set<Marker>.of(markers.values),
+                          myLocationButtonEnabled: false,
+                          zoomGesturesEnabled: true,
+                          mapType: MapType.hybrid,
+                          initialCameraPosition: CameraPosition(
+                              target:
+                                  LatLng(widget.event.lat, widget.event.lng),
+                              zoom: 15)),
                     ],
                   ),
                 ),

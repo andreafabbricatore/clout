@@ -115,7 +115,8 @@ class ChatListView extends StatelessWidget {
                     key: Key(chatlist[index].chatid),
                     onDismissed: chatlist[index].type == "user"
                         ? (direction) async {
-                            await db.deletechat(chatlist[index].chatid);
+                            await db.removeuserchatvisibility(
+                                curruser, chatlist[index].chatid);
                           }
                         : (direction) {},
                     child: _listviewitem(chatlist[index], index)));

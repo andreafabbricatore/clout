@@ -34,7 +34,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Future<void> getchatlist() async {
     List<Chat> chats = [];
     try {
-      for (int i = 0; i < widget.curruser.chats.length; i++) {
+      for (int i = 0; i < widget.curruser.visiblechats.length; i++) {
         Chat temp = await db.getChatfromDocId(widget.curruser.chats[i]);
         chats.add(temp);
       }
@@ -104,11 +104,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
         suffixiconcolor = Colors.white;
         searchedusers = [];
       });
+      await db.setuserchatvisibility(
+          widget.curruser, user.docid, userchat.chatid);
       searchcontroller.clear();
       FocusScope.of(context).unfocus();
-      getchatlist();
+      refresh();
     }
 
+    print(chatlist);
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(

@@ -45,7 +45,7 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
         querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
         const payload = {
             notification: {
-                title: "Clout - " + chat.chatname,
+                title: "Clout - " + chat.notititle,
                 body: chat.notification,
             },
         };

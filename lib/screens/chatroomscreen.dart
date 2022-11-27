@@ -217,8 +217,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         color: Colors.black,
                       ),
                       onPressed: () {
-                        db.sendmessage(_textmessage.text.trim(),
-                            widget.curruser.username, widget.chatinfo.chatid);
+                        db.sendmessage(
+                            _textmessage.text.trim(),
+                            widget.curruser.username,
+                            widget.chatinfo.chatid,
+                            chatname,
+                            widget.chatinfo.type);
                         _textmessage.clear();
                       },
                     )),

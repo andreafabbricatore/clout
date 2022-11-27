@@ -9,11 +9,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_map/flutter_map.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:latlong2/latlong.dart';
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
@@ -59,6 +58,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
       AppLocation(address: "", city: "", country: "", center: [0, 0]);
   bool emptylocation = false;
   bool buttonpressed = false;
+  GoogleMapController? mapController;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   void setup() {
     setState(() {
@@ -73,6 +74,28 @@ class _EditEventScreenState extends State<EditEventScreen> {
           country: widget.event.country,
           center: [widget.event.lng, widget.event.lat]);
     });
+    _addMarker(LatLng(widget.event.lat, widget.event.lng));
+  }
+
+  Future _addMarker(LatLng latlang) async {
+    setState(() {
+      final MarkerId markerId = MarkerId("chosenlocation");
+      Marker marker = Marker(
+        markerId: markerId,
+        draggable: true,
+        position:
+            latlang, //With this parameter you automatically obtain latitude and longitude
+        infoWindow: const InfoWindow(
+          title: "Chosen Location",
+        ),
+        icon: BitmapDescriptor.defaultMarker,
+      );
+
+      markers[markerId] = marker;
+    });
+
+    //This is optional, it will zoom when the marker has been created
+    mapController?.animateCamera(CameraUpdate.newLatLngZoom(latlang, 17.0));
   }
 
   Future<File> CompressAndGetFile(File file) async {
@@ -387,11 +410,24 @@ class _EditEventScreenState extends State<EditEventScreen> {
                     AppLocation chosen = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SearchLocation(),
+                          builder: (context) => SearchLocation(
+                            locationchosen: true,
+                            startlocation: AppLocation(
+                                address: widget.event.address,
+                                city: widget.event.city[0],
+                                country: widget.event.country,
+                                center: [widget.event.lat, widget.event.lng]),
+                          ),
                         ));
                     setState(() {
                       chosenLocation = chosen;
                     });
+                    _addMarker(LatLng(
+                        chosenLocation.center[0], chosenLocation.center[1]));
+                    mapController?.moveCamera(CameraUpdate.newLatLngZoom(
+                        LatLng(
+                            chosenLocation.center[0], chosenLocation.center[1]),
+                        17.0));
                     checklocationempty();
                   },
                   child: Container(
@@ -426,35 +462,25 @@ class _EditEventScreenState extends State<EditEventScreen> {
                     : SizedBox(
                         height: screenheight * 0.2,
                         width: screenwidth * 0.6,
-                        child: FlutterMap(
-                          options: MapOptions(
-                            center: LatLng(chosenLocation.center[1],
-                                chosenLocation.center[0]),
-                            zoom: 15.0,
-                            maxZoom: 20.0,
-                            minZoom: 13.0,
+                        child: GoogleMap(
+                          //Map widget from google_maps_flutter package
+                          myLocationButtonEnabled: false,
+                          zoomGesturesEnabled:
+                              true, //enable Zoom in, out on map
+                          initialCameraPosition: CameraPosition(
+                            //innital position in map
+                            target: LatLng(chosenLocation.center[0],
+                                chosenLocation.center[1]), //initial position
+                            zoom: 14.0, //initial zoom level
                           ),
-                          layers: [
-                            TileLayerOptions(
-                                additionalOptions: {
-                                  'accessToken':
-                                      dotenv.get('MAPBOX_ACCESS_TOKEN'),
-                                  'id': 'mapbox.mapbox-streets-v8'
-                                },
-                                urlTemplate:
-                                    "https://api.mapbox.com/styles/v1/andreaf1108/cl4y4djy6005f15obfxs5i0bb/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmVhZjExMDgiLCJhIjoiY2w0cjBxamlzMGFwZjNqcGRodm9nczA5biJ9.qXRB_MLgHmifo6DYtCYirw"),
-                            MarkerLayerOptions(markers: [
-                              Marker(
-                                  point: LatLng(chosenLocation.center[1],
-                                      chosenLocation.center[0]),
-                                  builder: ((context) => const Icon(
-                                        Icons.location_pin,
-                                        color:
-                                            Color.fromARGB(255, 255, 48, 117),
-                                        size: 18,
-                                      )))
-                            ])
-                          ],
+                          mapType: MapType.normal, //map type
+                          markers: Set<Marker>.of(markers.values),
+                          onMapCreated: (controller) {
+                            //method called when map is created
+                            setState(() {
+                              mapController = controller;
+                            });
+                          },
                         ),
                       ),
                 SizedBox(
@@ -496,8 +522,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
                               widget.event.address = chosenLocation.address;
                               widget.event.city =
                                   chosenLocation.city.toLowerCase().split(" ");
-                              widget.event.lat = chosenLocation.center[1];
-                              widget.event.lng = chosenLocation.center[0];
+                              widget.event.lat = chosenLocation.center[0];
+                              widget.event.lng = chosenLocation.center[1];
                             });
                             try {
                               if (imagepath == null) {
