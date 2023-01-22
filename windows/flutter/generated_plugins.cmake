@@ -3,9 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  app_links_windows
+  app_links
   geolocator_windows
-  maps_launcher
+  share_plus
   url_launcher_windows
 )
 

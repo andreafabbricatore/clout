@@ -147,7 +147,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
         error = true;
       });
       print(e);
-      if (e.toString() == "Exception: Error with userdocid") {
+      if (e.toString() == "Exception: Error with userdocid" ||
+          e.toString() == "Exception: Could not retrieve user") {
         FirebaseAuth.instance.signOut();
       }
     }
@@ -240,32 +241,31 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   ],
                 ),
               )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Clout",
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 255, 48, 117),
-                        fontFamily: "Kristi",
-                        fontWeight: FontWeight.w500,
-                        fontSize: 80),
-                    textScaleFactor: 1.0,
-                  ),
-                  const Text(
-                    "Go Out",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 30),
-                  ),
-                  SizedBox(
-                    height: screenheight * 0.1,
-                  ),
-                  const SpinKitFadingFour(
-                    color: Color.fromARGB(255, 255, 48, 117),
-                  ),
-                ],
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Clout",
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 255, 48, 117),
+                          fontFamily: "Kristi",
+                          fontWeight: FontWeight.w500,
+                          fontSize: 80),
+                      textScaleFactor: 1.0,
+                    ),
+                    const Text(
+                      "Go Out",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30),
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.1,
+                    ),
+                  ],
+                ),
               ),
       ),
     );

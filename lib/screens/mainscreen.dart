@@ -15,6 +15,7 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class MainScreen extends StatefulWidget {
   List<Event> eventlist;
@@ -41,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
   String deeplink = "";
   db_conn db = db_conn();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+  late bool canvibrate;
 
   Future<void> requestNotisPermission() async {
     NotificationSettings settings = await messaging.requestPermission(
@@ -154,12 +156,17 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  Future<void> canVibrate() async {
+    canvibrate = await Vibrate.canVibrate;
+  }
+
   @override
   void initState() {
     requestNotisPermission();
     //getforegroundnotis();
     initDeepLinks();
     parampasser(true);
+    canVibrate();
     super.initState();
   }
 

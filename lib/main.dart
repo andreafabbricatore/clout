@@ -1,6 +1,10 @@
+import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreen.dart';
+import 'package:clout/screens/completesignuploading.dart';
 import 'package:clout/screens/emailverificationscreen.dart';
 import 'package:clout/screens/loading.dart';
+import 'package:clout/screens/signupscreen.dart';
+import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -50,7 +54,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthenticationWrapper extends StatelessWidget {
+class AuthenticationWrapper extends StatefulWidget {
+  @override
+  State<AuthenticationWrapper> createState() => _AuthenticationWrapperState();
+}
+
+class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,13 +71,15 @@ class AuthenticationWrapper extends StatelessWidget {
             if (FirebaseAuth.instance.currentUser!.emailVerified) {
               return LoadingScreen(uid: FirebaseAuth.instance.currentUser!.uid);
             } else {
-              return const EmailVerificationScreen();
+              return CompleteSignUpLoading(
+                  uid: FirebaseAuth.instance.currentUser!.uid);
             }
           } else {
             return AuthScreen();
           }
         }),
       ),
+      backgroundColor: Colors.white,
     );
   }
 }

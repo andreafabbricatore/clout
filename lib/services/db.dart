@@ -63,7 +63,7 @@ class db_conn {
         'gender': '',
         'nationality': '',
         'pfp_url': '',
-        'birthday': '',
+        'birthday': DateTime(0, 1, 1),
         'interests': [],
         'hosted_events': [],
         'joined_events': [],
@@ -79,7 +79,11 @@ class db_conn {
         'visiblechats': [],
         'tokens': [],
         'notifications': [],
-        'plan': 'free'
+        'plan': 'free',
+        'setnameandpfp': false,
+        'setusername': false,
+        'setmisc': false,
+        'setinterests': false
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -509,6 +513,14 @@ class db_conn {
   }
 
   Future changeattribute(String attribute, String value, String uid) async {
+    String id = "";
+    await getUserDocID(uid).then((value) => id = value);
+    return users.doc(id).update({attribute: value}).catchError((error) {
+      throw Exception("Could not change $attribute");
+    });
+  }
+
+  Future changeattributebool(String attribute, bool value, String uid) async {
     String id = "";
     await getUserDocID(uid).then((value) => id = value);
     return users.doc(id).update({attribute: value}).catchError((error) {
@@ -1277,7 +1289,9 @@ class db_conn {
                   .collection('users')
                   .doc(element.id);
 
-              users.doc(element.id).set({'visiblechats': []});
+              users
+                  .doc(element.id)
+                  .set({'visiblechats': []}, SetOptions(merge: true));
             },
           ),
         );
@@ -1423,7 +1437,7 @@ class db_conn {
       DocumentSnapshot chat = await chats.doc(chatid).get();
       await users.doc(curruser.docid).set({
         'visiblechats': FieldValue.arrayRemove([chatid])
-      });
+      }, SetOptions(merge: true));
       List participants = chat['participants'];
       participants.removeWhere((element) => element == curruser.docid);
       String otheruserdocid = participants[0];

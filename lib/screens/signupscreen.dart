@@ -36,7 +36,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       gender: "",
       fullname: "",
       email: "",
-      birthday: DateTime(0, 0, 0),
+      birthday: DateTime(0, 1, 1),
       followers: [],
       following: [],
       favorites: [],
@@ -47,7 +47,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       blockedby: [],
       chats: [],
       visiblechats: [],
-      notifications: []);
+      notifications: [],
+      setnameandpfp: false,
+      setusername: false,
+      setmisc: false,
+      setinterests: false);
   bool checkedboxval = false;
   void displayErrorSnackBar(String error) async {
     final snackBar = SnackBar(
@@ -56,6 +60,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
     await Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void gopicandnamescreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => PicandNameScreen(curruser: curruser),
+      ),
+    );
   }
 
   @override
@@ -159,13 +172,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   setState(() {
                     curruser.email = emailController.text.trim();
                   });
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => PicandNameScreen(
-                          curruser: curruser, psw: pswController.text),
-                    ),
-                  );
+                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                      email: curruser.email, password: pswController.text);
+                  String uid = FirebaseAuth.instance.currentUser!.uid;
+                  await db.createuserinstance(
+                      curruser.email, uid); //set all signup attributes to false
+                  gopicandnamescreen();
                 } else {
                   if (emailController.text.isEmpty ||
                       !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
@@ -237,9 +249,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class PicandNameScreen extends StatefulWidget {
-  PicandNameScreen({super.key, required this.curruser, required this.psw});
+  PicandNameScreen({super.key, required this.curruser});
   AppUser curruser;
-  String psw;
   @override
   State<PicandNameScreen> createState() => _PicandNameScreenState();
 }
@@ -256,6 +267,39 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  var compressedimgpath;
+
+  Future<File> CompressAndGetFile(File file) async {
+    try {
+      final filePath = file.absolute.path;
+      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final splitted = filePath.substring(0, (lastIndex));
+      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+      var result = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 5,
+      );
+
+      //print(file.lengthSync());
+      //print(result!.lengthSync());
+
+      return result!;
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  void gousernamescreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            UsernameScreen(curruser: widget.curruser),
+      ),
+    );
   }
 
   @override
@@ -360,16 +404,15 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                 fullnamecontroller.text.trim().isNotEmpty) {
               setState(() {
                 widget.curruser.fullname = fullnamecontroller.text.trim();
+                widget.curruser.setnameandpfp = true;
               });
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => UsernameScreen(
-                      curruser: widget.curruser,
-                      imagepath: imagepath,
-                      psw: widget.psw),
-                ),
-              );
+              compressedimgpath = await CompressAndGetFile(imagepath);
+              await db.changepfp(compressedimgpath, widget.curruser.uid);
+              await db.changeattribute(
+                  'fullname', widget.curruser.fullname, widget.curruser.uid);
+              await db.changeattributebool(
+                  'setnameandpfp', true, widget.curruser.uid);
+              gousernamescreen();
             } else if (imagepath == null) {
               displayErrorSnackBar("Please upload Profile Picture");
             } else if (fullnamecontroller.text.trim().isEmpty) {
@@ -390,15 +433,11 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
 }
 
 class UsernameScreen extends StatefulWidget {
-  UsernameScreen(
-      {Key? key,
-      required this.curruser,
-      required this.imagepath,
-      required this.psw})
-      : super(key: key);
+  UsernameScreen({
+    Key? key,
+    required this.curruser,
+  }) : super(key: key);
   AppUser curruser;
-  var imagepath;
-  String psw;
   @override
   State<UsernameScreen> createState() => _UsernameScreenState();
 }
@@ -419,10 +458,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => MiscScreen(
-            curruser: widget.curruser,
-            imagepath: widget.imagepath,
-            psw: widget.psw),
+        builder: (BuildContext context) =>
+            MiscScreen(curruser: widget.curruser),
       ),
     );
   }
@@ -492,7 +529,12 @@ class _UsernameScreenState extends State<UsernameScreen> {
               setState(() {
                 widget.curruser.username =
                     usernamecontroller.text.trim().toLowerCase();
+                widget.curruser.setusername = true;
               });
+              await db.changeusername(
+                  widget.curruser.username, widget.curruser.uid);
+              await db.changeattributebool(
+                  'setusername', true, widget.curruser.uid);
               gotomiscscreen();
             }
           },
@@ -508,14 +550,9 @@ class _UsernameScreenState extends State<UsernameScreen> {
 }
 
 class MiscScreen extends StatefulWidget {
-  MiscScreen(
-      {super.key,
-      required this.curruser,
-      required this.imagepath,
-      required this.psw});
+  MiscScreen({super.key, required this.curruser});
   AppUser curruser;
-  var imagepath;
-  String psw;
+
   @override
   State<MiscScreen> createState() => _MiscScreenState();
 }
@@ -799,6 +836,15 @@ class _MiscScreenState extends State<MiscScreen> {
     'Zambia',
     'Zimbabwe'
   ];
+  void gointerestscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            InterestScreen(curruser: widget.curruser),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -949,22 +995,23 @@ class _MiscScreenState extends State<MiscScreen> {
         height: 70,
         width: 70,
         child: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             if (birthday != DateTime(0, 0, 0)) {
               setState(() {
                 widget.curruser.birthday = birthday;
                 widget.curruser.nationality = nationality;
                 widget.curruser.gender = gender;
+                widget.curruser.setmisc = true;
               });
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => InterestScreen(
-                      curruser: widget.curruser,
-                      imagepath: widget.imagepath,
-                      psw: widget.psw),
-                ),
-              );
+              await db.changeattribute(
+                  'gender', widget.curruser.gender, widget.curruser.uid);
+              await db.changeattribute('nationality',
+                  widget.curruser.nationality, widget.curruser.uid);
+              await db.changebirthday(
+                  widget.curruser.birthday, widget.curruser.uid);
+              await db.changeattributebool(
+                  'setmisc', true, widget.curruser.uid);
+              gointerestscreen();
             } else {
               displayErrorSnackBar("Please fill all fields correctly");
             }
@@ -984,12 +1031,8 @@ class InterestScreen extends StatefulWidget {
   InterestScreen({
     Key? key,
     required this.curruser,
-    required this.imagepath,
-    required this.psw,
   }) : super(key: key);
   AppUser curruser;
-  String psw;
-  var imagepath;
   @override
   State<InterestScreen> createState() => _InterestScreenState();
 }
@@ -1013,28 +1056,6 @@ class _InterestScreenState extends State<InterestScreen> {
   List selectedinterests = [];
   db_conn db = db_conn();
   bool buttonpressed = false;
-  var compressedimgpath;
-
-  Future<File> CompressAndGetFile(File file) async {
-    try {
-      final filePath = file.absolute.path;
-      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
-      final splitted = filePath.substring(0, (lastIndex));
-      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
-      var result = await FlutterImageCompress.compressAndGetFile(
-        filePath,
-        outPath,
-        quality: 5,
-      );
-
-      //print(file.lengthSync());
-      //print(result!.lengthSync());
-
-      return result!;
-    } catch (e) {
-      throw Exception();
-    }
-  }
 
   void displayErrorSnackBar(String error) {
     final snackBar = SnackBar(
@@ -1168,31 +1189,13 @@ class _InterestScreenState extends State<InterestScreen> {
                           if (selectedinterests.length >= 3) {
                             setState(() {
                               widget.curruser.interests = selectedinterests;
+                              widget.curruser.setinterests = true;
                             });
 
-                            await FirebaseAuth.instance
-                                .createUserWithEmailAndPassword(
-                                    email: widget.curruser.email,
-                                    password: widget.psw);
-                            String uid = FirebaseAuth.instance.currentUser!.uid;
-                            await db.createuserinstance(
-                                widget.curruser.email, uid);
-                            compressedimgpath =
-                                await CompressAndGetFile(widget.imagepath);
-                            await db.changepfp(compressedimgpath, uid);
-                            await db.changeusername(
-                                widget.curruser.username, uid);
-                            await db.changeattribute(
-                                'fullname', widget.curruser.fullname, uid);
-                            await db.changeattribute(
-                                'gender', widget.curruser.gender, uid);
-                            await db.changeattribute('nationality',
-                                widget.curruser.nationality, uid);
-                            await db.changebirthday(
-                                widget.curruser.birthday, uid);
-                            await db.changeinterests(
-                                'interests', widget.curruser.interests, uid);
-
+                            await db.changeinterests('interests',
+                                widget.curruser.interests, widget.curruser.uid);
+                            await db.changeattributebool(
+                                'setinterests', true, widget.curruser.uid);
                             donesignup();
                           } else {
                             displayErrorSnackBar("Choose at least 3 interests");

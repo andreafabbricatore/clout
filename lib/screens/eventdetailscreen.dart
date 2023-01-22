@@ -12,8 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-
-import 'package:maps_launcher/maps_launcher.dart';
+import 'package:map_launcher/map_launcher.dart' as Maps;
 import 'package:share_plus/share_plus.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -434,11 +433,114 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           markers: Set<Marker>.of(markers.values),
                           myLocationButtonEnabled: false,
                           zoomGesturesEnabled: true,
-                          mapType: MapType.hybrid,
                           initialCameraPosition: CameraPosition(
                               target:
                                   LatLng(widget.event.lat, widget.event.lng),
                               zoom: 15)),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                              backgroundColor: Colors.white,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return SizedBox(
+                                  height: screenheight * 0.18,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await Maps.MapLauncher.showMarker(
+                                                  mapType: Maps.MapType.apple,
+                                                  coords: Maps.Coords(
+                                                      widget.event.lat,
+                                                      widget.event.lng),
+                                                  title: widget.event.address);
+                                            },
+                                            child: RichText(
+                                              text: const TextSpan(
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontFamily: "Poppins",
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                  children: [
+                                                    TextSpan(text: "Open in "),
+                                                    TextSpan(
+                                                        text: "Apple Maps",
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    255,
+                                                                    48,
+                                                                    117),
+                                                            fontFamily:
+                                                                "Poppins",
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300)),
+                                                  ]),
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                border:
+                                                    Border.all(width: 0.05)),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await Maps.MapLauncher.showMarker(
+                                                  mapType: Maps.MapType.google,
+                                                  coords: Maps.Coords(
+                                                      widget.event.lat,
+                                                      widget.event.lng),
+                                                  title: widget.event.address);
+                                            },
+                                            child: RichText(
+                                              text: const TextSpan(
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontFamily: "Poppins",
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                  children: [
+                                                    TextSpan(text: "Open in "),
+                                                    TextSpan(
+                                                        text: "Google Maps",
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    255,
+                                                                    48,
+                                                                    117),
+                                                            fontFamily:
+                                                                "Poppins",
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300)),
+                                                  ]),
+                                            ),
+                                          ),
+                                        ]),
+                                  ),
+                                );
+                              });
+                        },
+                        child: Container(
+                          color: Colors.transparent,
+                        ),
+                      )
                     ],
                   ),
                 ),

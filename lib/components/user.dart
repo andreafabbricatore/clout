@@ -21,6 +21,10 @@ class AppUser {
   List chats;
   List visiblechats;
   List notifications;
+  bool setnameandpfp;
+  bool setusername;
+  bool setmisc;
+  bool setinterests;
 
   AppUser(
       {required this.username,
@@ -44,7 +48,11 @@ class AppUser {
       required this.blockedby,
       required this.chats,
       required this.visiblechats,
-      required this.notifications});
+      required this.notifications,
+      required this.setnameandpfp,
+      required this.setusername,
+      required this.setmisc,
+      required this.setinterests});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -69,6 +77,10 @@ class AppUser {
         blockedby: json['blocked_by'],
         chats: json['chats'] as List,
         visiblechats: json['visiblechats'] as List,
-        notifications: json['notifications'] as List);
+        notifications: json['notifications'] as List,
+        setnameandpfp: json['setnameandpfp'] as bool,
+        setusername: json['setusername'] as bool,
+        setmisc: json['setmisc'] as bool,
+        setinterests: json['setinterests'] as bool);
   }
 }
