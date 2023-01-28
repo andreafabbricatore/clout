@@ -32,7 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
 
   Future<void> updatecurruser() async {
-    AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+    AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
     setState(() {
       widget.curruser = updateduser;
     });
@@ -46,12 +46,21 @@ class _SearchScreenState extends State<SearchScreen> {
   FocusNode focusNode = FocusNode();
   Color suffixiconcolor = Colors.white;
 
-  void displayErrorSnackBar(String error) async {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 

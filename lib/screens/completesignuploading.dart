@@ -31,7 +31,6 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       following: [],
       clout: 0,
       favorites: [],
-      docid: "",
       bio: "",
       blockedusers: [],
       blockedby: [],
@@ -41,7 +40,9 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       setnameandpfp: false,
       setusername: false,
       setmisc: false,
-      setinterests: false);
+      setinterests: false,
+      lastknownlat: 0.0,
+      lastknownlng: 0.0);
 
   db_conn db = db_conn();
 
@@ -49,7 +50,7 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
 
   Future<void> getUser() async {
     try {
-      AppUser user = await db.getUserFromDocID(widget.uid);
+      AppUser user = await db.getUserFromUID(widget.uid);
       print(user);
       setState(() {
         curruser = user;

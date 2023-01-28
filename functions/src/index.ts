@@ -17,7 +17,7 @@ const fcm = admin.messaging();
 export const sendToDevice = functions.firestore.document("updates/{id}").onCreate(async (snapshot) => {
   const noti = snapshot.data();
 
-  const querySnapshot = await db.collection("users").where("docid", "in", noti.target).get();
+  const querySnapshot = await db.collection("users").where("uid", "in", noti.target).get();
 
   let finaltokens:string[] = [];
 
@@ -49,7 +49,7 @@ export const chatsendToDevices = functions.firestore.document("chats/{chatid}/me
 
     const participants:string[] = chatdataSnapshot.data()?.participants;
 
-    const querySnapshot = await db.collection("users").where("docid", "in", participants).get();
+    const querySnapshot = await db.collection("users").where("uid", "in", participants).get();
 
     // console.log(querySnapshot);
     let finaltokens:string[] = [];

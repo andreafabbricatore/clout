@@ -1,5 +1,6 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/loadingoverlay.dart';
+import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/editeventscreen.dart';
@@ -38,10 +39,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool deleteeventpressed = false;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -76,7 +86,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> updatecurruser() async {
     try {
-      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
       setState(() {
         widget.curruser = updateduser;
       });
@@ -134,7 +144,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         widget.event = updatedevent;
       });
       List<AppUser> temp = [
-        for (String x in widget.event.participants) await db.getUserFromDocID(x)
+        for (String x in widget.event.participants) await db.getUserFromUID(x)
       ];
       setState(() {
         widget.participants = temp;
@@ -272,7 +282,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 ),
               ),
               actions: [
-                widget.curruser.docid == widget.event.hostdocid
+                widget.curruser.uid == widget.event.hostdocid
                     ? GestureDetector(
                         onTap: () async {
                           Navigator.push(
@@ -326,7 +336,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ),
                 ),
-                widget.curruser.docid != widget.event.hostdocid
+                widget.curruser.uid != widget.event.hostdocid
                     ? InkWell(
                         onTap: () {
                           reportevent(widget.event);
@@ -390,7 +400,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           String hostdocid = await db
                               .getUserDocIDfromUsername(widget.event.host);
                           AppUser eventhost =
-                              await db.getUserFromDocID(hostdocid);
+                              await db.getUserFromUID(hostdocid);
                           usernavigate(eventhost, 0);
                         } catch (e) {
                           displayErrorSnackBar(
@@ -584,7 +594,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         screenwidth: screenwidth,
                         showcloutscore: false,
                         showrembutton:
-                            (widget.curruser.docid == widget.event.hostdocid) &&
+                            (widget.curruser.uid == widget.event.hostdocid) &&
                                 (joinedval != "Finished"),
                         removeUser: remuser,
                       ),
@@ -595,25 +605,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   height: screenheight * 0.02,
                 ),
                 InkWell(
-                  onTap: () async {
-                    buttonpressed ? null : interactevent(context);
-                  },
-                  child: SizedBox(
-                      height: 50,
-                      width: screenwidth * 0.5,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                            color: Color.fromARGB(255, 255, 48, 117),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        child: Center(
-                            child: Text(
-                          joinedval,
-                          style: const TextStyle(
-                              fontSize: 20, color: Colors.white),
-                        )),
-                      )),
-                )
+                    onTap: () async {
+                      buttonpressed ? null : interactevent(context);
+                    },
+                    child: PrimaryButton(
+                        screenwidth: screenwidth,
+                        buttonpressed: buttonpressed,
+                        text: joinedval,
+                        buttonwidth: screenwidth * 0.5))
               ]),
             ),
           );

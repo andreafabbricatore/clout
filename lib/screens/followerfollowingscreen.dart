@@ -28,10 +28,19 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
   List<AppUser> following = [];
   db_conn db = db_conn();
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -41,7 +50,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
     followers = [];
     try {
       for (int i = 0; i < widget.user.followers.length; i++) {
-        AppUser temp = await db.getUserFromDocIDSavy(widget.user.followers[i]);
+        AppUser temp = await db.getUserFromUIDSavy(widget.user.followers[i]);
         setState(() {
           followers.add(temp);
         });
@@ -55,7 +64,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
     following = [];
     try {
       for (int i = 0; i < widget.user.following.length; i++) {
-        AppUser temp = await db.getUserFromDocIDSavy(widget.user.following[i]);
+        AppUser temp = await db.getUserFromUIDSavy(widget.user.following[i]);
         setState(() {
           following.add(temp);
         });

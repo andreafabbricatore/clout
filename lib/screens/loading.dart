@@ -110,11 +110,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
         error = false;
       });
       await getUserAppLocation();
+      await db.updatelastuserloc(
+          widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
       if (curruserlocation.address != "" &&
           curruserlocation.city != "" &&
           curruserlocation.country != "" &&
           !listEquals(curruserlocation.center, [0.0, 0.0])) {
-        AppUser curruser = await db.getUserFromDocID(widget.uid);
+        AppUser curruser = await db.getUserFromUID(widget.uid);
         interests = curruser.interests;
         String city =
             await getcitywithoutnums(curruserlocation.city.toLowerCase());
@@ -197,6 +199,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initState() {
     loadinglogic();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

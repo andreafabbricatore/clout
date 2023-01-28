@@ -17,7 +17,7 @@ const db = admin.firestore();
 const fcm = admin.messaging();
 exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(async (snapshot) => {
     const noti = snapshot.data();
-    const querySnapshot = await db.collection("users").where("docid", "in", noti.target).get();
+    const querySnapshot = await db.collection("users").where("uid", "in", noti.target).get();
     let finaltokens = [];
     querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
     const payload = {
@@ -39,13 +39,13 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
         const chatid = context.params.chatid;
         const chatdataSnapshot = await db.collection("chats").doc(chatid).get();
         const participants = (_a = chatdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.participants;
-        const querySnapshot = await db.collection("users").where("docid", "in", participants).get();
+        const querySnapshot = await db.collection("users").where("uid", "in", participants).get();
         // console.log(querySnapshot);
         let finaltokens = [];
         querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
         const payload = {
             notification: {
-                title: "Clout - " + chat.notititle,
+                title: "Clout - " + chat.chatname,
                 body: chat.notification,
             },
         };

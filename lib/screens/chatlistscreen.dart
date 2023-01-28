@@ -22,10 +22,19 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Color suffixiconcolor = Colors.white;
   List<AppUser> searchedusers = [];
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -52,7 +61,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   Future<void> refresh() async {
     try {
-      AppUser curruser = await db.getUserFromDocID(widget.curruser.docid);
+      AppUser curruser = await db.getUserFromUID(widget.curruser.uid);
       setState(() {
         widget.curruser = curruser;
       });
@@ -85,12 +94,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
     Future<void> userchatinteract(AppUser user, int index) async {
       bool userchatexists =
-          await db.checkuserchatexists(widget.curruser, user.docid);
+          await db.checkuserchatexists(widget.curruser, user.uid);
       if (!userchatexists) {
-        await db.createuserchat(widget.curruser, user.docid);
+        await db.createuserchat(widget.curruser, user.uid);
       }
       Chat userchat =
-          await db.getUserChatFromParticipants(widget.curruser, user.docid);
+          await db.getUserChatFromParticipants(widget.curruser, user.uid);
 
       await Navigator.push(
           context,
@@ -105,13 +114,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
         searchedusers = [];
       });
       await db.setuserchatvisibility(
-          widget.curruser, user.docid, userchat.chatid);
+          widget.curruser, user.uid, userchat.chatid);
       searchcontroller.clear();
       FocusScope.of(context).unfocus();
       refresh();
     }
 
-    print(chatlist);
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(

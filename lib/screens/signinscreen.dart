@@ -1,8 +1,10 @@
+import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/pswresetscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SignInScreen extends StatefulWidget {
   SignInScreen({Key? key}) : super(key: key);
@@ -16,10 +18,19 @@ class _SignInScreenState extends State<SignInScreen> {
   final emailController = TextEditingController();
   final pswController = TextEditingController();
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -33,6 +44,8 @@ class _SignInScreenState extends State<SignInScreen> {
           fullscreenDialog: true),
     );
   }
+
+  bool signinbuttonpressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -124,30 +137,32 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             SizedBox(height: screenheight * 0.02),
             InkWell(
-              onTap: () async {
-                try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: emailController.text.trim(),
-                      password: pswController.text.trim());
-                  donesignin();
-                } catch (e) {
-                  displayErrorSnackBar("Could not Sign in");
-                }
-              },
-              child: SizedBox(
-                  height: 50,
-                  width: screenwidth * 0.5,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                        color: Color.fromARGB(255, 255, 48, 117),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: const Center(
-                        child: Text(
-                      "Sign In",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    )),
-                  )),
-            ),
+                onTap: signinbuttonpressed
+                    ? null
+                    : () async {
+                        try {
+                          setState(() {
+                            signinbuttonpressed = true;
+                          });
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(
+                                  email: emailController.text.trim(),
+                                  password: pswController.text.trim());
+                          donesignin();
+                        } catch (e) {
+                          displayErrorSnackBar("Could not Sign in");
+                        } finally {
+                          setState(() {
+                            signinbuttonpressed = false;
+                          });
+                        }
+                      },
+                child: PrimaryButton(
+                  screenwidth: screenwidth,
+                  buttonwidth: screenwidth * 0.5,
+                  buttonpressed: signinbuttonpressed,
+                  text: "Sign In",
+                )),
             SizedBox(height: screenheight * 0.02),
             GestureDetector(
               onTap: () {

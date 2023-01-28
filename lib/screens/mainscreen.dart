@@ -86,10 +86,19 @@ class _MainScreenState extends State<MainScreen> {
     ];
   }
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -137,11 +146,11 @@ class _MainScreenState extends State<MainScreen> {
       Event chosenEvent =
           await db.getEventfromDocId(uri.toString().split("/").last);
       List<AppUser> participants = [
-        for (String x in chosenEvent.participants) await db.getUserFromDocID(x)
+        for (String x in chosenEvent.participants) await db.getUserFromUID(x)
       ];
       godeeplinkeventdetailscreen(chosenEvent, participants);
     } catch (e) {
-      //nothing
+      displayErrorSnackBar("Invalid Event Link");
     }
   }
 

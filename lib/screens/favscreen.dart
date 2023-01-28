@@ -18,10 +18,19 @@ class _FavScreenState extends State<FavScreen> {
   List<Event> favorites = [];
   db_conn db = db_conn();
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -37,9 +46,9 @@ class _FavScreenState extends State<FavScreen> {
   Future interactfav(Event event) async {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
-        await db.remFromFav(widget.curruser.docid, event.docid);
+        await db.remFromFav(widget.curruser.uid, event.docid);
       } else {
-        await db.addToFav(widget.curruser.docid, event.docid);
+        await db.addToFav(widget.curruser.uid, event.docid);
       }
     } catch (e) {
       displayErrorSnackBar("Could not update favorites");
@@ -50,7 +59,7 @@ class _FavScreenState extends State<FavScreen> {
 
   Future<void> updatecurruser() async {
     try {
-      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
       setState(() {
         widget.curruser = updateduser;
       });
@@ -81,7 +90,7 @@ class _FavScreenState extends State<FavScreen> {
     Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromDocID(x)
+          for (String x in event.participants) await db.getUserFromUID(x)
         ];
 
         await Navigator.push(

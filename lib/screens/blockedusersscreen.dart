@@ -14,10 +14,19 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
   db_conn db = db_conn();
   List<AppUser> blockedusers = [];
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -27,8 +36,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     try {
       List<AppUser> temp = [];
       for (int i = 0; i < widget.curruser.blockedusers.length; i++) {
-        AppUser user =
-            await db.getUserFromDocID(widget.curruser.blockedusers[i]);
+        AppUser user = await db.getUserFromUID(widget.curruser.blockedusers[i]);
         temp.add(user);
       }
       setState(() {
@@ -41,7 +49,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
 
   Future<void> updatecurruser() async {
     try {
-      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
       setState(() {
         widget.curruser = updateduser;
       });
@@ -68,7 +76,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
 
     Future<void> unblockUser(AppUser user, int index) async {
       try {
-        await db.unblockUser(widget.curruser.docid, user.docid);
+        await db.unblockUser(widget.curruser.uid, user.uid);
         refresh();
       } catch (e) {
         displayErrorSnackBar("Could not remove participant, please try again");

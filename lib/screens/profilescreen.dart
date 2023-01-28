@@ -38,10 +38,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<Event> hostedEvents = [];
   List<AppUser> globalrankedusers = [];
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -69,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> updateuser() async {
     try {
-      AppUser updateduser = await db.getUserFromDocID(widget.user.docid);
+      AppUser updateduser = await db.getUserFromUID(widget.user.uid);
       setState(() {
         widget.user = updateduser;
       });
@@ -80,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> updatecurruser() async {
     try {
-      AppUser updateduser = await db.getUserFromDocID(widget.curruser.docid);
+      AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
       setState(() {
         widget.curruser = updateduser;
       });
@@ -167,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> follow() async {
     try {
-      await db.follow(widget.curruser.docid, widget.user.docid);
+      await db.follow(widget.curruser.uid, widget.user.uid);
       refresh();
     } catch (e) {
       displayErrorSnackBar("Could not follow @${widget.user.username}");
@@ -176,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> unfollow() async {
     try {
-      await db.unFollow(widget.curruser.docid, widget.user.docid);
+      await db.unFollow(widget.curruser.uid, widget.user.uid);
       refresh();
     } catch (e) {
       displayErrorSnackBar("Could not unfollow @${widget.user.username}");
@@ -186,9 +195,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future interactfav(Event event) async {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
-        await db.remFromFav(widget.curruser.docid, event.docid);
+        await db.remFromFav(widget.curruser.uid, event.docid);
       } else {
-        await db.addToFav(widget.curruser.docid, event.docid);
+        await db.addToFav(widget.curruser.uid, event.docid);
       }
     } catch (e) {
       displayErrorSnackBar("Could not update favorites");
@@ -217,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Future<void> navigate(Event event, int index) async {
       try {
         List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromDocID(x)
+          for (String x in event.participants) await db.getUserFromUID(x)
         ];
 
         await Navigator.push(
@@ -242,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         TextButton(
           child: const Text("Block Account"),
           onPressed: () async {
-            await db.blockUser(widget.curruser.docid, widget.user.docid);
+            await db.blockUser(widget.curruser.uid, widget.user.uid);
             displayErrorSnackBar(
                 "Blocked User! To unblock, please visit Settings.");
             Navigator.pop(context);
@@ -295,18 +304,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ? [
                 InkWell(
                   onTap: () {
-                    refresh();
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                    child: Icon(
-                      Icons.refresh,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
                     settings();
                   },
                   child: const Padding(
@@ -352,87 +349,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: const Border(
             bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
       ),
-      body: Column(children: [
-        ProfileTopContainer(
-          user: widget.user,
-          iscurruser: widget.iscurruser,
-          curruser: widget.curruser,
-          editprofile: editprofile,
-          followerscreen: followerscreen,
-          followingscreen: followingscreen,
-          cloutscreen: cloutscreen,
-          follow: widget.curruser.following.contains(widget.user.docid)
-              ? unfollow
-              : follow,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            InkWell(
-              onTap: () {
-                setState(() {
-                  joinedevents = true;
-                });
-              },
-              child: Container(
-                height: screenheight * 0.045,
-                width: screenwidth * 0.5,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            color: joinedevents
-                                ? Colors.black
-                                : const Color.fromARGB(55, 158, 158, 158)),
-                        right: const BorderSide(
-                            color: Color.fromARGB(55, 158, 158, 158)))),
-                child: Center(
-                    child: Text(
-                  "Joined Events",
-                  style: TextStyle(
-                      fontWeight:
-                          joinedevents ? FontWeight.bold : FontWeight.normal),
-                )),
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        color: const Color.fromARGB(255, 255, 48, 117),
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: screenheight,
+            width: screenwidth,
+            child: Column(children: [
+              ProfileTopContainer(
+                user: widget.user,
+                iscurruser: widget.iscurruser,
+                curruser: widget.curruser,
+                editprofile: editprofile,
+                followerscreen: followerscreen,
+                followingscreen: followingscreen,
+                cloutscreen: cloutscreen,
+                follow: widget.curruser.following.contains(widget.user.uid)
+                    ? unfollow
+                    : follow,
               ),
-            ),
-            InkWell(
-              onTap: () {
-                setState(() {
-                  joinedevents = false;
-                });
-              },
-              child: Container(
-                height: screenheight * 0.045,
-                width: screenwidth * 0.5,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            color: joinedevents
-                                ? const Color.fromARGB(55, 158, 158, 158)
-                                : Colors.black),
-                        left: const BorderSide(color: Colors.white))),
-                child: Center(
-                    child: Text(
-                  "Hosted Events",
-                  style: TextStyle(
-                      fontWeight:
-                          joinedevents ? FontWeight.normal : FontWeight.bold),
-                )),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        joinedevents = true;
+                      });
+                    },
+                    child: Container(
+                      height: screenheight * 0.045,
+                      width: screenwidth * 0.5,
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: joinedevents
+                                      ? Colors.black
+                                      : const Color.fromARGB(
+                                          55, 158, 158, 158)),
+                              right: const BorderSide(
+                                  color: Color.fromARGB(55, 158, 158, 158)))),
+                      child: Center(
+                          child: Text(
+                        "Joined Events",
+                        style: TextStyle(
+                            fontWeight: joinedevents
+                                ? FontWeight.bold
+                                : FontWeight.normal),
+                      )),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        joinedevents = false;
+                      });
+                    },
+                    child: Container(
+                      height: screenheight * 0.045,
+                      width: screenwidth * 0.5,
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: joinedevents
+                                      ? const Color.fromARGB(55, 158, 158, 158)
+                                      : Colors.black),
+                              left: const BorderSide(color: Colors.white))),
+                      child: Center(
+                          child: Text(
+                        "Hosted Events",
+                        style: TextStyle(
+                            fontWeight: joinedevents
+                                ? FontWeight.normal
+                                : FontWeight.bold),
+                      )),
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
+              EventListView(
+                eventList: joinedevents ? joinedEvents : hostedEvents,
+                isHorizontal: false,
+                onTap: navigate,
+                scrollable: false,
+                leftpadding: true,
+                curruser: widget.curruser,
+                interactfav: interactfav,
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+              ),
+            ]),
+          ),
         ),
-        EventListView(
-          eventList: joinedevents ? joinedEvents : hostedEvents,
-          isHorizontal: false,
-          onTap: navigate,
-          scrollable: false,
-          leftpadding: true,
-          curruser: widget.curruser,
-          interactfav: interactfav,
-          screenheight: screenheight,
-          screenwidth: screenwidth,
-        ),
-      ]),
+      ),
     );
   }
 }

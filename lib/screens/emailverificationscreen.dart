@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/services/db.dart';
@@ -19,6 +20,7 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   bool isemailverified = false;
   bool deletebuttonpressed = false;
+  bool sendbuttonpressed = false;
   Timer? timer;
   TextEditingController psw = TextEditingController();
   db_conn db = db_conn();
@@ -38,10 +40,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     }
   }
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -107,7 +118,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     try {
                       String userid = await db.getUserDocIDfromUID(
                           FirebaseAuth.instance.currentUser!.uid);
-                      AppUser curruser = await db.getUserFromDocID(userid);
+                      AppUser curruser = await db.getUserFromUID(userid);
                       await FirebaseAuth.instance.signInWithEmailAndPassword(
                           email: curruser.email, password: psw.text.trim());
                       await db.deleteuser(curruser);
@@ -179,8 +190,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     SizedBox(
                       height: screenheight * 0.02,
                     ),
-                    Center(
-                        child: const Text(
+                    const Center(
+                        child: Text(
                       "Press below to send again",
                       style: TextStyle(fontSize: 15),
                       textScaleFactor: 1.0,
@@ -190,26 +201,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     ),
                     Center(
                         child: InkWell(
-                      onTap: () {
-                        sendverificationemail();
-                      },
-                      child: SizedBox(
-                          height: 50,
-                          width: screenwidth * 0.6,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 48, 117),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            child: const Center(
-                                child: Text(
-                              "Resend Email",
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
-                              textScaleFactor: 1.0,
-                            )),
-                          )),
-                    )),
+                            onTap: sendbuttonpressed
+                                ? null
+                                : () {
+                                    setState(() {
+                                      sendbuttonpressed = true;
+                                    });
+                                    sendverificationemail();
+                                    setState(() {
+                                      sendbuttonpressed = false;
+                                    });
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: sendbuttonpressed,
+                                text: "Resend Email",
+                                buttonwidth: screenwidth * 0.6))),
                     SizedBox(
                       height: screenheight * 0.35,
                     ),

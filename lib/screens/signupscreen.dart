@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/loadingoverlay.dart';
+import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/services/db.dart';
@@ -40,7 +41,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       followers: [],
       following: [],
       favorites: [],
-      docid: "",
       clout: 0,
       bio: "",
       blockedusers: [],
@@ -51,14 +51,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
       setnameandpfp: false,
       setusername: false,
       setmisc: false,
-      setinterests: false);
-  bool checkedboxval = false;
-  void displayErrorSnackBar(String error) async {
+      setinterests: false,
+      lastknownlat: 0.0,
+      lastknownlng: 0.0);
+  bool signupbuttonpressed = false;
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+    Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -161,51 +172,57 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             SizedBox(height: screenheight * 0.02),
             InkWell(
-              onTap: () async {
-                bool emailunique =
-                    await db.emailUnique(emailController.text.trim());
-                if (emailController.text.isNotEmpty &&
-                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                        .hasMatch(emailController.text.trim()) &&
-                    emailunique &&
-                    pswController.text.length >= 8) {
-                  setState(() {
-                    curruser.email = emailController.text.trim();
-                  });
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: curruser.email, password: pswController.text);
-                  String uid = FirebaseAuth.instance.currentUser!.uid;
-                  await db.createuserinstance(
-                      curruser.email, uid); //set all signup attributes to false
-                  gopicandnamescreen();
-                } else {
-                  if (emailController.text.isEmpty ||
-                      !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                          .hasMatch(emailController.text.trim())) {
-                    displayErrorSnackBar("Invalid email address");
-                  } else if (!emailunique) {
-                    displayErrorSnackBar(
-                        "An account is already associated with this email");
-                  } else if (pswController.text.length < 8) {
-                    displayErrorSnackBar(
-                        "Password has to be at least 8 characters");
-                  }
-                }
-              },
-              child: SizedBox(
-                  height: 50,
-                  width: screenwidth * 0.5,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                        color: Color.fromARGB(255, 255, 48, 117),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: const Center(
-                        child: Text(
-                      "Sign Up",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    )),
-                  )),
-            ),
+                onTap: signupbuttonpressed
+                    ? null
+                    : () async {
+                        setState(() {
+                          signupbuttonpressed = true;
+                        });
+                        bool emailunique =
+                            await db.emailUnique(emailController.text.trim());
+                        if (emailController.text.isNotEmpty &&
+                            RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(emailController.text.trim()) &&
+                            emailunique &&
+                            pswController.text.length >= 8) {
+                          setState(() {
+                            curruser.email = emailController.text.trim();
+                          });
+                          try {
+                            await FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(
+                                    email: curruser.email,
+                                    password: pswController.text);
+                            String uid = FirebaseAuth.instance.currentUser!.uid;
+                            await db.createuserinstance(curruser.email,
+                                uid); //set all signup attributes to false
+                            gopicandnamescreen();
+                          } catch (e) {
+                            displayErrorSnackBar(
+                                "Could not Sign Up, please try again");
+                          }
+                        } else {
+                          if (emailController.text.isEmpty ||
+                              !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                  .hasMatch(emailController.text.trim())) {
+                            displayErrorSnackBar("Invalid email address");
+                          } else if (!emailunique) {
+                            displayErrorSnackBar(
+                                "An account is already associated with this email");
+                          } else if (pswController.text.length < 8) {
+                            displayErrorSnackBar(
+                                "Password has to be at least 8 characters");
+                          }
+                        }
+                        setState(() {
+                          signupbuttonpressed = false;
+                        });
+                      },
+                child: PrimaryButton(
+                    screenwidth: screenwidth,
+                    buttonwidth: screenwidth * 0.5,
+                    buttonpressed: signupbuttonpressed,
+                    text: "Sign Up")),
             SizedBox(height: screenheight * 0.3),
             SizedBox(
               width: screenwidth * 0.6,

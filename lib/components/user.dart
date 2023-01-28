@@ -14,7 +14,6 @@ class AppUser {
   List following;
   List favorites;
   int clout;
-  String docid;
   String bio;
   List blockedusers;
   List blockedby;
@@ -25,6 +24,8 @@ class AppUser {
   bool setusername;
   bool setmisc;
   bool setinterests;
+  double lastknownlat;
+  double lastknownlng;
 
   AppUser(
       {required this.username,
@@ -42,7 +43,6 @@ class AppUser {
       required this.following,
       required this.clout,
       required this.favorites,
-      required this.docid,
       required this.bio,
       required this.blockedusers,
       required this.blockedby,
@@ -52,7 +52,9 @@ class AppUser {
       required this.setnameandpfp,
       required this.setusername,
       required this.setmisc,
-      required this.setinterests});
+      required this.setinterests,
+      required this.lastknownlat,
+      required this.lastknownlng});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -71,7 +73,6 @@ class AppUser {
         following: json['following'] as List,
         clout: json['clout'] as int,
         favorites: json['favorites'] as List,
-        docid: json['uid'],
         bio: json['bio'],
         blockedusers: json['blocked_users'],
         blockedby: json['blocked_by'],
@@ -81,6 +82,8 @@ class AppUser {
         setnameandpfp: json['setnameandpfp'] as bool,
         setusername: json['setusername'] as bool,
         setmisc: json['setmisc'] as bool,
-        setinterests: json['setinterests'] as bool);
+        setinterests: json['setinterests'] as bool,
+        lastknownlat: json['lastknownlat'],
+        lastknownlng: json['lastknownlng']);
   }
 }

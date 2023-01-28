@@ -185,7 +185,7 @@ class EventListView extends StatelessWidget {
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           );
 

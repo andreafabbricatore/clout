@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/loadingoverlay.dart';
+import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
@@ -284,10 +285,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String bio = "";
   List newinterests = [];
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -332,248 +342,232 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    return buttonpressed
-        ? LoadingOverlay(
-            text: "Updating your info...",
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.0,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: const Icon(
+            Icons.arrow_back_ios,
             color: Colors.black,
-          )
-        : Scaffold(
-            resizeToAvoidBottomInset: true,
-            backgroundColor: Colors.white,
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0.0,
-              leading: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.black,
-                ),
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(children: [
+          Center(
+            child: InkWell(
+              onTap: () async {
+                try {
+                  XFile? image =
+                      await picker.pickImage(source: ImageSource.gallery);
+                  if (image != null) {
+                    setState(() {
+                      imagepath = File(image.path);
+                    });
+                    //print(imagepath);
+                  }
+                } catch (e) {
+                  displayErrorSnackBar("Error with profile picture");
+                }
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: imagepath == null
+                    ? Image.network(
+                        widget.curruser.pfpurl,
+                        height: screenheight * 0.2,
+                        width: screenheight * 0.2,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.file(
+                        imagepath,
+                        height: screenheight * 0.2,
+                        width: screenheight * 0.2,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
-            body: SingleChildScrollView(
-              child: Column(children: [
-                Center(
-                  child: InkWell(
-                    onTap: () async {
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          const Text(
+            "Change Profile Picture",
+            style: TextStyle(fontSize: 15),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          textdatafield(screenwidth, "fullname", fullnamecontroller),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          textdatafield(screenwidth, "username", usernamecontroller),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          textdatafield(screenwidth, "bio: socials, intro ...", biocontroller),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          SizedBox(
+            width: screenwidth * 0.6,
+            child: DropdownButtonFormField(
+              decoration: const InputDecoration(
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color.fromARGB(255, 255, 48, 117)))),
+              value: gender,
+              onChanged: (String? newValue) {
+                setState(() {
+                  gender = newValue!;
+                });
+              },
+              onSaved: (String? newValue) {
+                setState(() {
+                  gender = newValue!;
+                });
+              },
+              items: genders.map((String items) {
+                return DropdownMenuItem(
+                  value: items,
+                  child: Text(items),
+                );
+              }).toList(),
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          SizedBox(
+            width: screenwidth * 0.6,
+            child: DropdownButtonFormField(
+              decoration: const InputDecoration(
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color.fromARGB(255, 255, 48, 117)))),
+              value: nationality,
+              onChanged: (String? newValue) {
+                setState(() {
+                  nationality = newValue!;
+                });
+              },
+              onSaved: (String? newValue) {
+                setState(() {
+                  nationality = newValue!;
+                });
+              },
+              items: nations.map((String items) {
+                return DropdownMenuItem(
+                  value: items,
+                  child: Text(items),
+                );
+              }).toList(),
+              isExpanded: true,
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          InkWell(
+            onTap: () async {
+              List updatedinterests = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => UpdateInterests(
+                            curruser: widget.curruser,
+                          )));
+              setState(() {
+                newinterests = updatedinterests;
+              });
+              //print(widget.interests);
+            },
+            child: Container(
+              height: screenwidth * 0.13,
+              width: screenwidth * 0.6,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: Colors.black)),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      "Interests",
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: 3,
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 15,
+                    )
+                  ]),
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          InkWell(
+              onTap: buttonpressed
+                  ? null
+                  : () async {
+                      setState(() {
+                        buttonpressed = true;
+                      });
                       try {
-                        XFile? image =
-                            await picker.pickImage(source: ImageSource.gallery);
-                        if (image != null) {
-                          setState(() {
-                            imagepath = File(image.path);
-                          });
-                          //print(imagepath);
+                        if (imagepath != null) {
+                          compressedimgpath =
+                              await CompressAndGetFile(imagepath);
+                          await db.changepfp(
+                              compressedimgpath, widget.curruser.uid);
                         }
+                        bool unique = await db
+                            .usernameUnique(usernamecontroller.text.trim());
+                        if (unique &&
+                            usernamecontroller.text.isNotEmpty &&
+                            RegExp(r'^[a-zA-Z0-9&%=]+$')
+                                .hasMatch(usernamecontroller.text.trim())) {
+                          await db.changeusername(
+                              usernamecontroller.text.trim(),
+                              widget.curruser.uid);
+                        }
+                        if (fullnamecontroller.text.isNotEmpty) {
+                          await db.changeattribute(
+                              'fullname',
+                              fullnamecontroller.text.trim(),
+                              widget.curruser.uid);
+                        }
+                        await db.changeattribute(
+                            'gender', gender, widget.curruser.uid);
+                        await db.changeattribute(
+                            'nationality', nationality, widget.curruser.uid);
+                        await db.changeinterests(
+                            'interests', newinterests, widget.curruser.uid);
+                        await db.changeattribute('bio',
+                            biocontroller.text.trim(), widget.curruser.uid);
                       } catch (e) {
-                        displayErrorSnackBar("Error with profile picture");
+                        displayErrorSnackBar("Could not update profile");
+                      } finally {
+                        setState(() {
+                          buttonpressed = false;
+                        });
+                        Navigator.pop(context);
                       }
                     },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: imagepath == null
-                          ? Image.network(
-                              widget.curruser.pfpurl,
-                              height: screenheight * 0.2,
-                              width: screenheight * 0.2,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              imagepath,
-                              height: screenheight * 0.2,
-                              width: screenheight * 0.2,
-                              fit: BoxFit.cover,
-                            ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                const Text(
-                  "Change Profile Picture",
-                  style: TextStyle(fontSize: 15),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                textdatafield(screenwidth, "fullname", fullnamecontroller),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                textdatafield(screenwidth, "username", usernamecontroller),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                textdatafield(
-                    screenwidth, "bio: socials, intro ...", biocontroller),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                SizedBox(
-                  width: screenwidth * 0.6,
-                  child: DropdownButtonFormField(
-                    decoration: const InputDecoration(
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color.fromARGB(255, 255, 48, 117)))),
-                    value: gender,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        gender = newValue!;
-                      });
-                    },
-                    onSaved: (String? newValue) {
-                      setState(() {
-                        gender = newValue!;
-                      });
-                    },
-                    items: genders.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                SizedBox(
-                  width: screenwidth * 0.6,
-                  child: DropdownButtonFormField(
-                    decoration: const InputDecoration(
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color.fromARGB(255, 255, 48, 117)))),
-                    value: nationality,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        nationality = newValue!;
-                      });
-                    },
-                    onSaved: (String? newValue) {
-                      setState(() {
-                        nationality = newValue!;
-                      });
-                    },
-                    items: nations.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                    isExpanded: true,
-                  ),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                InkWell(
-                  onTap: () async {
-                    List updatedinterests = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => UpdateInterests(
-                                  curruser: widget.curruser,
-                                )));
-                    setState(() {
-                      newinterests = updatedinterests;
-                    });
-                    //print(widget.interests);
-                  },
-                  child: Container(
-                    height: screenwidth * 0.13,
-                    width: screenwidth * 0.6,
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black)),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "Interests",
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            width: 3,
-                          ),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            size: 15,
-                          )
-                        ]),
-                  ),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                InkWell(
-                  onTap: buttonpressed
-                      ? null
-                      : () async {
-                          setState(() {
-                            buttonpressed = true;
-                          });
-                          try {
-                            if (imagepath != null) {
-                              compressedimgpath =
-                                  await CompressAndGetFile(imagepath);
-                              await db.changepfp(
-                                  compressedimgpath, widget.curruser.uid);
-                            }
-                            bool unique = await db
-                                .usernameUnique(usernamecontroller.text.trim());
-                            if (unique &&
-                                usernamecontroller.text.isNotEmpty &&
-                                RegExp(r'^[a-zA-Z0-9&%=]+$')
-                                    .hasMatch(usernamecontroller.text.trim())) {
-                              await db.changeusername(
-                                  usernamecontroller.text.trim(),
-                                  widget.curruser.uid);
-                            }
-                            if (fullnamecontroller.text.isNotEmpty) {
-                              await db.changeattribute(
-                                  'fullname',
-                                  fullnamecontroller.text.trim(),
-                                  widget.curruser.uid);
-                            }
-                            await db.changeattribute(
-                                'gender', gender, widget.curruser.uid);
-                            await db.changeattribute('nationality', nationality,
-                                widget.curruser.uid);
-                            await db.changeinterests(
-                                'interests', newinterests, widget.curruser.uid);
-                            await db.changeattribute('bio',
-                                biocontroller.text.trim(), widget.curruser.uid);
-                          } catch (e) {
-                            displayErrorSnackBar("Could not update profile");
-                          } finally {
-                            setState(() {
-                              buttonpressed = false;
-                            });
-                            Navigator.pop(context);
-                          }
-                        },
-                  child: SizedBox(
-                      height: 50,
-                      width: screenwidth * 0.6,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                            color: Color.fromARGB(255, 255, 48, 117),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        child: const Center(
-                            child: Text(
-                          "Update Profile",
-                          style: TextStyle(fontSize: 20, color: Colors.white),
-                        )),
-                      )),
-                )
-              ]),
-            ),
-          );
+              child: PrimaryButton(
+                  screenwidth: screenwidth,
+                  buttonpressed: buttonpressed,
+                  text: "Update Profile",
+                  buttonwidth: screenwidth * 0.6))
+        ]),
+      ),
+    );
   }
 }

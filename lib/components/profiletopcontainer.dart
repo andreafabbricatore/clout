@@ -176,7 +176,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                           child: Container(
                             height: screenheight * 0.03,
                             width: widget.curruser.following
-                                    .contains(widget.user.docid)
+                                    .contains(widget.user.uid)
                                 ? screenwidth * 0.3
                                 : screenwidth * 0.2,
                             decoration: BoxDecoration(
@@ -188,7 +188,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                             child: Center(
                                 child: Text(
                               widget.curruser.following
-                                      .contains(widget.user.docid)
+                                      .contains(widget.user.uid)
                                   ? "Stop Following"
                                   : "Follow",
                               style: const TextStyle(fontSize: 15),

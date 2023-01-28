@@ -34,7 +34,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     Future<void> usernavigate(String docid, int index) async {
-      AppUser user = await db.getUserFromDocID(docid);
+      AppUser user = await db.getUserFromUID(docid);
       Navigator.push(
           context,
           CupertinoPageRoute(

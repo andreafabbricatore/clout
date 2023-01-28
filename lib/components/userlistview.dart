@@ -79,7 +79,7 @@ class UserListView extends StatelessWidget {
                 textAlign: TextAlign.right,
               )
             : Container(),
-        showrembutton && user.docid != curruser.docid
+        showrembutton && user.uid != curruser.uid
             ? GestureDetector(
                 onTap: () {
                   removeUser?.call(user, index);

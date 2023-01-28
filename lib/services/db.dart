@@ -51,10 +51,10 @@ class db_conn {
       FirebaseFirestore.instance.collection('updates');
   CollectionReference report = FirebaseFirestore.instance.collection('report');
   CollectionReference chats = FirebaseFirestore.instance.collection('chats');
+  CollectionReference bugs = FirebaseFirestore.instance.collection('bugs');
 
   Future createuserinstance(String email, String uid) async {
     try {
-      String docid = "";
       await users.doc(uid).set({
         'fullname': '',
         'email': email,
@@ -83,7 +83,9 @@ class db_conn {
         'setnameandpfp': false,
         'setusername': false,
         'setmisc': false,
-        'setinterests': false
+        'setinterests': false,
+        'lastknownlat': 0.0,
+        'lastknownlng': 0.0
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -92,7 +94,7 @@ class db_conn {
 
   Future deleteuser(AppUser curruser) async {
     try {
-      DocumentSnapshot userSnapshot = await users.doc(curruser.docid).get();
+      DocumentSnapshot userSnapshot = await users.doc(curruser.uid).get();
       List joinedEvents = userSnapshot['joined_events'];
       List hostedEvents = userSnapshot['hosted_events'];
       List followers = userSnapshot['followers'];
@@ -108,11 +110,11 @@ class db_conn {
       }
       //print("deleted events");
       for (String userid in following) {
-        await unFollow(curruser.docid, userid);
+        await unFollow(curruser.uid, userid);
       }
       //print("removed following");
       for (String userid in followers) {
-        await unFollow(userid, curruser.docid);
+        await unFollow(userid, curruser.uid);
       }
       //print("removed followers");
       await FirebaseStorage.instance
@@ -122,10 +124,8 @@ class db_conn {
       try {
         final instance = FirebaseFirestore.instance;
         final batch = instance.batch();
-        var collection = instance
-            .collection('users')
-            .doc(curruser.docid)
-            .collection('tokens');
+        var collection =
+            instance.collection('users').doc(curruser.uid).collection('tokens');
         var snapshots = await collection.get();
         for (var doc in snapshots.docs) {
           batch.delete(doc.reference);
@@ -134,7 +134,7 @@ class db_conn {
       } catch (e) {
         //print("Nothing")
       }
-      return users.doc(curruser.docid).delete();
+      return users.doc(curruser.uid).delete();
     } catch (e) {
       throw Exception("Could not delete user");
     }
@@ -180,7 +180,7 @@ class db_conn {
           'hostdocid': newevent.hostdocid,
           'time': newevent.datetime,
           'maxparticipants': newevent.maxparticipants,
-          'participants': [curruser.docid],
+          'participants': [curruser.uid],
           'image': "",
           'custom_image': false,
           'lat': newevent.lat,
@@ -203,7 +203,7 @@ class db_conn {
         String chatid = "";
         await chats.add({
           "connectedid": [eventid],
-          "participants": [curruser.docid],
+          "participants": [curruser.uid],
           "chatname": [newevent.title],
           "iconurl": [bannerUrl],
           "mostrecentmessage": "${newevent.title} was just created!",
@@ -215,7 +215,7 @@ class db_conn {
           'timestamp': DateTime.now()
         });
         await events.doc(eventid).update({"chatid": chatid});
-        await users.doc(curruser.docid).set({
+        await users.doc(curruser.uid).set({
           'joined_events': FieldValue.arrayUnion([eventid]),
           'hosted_events': FieldValue.arrayUnion([eventid]),
           'chats': FieldValue.arrayUnion([chatid]),
@@ -289,12 +289,12 @@ class db_conn {
         users
             .doc(event.hostdocid)
             .set({'clout': FieldValue.increment(5)}, SetOptions(merge: true));
-        users.doc(curruser.docid).set({
+        users.doc(curruser.uid).set({
           'joined_events': FieldValue.arrayUnion([eventid]),
           'clout': FieldValue.increment(10)
         }, SetOptions(merge: true));
         events.doc(eventid).set({
-          'participants': FieldValue.arrayUnion([curruser.docid])
+          'participants': FieldValue.arrayUnion([curruser.uid])
         }, SetOptions(merge: true));
       }
     } catch (e) {
@@ -315,12 +315,12 @@ class db_conn {
                 '@${curruser.username} joined your your event: ${event.title}',
             'type': 'joined'
           });
-          users.doc(curruser.docid).set({
+          users.doc(curruser.uid).set({
             'chats': FieldValue.arrayUnion([event.chatid]),
             'visiblechats': FieldValue.arrayUnion([event.chatid])
           }, SetOptions(merge: true));
           chats.doc(event.chatid).set({
-            'participants': FieldValue.arrayUnion([curruser.docid])
+            'participants': FieldValue.arrayUnion([curruser.uid])
           }, SetOptions(merge: true));
           chats.doc(event.chatid).collection('messages').add({
             'content': "${curruser.username} joined the event",
@@ -345,21 +345,21 @@ class db_conn {
       if (participants.length == 1) {
         throw Exception("Cannot leave event");
       } else {
-        chatparticipants.removeWhere((element) => element == curruser.docid);
+        chatparticipants.removeWhere((element) => element == curruser.uid);
         users
             .doc(event.hostdocid)
             .set({'clout': FieldValue.increment(-5)}, SetOptions(merge: true));
-        users.doc(curruser.docid).set({
+        users.doc(curruser.uid).set({
           'joined_events': FieldValue.arrayRemove([event.docid]),
           'clout': FieldValue.increment(-10),
           'chats': FieldValue.arrayRemove([event.chatid]),
           'visiblechats': FieldValue.arrayRemove([event.chatid])
         }, SetOptions(merge: true));
         events.doc(event.docid).set({
-          'participants': FieldValue.arrayRemove([curruser.docid])
+          'participants': FieldValue.arrayRemove([curruser.uid])
         }, SetOptions(merge: true));
         chats.doc(event.chatid).set({
-          'participants': FieldValue.arrayRemove([curruser.docid])
+          'participants': FieldValue.arrayRemove([curruser.uid])
         }, SetOptions(merge: true));
         chats.doc(event.chatid).collection('messages').add({
           'content': "${curruser.username} left the event",
@@ -376,20 +376,20 @@ class db_conn {
 
   Future removeparticipant(AppUser user, Event event) async {
     try {
-      users.doc(user.docid).set({
+      users.doc(user.uid).set({
         'joined_events': FieldValue.arrayRemove([event.docid]),
         'clout': FieldValue.increment(-10),
         'chats': FieldValue.arrayRemove([event.chatid]),
         'visiblechats': FieldValue.arrayRemove([event.chatid]),
       }, SetOptions(merge: true));
       events.doc(event.docid).set({
-        'participants': FieldValue.arrayRemove([user.docid])
+        'participants': FieldValue.arrayRemove([user.uid])
       }, SetOptions(merge: true));
       users
           .doc(event.hostdocid)
           .set({'clout': FieldValue.increment(-5)}, SetOptions(merge: true));
       chats.doc(event.chatid).set({
-        'participants': FieldValue.arrayRemove([user.docid])
+        'participants': FieldValue.arrayRemove([user.uid])
       }, SetOptions(merge: true));
       chats.doc(event.chatid).collection('messages').add({
         'content': "${user.username} was removed from the event",
@@ -399,7 +399,7 @@ class db_conn {
       chats.doc(event.chatid).update(
           {'mostrecentmessage': "${user.username} was removed from the event"});
       updates.add({
-        'target': [user.docid],
+        'target': [user.uid],
         'description': 'You were kicked out of the event: ${event.title}',
         'notification': 'You were kicked out of the event: ${event.title}',
         'type': 'kicked'
@@ -414,7 +414,7 @@ class db_conn {
       DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
       List participants = eventSnapshot['participants'];
       for (String x in participants) {
-        if (x == host.docid) {
+        if (x == host.uid) {
           int decrease = (participants.length - 1) * 5 + 20;
           users.doc(x).set({
             'hosted_events': FieldValue.arrayRemove([event.docid]),
@@ -1068,7 +1068,7 @@ class db_conn {
     }
   }
 
-  Future<AppUser> getUserFromDocID(String docid) async {
+  Future<AppUser> getUserFromUID(String docid) async {
     try {
       DocumentSnapshot documentSnapshot = await users.doc(docid).get();
       return AppUser.fromJson(documentSnapshot.data(), docid);
@@ -1077,7 +1077,7 @@ class db_conn {
     }
   }
 
-  Future<AppUser> getUserFromDocIDSavy(String docid) async {
+  Future<AppUser> getUserFromUIDSavy(String docid) async {
     try {
       DocumentSnapshot documentSnapshot = await users.doc(docid).getSavy();
       return AppUser.fromJson(documentSnapshot.data(), docid);
@@ -1152,14 +1152,13 @@ class db_conn {
     String? fcmToken = await FirebaseMessaging.instance.getToken();
 
     if (fcmToken != null) {
-      var tokenRef =
-          users.doc(curruser.docid).collection('tokens').doc(fcmToken);
+      var tokenRef = users.doc(curruser.uid).collection('tokens').doc(fcmToken);
       await tokenRef.set({
         'token': fcmToken,
         'createdAt': FieldValue.serverTimestamp(),
         'platform': Platform.operatingSystem
       });
-      await users.doc(curruser.docid).set({
+      await users.doc(curruser.uid).set({
         "tokens": FieldValue.arrayUnion([fcmToken])
       }, SetOptions(merge: true));
     }
@@ -1172,7 +1171,7 @@ class db_conn {
     try {
       await report.get().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
-              if (doc["docid"] == user.docid && doc["type"] == "user") {
+              if (doc["docid"] == user.uid && doc["type"] == "user") {
                 unique = false;
                 docid = doc.id;
                 instances = doc["instances"];
@@ -1180,7 +1179,7 @@ class db_conn {
             })
           });
       if (unique) {
-        report.add({"docid": user.docid, "type": "user", "instances": 1});
+        report.add({"docid": user.uid, "type": "user", "instances": 1});
       } else {
         report.doc(docid!).update({"instances": instances! + 1});
       }
@@ -1336,7 +1335,6 @@ class db_conn {
                 'blocked_users': user.blockedusers,
                 'blocked_by': user.blockedby,
                 'chats': user.chats,
-                'docid': user.uid,
                 'tokens': tokens
               });
               query.docs.forEach((token) async {
@@ -1393,35 +1391,47 @@ class db_conn {
   }
 
   Future<void> createuserchat(AppUser curruser, String otheruserdocid) async {
-    AppUser otheruser = await getUserFromDocID(otheruserdocid);
+    AppUser otheruser = await getUserFromUID(otheruserdocid);
     String chatid = "";
     await chats.add({
-      "connectedid": [curruser.docid, otheruser.docid],
-      "participants": [curruser.docid, otheruser.docid],
+      "connectedid": [curruser.uid, otheruser.uid],
+      "participants": [curruser.uid, otheruser.uid],
       "chatname": [curruser.username, otheruser.username],
       "iconurl": [curruser.pfpurl, otheruser.pfpurl],
       "mostrecentmessage": "",
       "type": "user",
     }).then((value) => chatid = value.id);
-    await users.doc(curruser.docid).set({
+    await users.doc(curruser.uid).set({
       "chats": FieldValue.arrayUnion([chatid])
     }, SetOptions(merge: true));
-    await users.doc(otheruser.docid).set({
+    await users.doc(otheruser.uid).set({
       "chats": FieldValue.arrayUnion([chatid])
     }, SetOptions(merge: true));
+  }
+
+  Future<void> reportbug(String bug, String curruserid) async {
+    try {
+      await bugs.add({
+        "bug": bug,
+        "reported_by": curruserid,
+        "time": FieldValue.serverTimestamp()
+      });
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   Future<void> setuserchatvisibility(
       AppUser curruser, String otheruserdocid, String chatid) async {
     try {
-      AppUser otheruser = await getUserFromDocID(otheruserdocid);
+      AppUser otheruser = await getUserFromUID(otheruserdocid);
       QuerySnapshot querySnapshot =
           await chats.doc(chatid).collection("messages").get();
       if (querySnapshot.docs.isNotEmpty) {
-        await users.doc(curruser.docid).set({
+        await users.doc(curruser.uid).set({
           "visiblechats": FieldValue.arrayUnion([chatid])
         }, SetOptions(merge: true));
-        await users.doc(otheruser.docid).set({
+        await users.doc(otheruser.uid).set({
           "visiblechats": FieldValue.arrayUnion([chatid])
         }, SetOptions(merge: true));
       } else {
@@ -1435,11 +1445,11 @@ class db_conn {
   Future<void> removeuserchatvisibility(AppUser curruser, String chatid) async {
     try {
       DocumentSnapshot chat = await chats.doc(chatid).get();
-      await users.doc(curruser.docid).set({
+      await users.doc(curruser.uid).set({
         'visiblechats': FieldValue.arrayRemove([chatid])
       }, SetOptions(merge: true));
       List participants = chat['participants'];
-      participants.removeWhere((element) => element == curruser.docid);
+      participants.removeWhere((element) => element == curruser.uid);
       String otheruserdocid = participants[0];
       DocumentSnapshot userdoc = await users.doc(otheruserdocid).get();
       List otheruserchatlist = userdoc['visiblechats'];
@@ -1460,9 +1470,9 @@ class db_conn {
         DocumentSnapshot chatsnapshot =
             await chats.doc(curruser.chats[i]).get();
         if (listEquals(chatsnapshot['participants'],
-                <dynamic>[curruser.docid, otheruserdocid]) ||
+                <dynamic>[curruser.uid, otheruserdocid]) ||
             listEquals(chatsnapshot['participants'],
-                    <dynamic>[otheruserdocid, curruser.docid]) &&
+                    <dynamic>[otheruserdocid, curruser.uid]) &&
                 (chatsnapshot['type'] == 'user')) {
           instances = instances + 1;
         }
@@ -1480,15 +1490,24 @@ class db_conn {
       await chats.get().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
               if (listEquals(doc['participants'],
-                      <dynamic>[curruser.docid, otheruserdocid]) ||
+                      <dynamic>[curruser.uid, otheruserdocid]) ||
                   listEquals(doc['participants'],
-                          <dynamic>[otheruserdocid, curruser.docid]) &&
+                          <dynamic>[otheruserdocid, curruser.uid]) &&
                       (doc['type'] == 'user')) {
                 userchat = Chat.fromJson(doc.data(), doc.id);
               }
             })
           });
       return userchat;
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> updatelastuserloc(String uid, double lat, double lng) async {
+    try {
+      await users.doc(uid).set(
+          {'lastknownlat': lat, 'lastknownlng': lng}, SetOptions(merge: true));
     } catch (e) {
       throw Exception();
     }

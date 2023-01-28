@@ -6,6 +6,7 @@ import 'package:clout/screens/blockedusersscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SetttingsScreen extends StatefulWidget {
   SetttingsScreen({Key? key, required this.curruser}) : super(key: key);
@@ -24,14 +25,26 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
 
   TextEditingController emailaddress = TextEditingController();
 
+  TextEditingController bugcontroller = TextEditingController();
+
   bool deletebuttonpressed = false;
   bool updatepswbuttonpressed = false;
   bool updateemailbuttonpressed = false;
+  bool bugbuttonpressed = false;
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -53,6 +66,15 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
           builder: (BuildContext context) => AuthenticationWrapper(),
           fullscreenDialog: true),
     );
+  }
+
+  @override
+  void dispose() {
+    bugcontroller.dispose();
+    emailaddress.dispose();
+    psw.dispose();
+    newpsw.dispose();
+    super.dispose();
   }
 
   @override
@@ -80,8 +102,196 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 8.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         child: ListView(children: [
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          Text(
+            "Privacy",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          GestureDetector(
+            onTap: () {
+              launchUrl(Uri.parse("https://termify.io/eula/1664706776"));
+            },
+            child: Row(
+              children: const [
+                Icon(Icons.person, size: 30),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  "End User License Agreement",
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          GestureDetector(
+            onTap: () {
+              launchUrl(
+                  Uri.parse("https://termify.io/privacy-policy/1664707655"));
+            },
+            child: Row(
+              children: const [
+                Icon(Icons.bookmark_outline, size: 30),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  "Privacy Statement",
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.04,
+          ),
+          Text(
+            "Support",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      backgroundColor: Colors.white,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                        height: screenheight * 0.33,
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Column(children: [
+                          const Text("Report a Bug",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25)),
+                          SizedBox(
+                            height: screenheight * 0.02,
+                          ),
+                          const Text(
+                            "Please describe the bug",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(
+                            height: screenheight * 0.02,
+                          ),
+                          SizedBox(
+                            width: screenwidth * 0.6,
+                            child: TextField(
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                              decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color:
+                                            Color.fromARGB(255, 255, 48, 117))),
+                                hintText: "Bug Description",
+                                hintStyle: TextStyle(
+                                  color: Color.fromARGB(39, 0, 0, 0),
+                                  fontSize: 15,
+                                ),
+                              ),
+                              textAlign: TextAlign.start,
+                              enableSuggestions: true,
+                              autocorrect: true,
+                              controller: bugcontroller,
+                              keyboardType: TextInputType.text,
+                              minLines: 1,
+                              maxLines: 3,
+                            ),
+                          ),
+                          SizedBox(
+                            height: screenheight * 0.04,
+                          ),
+                          GestureDetector(
+                            onTap: bugbuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      bugbuttonpressed = true;
+                                    });
+                                    try {
+                                      await db.reportbug(
+                                          bugcontroller.text.trim(),
+                                          widget.curruser.uid);
+                                      bugcontroller.clear();
+                                      Navigator.pop(context);
+                                    } catch (e) {
+                                      displayErrorSnackBar(
+                                          "Invalid Action, try again");
+                                    } finally {
+                                      bugbuttonpressed = false;
+                                    }
+                                  },
+                            child: SizedBox(
+                                height: 50,
+                                width: screenwidth * 0.6,
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                      color: Color.fromARGB(255, 255, 48, 117),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                  child: const Center(
+                                      child: Text(
+                                    "Report",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  )),
+                                )),
+                          ),
+                        ]),
+                      ),
+                    );
+                  });
+            },
+            child: Row(
+              children: const [
+                Icon(Icons.bug_report_outlined, size: 30),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  "Report a Bug",
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.04,
+          ),
+          const Text(
+            "Account",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+          ),
           SizedBox(
             height: screenheight * 0.02,
           ),
@@ -150,6 +360,12 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                       await FirebaseAuth.instance.currentUser!
                                           .updateEmail(
                                               emailaddress.text.trim());
+                                      emailaddress.clear();
+                                      psw.clear();
+                                      newpsw.clear();
+                                      emailaddress.dispose();
+                                      psw.dispose();
+                                      newpsw.dispose();
                                       goauthwrapper();
                                     } catch (e) {
                                       displayErrorSnackBar(
@@ -251,6 +467,12 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                       }
                                       await FirebaseAuth.instance.currentUser!
                                           .updatePassword(newpsw.text.trim());
+                                      emailaddress.clear();
+                                      psw.clear();
+                                      newpsw.clear();
+                                      emailaddress.dispose();
+                                      psw.dispose();
+                                      newpsw.dispose();
                                       goauthwrapper();
                                     } catch (e) {
                                       displayErrorSnackBar(
@@ -322,19 +544,20 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
             ),
           ),
           SizedBox(
-            height: screenheight * 0.04,
+            height: screenheight * 0.05,
           ),
           GestureDetector(
-            onTap: () async {
-              await FirebaseAuth.instance.signOut();
-              goauthwrapper();
-            },
-            child: const Text(
-              "Log out",
-              style: TextStyle(
-                  fontSize: 20, color: Color.fromARGB(255, 255, 48, 117)),
-            ),
-          ),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                goauthwrapper();
+              },
+              child: const Center(
+                child: Text(
+                  "Log Out",
+                  style: TextStyle(
+                      fontSize: 20, color: Color.fromARGB(255, 255, 48, 117)),
+                ),
+              )),
           SizedBox(
             height: screenheight * 0.55,
           ),
@@ -436,6 +659,12 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                                       await FirebaseAuth
                                                           .instance.currentUser!
                                                           .delete();
+                                                      emailaddress.clear();
+                                                      psw.clear();
+                                                      newpsw.clear();
+                                                      emailaddress.dispose();
+                                                      psw.dispose();
+                                                      newpsw.dispose();
                                                       goauthwrapper();
                                                     } catch (e) {
                                                       displayErrorSnackBar(
