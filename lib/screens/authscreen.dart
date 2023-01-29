@@ -11,29 +11,9 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  List allinterests = [
-    "Sports",
-    "Music",
-    "Dance",
-    "Movies",
-    "Singing",
-    "Drinking",
-    "Art"
-  ];
-  int chosenindex = 0;
-
-  void chooseBackground() {
-    Random rnd = Random();
-    int r = 0 + rnd.nextInt(allinterests.length);
-    setState(() {
-      chosenindex = r;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    chooseBackground();
   }
 
   @override
@@ -41,19 +21,10 @@ class _AuthScreenState extends State<AuthScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: GestureDetector(
-        onLongPress: () {
-          chooseBackground();
-          setState(() {});
-        },
+        onLongPress: () {},
         child: Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                      "assets/images/interestbanners/${allinterests[chosenindex].toString().toLowerCase()}.jpeg"),
-                  fit: BoxFit.cover,
-                  opacity: 0.7)),
           child: Padding(
               padding: EdgeInsets.fromLTRB(screenwidth * 0.05,
                   screenheight * 0.1, screenwidth * 0.05, screenheight * 0.1),
@@ -61,16 +32,32 @@ class _AuthScreenState extends State<AuthScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: screenheight * 0.15),
-                  const Text(
-                    "GET\nCLOUT\nGO\nOUT",
-                    style: TextStyle(
-                        fontSize: 70,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                    textScaleFactor: 1.0,
-                  ),
-                  SizedBox(height: screenheight * 0.1),
+                  SizedBox(height: screenheight * 0.12),
+                  RichText(
+                      textScaleFactor: 1.0,
+                      text: const TextSpan(
+                          style: TextStyle(
+                              fontSize: 70,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black),
+                          children: [
+                            TextSpan(
+                              text: "GET\n",
+                            ),
+                            TextSpan(
+                                text: "Clout\n",
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 255, 48, 117),
+                                )),
+                            TextSpan(
+                              text: "GO\n",
+                            ),
+                            TextSpan(
+                                text: "Out\n",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 255, 48, 117))),
+                          ])),
+                  SizedBox(height: screenheight * 0.08),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -112,12 +99,11 @@ class _AuthScreenState extends State<AuthScreen> {
                                   builder: (context) => SignInScreen()),
                             );
                           },
-                          child: Container(
-                            color: const Color.fromARGB(35, 255, 48, 117),
-                            child: const Text(
-                              "Already have an account?",
-                              style: TextStyle(color: Colors.white),
-                            ),
+                          child: const Text(
+                            "Already have an account?",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                decoration: TextDecoration.underline),
                           )))
                 ],
               )),

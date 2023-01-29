@@ -58,6 +58,11 @@ class _HomeScreenState extends State<HomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void getEventsList(interests) async {
     try {
       List<Event> events = await db.getEvents(interests);

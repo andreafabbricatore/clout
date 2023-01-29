@@ -3,6 +3,7 @@ import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/completesignuploading.dart';
 import 'package:clout/screens/emailverificationscreen.dart';
 import 'package:clout/screens/loading.dart';
+import 'package:clout/screens/preauthscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -75,7 +76,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
                   uid: FirebaseAuth.instance.currentUser!.uid);
             }
           } else {
-            return AuthScreen();
+            return PreAuthScreen();
           }
         }),
       ),

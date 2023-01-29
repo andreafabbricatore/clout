@@ -107,7 +107,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Text(
+          const Text(
             "Privacy",
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
@@ -120,14 +120,19 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               launchUrl(Uri.parse("https://termify.io/eula/1664706776"));
             },
             child: Row(
-              children: const [
-                Icon(Icons.person, size: 30),
-                SizedBox(
+              children: [
+                const Icon(Icons.person, size: 30),
+                const SizedBox(
                   width: 6,
                 ),
-                Text(
-                  "End User License Agreement",
-                  style: TextStyle(fontSize: 20),
+                SizedBox(
+                  width: screenwidth * 0.8,
+                  child: const Text(
+                    "End User License Agreement",
+                    style: TextStyle(fontSize: 20),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 )
               ],
             ),
@@ -396,14 +401,19 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                   });
             },
             child: Row(
-              children: const [
-                Icon(Icons.email_outlined, size: 30),
-                SizedBox(
+              children: [
+                const Icon(Icons.email_outlined, size: 30),
+                const SizedBox(
                   width: 6,
                 ),
-                Text(
-                  "Update Email Address",
-                  style: TextStyle(fontSize: 20),
+                SizedBox(
+                  width: screenwidth * 0.8,
+                  child: const Text(
+                    "Update Email Address",
+                    style: TextStyle(fontSize: 20),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 )
               ],
             ),
