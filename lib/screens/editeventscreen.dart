@@ -1,5 +1,4 @@
 import 'package:clout/components/event.dart';
-import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/searchlocation.dart';
@@ -80,7 +79,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
-      final MarkerId markerId = MarkerId("chosenlocation");
+      const MarkerId markerId = MarkerId("chosenlocation");
       Marker marker = Marker(
         markerId: markerId,
         draggable: true,
@@ -102,7 +101,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
-      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
       final splitted = filePath.substring(0, (lastIndex));
       final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
       var result = await FlutterImageCompress.compressAndGetFile(
@@ -190,9 +189,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back_ios,
-                  color: Color.fromARGB(255, 255, 48, 117),
+                  color: Theme.of(context).primaryColor,
                 ),
               )
             : Container(),
@@ -200,10 +199,10 @@ class _EditEventScreenState extends State<EditEventScreen> {
           onTap: () {
             CompressAndGetFile(imagepath);
           },
-          child: const Text(
+          child: Text(
             "Edit Event",
             style: TextStyle(
-                color: Color.fromARGB(255, 255, 48, 117),
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 30),
           ),
@@ -264,17 +263,17 @@ class _EditEventScreenState extends State<EditEventScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
             child: TextField(
-              style: const TextStyle(
-                color: Color.fromARGB(255, 255, 48, 117),
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 30,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                        BorderSide(color: Theme.of(context).primaryColor)),
                 hintText: "Event Name",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 30,
                 ),
@@ -289,10 +288,10 @@ class _EditEventScreenState extends State<EditEventScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 48, 117)))),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor))),
               value: selectedinterest,
               onChanged: (String? newValue) {
                 setState(() {
@@ -325,12 +324,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 fontWeight: FontWeight.w300,
                 fontSize: 15,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                        BorderSide(color: Theme.of(context).primaryColor)),
                 hintText: "Description",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 15,
                 ),
@@ -353,12 +352,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 fontWeight: FontWeight.w300,
                 fontSize: 15,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                        BorderSide(color: Theme.of(context).primaryColor)),
                 hintText: "Max. Number of Participants",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 15,
                 ),

@@ -4,7 +4,6 @@ import 'package:clout/screens/pswresetscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SignInScreen extends StatefulWidget {
   SignInScreen({Key? key}) : super(key: key);
@@ -55,10 +54,10 @@ class _SignInScreenState extends State<SignInScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Clout",
           style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+              color: Theme.of(context).primaryColor,
               fontFamily: "Kristi",
               fontWeight: FontWeight.w500,
               fontSize: 50),
@@ -71,8 +70,8 @@ class _SignInScreenState extends State<SignInScreen> {
             onTap: () {
               Navigator.pop(context);
             },
-            child: const Icon(Icons.arrow_back,
-                color: Color.fromARGB(255, 255, 48, 117))),
+            child:
+                Icon(Icons.arrow_back, color: Theme.of(context).primaryColor)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -93,12 +92,13 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                              color: Color.fromARGB(255, 255, 48, 117))),
+                              color: Theme.of(context).primaryColor)),
                       hintText: 'e.g. timcook@gmail.com',
-                      hintStyle: TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
+                      hintStyle:
+                          const TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   textAlign: TextAlign.center,
@@ -120,12 +120,13 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                              color: Color.fromARGB(255, 255, 48, 117))),
+                              color: Theme.of(context).primaryColor)),
                       hintText: 'e.g. supersecret',
-                      hintStyle: TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
+                      hintStyle:
+                          const TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
                   controller: pswController,
                   obscureText: true,
                   keyboardType: TextInputType.visiblePassword,

@@ -27,29 +27,42 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
         },
     };
     querySnapshot.docs.forEach(async (element) => {
-        await db.collection("users").doc(element.id).set({ "notifications": firebase_admin_1.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": firebase_admin_1.firestore.Timestamp.now() }) }, { merge: true });
+        await db.collection("users").doc(element.id).set({ "notifications": firebase_admin_1.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": firebase_admin_1.firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid }) }, { merge: true });
     });
     await db.collection("updates").doc(snapshot.id).delete();
     return fcm.sendToDevice(finaltokens, payload);
 });
 exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/messages/{id}").onCreate(async (snapshot, context) => {
-    var _a;
+    var _a, _b;
     const chat = snapshot.data();
     if (chat.sender != "server") {
         const chatid = context.params.chatid;
         const chatdataSnapshot = await db.collection("chats").doc(chatid).get();
         const participants = (_a = chatdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.participants;
+        const index = participants.indexOf(chat.senderuid);
+        participants.splice(index, 1);
         const querySnapshot = await db.collection("users").where("uid", "in", participants).get();
         // console.log(querySnapshot);
         let finaltokens = [];
         querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
-        const payload = {
-            notification: {
-                title: "Clout - " + chat.chatname,
-                body: chat.notification,
-            },
-        };
-        return fcm.sendToDevice(finaltokens, payload);
+        if (((_b = chatdataSnapshot.data()) === null || _b === void 0 ? void 0 : _b.type) == "user") {
+            const payload = {
+                notification: {
+                    title: "Clout - " + chat.sender,
+                    body: chat.notification,
+                },
+            };
+            return fcm.sendToDevice(finaltokens, payload);
+        }
+        else {
+            const payload = {
+                notification: {
+                    title: "Clout - " + chat.chatname,
+                    body: chat.notification,
+                },
+            };
+            return fcm.sendToDevice(finaltokens, payload);
+        }
     }
     else {
         return;

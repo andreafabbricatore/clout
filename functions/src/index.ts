@@ -31,7 +31,7 @@ export const sendToDevice = functions.firestore.document("updates/{id}").onCreat
   };
 
   querySnapshot.docs.forEach(async (element) => {
-    await db.collection("users").doc(element.id).set({"notifications": firestore.FieldValue.arrayUnion({"notification": noti.notification, "type": noti.type, "time": firestore.Timestamp.now()})}, {merge: true});
+    await db.collection("users").doc(element.id).set({"notifications": firestore.FieldValue.arrayUnion({"notification": noti.notification, "type": noti.type, "time": firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid})}, {merge: true});
   });
 
   await db.collection("updates").doc(snapshot.id).delete();
@@ -49,21 +49,33 @@ export const chatsendToDevices = functions.firestore.document("chats/{chatid}/me
 
     const participants:string[] = chatdataSnapshot.data()?.participants;
 
+    const index = participants.indexOf(chat.senderuid);
+
+    participants.splice(index, 1);
+
     const querySnapshot = await db.collection("users").where("uid", "in", participants).get();
 
     // console.log(querySnapshot);
     let finaltokens:string[] = [];
 
     querySnapshot.docs.map((snap) => finaltokens = finaltokens.concat(snap.data()?.tokens));
-
-    const payload: admin.messaging.MessagingPayload = {
-      notification: {
-        title: "Clout - " + chat.chatname,
-        body: chat.notification,
-      },
-    };
-
-    return fcm.sendToDevice(finaltokens, payload);
+    if (chatdataSnapshot.data()?.type == "user") {
+      const payload: admin.messaging.MessagingPayload = {
+        notification: {
+          title: "Clout - " + chat.sender,
+          body: chat.notification,
+        },
+      };
+      return fcm.sendToDevice(finaltokens, payload);
+    } else {
+      const payload: admin.messaging.MessagingPayload = {
+        notification: {
+          title: "Clout - " + chat.chatname,
+          body: chat.notification,
+        },
+      };
+      return fcm.sendToDevice(finaltokens, payload);
+    }
   } else {
     return;
   }

@@ -64,6 +64,18 @@ class _SearchScreenState extends State<SearchScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void gotointerestsearchscreen(
+      String interest, List<Event> interesteventlist) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => InterestSearchScreen(
+                interest: interest,
+                events: interesteventlist,
+                curruser: widget.curruser,
+                userlocation: widget.userlocation)));
+  }
+
   @override
   void initState() {
     focusNode.addListener(() {
@@ -86,15 +98,8 @@ class _SearchScreenState extends State<SearchScreen> {
             interest,
             widget.userlocation.country,
             widget.curruser);
+        gotointerestsearchscreen(interest, interesteventlist);
         //print(interesteventlist);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => InterestSearchScreen(
-                    interest: interest,
-                    events: interesteventlist,
-                    curruser: widget.curruser,
-                    userlocation: widget.userlocation)));
       } catch (e) {
         displayErrorSnackBar("Could not display events");
       }
@@ -194,7 +199,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         },
                         child: SizedBox(
                           width: screenwidth * 0.05,
-                          child: Icon(Icons.calendar_today_rounded),
+                          child: const Icon(Icons.calendar_today_rounded),
                         ),
                       )
               ],
@@ -236,7 +241,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             border: Border.all(
                                 width: 1,
                                 color: searchevents
-                                    ? const Color.fromARGB(255, 255, 48, 117)
+                                    ? Theme.of(context).primaryColor
                                     : Colors.black),
                           ),
                           child: const Center(child: Text("Events")),
@@ -271,7 +276,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 width: 1,
                                 color: searchevents
                                     ? Colors.black
-                                    : const Color.fromARGB(255, 255, 48, 117)),
+                                    : Theme.of(context).primaryColor),
                           ),
                           child: const Center(child: Text("Users")),
                         ),

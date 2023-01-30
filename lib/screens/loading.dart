@@ -73,6 +73,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return true;
   }
 
+  //change to google maps
   Future<void> getUserAppLocation() async {
     String searchquery =
         "${_userLocation?.longitude},${_userLocation?.latitude}";
@@ -233,10 +234,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
                           height: 50,
                           width: screenwidth * 0.6,
                           child: Container(
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 48, 117),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(20))),
                             child: const Center(
                                 child: Text(
                               "Refresh",
@@ -252,10 +253,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Clout",
                       style: TextStyle(
-                          color: Color.fromARGB(255, 255, 48, 117),
+                          color: Theme.of(context).primaryColor,
                           fontFamily: "Kristi",
                           fontWeight: FontWeight.w500,
                           fontSize: 80),

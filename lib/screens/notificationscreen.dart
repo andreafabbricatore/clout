@@ -1,6 +1,8 @@
+import 'package:clout/components/event.dart';
 import 'package:clout/components/notificationslistview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/notification.dart';
+import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,10 +19,70 @@ class _NotificationScreenState extends State<NotificationScreen> {
   db_conn db = db_conn();
   List<NotificationElement> notis = [];
 
+  void displayErrorSnackBar(
+    String error,
+  ) {
+    final snackBar = SnackBar(
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
+    );
+    Future.delayed(const Duration(milliseconds: 400));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void setup() {
     notis = [];
     for (int i = 0; i < widget.curruser.notifications.length; i++) {
-      notis.add(NotificationElement.fromJson(widget.curruser.notifications[i]));
+      notis.insert(
+          0, NotificationElement.fromJson(widget.curruser.notifications[i]));
+    }
+  }
+
+  Future<void> refresh() async {
+    await updatecurruser();
+    setup();
+  }
+
+  void gotoprofilescreen(AppUser user) {
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ProfileScreen(
+                  user: user,
+                  curruser: widget.curruser,
+                  visit: true,
+                )));
+  }
+
+  Future<void> updatecurruser() async {
+    try {
+      AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
+      setState(() {
+        widget.curruser = updateduser;
+      });
+    } catch (e) {
+      displayErrorSnackBar("Could not refresh user");
+    }
+  }
+
+  Future interactfav(Event event) async {
+    try {
+      if (widget.curruser.favorites.contains(event.docid)) {
+        await db.remFromFav(widget.curruser.uid, event.docid);
+      } else {
+        await db.addToFav(widget.curruser.uid, event.docid);
+      }
+    } catch (e) {
+      displayErrorSnackBar("Could not update favorites");
+    } finally {
+      updatecurruser();
     }
   }
 
@@ -33,15 +95,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
-    Future<void> usernavigate(String docid, int index) async {
-      AppUser user = await db.getUserFromUID(docid);
-      Navigator.push(
+    Future<void> usernavigate(String uid, int index) async {
+      AppUser user = await db.getUserFromUID(uid);
+      gotoprofilescreen(user);
+    }
+
+    Future<void> eventnavigate(String eventid, int index) async {
+      Event event = await db.getEventfromDocId(eventid);
+      List<AppUser> participants = [
+        for (String x in event.participants) await db.getUserFromUID(x)
+      ];
+      await Navigator.push(
           context,
-          CupertinoPageRoute(
-              builder: (_) => ProfileScreen(
-                    user: user,
+          MaterialPageRoute(
+              builder: (_) => EventDetailScreen(
+                    event: event,
                     curruser: widget.curruser,
-                    visit: true,
+                    participants: participants,
+                    interactfav: interactfav,
                   )));
     }
 
@@ -71,13 +142,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
       ),
-      body: Column(children: [
-        NotificationsListView(
-          notificationlist: notis,
-          screenwidth: screenwidth,
-          onTapUsername: usernavigate,
-        )
-      ]),
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        color: Theme.of(context).primaryColor,
+        child: Column(children: [
+          NotificationsListView(
+            notificationlist: notis,
+            screenwidth: screenwidth,
+            onTapUsername: usernavigate,
+            onTapEvent: eventnavigate,
+          )
+        ]),
+      ),
     );
   }
 }

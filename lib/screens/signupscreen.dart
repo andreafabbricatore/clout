@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/primarybutton.dart';
-import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
+import 'package:clout/screens/authscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -26,35 +26,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final emailController = TextEditingController();
   final pswController = TextEditingController();
   db_conn db = db_conn();
-  AppUser curruser = AppUser(
-      username: "",
-      uid: "",
-      pfpurl: "",
-      nationality: "",
-      joinedEvents: [],
-      hostedEvents: [],
-      interests: [],
-      gender: "",
-      fullname: "",
-      email: "",
-      birthday: DateTime(0, 1, 1),
-      followers: [],
-      following: [],
-      favorites: [],
-      clout: 0,
-      bio: "",
-      blockedusers: [],
-      blockedby: [],
-      chats: [],
-      visiblechats: [],
-      notifications: [],
-      setnameandpfp: false,
-      setusername: false,
-      setmisc: false,
-      setinterests: false,
-      lastknownlat: 0.0,
-      lastknownlng: 0.0);
   bool signupbuttonpressed = false;
+
   void displayErrorSnackBar(
     String error,
   ) {
@@ -77,8 +50,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => PicandNameScreen(curruser: curruser),
-      ),
+          builder: (BuildContext context) => PicandNameScreen(),
+          fullscreenDialog: true),
     );
   }
 
@@ -90,10 +63,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Clout",
           style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+              color: Theme.of(context).primaryColor,
               fontFamily: "Kristi",
               fontWeight: FontWeight.w500,
               fontSize: 50),
@@ -106,8 +79,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             onTap: () {
               Navigator.pop(context);
             },
-            child: const Icon(Icons.arrow_back,
-                color: Color.fromARGB(255, 255, 48, 117))),
+            child:
+                Icon(Icons.arrow_back, color: Theme.of(context).primaryColor)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -128,12 +101,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                              color: Color.fromARGB(255, 255, 48, 117))),
+                              color: Theme.of(context).primaryColor)),
                       hintText: 'e.g. example@example.com',
-                      hintStyle: TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
+                      hintStyle:
+                          const TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   textAlign: TextAlign.center,
@@ -155,12 +129,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
                 child: TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                              color: Color.fromARGB(255, 255, 48, 117))),
+                              color: Theme.of(context).primaryColor)),
                       hintText: 'e.g. supersecret',
-                      hintStyle: TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
+                      hintStyle:
+                          const TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
                   controller: pswController,
                   obscureText: true,
                   keyboardType: TextInputType.visiblePassword,
@@ -185,16 +160,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 .hasMatch(emailController.text.trim()) &&
                             emailunique &&
                             pswController.text.length >= 8) {
-                          setState(() {
-                            curruser.email = emailController.text.trim();
-                          });
                           try {
                             await FirebaseAuth.instance
                                 .createUserWithEmailAndPassword(
-                                    email: curruser.email,
+                                    email: emailController.text.trim(),
                                     password: pswController.text);
                             String uid = FirebaseAuth.instance.currentUser!.uid;
-                            await db.createuserinstance(curruser.email,
+                            await db.createuserinstance(
+                                emailController.text.trim(),
                                 uid); //set all signup attributes to false
                             gopicandnamescreen();
                           } catch (e) {
@@ -236,8 +209,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           text: "By continuing you are agreeing to the "),
                       TextSpan(
                           text: "End User License Agreement",
-                          style: const TextStyle(
-                              color: Color.fromARGB(255, 255, 48, 117)),
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               launchUrl(Uri.parse(
@@ -246,8 +219,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       const TextSpan(text: " and "),
                       TextSpan(
                           text: "the Privacy Statement",
-                          style: const TextStyle(
-                              color: Color.fromARGB(255, 255, 48, 117)),
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               launchUrl(Uri.parse(
@@ -266,8 +239,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class PicandNameScreen extends StatefulWidget {
-  PicandNameScreen({super.key, required this.curruser});
-  AppUser curruser;
+  PicandNameScreen({super.key});
   @override
   State<PicandNameScreen> createState() => _PicandNameScreenState();
 }
@@ -277,10 +249,21 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   ImagePicker picker = ImagePicker();
   var imagepath;
   db_conn db = db_conn();
-  void displayErrorSnackBar(String error) {
+  bool cancelbuttonpressed = false;
+  TextEditingController psw = TextEditingController();
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -309,13 +292,21 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
     }
   }
 
+  void goauthscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthScreen(),
+          fullscreenDialog: true),
+    );
+  }
+
   void gousernamescreen() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) =>
-            UsernameScreen(curruser: widget.curruser),
-      ),
+          builder: (BuildContext context) => UsernameScreen(),
+          fullscreenDialog: true),
     );
   }
 
@@ -328,10 +319,109 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        leading: GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    backgroundColor: Colors.white,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                      height: screenheight * 0.35,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Column(children: [
+                        const Text("Cancel SignUp",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25)),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        const Text(
+                          "Enter password to cancel Sign Up.",
+                          style: TextStyle(fontSize: 15),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
+                        SizedBox(
+                          height: screenheight * 0.04,
+                        ),
+                        GestureDetector(
+                          onTap: cancelbuttonpressed
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    cancelbuttonpressed = true;
+                                  });
+                                  try {
+                                    String email = FirebaseAuth
+                                            .instance.currentUser!.email ??
+                                        "";
+                                    try {
+                                      await FirebaseAuth.instance
+                                          .signInWithEmailAndPassword(
+                                              email: email,
+                                              password: psw.text.trim());
+                                    } catch (e) {
+                                      displayErrorSnackBar(
+                                          "Could not cancel Sign Up, pleaes make sure password is correct");
+                                    }
+                                    await db.firstcancelsignup(
+                                        FirebaseAuth.instance.currentUser!.uid);
+                                    await FirebaseAuth.instance.currentUser!
+                                        .delete();
+                                    psw.clear();
+                                    psw.dispose();
+                                    goauthscreen();
+                                  } catch (e) {
+                                  } finally {
+                                    setState(() {
+                                      cancelbuttonpressed = false;
+                                    });
+                                  }
+                                },
+                          child: SizedBox(
+                              height: 50,
+                              width: screenwidth * 0.7,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20))),
+                                child: const Center(
+                                    child: Text(
+                                  "Cancel Sign Up",
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                )),
+                              )),
+                        ),
+                      ]),
+                    ),
+                  );
+                });
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        title: Text(
           "Who are you",
           style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 30),
         ),
@@ -345,7 +435,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
               children: [
                 Container(
                   width: screenwidth * 0.25,
-                  color: const Color.fromARGB(255, 255, 48, 117),
+                  color: Theme.of(context).primaryColor,
                   height: 4.0,
                 ),
                 SizedBox(
@@ -395,7 +485,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                             width: screenheight * 0.2,
                           )
                         : Container(
-                            color: const Color.fromARGB(255, 255, 48, 117),
+                            color: Theme.of(context).primaryColor,
                             height: screenheight * 0.2,
                             width: screenheight * 0.2,
                             child: Icon(
@@ -417,28 +507,32 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            if (imagepath != null &&
-                fullnamecontroller.text.trim().isNotEmpty) {
-              setState(() {
-                widget.curruser.fullname = fullnamecontroller.text.trim();
-                widget.curruser.setnameandpfp = true;
-              });
-              compressedimgpath = await CompressAndGetFile(imagepath);
-              await db.changepfp(compressedimgpath, widget.curruser.uid);
-              await db.changeattribute(
-                  'fullname', widget.curruser.fullname, widget.curruser.uid);
-              await db.changeattributebool(
-                  'setnameandpfp', true, widget.curruser.uid);
-              gousernamescreen();
-            } else if (imagepath == null) {
-              displayErrorSnackBar("Please upload Profile Picture");
-            } else if (fullnamecontroller.text.trim().isEmpty) {
-              displayErrorSnackBar("Please enter your full name");
-            } else {
-              displayErrorSnackBar("Error with full name or profile picture");
+            try {
+              if (imagepath != null &&
+                  fullnamecontroller.text.trim().isNotEmpty) {
+                compressedimgpath = await CompressAndGetFile(imagepath);
+                await db.changepfp(
+                    compressedimgpath, FirebaseAuth.instance.currentUser!.uid);
+                await db.changeattribute(
+                    'fullname',
+                    fullnamecontroller.text.trim(),
+                    FirebaseAuth.instance.currentUser!.uid);
+                await db.changeattributebool('setnameandpfp', true,
+                    FirebaseAuth.instance.currentUser!.uid);
+                gousernamescreen();
+              } else if (imagepath == null) {
+                displayErrorSnackBar("Please upload Profile Picture");
+              } else if (fullnamecontroller.text.trim().isEmpty) {
+                displayErrorSnackBar("Please enter your full name");
+              } else {
+                displayErrorSnackBar("Error with full name or profile picture");
+              }
+            } catch (e) {
+              displayErrorSnackBar(
+                  "Could not complete step, please try again or cancel sign up if error persists");
             }
           },
-          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+          backgroundColor: Theme.of(context).primaryColor,
           child: const Icon(
             Icons.arrow_circle_right_outlined,
             size: 60,
@@ -452,9 +546,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
 class UsernameScreen extends StatefulWidget {
   UsernameScreen({
     Key? key,
-    required this.curruser,
   }) : super(key: key);
-  AppUser curruser;
   @override
   State<UsernameScreen> createState() => _UsernameScreenState();
 }
@@ -462,21 +554,41 @@ class UsernameScreen extends StatefulWidget {
 class _UsernameScreenState extends State<UsernameScreen> {
   final usernamecontroller = TextEditingController();
   db_conn db = db_conn();
-  void displayErrorSnackBar(String error) {
+  bool cancelbuttonpressed = false;
+  TextEditingController psw = TextEditingController();
+
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void goauthscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthScreen(),
+          fullscreenDialog: true),
+    );
   }
 
   void gotomiscscreen() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) =>
-            MiscScreen(curruser: widget.curruser),
+        builder: (BuildContext context) => MiscScreen(),
       ),
     );
   }
@@ -489,10 +601,106 @@ class _UsernameScreenState extends State<UsernameScreen> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        leading: GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    backgroundColor: Colors.white,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                      height: screenheight * 0.35,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Column(children: [
+                        const Text("Cancel SignUp",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25)),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        const Text(
+                          "Enter password to cancel Sign Up.",
+                          style: TextStyle(fontSize: 15),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
+                        SizedBox(
+                          height: screenheight * 0.04,
+                        ),
+                        GestureDetector(
+                          onTap: cancelbuttonpressed
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    cancelbuttonpressed = true;
+                                  });
+                                  try {
+                                    String email = FirebaseAuth
+                                            .instance.currentUser!.email ??
+                                        "";
+                                    await FirebaseAuth.instance
+                                        .signInWithEmailAndPassword(
+                                            email: email,
+                                            password: psw.text.trim());
+                                    await db.cancelsignup(
+                                        FirebaseAuth.instance.currentUser!.uid);
+                                    await FirebaseAuth.instance.currentUser!
+                                        .delete();
+                                    psw.clear();
+                                    psw.dispose();
+                                    goauthscreen();
+                                  } catch (e) {
+                                    displayErrorSnackBar(
+                                        "Could not cancel signup, please try again and makes sure password is correct");
+                                  } finally {
+                                    setState(() {
+                                      cancelbuttonpressed = false;
+                                    });
+                                  }
+                                },
+                          child: SizedBox(
+                              height: 50,
+                              width: screenwidth * 0.7,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20))),
+                                child: const Center(
+                                    child: Text(
+                                  "Cancel Sign Up",
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                )),
+                              )),
+                        ),
+                      ]),
+                    ),
+                  );
+                });
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        title: Text(
           "Username",
           style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 30),
         ),
@@ -506,7 +714,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
               children: [
                 Container(
                   width: screenwidth * 0.5,
-                  color: const Color.fromARGB(255, 255, 48, 117),
+                  color: Theme.of(context).primaryColor,
                   height: 4.0,
                 ),
                 SizedBox(
@@ -532,30 +740,32 @@ class _UsernameScreenState extends State<UsernameScreen> {
         width: 70,
         child: FloatingActionButton(
           onPressed: () async {
-            bool uniqueness = await db.usernameUnique(usernamecontroller.text);
-            if (!uniqueness && usernamecontroller.text.isNotEmpty) {
-              setState(() {
-                displayErrorSnackBar("Username already taken");
-              });
-            } else if (usernamecontroller.text.isEmpty) {
-              displayErrorSnackBar("Invalid Username");
-            } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
-                .hasMatch(usernamecontroller.text.trim())) {
-              displayErrorSnackBar("Please only enter alphanumeric characters");
-            } else {
-              setState(() {
-                widget.curruser.username =
-                    usernamecontroller.text.trim().toLowerCase();
-                widget.curruser.setusername = true;
-              });
-              await db.changeusername(
-                  widget.curruser.username, widget.curruser.uid);
-              await db.changeattributebool(
-                  'setusername', true, widget.curruser.uid);
-              gotomiscscreen();
+            try {
+              bool uniqueness =
+                  await db.usernameUnique(usernamecontroller.text);
+              if (!uniqueness && usernamecontroller.text.isNotEmpty) {
+                setState(() {
+                  displayErrorSnackBar("Username already taken");
+                });
+              } else if (usernamecontroller.text.isEmpty) {
+                displayErrorSnackBar("Invalid Username");
+              } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
+                  .hasMatch(usernamecontroller.text.trim())) {
+                displayErrorSnackBar(
+                    "Please only enter alphanumeric characters");
+              } else {
+                await db.changeusername(
+                    usernamecontroller.text.trim().toLowerCase(),
+                    FirebaseAuth.instance.currentUser!.uid);
+                await db.changeattributebool('setusername', true,
+                    FirebaseAuth.instance.currentUser!.uid);
+                gotomiscscreen();
+              }
+            } catch (e) {
+              displayErrorSnackBar("Could not complete step, please try again");
             }
           },
-          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+          backgroundColor: Theme.of(context).primaryColor,
           child: const Icon(
             Icons.arrow_circle_right_outlined,
             size: 60,
@@ -567,8 +777,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
 }
 
 class MiscScreen extends StatefulWidget {
-  MiscScreen({super.key, required this.curruser});
-  AppUser curruser;
+  MiscScreen({super.key});
 
   @override
   State<MiscScreen> createState() => _MiscScreenState();
@@ -579,6 +788,8 @@ class _MiscScreenState extends State<MiscScreen> {
   String gender = 'Male';
   String nationality = 'Australia';
   db_conn db = db_conn();
+  bool cancelbuttonpressed = false;
+  TextEditingController psw = TextEditingController();
   List allinterests = [
     "Sports",
     "Nature",
@@ -853,13 +1064,22 @@ class _MiscScreenState extends State<MiscScreen> {
     'Zambia',
     'Zimbabwe'
   ];
+
+  void goauthscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthScreen(),
+          fullscreenDialog: true),
+    );
+  }
+
   void gointerestscreen() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) =>
-            InterestScreen(curruser: widget.curruser),
-      ),
+          builder: (BuildContext context) => InterestScreen(),
+          fullscreenDialog: true),
     );
   }
 
@@ -876,10 +1096,106 @@ class _MiscScreenState extends State<MiscScreen> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        leading: GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    backgroundColor: Colors.white,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                      height: screenheight * 0.35,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Column(children: [
+                        const Text("Cancel SignUp",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25)),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        const Text(
+                          "Enter password to cancel Sign Up.",
+                          style: TextStyle(fontSize: 15),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
+                        SizedBox(
+                          height: screenheight * 0.04,
+                        ),
+                        GestureDetector(
+                          onTap: cancelbuttonpressed
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    cancelbuttonpressed = true;
+                                  });
+                                  try {
+                                    String email = FirebaseAuth
+                                            .instance.currentUser!.email ??
+                                        "";
+                                    await FirebaseAuth.instance
+                                        .signInWithEmailAndPassword(
+                                            email: email,
+                                            password: psw.text.trim());
+                                    await db.cancelsignup(
+                                        FirebaseAuth.instance.currentUser!.uid);
+                                    await FirebaseAuth.instance.currentUser!
+                                        .delete();
+                                    psw.clear();
+                                    psw.dispose();
+                                    goauthscreen();
+                                  } catch (e) {
+                                    displayErrorSnackBar(
+                                        "Could not cancel signup, please try again and makes sure password is correct");
+                                  } finally {
+                                    setState(() {
+                                      cancelbuttonpressed = false;
+                                    });
+                                  }
+                                },
+                          child: SizedBox(
+                              height: 50,
+                              width: screenwidth * 0.7,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20))),
+                                child: const Center(
+                                    child: Text(
+                                  "Cancel Sign Up",
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                )),
+                              )),
+                        ),
+                      ]),
+                    ),
+                  );
+                });
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        title: Text(
           "Other info",
           style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 30),
         ),
@@ -893,7 +1209,7 @@ class _MiscScreenState extends State<MiscScreen> {
               children: [
                 Container(
                   width: screenwidth * 0.75,
-                  color: const Color.fromARGB(255, 255, 48, 117),
+                  color: Theme.of(context).primaryColor,
                   height: 4.0,
                 ),
                 SizedBox(
@@ -912,10 +1228,10 @@ class _MiscScreenState extends State<MiscScreen> {
             SizedBox(
               width: screenwidth * 0.6,
               child: DropdownButtonFormField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 48, 117)))),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor))),
                 value: gender,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -939,10 +1255,10 @@ class _MiscScreenState extends State<MiscScreen> {
             SizedBox(
               width: screenwidth * 0.6,
               child: DropdownButtonFormField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 48, 117)))),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor))),
                 value: nationality,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -1014,26 +1330,21 @@ class _MiscScreenState extends State<MiscScreen> {
         child: FloatingActionButton(
           onPressed: () async {
             if (birthday != DateTime(0, 0, 0)) {
-              setState(() {
-                widget.curruser.birthday = birthday;
-                widget.curruser.nationality = nationality;
-                widget.curruser.gender = gender;
-                widget.curruser.setmisc = true;
-              });
               await db.changeattribute(
-                  'gender', widget.curruser.gender, widget.curruser.uid);
-              await db.changeattribute('nationality',
-                  widget.curruser.nationality, widget.curruser.uid);
+                  'gender', gender, FirebaseAuth.instance.currentUser!.uid);
+              await db.changeattribute('nationality', nationality,
+                  FirebaseAuth.instance.currentUser!.uid);
               await db.changebirthday(
-                  widget.curruser.birthday, widget.curruser.uid);
+                  birthday, FirebaseAuth.instance.currentUser!.uid);
               await db.changeattributebool(
-                  'setmisc', true, widget.curruser.uid);
+                  'setmisc', true, FirebaseAuth.instance.currentUser!.uid);
               gointerestscreen();
             } else {
-              displayErrorSnackBar("Please fill all fields correctly");
+              displayErrorSnackBar(
+                  "Please try again and make sure all fields are filled correctly");
             }
           },
-          backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+          backgroundColor: Theme.of(context).primaryColor,
           child: const Icon(
             Icons.arrow_circle_right_outlined,
             size: 60,
@@ -1047,9 +1358,7 @@ class _MiscScreenState extends State<MiscScreen> {
 class InterestScreen extends StatefulWidget {
   InterestScreen({
     Key? key,
-    required this.curruser,
   }) : super(key: key);
-  AppUser curruser;
   @override
   State<InterestScreen> createState() => _InterestScreenState();
 }
@@ -1073,14 +1382,34 @@ class _InterestScreenState extends State<InterestScreen> {
   List selectedinterests = [];
   db_conn db = db_conn();
   bool buttonpressed = false;
+  bool cancelbuttonpressed = false;
+  TextEditingController psw = TextEditingController();
 
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void goauthscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthScreen(),
+          fullscreenDialog: true),
+    );
   }
 
   void donesignup() {
@@ -1111,7 +1440,7 @@ class _InterestScreenState extends State<InterestScreen> {
           border: Border.all(
               width: selectedinterests.contains(interest) ? 2 : 0,
               color: selectedinterests.contains(interest)
-                  ? const Color.fromARGB(255, 255, 48, 117)
+                  ? Theme.of(context).primaryColor
                   : Colors.black),
           image: DecorationImage(
               opacity: selectedinterests.contains(interest) ? 0.8 : 1,
@@ -1127,7 +1456,7 @@ class _InterestScreenState extends State<InterestScreen> {
               fontSize: 35,
               fontWeight: FontWeight.bold,
               color: selectedinterests.contains(interest)
-                  ? const Color.fromARGB(255, 255, 48, 117)
+                  ? Theme.of(context).primaryColor
                   : Colors.white),
           textScaleFactor: 1.0,
         )),
@@ -1138,18 +1467,118 @@ class _InterestScreenState extends State<InterestScreen> {
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
     return buttonpressed
         ? LoadingOverlay(
             text: "Creating your account...",
-            color: const Color.fromARGB(255, 255, 48, 117))
+            color: Theme.of(context).primaryColor)
         : Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.white,
             appBar: AppBar(
-              title: const Text(
+              leading: GestureDetector(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          backgroundColor: Colors.white,
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                            height: screenheight * 0.35,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            child: Column(children: [
+                              const Text("Cancel SignUp",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25)),
+                              SizedBox(
+                                height: screenheight * 0.02,
+                              ),
+                              const Text(
+                                "Enter password to cancel Sign Up.",
+                                style: TextStyle(fontSize: 15),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(
+                                height: screenheight * 0.02,
+                              ),
+                              textdatafield(
+                                  screenwidth * 0.4, "Enter Password", psw),
+                              SizedBox(
+                                height: screenheight * 0.04,
+                              ),
+                              GestureDetector(
+                                onTap: cancelbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          cancelbuttonpressed = true;
+                                        });
+                                        try {
+                                          String email = FirebaseAuth.instance
+                                                  .currentUser!.email ??
+                                              "";
+                                          await FirebaseAuth.instance
+                                              .signInWithEmailAndPassword(
+                                                  email: email,
+                                                  password: psw.text.trim());
+                                          await db.cancelsignup(FirebaseAuth
+                                              .instance.currentUser!.uid);
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .delete();
+                                          psw.clear();
+                                          psw.dispose();
+                                          goauthscreen();
+                                        } catch (e) {
+                                          displayErrorSnackBar(
+                                              "Could not cancel signup, please try again and makes sure password is correct");
+                                        } finally {
+                                          setState(() {
+                                            cancelbuttonpressed = false;
+                                          });
+                                        }
+                                      },
+                                child: SizedBox(
+                                    height: 50,
+                                    width: screenwidth * 0.7,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: const Center(
+                                          child: Text(
+                                        "Cancel Sign Up",
+                                        style: TextStyle(
+                                            fontSize: 20, color: Colors.white),
+                                      )),
+                                    )),
+                              ),
+                            ]),
+                          ),
+                        );
+                      });
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              title: Text(
                 "What are your interests?",
                 style: TextStyle(
-                    color: Color.fromARGB(255, 255, 48, 117),
+                    color: Theme.of(context).primaryColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 20),
               ),
@@ -1159,7 +1588,7 @@ class _InterestScreenState extends State<InterestScreen> {
                     children: [
                       Container(
                         width: screenwidth,
-                        color: const Color.fromARGB(255, 255, 48, 117),
+                        color: Theme.of(context).primaryColor,
                         height: 4.0,
                       ),
                     ],
@@ -1204,15 +1633,12 @@ class _InterestScreenState extends State<InterestScreen> {
                         });
                         try {
                           if (selectedinterests.length >= 3) {
-                            setState(() {
-                              widget.curruser.interests = selectedinterests;
-                              widget.curruser.setinterests = true;
-                            });
-
-                            await db.changeinterests('interests',
-                                widget.curruser.interests, widget.curruser.uid);
-                            await db.changeattributebool(
-                                'setinterests', true, widget.curruser.uid);
+                            await db.changeinterests(
+                                'interests',
+                                selectedinterests,
+                                FirebaseAuth.instance.currentUser!.uid);
+                            await db.changeattributebool('setinterests', true,
+                                FirebaseAuth.instance.currentUser!.uid);
                             donesignup();
                           } else {
                             displayErrorSnackBar("Choose at least 3 interests");
@@ -1227,7 +1653,7 @@ class _InterestScreenState extends State<InterestScreen> {
                           });
                         }
                       },
-                backgroundColor: const Color.fromARGB(255, 255, 48, 117),
+                backgroundColor: Theme.of(context).primaryColor,
                 child: const Icon(
                   Icons.arrow_circle_right_outlined,
                   size: 60,

@@ -56,7 +56,6 @@ class EventListView extends StatelessWidget {
                   child: Text(
                     event.title,
                     style: const TextStyle(
-                        fontFamily: "Poppins",
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
@@ -67,14 +66,12 @@ class EventListView extends StatelessWidget {
               ),
               Text(event.interest,
                   style: const TextStyle(
-                      fontFamily: "Poppins",
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 255, 48, 117))),
               Text(
-                "${event.address}",
+                event.address,
                 style: const TextStyle(
-                    fontFamily: "Poppins",
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
@@ -85,7 +82,6 @@ class EventListView extends StatelessWidget {
               Text(
                 "${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}",
                 style: const TextStyle(
-                    fontFamily: "Poppins",
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
@@ -113,7 +109,6 @@ class EventListView extends StatelessWidget {
                             child: Text(
                               event.title,
                               style: const TextStyle(
-                                  fontFamily: "Poppins",
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black),
@@ -133,15 +128,13 @@ class EventListView extends StatelessWidget {
                       ),
                       Text(event.interest,
                           style: const TextStyle(
-                              fontFamily: "Poppins",
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Color.fromARGB(255, 255, 48, 117))),
                       const SizedBox(height: 5),
                       Text(
-                        "${event.address}",
+                        event.address,
                         style: const TextStyle(
-                            fontFamily: "Poppins",
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Colors.black),
@@ -151,7 +144,6 @@ class EventListView extends StatelessWidget {
                       Text(
                         "${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}",
                         style: const TextStyle(
-                            fontFamily: "Poppins",
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Colors.black),
@@ -162,7 +154,6 @@ class EventListView extends StatelessWidget {
                       Text(
                         event.description,
                         style: const TextStyle(
-                            fontFamily: "Poppins",
                             fontSize: 12,
                             fontWeight: FontWeight.w300,
                             color: Colors.black),
@@ -175,7 +166,6 @@ class EventListView extends StatelessWidget {
                             ? "${event.participants.length}/${event.maxparticipants} participants"
                             : "Participant number reached",
                         style: const TextStyle(
-                            fontFamily: "Poppins",
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Colors.black),

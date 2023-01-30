@@ -161,7 +161,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
           SizedBox(
             height: screenheight * 0.04,
           ),
-          Text(
+          const Text(
             "Support",
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
@@ -179,7 +179,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                           borderRadius: BorderRadius.circular(10)),
                       backgroundColor: Colors.white,
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
                         height: screenheight * 0.33,
                         decoration: const BoxDecoration(
                             color: Colors.white,
@@ -212,13 +212,12 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                 fontWeight: FontWeight.w300,
                                 fontSize: 15,
                               ),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(
-                                        color:
-                                            Color.fromARGB(255, 255, 48, 117))),
+                                        color: Theme.of(context).primaryColor)),
                                 hintText: "Bug Description",
-                                hintStyle: TextStyle(
+                                hintStyle: const TextStyle(
                                   color: Color.fromARGB(39, 0, 0, 0),
                                   fontSize: 15,
                                 ),
@@ -259,9 +258,9 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                 height: 50,
                                 width: screenwidth * 0.6,
                                 child: Container(
-                                  decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 48, 117),
-                                      borderRadius: BorderRadius.all(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: const BorderRadius.all(
                                           Radius.circular(20))),
                                   child: const Center(
                                       child: Text(
@@ -310,7 +309,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                           borderRadius: BorderRadius.circular(10)),
                       backgroundColor: Colors.white,
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
                         height: screenheight * 0.4,
                         decoration: const BoxDecoration(
                             color: Colors.white,
@@ -383,9 +382,9 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                 height: 50,
                                 width: screenwidth * 0.7,
                                 child: Container(
-                                  decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 48, 117),
-                                      borderRadius: BorderRadius.all(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: const BorderRadius.all(
                                           Radius.circular(20))),
                                   child: const Center(
                                       child: Text(
@@ -497,9 +496,9 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                 height: 50,
                                 width: screenwidth * 0.7,
                                 child: Container(
-                                  decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 48, 117),
-                                      borderRadius: BorderRadius.all(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: const BorderRadius.all(
                                           Radius.circular(20))),
                                   child: const Center(
                                       child: Text(
@@ -561,11 +560,11 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                 await FirebaseAuth.instance.signOut();
                 goauthwrapper();
               },
-              child: const Center(
+              child: Center(
                 child: Text(
                   "Log Out",
                   style: TextStyle(
-                      fontSize: 20, color: Color.fromARGB(255, 255, 48, 117)),
+                      fontSize: 20, color: Theme.of(context).primaryColor),
                 ),
               )),
           SizedBox(
@@ -718,9 +717,9 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                 height: 50,
                                 width: screenwidth * 0.7,
                                 child: Container(
-                                  decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 48, 117),
-                                      borderRadius: BorderRadius.all(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: const BorderRadius.all(
                                           Radius.circular(20))),
                                   child: const Center(
                                       child: Text(
@@ -735,11 +734,11 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                     );
                   });
             },
-            child: const Center(
+            child: Center(
               child: Text(
                 "Delete Account",
                 style: TextStyle(
-                    fontSize: 20, color: Color.fromARGB(255, 255, 48, 117)),
+                    fontSize: 20, color: Theme.of(context).primaryColor),
               ),
             ),
           ),

@@ -1,5 +1,4 @@
 import 'package:clout/components/event.dart';
-import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/searchlocation.dart';
@@ -103,7 +102,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
-      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
       final splitted = filePath.substring(0, (lastIndex));
       final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
       var result = await FlutterImageCompress.compressAndGetFile(
@@ -191,9 +190,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back_ios,
-                  color: Color.fromARGB(255, 255, 48, 117),
+                  color: Theme.of(context).primaryColor,
                 ),
               )
             : Container(),
@@ -201,10 +200,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           onTap: () {
             CompressAndGetFile(imagepath);
           },
-          child: const Text(
+          child: Text(
             "Create Event",
             style: TextStyle(
-                color: Color.fromARGB(255, 255, 48, 117),
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 30),
           ),
@@ -238,7 +237,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               borderRadius: BorderRadius.circular(15),
               child: imagepath == null
                   ? Container(
-                      color: const Color.fromARGB(255, 255, 48, 117),
+                      color: Theme.of(context).primaryColor,
                       height: screenheight * 0.2,
                       width: screenheight * 0.2,
                       child: Icon(
@@ -269,17 +268,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
             child: TextField(
-              style: const TextStyle(
-                color: Color.fromARGB(255, 255, 48, 117),
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 30,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                        BorderSide(color: Theme.of(context).primaryColor)),
                 hintText: "Event Name",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 30,
                 ),
@@ -294,10 +293,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 48, 117)))),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor))),
               value: selectedinterest,
               onChanged: (String? newValue) {
                 setState(() {
@@ -330,12 +329,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 fontWeight: FontWeight.w300,
                 fontSize: 15,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                        BorderSide(color: Theme.of(context).primaryColor)),
                 hintText: "Description",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 15,
                 ),
@@ -358,12 +357,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 fontWeight: FontWeight.w300,
                 fontSize: 15,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
-                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
+                        BorderSide(color: Theme.of(context).primaryColor)),
                 hintText: "Max. Number of Participants",
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Color.fromARGB(39, 0, 0, 0),
                   fontSize: 15,
                 ),

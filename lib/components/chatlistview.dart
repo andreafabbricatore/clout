@@ -59,7 +59,7 @@ class ChatListView extends StatelessWidget {
             children: [
               Text(
                 chatname,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
@@ -67,8 +67,8 @@ class ChatListView extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                "${chat.mostrecentmessage}",
-                style: TextStyle(
+                chat.mostrecentmessage,
+                style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w300,
                     color: Colors.grey),

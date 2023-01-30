@@ -144,10 +144,10 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Filter by Date",
           style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 30),
         ),
@@ -159,9 +159,9 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_ios,
-            color: Color.fromARGB(255, 255, 48, 117),
+            color: Theme.of(context).primaryColor,
           ),
         ),
       ),
@@ -175,7 +175,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                   initialSelectedDate: initialDate,
                   initialDisplayDate: initialDate,
                   minDate: DateTime.now(),
-                  selectionColor: const Color.fromARGB(255, 255, 48, 117),
+                  selectionColor: Theme.of(context).primaryColor,
                   todayHighlightColor: Colors.grey,
                   selectionTextStyle: const TextStyle(color: Colors.white),
                 )

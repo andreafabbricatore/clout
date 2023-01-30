@@ -55,10 +55,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
   }
 
-  void setup() async {
-    await getchatlist();
-  }
-
   Future<void> refresh() async {
     try {
       AppUser curruser = await db.getUserFromUID(widget.curruser.uid);
@@ -74,13 +70,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   void initState() {
     super.initState();
-    setup();
+    refresh();
   }
 
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
-    final screenheight = MediaQuery.of(context).size.height;
     Future<void> chatnavigate(Chat chat, int index) async {
       await Navigator.push(
           context,
@@ -89,7 +84,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     chatinfo: chat,
                     curruser: widget.curruser,
                   )));
-      getchatlist();
+      refresh();
     }
 
     Future<void> userchatinteract(AppUser user, int index) async {
@@ -113,6 +108,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         suffixiconcolor = Colors.white;
         searchedusers = [];
       });
+      //error?
       await db.setuserchatvisibility(
           widget.curruser, user.uid, userchat.chatid);
       searchcontroller.clear();
@@ -137,18 +133,18 @@ class _ChatListScreenState extends State<ChatListScreen> {
             onTap: () {
               Navigator.pop(context);
             },
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Icon(
                 Icons.arrow_back_ios,
-                color: Color.fromARGB(255, 255, 48, 117),
+                color: Theme.of(context).primaryColor,
               ),
             ),
           ),
         ),
         body: RefreshIndicator(
           onRefresh: refresh,
-          color: const Color.fromARGB(255, 255, 48, 117),
+          color: Theme.of(context).primaryColor,
           child: Column(children: [
             Center(
               child: Focus(
@@ -211,12 +207,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
             ),
             !searching
-                ? ChatListView(
-                    chatlist: chatlist,
-                    screenwidth: screenwidth,
-                    onTap: chatnavigate,
-                    curruser: widget.curruser,
-                  )
+                ? chatlist.isNotEmpty
+                    ? ChatListView(
+                        chatlist: chatlist,
+                        screenwidth: screenwidth,
+                        onTap: chatnavigate,
+                        curruser: widget.curruser,
+                      )
+                    : Container()
                 : UserListView(
                     userres: searchedusers,
                     onTap: userchatinteract,

@@ -31,7 +31,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
         border: Border.all(
             width: widget.curruser.interests.contains(interest) ? 2 : 0,
             color: widget.curruser.interests.contains(interest)
-                ? const Color.fromARGB(255, 255, 48, 117)
+                ? Theme.of(context).primaryColor
                 : Colors.black),
         image: DecorationImage(
             opacity: widget.curruser.interests.contains(interest) ? 0.8 : 1,
@@ -47,7 +47,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
             fontSize: 35,
             fontWeight: FontWeight.bold,
             color: widget.curruser.interests.contains(interest)
-                ? const Color.fromARGB(255, 255, 48, 117)
+                ? Theme.of(context).primaryColor
                 : Colors.white),
         textScaleFactor: 1.0,
       )),

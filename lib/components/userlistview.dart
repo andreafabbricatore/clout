@@ -64,7 +64,7 @@ class UserListView extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                "${user.fullname}",
+                user.fullname,
                 style: const TextStyle(fontSize: 15, color: Colors.black),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

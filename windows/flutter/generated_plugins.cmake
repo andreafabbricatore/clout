@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   geolocator_windows
+  rive_common
   share_plus
   url_launcher_windows
 )

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:flutter/material.dart';
@@ -49,18 +48,18 @@ class _PreAuthScreenState extends State<PreAuthScreen> {
             height: screenheight,
             width: screenwidth,
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SmoothPageIndicator(
                     controller: controller,
                     count: 3,
-                    effect: const ExpandingDotsEffect(
+                    effect: ExpandingDotsEffect(
                         dotWidth: 10,
                         dotHeight: 10,
-                        dotColor: Color.fromARGB(130, 255, 48, 117),
-                        activeDotColor: Color.fromARGB(255, 255, 48, 117)),
+                        dotColor: const Color.fromARGB(130, 255, 48, 117),
+                        activeDotColor: Theme.of(context).primaryColor),
                     onDotClicked: (index) {
                       controller.jumpToPage(index);
                     },
@@ -142,33 +141,34 @@ class Page1 extends StatelessWidget {
             ),
             RichText(
               textAlign: TextAlign.start,
-              text: const TextSpan(
-                  style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black),
+              text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
                   children: [
-                    TextSpan(
+                    const TextSpan(
                       text: "Feeling ",
                     ),
                     TextSpan(
                         text: "bored",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
-                    TextSpan(text: "?\n"),
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    const TextSpan(text: "?\n"),
                     TextSpan(
                         text: "Find ",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
-                    TextSpan(
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    const TextSpan(
                       text: "something to do,\n",
                     ),
-                    TextSpan(text: "Make "),
+                    const TextSpan(text: "Make "),
                     TextSpan(
                         text: "new friends",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
-                    TextSpan(text: ".")
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    const TextSpan(text: ".")
                   ]),
             ),
           ],
@@ -187,13 +187,13 @@ class Page2 extends StatefulWidget {
 
 class _Page2State extends State<Page2> {
   List<String> passions = [
-    "touching kids",
+    "drinking out",
     "playing football",
-    "drowning in pools",
+    "painting",
     "partying hard",
-    "caressing grass"
+    "playing poker"
   ];
-  String passion = "touching kids";
+  String passion = "drinking out";
   int index = 0;
   Timer? timer;
 
@@ -249,24 +249,25 @@ class _Page2State extends State<Page2> {
               textAlign: TextAlign.center,
               text: TextSpan(
                   style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black),
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
                   children: [
                     const TextSpan(text: "Like "),
                     TextSpan(
                         text: passion,
-                        style: const TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
                     const TextSpan(text: "?\nSomeone "),
-                    const TextSpan(
+                    TextSpan(
                         text: "near you\n",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
-                    const TextSpan(
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    TextSpan(
                         text: "wants to",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
                     const TextSpan(text: " do that too.")
                   ]),
             ),
@@ -307,41 +308,41 @@ class Page3 extends StatelessWidget {
             ),
             RichText(
               textAlign: TextAlign.end,
-              text: const TextSpan(
-                  style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black),
+              text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
                   children: [
-                    TextSpan(
+                    const TextSpan(
                       text: "Let's have ",
                     ),
                     TextSpan(
                         text: "real",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
                     TextSpan(
                         text: " fun",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
-                    TextSpan(text: ".\n"),
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    const TextSpan(text: ".\n"),
                     TextSpan(
                         text: "Join",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
-                    TextSpan(text: " or "),
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    const TextSpan(text: " or "),
                     TextSpan(
                         text: "Host",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 48, 117))),
-                    TextSpan(text: " an Event,\n"),
-                    TextSpan(
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    const TextSpan(text: " an Event,\n"),
+                    const TextSpan(
                       text: "Get Clout, ",
                     ),
                     TextSpan(
                         text: "Go Out!",
-                        style:
-                            TextStyle(color: Color.fromARGB(255, 255, 48, 117)))
+                        style: TextStyle(color: Theme.of(context).primaryColor))
                   ]),
             ),
           ],

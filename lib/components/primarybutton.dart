@@ -94,9 +94,9 @@ class _PrimaryButtonState extends State<PrimaryButton>
                           ));
               })
           : Container(
-              decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 255, 48, 117),
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(20))),
               child: widget.buttonpressed
                   ? Align(
                       alignment: Alignment.centerLeft,

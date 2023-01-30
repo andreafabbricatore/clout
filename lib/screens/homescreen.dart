@@ -1,13 +1,12 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
-import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
-import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/notificationscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> interesteventlist = [];
   List userinterests = [];
   List<Event> totaleventlist = [];
+  final double _offsetToArmed = 200;
 
   void displayErrorSnackBar(
     String error,
@@ -213,19 +213,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: () {
-            displayErrorSnackBar("test");
-          },
-          child: const Text(
-            "Clout",
-            style: TextStyle(
-                color: Color.fromARGB(255, 255, 48, 117),
-                fontFamily: "Kristi",
-                fontWeight: FontWeight.w500,
-                fontSize: 50),
-            textScaleFactor: 1.0,
-          ),
+        title: Text(
+          "Clout",
+          style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w900,
+              fontSize: 50,
+              fontStyle: FontStyle.italic),
+          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -269,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: refresh,
-        color: const Color.fromARGB(255, 255, 48, 117),
+        color: Theme.of(context).primaryColor,
         child: Padding(
           padding: EdgeInsets.all(screenheight * 0.02),
           child: Column(

@@ -1,11 +1,6 @@
-import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/completesignuploading.dart';
-import 'package:clout/screens/emailverificationscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/preauthscreen.dart';
-import 'package:clout/screens/signupscreen.dart';
-import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -50,7 +45,9 @@ class MyApp extends StatelessWidget {
       title: 'clout',
       debugShowCheckedModeBanner: false,
       home: AuthenticationWrapper(),
-      theme: ThemeData(primaryColor: const Color.fromARGB(255, 255, 48, 117)),
+      theme: ThemeData(
+        primaryColor: Theme.of(context).primaryColor,
+      ),
     );
   }
 }

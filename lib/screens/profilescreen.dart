@@ -56,12 +56,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Future<void> reportuser(AppUser user) async {
+  Future<void> reportuser() async {
     try {
-      await db.reportUser(user);
-      displayErrorSnackBar("Reported @${user.username}");
+      await db.reportUser(widget.user);
+      displayErrorSnackBar("Reported @${widget.user.username}");
+      Navigator.pop(context);
     } catch (e) {
       displayErrorSnackBar("Could not report, please try again");
+    }
+  }
+
+  Future<void> blockuser() async {
+    try {
+      await db.blockUser(widget.curruser.uid, widget.user.uid);
+      displayErrorSnackBar("Blocked User! To unblock, please visit Settings.");
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } catch (e) {
+      displayErrorSnackBar("Could not block user, please try again");
     }
   }
 
@@ -275,11 +287,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Icon(
                     Icons.arrow_back_ios,
-                    color: Color.fromARGB(255, 255, 48, 117),
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               )
@@ -317,24 +329,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ]
             : [
                 InkWell(
-                  onTap: () {
-                    refresh();
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                    child: Icon(
-                      Icons.refresh,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                InkWell(
                   onTap: () async {
-                    await reportuser(widget.user);
-                    showDialog(
+                    showModalBottomSheet(
+                        backgroundColor: Colors.white,
                         context: context,
                         builder: (BuildContext context) {
-                          return alert;
+                          return SizedBox(
+                            height: screenheight * 0.18,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await reportuser();
+                                      },
+                                      child: const Text("Report User",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w300)),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(width: 0.05)),
+                                    ),
+                                    GestureDetector(
+                                        onTap: () async {
+                                          await blockuser();
+                                        },
+                                        child: const Text("Block User",
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w300))),
+                                  ]),
+                            ),
+                          );
                         });
                   },
                   child: const Padding(
@@ -351,7 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: refresh,
-        color: const Color.fromARGB(255, 255, 48, 117),
+        color: Theme.of(context).primaryColor,
         child: SingleChildScrollView(
           child: SizedBox(
             height: screenheight,

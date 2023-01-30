@@ -71,10 +71,10 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Clout Score",
           style: TextStyle(
-              color: Color.fromARGB(255, 255, 48, 117),
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 30),
           textScaleFactor: 1.0,
@@ -83,9 +83,9 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_ios,
-            color: Color.fromARGB(255, 255, 48, 117),
+            color: Theme.of(context).primaryColor,
           ),
         ),
         backgroundColor: Colors.white,

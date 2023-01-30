@@ -156,11 +156,11 @@ class _MainScreenState extends State<MainScreen> {
 
   void getforegroundnotis() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
+      //print('Got a message whilst in the foreground!');
+      //print('Message data: ${message.data}');
 
       if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
+        //print('Message also contained a notification: ${message.notification}');
       }
     });
   }
@@ -193,7 +193,7 @@ class _MainScreenState extends State<MainScreen> {
                 "Home",
                 textScaleFactor: 1.0,
               ),
-              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              activeColor: Theme.of(context).primaryColor,
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
@@ -204,7 +204,7 @@ class _MainScreenState extends State<MainScreen> {
                 "Search",
                 textScaleFactor: 1.0,
               ),
-              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              activeColor: Theme.of(context).primaryColor,
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
@@ -215,7 +215,7 @@ class _MainScreenState extends State<MainScreen> {
                 "Create",
                 textScaleFactor: 1.0,
               ),
-              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              activeColor: Theme.of(context).primaryColor,
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
@@ -226,7 +226,7 @@ class _MainScreenState extends State<MainScreen> {
                 "Favorites",
                 textScaleFactor: 1.0,
               ),
-              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              activeColor: Theme.of(context).primaryColor,
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
@@ -235,7 +235,7 @@ class _MainScreenState extends State<MainScreen> {
                 "Profile",
                 textScaleFactor: 1.0,
               ),
-              activeColor: const Color.fromARGB(255, 255, 48, 117),
+              activeColor: Theme.of(context).primaryColor,
               inactiveColor: Colors.grey,
             )
           ],

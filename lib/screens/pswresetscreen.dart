@@ -45,9 +45,9 @@ class _PswResetScreenState extends State<PswResetScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_ios,
-            color: Color.fromARGB(255, 255, 48, 117),
+            color: Theme.of(context).primaryColor,
           ),
         ),
       ),

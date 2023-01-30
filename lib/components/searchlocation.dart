@@ -2,8 +2,6 @@ import 'package:clout/components/location.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
@@ -78,12 +76,12 @@ class _SearchLocationState extends State<SearchLocation> {
   Widget _listviewitem(AppLocation location, int index, int length) {
     BorderRadius border = BorderRadius.zero;
     if (index == 0 && length == 1) {
-      border = BorderRadius.all(Radius.circular(10));
+      border = const BorderRadius.all(Radius.circular(10));
     } else if (index == 0) {
-      border = BorderRadius.only(
+      border = const BorderRadius.only(
           topLeft: Radius.circular(10), topRight: Radius.circular(10));
     } else if (index == (length - 1)) {
-      border = BorderRadius.only(
+      border = const BorderRadius.only(
           bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10));
     }
     return Container(
@@ -167,9 +165,9 @@ class _SearchLocationState extends State<SearchLocation> {
           onTap: () {
             Navigator.pop(context, chosenLocation);
           },
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_ios,
-            color: Color.fromARGB(255, 255, 48, 117),
+            color: Theme.of(context).primaryColor,
           ),
         ),
       ),
@@ -205,7 +203,7 @@ class _SearchLocationState extends State<SearchLocation> {
             Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.fromLTRB(8, 16, 8, 0),
+                  padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
                   child: TextField(
                     controller: searchcontroller,
                     onChanged: (String searchquery) async {
@@ -288,10 +286,10 @@ class _SearchLocationState extends State<SearchLocation> {
                             height: 50,
                             width: screenwidth * 0.5,
                             child: Container(
-                              decoration: const BoxDecoration(
-                                  color: Color.fromARGB(255, 255, 48, 117),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20))),
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20))),
                               child: const Center(
                                   child: Text(
                                 "Choose Location",

@@ -1,18 +1,20 @@
-import 'package:clout/components/chat.dart';
 import 'package:clout/components/notification.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class NotificationsListView extends StatelessWidget {
-  NotificationsListView({
-    Key? key,
-    required this.notificationlist,
-    required this.screenwidth,
-    required this.onTapUsername,
-  }) : super(key: key);
+  NotificationsListView(
+      {Key? key,
+      required this.notificationlist,
+      required this.screenwidth,
+      required this.onTapUsername,
+      required,
+      required this.onTapEvent})
+      : super(key: key);
   List<NotificationElement> notificationlist;
   double screenwidth;
-  final Function(String username, int index) onTapUsername;
+  final Function(String uid, int index) onTapUsername;
+  final Function(String eventid, int index) onTapEvent;
 
   Widget _listviewitem(
     NotificationElement notification,
@@ -29,7 +31,10 @@ class NotificationsListView extends StatelessWidget {
                 text: username,
                 style: const TextStyle(
                     color: Colors.black, fontWeight: FontWeight.bold),
-                recognizer: TapGestureRecognizer()..onTap = () {}),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTapUsername.call(notification.userid, index);
+                  }),
             const TextSpan(text: " started following you"),
           ]);
     } else if (notification.type == "modified") {
@@ -42,7 +47,10 @@ class NotificationsListView extends StatelessWidget {
                 text: eventitle,
                 style: const TextStyle(
                     color: Colors.black, fontWeight: FontWeight.bold),
-                recognizer: TapGestureRecognizer()..onTap = () {}),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTapEvent.call(notification.eventid, index);
+                  }),
             const TextSpan(text: " was modified. Check out the changes!"),
           ]);
     } else if (notification.type == "kicked") {
@@ -56,7 +64,10 @@ class NotificationsListView extends StatelessWidget {
                 text: eventtitle,
                 style: const TextStyle(
                     color: Colors.black, fontWeight: FontWeight.bold),
-                recognizer: TapGestureRecognizer()..onTap = () {}),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTapEvent.call(notification.eventid, index);
+                  }),
           ]);
     } else if (notification.type == "joined") {
       List<String> text = notification.notification.split(" ");
@@ -70,13 +81,19 @@ class NotificationsListView extends StatelessWidget {
                 text: username,
                 style: const TextStyle(
                     color: Colors.black, fontWeight: FontWeight.bold),
-                recognizer: TapGestureRecognizer()..onTap = () {}),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTapUsername.call(notification.userid, index);
+                  }),
             const TextSpan(text: " joined your event: "),
             TextSpan(
                 text: eventtitle,
                 style: const TextStyle(
                     color: Colors.black, fontWeight: FontWeight.bold),
-                recognizer: TapGestureRecognizer()..onTap = () {}),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTapEvent.call(notification.eventid, index);
+                  }),
           ]);
     } else {}
 

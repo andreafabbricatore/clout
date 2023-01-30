@@ -77,6 +77,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     Future<void> unblockUser(AppUser user, int index) async {
       try {
         await db.unblockUser(widget.curruser.uid, user.uid);
+        displayErrorSnackBar("Unblocked user! We love friendship :)");
         refresh();
       } catch (e) {
         displayErrorSnackBar("Could not remove participant, please try again");

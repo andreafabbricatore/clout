@@ -144,15 +144,15 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_ios,
-            color: Color.fromARGB(255, 255, 48, 117),
+            color: Theme.of(context).primaryColor,
           ),
         ),
       ),
       body: RefreshIndicator(
         onRefresh: refresh,
-        color: const Color.fromARGB(255, 255, 48, 117),
+        color: Theme.of(context).primaryColor,
         child: Padding(
           padding: EdgeInsets.all(screenheight * 0.02),
           child: widget.events.isNotEmpty

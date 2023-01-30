@@ -59,7 +59,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
-      final MarkerId markerId = MarkerId("chosenlocation");
+      const MarkerId markerId = MarkerId("chosenlocation");
       Marker marker = Marker(
         markerId: markerId,
         draggable: true,
@@ -276,9 +276,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back_ios,
-                  color: Color.fromARGB(255, 255, 48, 117),
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               actions: [
@@ -377,7 +377,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   style: const TextStyle(
                       fontSize: 40,
                       color: Colors.black,
-                      fontFamily: "Poppins",
                       fontWeight: FontWeight.bold),
                 ),
                 SizedBox(
@@ -388,17 +387,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   children: [
                     Text(
                       widget.event.interest,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 25,
-                          color: Color.fromARGB(255, 255, 48, 117),
-                          fontFamily: "Poppins",
+                          color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold),
                     ),
                     InkWell(
                       onTap: () async {
                         try {
                           String hostdocid = await db
-                              .getUserDocIDfromUsername(widget.event.host);
+                              .getUserUIDfromUsername(widget.event.host);
                           AppUser eventhost =
                               await db.getUserFromUID(hostdocid);
                           usernavigate(eventhost, 0);
@@ -409,10 +407,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       },
                       child: Text(
                         "@${widget.event.host}",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
-                          color: Color.fromARGB(255, 255, 48, 117),
-                          fontFamily: "Poppins",
+                          color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -427,7 +424,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   style: const TextStyle(
                       fontSize: 15,
                       color: Colors.black,
-                      fontFamily: "Poppins",
                       fontWeight: FontWeight.bold),
                 ),
                 SizedBox(
@@ -477,7 +473,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                   style: TextStyle(
                                                       fontSize: 20,
                                                       color: Colors.black,
-                                                      fontFamily: "Poppins",
                                                       fontWeight:
                                                           FontWeight.w300),
                                                   children: [
@@ -492,8 +487,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                                     255,
                                                                     48,
                                                                     117),
-                                                            fontFamily:
-                                                                "Poppins",
                                                             fontWeight:
                                                                 FontWeight
                                                                     .w300)),
@@ -519,7 +512,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                   style: TextStyle(
                                                       fontSize: 20,
                                                       color: Colors.black,
-                                                      fontFamily: "Poppins",
                                                       fontWeight:
                                                           FontWeight.w300),
                                                   children: [
@@ -534,8 +526,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                                     255,
                                                                     48,
                                                                     117),
-                                                            fontFamily:
-                                                                "Poppins",
                                                             fontWeight:
                                                                 FontWeight
                                                                     .w300)),
@@ -562,7 +552,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   style: const TextStyle(
                       fontSize: 15,
                       color: Colors.black,
-                      fontFamily: "Poppins",
                       fontWeight: FontWeight.w400),
                 ),
                 SizedBox(
@@ -576,7 +565,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   style: const TextStyle(
                       fontSize: 20,
                       color: Colors.black,
-                      fontFamily: "Poppins",
                       fontWeight: FontWeight.bold),
                 ),
                 SizedBox(

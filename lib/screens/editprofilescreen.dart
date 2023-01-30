@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:clout/components/datatextfield.dart';
-import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
@@ -306,7 +305,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
-      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
       final splitted = filePath.substring(0, (lastIndex));
       final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
       var result = await FlutterImageCompress.compressAndGetFile(
@@ -419,10 +418,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 48, 117)))),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor))),
               value: gender,
               onChanged: (String? newValue) {
                 setState(() {
@@ -448,10 +447,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 48, 117)))),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor))),
               value: nationality,
               onChanged: (String? newValue) {
                 setState(() {

@@ -63,7 +63,7 @@ class db_conn {
         'gender': '',
         'nationality': '',
         'pfp_url': '',
-        'birthday': DateTime(0, 1, 1),
+        'birthday': DateTime(1900, 1, 1, 0, 0),
         'interests': [],
         'hosted_events': [],
         'joined_events': [],
@@ -140,9 +140,19 @@ class db_conn {
     }
   }
 
-  Future cancelsignup(String uid, String docid) async {
-    await FirebaseStorage.instance.ref('/user_pfp/${uid}.jpg').delete();
-    return users.doc(docid).delete();
+  Future firstcancelsignup(String uid) async {
+    try {
+      return users.doc(uid).delete();
+    } catch (e) {}
+  }
+
+  Future cancelsignup(String uid) async {
+    try {
+      await FirebaseStorage.instance.ref('/user_pfp/$uid.jpg').delete();
+      return users.doc(uid).delete();
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   Future createevent(Event newevent, AppUser curruser, var imagepath) async {
@@ -271,6 +281,8 @@ class db_conn {
         'target': event.participants,
         'description': '${event.title} was modified. Check out the changes!',
         'notification': '${event.title} was modified. Check out the changes!',
+        'eventid': event.docid,
+        'userid': "",
         'type': 'modified'
       });
     } catch (e) {
@@ -313,6 +325,8 @@ class db_conn {
                 '${curruser.fullname} joined your your event: ${event.title}',
             'notification':
                 '@${curruser.username} joined your your event: ${event.title}',
+            'eventid': event.docid,
+            'userid': curruser.uid,
             'type': 'joined'
           });
           users.doc(curruser.uid).set({
@@ -402,6 +416,8 @@ class db_conn {
         'target': [user.uid],
         'description': 'You were kicked out of the event: ${event.title}',
         'notification': 'You were kicked out of the event: ${event.title}',
+        'eventid': event.docid,
+        'userid': "",
         'type': 'kicked'
       });
     } catch (e) {
@@ -479,10 +495,9 @@ class db_conn {
     try {
       await uploadUserPFP(filePath, uid);
       String photoUrl = await downloadUserPFPURL(uid);
-      String id = "";
-      await getUserDocID(uid).then((value) => id = value);
-      DocumentSnapshot documentSnapshot = await users.doc(id).get();
-      await users.doc(id).update({'pfp_url': photoUrl});
+      DocumentSnapshot documentSnapshot = await users.doc(uid).get();
+      print("here");
+      await users.doc(uid).update({'pfp_url': photoUrl});
       List chatlist = documentSnapshot['chats'];
       for (int i = 0; i < chatlist.length; i++) {
         DocumentSnapshot chatsnapshot = await chats.doc(chatlist[i]).get();
@@ -649,7 +664,7 @@ class db_conn {
     }
   }
 
-  Future<String> getUserDocIDfromUsername(String username) async {
+  Future<String> getUserUIDfromUsername(String username) async {
     String docID = "";
     try {
       await FirebaseFirestore.instance
@@ -658,29 +673,6 @@ class db_conn {
           .then((QuerySnapshot querySnapshot) => {
                 querySnapshot.docs.forEach((doc) {
                   if (doc["username"] == username) {
-                    docID = doc.id;
-                  }
-                })
-              });
-    } catch (e) {
-      throw Exception("Error with userdocid");
-    }
-    if (docID != "") {
-      return docID;
-    } else {
-      throw Exception("Error with userdocid");
-    }
-  }
-
-  Future<String> getUserDocIDfromUID(String uid) async {
-    String docID = "";
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .get()
-          .then((QuerySnapshot querySnapshot) => {
-                querySnapshot.docs.forEach((doc) {
-                  if (doc["uid"] == uid) {
                     docID = doc.id;
                   }
                 })
@@ -949,7 +941,7 @@ class db_conn {
 
   Future<Chat> getChatfromDocId(String chatid) async {
     try {
-      DocumentSnapshot documentSnapshot = await chats.doc(chatid).getSavy();
+      DocumentSnapshot documentSnapshot = await chats.doc(chatid).get();
       Chat chat = Chat.fromJson(documentSnapshot.data(), chatid);
       return chat;
     } catch (e) {
@@ -1101,6 +1093,8 @@ class db_conn {
           'target': [userdocid],
           'description': "${curruserdoc['fullname']} started following you",
           'notification': "@${curruserdoc['username']} started following you",
+          'eventid': "",
+          'userid': curruserdocid,
           'type': 'followed'
         });
       } catch (e) {
@@ -1352,7 +1346,7 @@ class db_conn {
         );
   }
 
-  Future sendmessage(String content, String sender, String docid,
+  Future sendmessage(String content, AppUser sender, String docid,
       String notititle, String type) async {
     try {
       String notification = "";
@@ -1363,14 +1357,15 @@ class db_conn {
       }
       await chats.doc(docid).collection('messages').add({
         'content': content,
-        'sender': sender,
+        'sender': sender.username,
+        'senderuid': sender.uid,
         'timestamp': DateTime.now(),
         'notification': notification,
         'notititle': notititle,
       });
       return chats
           .doc(docid)
-          .update({'mostrecentmessage': '$sender: $content'});
+          .update({'mostrecentmessage': '${sender.username}: $content'});
     } catch (e) {
       throw Exception();
     }
@@ -1427,7 +1422,7 @@ class db_conn {
       AppUser otheruser = await getUserFromUID(otheruserdocid);
       QuerySnapshot querySnapshot =
           await chats.doc(chatid).collection("messages").get();
-      if (querySnapshot.docs.isNotEmpty) {
+      if (querySnapshot.size > 0) {
         await users.doc(curruser.uid).set({
           "visiblechats": FieldValue.arrayUnion([chatid])
         }, SetOptions(merge: true));
@@ -1461,19 +1456,22 @@ class db_conn {
     }
   }
 
+  bool userchatparticipantsequality(
+      List<dynamic> participants, String otheruserdocid, String curruserdocid) {
+    return (participants.contains(otheruserdocid) &&
+        participants.contains(curruserdocid));
+  }
+
   Future<bool> checkuserchatexists(
       AppUser curruser, String otheruserdocid) async {
     int instances = 0;
     try {
-      List chatlist = curruser.chats;
       for (int i = 0; i < curruser.chats.length; i++) {
         DocumentSnapshot chatsnapshot =
             await chats.doc(curruser.chats[i]).get();
-        if (listEquals(chatsnapshot['participants'],
-                <dynamic>[curruser.uid, otheruserdocid]) ||
-            listEquals(chatsnapshot['participants'],
-                    <dynamic>[otheruserdocid, curruser.uid]) &&
-                (chatsnapshot['type'] == 'user')) {
+        if ((chatsnapshot['type'] == 'user') &&
+            userchatparticipantsequality(
+                chatsnapshot['participants'], otheruserdocid, curruser.uid)) {
           instances = instances + 1;
         }
       }

@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/emailverificationscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
 import 'package:clout/services/db.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CompleteSignUpLoading extends StatefulWidget {
@@ -51,7 +48,6 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
   Future<void> getUser() async {
     try {
       AppUser user = await db.getUserFromUID(widget.uid);
-      print(user);
       setState(() {
         curruser = user;
       });
@@ -67,37 +63,36 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) =>
-              PicandNameScreen(curruser: curruser),
-        ),
+            builder: (BuildContext context) => PicandNameScreen(),
+            fullscreenDialog: true),
       );
     } else if (curruser.setusername == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => UsernameScreen(curruser: curruser),
-        ),
+            builder: (BuildContext context) => UsernameScreen(),
+            fullscreenDialog: true),
       );
     } else if (curruser.setmisc == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => MiscScreen(curruser: curruser),
-        ),
+            builder: (BuildContext context) => MiscScreen(),
+            fullscreenDialog: true),
       );
     } else if (curruser.setinterests == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => InterestScreen(curruser: curruser),
-        ),
+            builder: (BuildContext context) => InterestScreen(),
+            fullscreenDialog: true),
       );
     } else {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => const EmailVerificationScreen(),
-        ),
+            builder: (BuildContext context) => const EmailVerificationScreen(),
+            fullscreenDialog: true),
       );
     }
   }
@@ -140,10 +135,10 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
                           height: 50,
                           width: screenwidth * 0.6,
                           child: Container(
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 48, 117),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(20))),
                             child: const Center(
                                 child: Text(
                               "Refresh",
@@ -159,10 +154,10 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Clout",
                       style: TextStyle(
-                          color: Color.fromARGB(255, 255, 48, 117),
+                          color: Theme.of(context).primaryColor,
                           fontFamily: "Kristi",
                           fontWeight: FontWeight.w500,
                           fontSize: 80),

@@ -85,6 +85,17 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     setupnames();
   }
 
+  void gotoprofilescreen(AppUser otheruser) {
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ProfileScreen(
+                  user: otheruser,
+                  curruser: widget.curruser,
+                  visit: true,
+                )));
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -99,14 +110,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               List temp = widget.chatinfo.connectedid;
               temp.removeWhere((element) => element == widget.curruser.uid);
               AppUser otheruser = await db.getUserFromUID(temp[0]);
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (_) => ProfileScreen(
-                            user: otheruser,
-                            curruser: widget.curruser,
-                            visit: true,
-                          )));
+              gotoprofilescreen(otheruser);
             } else {
               Event chosenEvent =
                   await db.getEventfromDocId(widget.chatinfo.connectedid[0]);
@@ -166,8 +170,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SpinKitFadingFour(
-                    color: Color.fromARGB(255, 255, 48, 117),
+                  return SpinKitFadingFour(
+                    color: Theme.of(context).primaryColor,
                   );
                 }
                 return ListView(
@@ -191,7 +195,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                               child: Center(
                                   child: Text(
                                 data['content'].toString().toUpperCase(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               ))));
                     } else {
@@ -204,31 +208,31 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 );
               })),
       bottomNavigationBar: Container(
-          margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+          margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
           padding: MediaQuery.of(context).viewInsets,
           color: Colors.white,
           child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(10))),
-              padding: EdgeInsets.symmetric(vertical: 2),
-              margin: EdgeInsets.fromLTRB(15, 0, 15, 25),
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              margin: const EdgeInsets.fromLTRB(15, 0, 15, 25),
               child: TextField(
                 controller: _textmessage,
                 decoration: InputDecoration(
                     contentPadding:
-                        EdgeInsets.symmetric(vertical: 14, horizontal: 5),
+                        const EdgeInsets.symmetric(vertical: 14, horizontal: 5),
                     border: InputBorder.none,
                     hintText: 'Type a message',
                     suffixIcon: IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         CupertinoIcons.arrow_right_square_fill,
                         color: Colors.black,
                       ),
                       onPressed: () {
                         db.sendmessage(
                             _textmessage.text.trim(),
-                            widget.curruser.username,
+                            widget.curruser,
                             widget.chatinfo.chatid,
                             chatname,
                             widget.chatinfo.type);
