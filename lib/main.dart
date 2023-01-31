@@ -13,7 +13,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
-
+  //try { String uid = FirebaseAuth.instance.currentUser!.uid;} catch(e) {}
   //print("Handling a background message: ${message.messageId}");
 }
 
@@ -22,13 +22,16 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await dotenv.load(fileName: "assets/.env");
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  if (FirebaseAuth.instance.currentUser != null) {
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: false,
-    badge: true,
-    sound: false,
-  );
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: false,
+    );
+  }
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -46,7 +49,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: AuthenticationWrapper(),
       theme: ThemeData(
-        primaryColor: Theme.of(context).primaryColor,
+        primaryColor: const Color.fromARGB(255, 255, 48, 117),
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -250,6 +251,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   var imagepath;
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
+  bool continuebuttonpressed = false;
   TextEditingController psw = TextEditingController();
   void displayErrorSnackBar(
     String error,
@@ -498,47 +500,53 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
           SizedBox(height: screenheight * 0.05),
           textdatafield(screenwidth, "Full Name", fullnamecontroller),
           SizedBox(
-            height: screenheight * 0.02,
+            height: screenheight * 0.1,
           ),
+          GestureDetector(
+            onTap: continuebuttonpressed
+                ? null
+                : () async {
+                    setState(() {
+                      continuebuttonpressed = true;
+                    });
+                    try {
+                      if (imagepath != null &&
+                          fullnamecontroller.text.trim().isNotEmpty) {
+                        compressedimgpath = await CompressAndGetFile(imagepath);
+                        await db.changepfp(compressedimgpath,
+                            FirebaseAuth.instance.currentUser!.uid);
+                        await db.changeattribute(
+                            'fullname',
+                            fullnamecontroller.text.trim(),
+                            FirebaseAuth.instance.currentUser!.uid);
+                        await db.changeattributebool('setnameandpfp', true,
+                            FirebaseAuth.instance.currentUser!.uid);
+                        gousernamescreen();
+                      } else if (imagepath == null) {
+                        displayErrorSnackBar("Please upload Profile Picture");
+                      } else if (fullnamecontroller.text.trim().isEmpty) {
+                        displayErrorSnackBar("Please enter your full name");
+                      } else {
+                        displayErrorSnackBar(
+                            "Error with full name or profile picture");
+                      }
+                    } catch (e) {
+                      displayErrorSnackBar(
+                          "Could not complete step, please try again or cancel sign up if error persists");
+                    } finally {
+                      setState(() {
+                        continuebuttonpressed = false;
+                      });
+                    }
+                  },
+            child: PrimaryButton(
+                screenwidth: screenwidth,
+                buttonpressed: continuebuttonpressed,
+                text: "Continue",
+                buttonwidth: screenwidth * 0.6),
+          )
         ],
       )),
-      floatingActionButton: SizedBox(
-        height: 70,
-        width: 70,
-        child: FloatingActionButton(
-          onPressed: () async {
-            try {
-              if (imagepath != null &&
-                  fullnamecontroller.text.trim().isNotEmpty) {
-                compressedimgpath = await CompressAndGetFile(imagepath);
-                await db.changepfp(
-                    compressedimgpath, FirebaseAuth.instance.currentUser!.uid);
-                await db.changeattribute(
-                    'fullname',
-                    fullnamecontroller.text.trim(),
-                    FirebaseAuth.instance.currentUser!.uid);
-                await db.changeattributebool('setnameandpfp', true,
-                    FirebaseAuth.instance.currentUser!.uid);
-                gousernamescreen();
-              } else if (imagepath == null) {
-                displayErrorSnackBar("Please upload Profile Picture");
-              } else if (fullnamecontroller.text.trim().isEmpty) {
-                displayErrorSnackBar("Please enter your full name");
-              } else {
-                displayErrorSnackBar("Error with full name or profile picture");
-              }
-            } catch (e) {
-              displayErrorSnackBar(
-                  "Could not complete step, please try again or cancel sign up if error persists");
-            }
-          },
-          backgroundColor: Theme.of(context).primaryColor,
-          child: const Icon(
-            Icons.arrow_circle_right_outlined,
-            size: 60,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -555,6 +563,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
   final usernamecontroller = TextEditingController();
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
+  bool continuebuttonpressed = false;
   TextEditingController psw = TextEditingController();
 
   void displayErrorSnackBar(
@@ -731,47 +740,46 @@ class _UsernameScreenState extends State<UsernameScreen> {
           SizedBox(height: screenheight * 0.3),
           textdatafield(screenwidth, "Username", usernamecontroller),
           SizedBox(
-            height: screenheight * 0.02,
+            height: screenheight * 0.1,
           ),
+          GestureDetector(
+            onTap: continuebuttonpressed
+                ? null
+                : () async {
+                    try {
+                      bool uniqueness =
+                          await db.usernameUnique(usernamecontroller.text);
+                      if (!uniqueness && usernamecontroller.text.isNotEmpty) {
+                        setState(() {
+                          displayErrorSnackBar("Username already taken");
+                        });
+                      } else if (usernamecontroller.text.isEmpty) {
+                        displayErrorSnackBar("Invalid Username");
+                      } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
+                          .hasMatch(usernamecontroller.text.trim())) {
+                        displayErrorSnackBar(
+                            "Please only enter alphanumeric characters");
+                      } else {
+                        await db.changeusername(
+                            usernamecontroller.text.trim().toLowerCase(),
+                            FirebaseAuth.instance.currentUser!.uid);
+                        await db.changeattributebool('setusername', true,
+                            FirebaseAuth.instance.currentUser!.uid);
+                        gotomiscscreen();
+                      }
+                    } catch (e) {
+                      displayErrorSnackBar(
+                          "Could not complete step, please try again");
+                    }
+                  },
+            child: PrimaryButton(
+                screenwidth: screenwidth,
+                buttonpressed: continuebuttonpressed,
+                text: "Continue",
+                buttonwidth: screenwidth * 0.6),
+          )
         ],
       )),
-      floatingActionButton: SizedBox(
-        height: 70,
-        width: 70,
-        child: FloatingActionButton(
-          onPressed: () async {
-            try {
-              bool uniqueness =
-                  await db.usernameUnique(usernamecontroller.text);
-              if (!uniqueness && usernamecontroller.text.isNotEmpty) {
-                setState(() {
-                  displayErrorSnackBar("Username already taken");
-                });
-              } else if (usernamecontroller.text.isEmpty) {
-                displayErrorSnackBar("Invalid Username");
-              } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
-                  .hasMatch(usernamecontroller.text.trim())) {
-                displayErrorSnackBar(
-                    "Please only enter alphanumeric characters");
-              } else {
-                await db.changeusername(
-                    usernamecontroller.text.trim().toLowerCase(),
-                    FirebaseAuth.instance.currentUser!.uid);
-                await db.changeattributebool('setusername', true,
-                    FirebaseAuth.instance.currentUser!.uid);
-                gotomiscscreen();
-              }
-            } catch (e) {
-              displayErrorSnackBar("Could not complete step, please try again");
-            }
-          },
-          backgroundColor: Theme.of(context).primaryColor,
-          child: const Icon(
-            Icons.arrow_circle_right_outlined,
-            size: 60,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -789,23 +797,21 @@ class _MiscScreenState extends State<MiscScreen> {
   String nationality = 'Australia';
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
+  bool continuebuttonpressed = false;
   TextEditingController psw = TextEditingController();
-  List allinterests = [
-    "Sports",
-    "Nature",
-    "Music",
-    "Dance",
-    "Movies",
-    "Acting",
-    "Singing",
-    "Drinking",
-    "Food",
-    "Art"
-  ];
-  void displayErrorSnackBar(String error) {
+  void displayErrorSnackBar(
+    String error,
+  ) {
     final snackBar = SnackBar(
-      content: Text(error),
-      duration: const Duration(seconds: 2),
+      content: Text(
+        error,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: false,
+      closeIconColor: Colors.white,
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -1319,38 +1325,42 @@ class _MiscScreenState extends State<MiscScreen> {
               ),
             ),
             SizedBox(
-              height: screenheight * 0.02,
+              height: screenheight * 0.1,
             ),
+            GestureDetector(
+              onTap: continuebuttonpressed
+                  ? null
+                  : () async {
+                      setState(() {
+                        continuebuttonpressed = true;
+                      });
+                      if (birthday != DateTime(0, 0, 0)) {
+                        await db.changeattribute('gender', gender,
+                            FirebaseAuth.instance.currentUser!.uid);
+                        await db.changeattribute('nationality', nationality,
+                            FirebaseAuth.instance.currentUser!.uid);
+                        await db.changebirthday(
+                            birthday, FirebaseAuth.instance.currentUser!.uid);
+                        await db.changeattributebool('setmisc', true,
+                            FirebaseAuth.instance.currentUser!.uid);
+                        gointerestscreen();
+                      } else {
+                        displayErrorSnackBar(
+                            "Please try again and make sure all fields are filled correctly");
+                      }
+                      setState(() {
+                        continuebuttonpressed = false;
+                      });
+                    },
+              child: PrimaryButton(
+                  screenwidth: screenwidth,
+                  buttonpressed: continuebuttonpressed,
+                  text: "Continue",
+                  buttonwidth: screenwidth * 0.6),
+            )
           ],
         ),
       )),
-      floatingActionButton: SizedBox(
-        height: 70,
-        width: 70,
-        child: FloatingActionButton(
-          onPressed: () async {
-            if (birthday != DateTime(0, 0, 0)) {
-              await db.changeattribute(
-                  'gender', gender, FirebaseAuth.instance.currentUser!.uid);
-              await db.changeattribute('nationality', nationality,
-                  FirebaseAuth.instance.currentUser!.uid);
-              await db.changebirthday(
-                  birthday, FirebaseAuth.instance.currentUser!.uid);
-              await db.changeattributebool(
-                  'setmisc', true, FirebaseAuth.instance.currentUser!.uid);
-              gointerestscreen();
-            } else {
-              displayErrorSnackBar(
-                  "Please try again and make sure all fields are filled correctly");
-            }
-          },
-          backgroundColor: Theme.of(context).primaryColor,
-          child: const Icon(
-            Icons.arrow_circle_right_outlined,
-            size: 60,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -1600,26 +1610,28 @@ class _InterestScreenState extends State<InterestScreen> {
             ),
             body: Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2),
-                      shrinkWrap: true,
-                      itemCount: allinterests.length,
-                      itemBuilder: ((context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                          child: _listviewitem(allinterests[index]),
-                        );
-                      }),
+              child: Stack(children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                        shrinkWrap: true,
+                        itemCount: allinterests.length,
+                        itemBuilder: ((context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                            child: _listviewitem(allinterests[index]),
+                          );
+                        }),
+                      ),
                     ),
-                  )
-                ],
-              ),
+                  ],
+                ),
+              ]),
             ),
             floatingActionButton: SizedBox(
               height: 70,
@@ -1654,10 +1666,19 @@ class _InterestScreenState extends State<InterestScreen> {
                         }
                       },
                 backgroundColor: Theme.of(context).primaryColor,
-                child: const Icon(
-                  Icons.arrow_circle_right_outlined,
-                  size: 60,
-                ),
+                child: buttonpressed
+                    ? const Align(
+                        alignment: Alignment.centerLeft,
+                        child: SpinKitThreeInOut(
+                          color: Colors.white,
+                          size: 12,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        size: 30,
+                        color: Colors.white,
+                      ),
               ),
             ),
           );

@@ -110,6 +110,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         error = false;
       });
+      Stopwatch stopwatch = Stopwatch()..start();
       await getUserAppLocation();
       await db.updatelastuserloc(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
@@ -141,8 +142,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
             }
           }
         }
-        doneLoading(curruser);
+        stopwatch.stop();
+
+        int diff = stopwatch.elapsed.inSeconds.ceil() > 2
+            ? stopwatch.elapsed.inSeconds.ceil()
+            : 2 - stopwatch.elapsed.inSeconds.ceil();
+        Timer(Duration(seconds: diff), () => doneLoading(curruser));
       } else {
+        stopwatch.stop();
         throw Exception();
       }
     } catch (e) {
@@ -212,7 +219,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     final screenheight = MediaQuery.of(context).size.height;
     final screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
         child: error
             ? Center(
@@ -222,6 +229,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     const Text(
                       "Please make sure Location Services are enabled\nor\nCheck your internet connection",
                       textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
                     ),
                     SizedBox(
                       height: screenheight * 0.02,
@@ -249,32 +257,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   ],
                 ),
               )
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Clout",
-                      style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontFamily: "Kristi",
-                          fontWeight: FontWeight.w500,
-                          fontSize: 80),
-                      textScaleFactor: 1.0,
-                    ),
-                    const Text(
-                      "Go Out",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30),
-                    ),
-                    SizedBox(
-                      height: screenheight * 0.1,
-                    ),
-                  ],
-                ),
-              ),
+            : Center(child: Image.asset("assets/images/logos/cloutlogo.gif")),
       ),
     );
   }

@@ -636,6 +636,29 @@ class db_conn {
     }
   }
 
+  bool checkitemslistcontainedinothersamelengthlist(List list1, List list2) {
+    for (int i = 0; i < list1.length; i++) {
+      if (!list2.contains(list1[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool checkeventparticipantsequality(
+      List docparticipants, List eventparticipants) {
+    if (docparticipants.length == eventparticipants.length) {
+      if (checkitemslistcontainedinothersamelengthlist(
+          docparticipants, eventparticipants)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   Future<String> getEventDocID(Event event) async {
     String docID = "";
     try {
@@ -1487,11 +1510,9 @@ class db_conn {
       late Chat userchat;
       await chats.get().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
-              if (listEquals(doc['participants'],
-                      <dynamic>[curruser.uid, otheruserdocid]) ||
-                  listEquals(doc['participants'],
-                          <dynamic>[otheruserdocid, curruser.uid]) &&
-                      (doc['type'] == 'user')) {
+              if ((doc['type'] == 'user') &&
+                  userchatparticipantsequality(
+                      doc['participants'], otheruserdocid, curruser.uid)) {
                 userchat = Chat.fromJson(doc.data(), doc.id);
               }
             })

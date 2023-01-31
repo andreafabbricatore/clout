@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/emailverificationscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
@@ -98,8 +100,12 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
   }
 
   refresh() async {
+    Stopwatch stopwatch = Stopwatch()..start();
     await getUser();
-    logic();
+    int diff = stopwatch.elapsed.inSeconds.ceil() > 2
+        ? stopwatch.elapsed.inSeconds.ceil()
+        : 2 - stopwatch.elapsed.inSeconds.ceil();
+    Timer(Duration(seconds: diff), () => logic());
   }
 
   @override
@@ -113,70 +119,45 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
     final screenheight = MediaQuery.of(context).size.height;
     final screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
-        child: error
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Check your internet connection",
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(
-                      height: screenheight * 0.02,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        refresh();
-                      },
-                      child: SizedBox(
-                          height: 50,
-                          width: screenwidth * 0.6,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(20))),
-                            child: const Center(
-                                child: Text(
-                              "Refresh",
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
+          child: error
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Check your internet connection",
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: screenheight * 0.02,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          refresh();
+                        },
+                        child: SizedBox(
+                            height: 50,
+                            width: screenwidth * 0.6,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20))),
+                              child: const Center(
+                                  child: Text(
+                                "Refresh",
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              )),
                             )),
-                          )),
-                    ),
-                  ],
-                ),
-              )
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Clout",
-                      style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontFamily: "Kristi",
-                          fontWeight: FontWeight.w500,
-                          fontSize: 80),
-                      textScaleFactor: 1.0,
-                    ),
-                    const Text(
-                      "Go Out",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30),
-                    ),
-                    SizedBox(
-                      height: screenheight * 0.1,
-                    ),
-                  ],
-                ),
-              ),
-      ),
+                      ),
+                    ],
+                  ),
+                )
+              : Center(
+                  child: Image.asset("assets/images/logos/cloutlogo.gif"))),
     );
   }
 }

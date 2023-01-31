@@ -174,7 +174,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 );
               },
               child: const Center(
-                child: Text("Forgot password?"),
+                child: Text(
+                  "Forgot password?",
+                  style: TextStyle(
+                      color: Colors.grey, decoration: TextDecoration.underline),
+                ),
               ),
             )
           ],
