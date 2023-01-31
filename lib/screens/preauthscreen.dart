@@ -143,10 +143,10 @@ class Page1 extends StatelessWidget {
               textAlign: TextAlign.start,
               text: TextSpan(
                   style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
-                  ),
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                      fontFamily: "Archivo"),
                   children: [
                     const TextSpan(
                       text: "Feeling ",
@@ -249,10 +249,10 @@ class _Page2State extends State<Page2> {
               textAlign: TextAlign.center,
               text: TextSpan(
                   style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
-                  ),
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                      fontFamily: "Archivo"),
                   children: [
                     const TextSpan(text: "Like "),
                     TextSpan(
@@ -310,10 +310,10 @@ class Page3 extends StatelessWidget {
               textAlign: TextAlign.end,
               text: TextSpan(
                   style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
-                  ),
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                      fontFamily: "Archivo"),
                   children: [
                     const TextSpan(
                       text: "Let's have ",

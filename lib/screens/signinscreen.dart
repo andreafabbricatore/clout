@@ -58,8 +58,8 @@ class _SignInScreenState extends State<SignInScreen> {
           "Clout",
           style: TextStyle(
               color: Theme.of(context).primaryColor,
-              fontFamily: "Kristi",
-              fontWeight: FontWeight.w500,
+              fontFamily: "Archivo",
+              fontWeight: FontWeight.w800,
               fontSize: 50),
           textScaleFactor: 1.0,
         ),

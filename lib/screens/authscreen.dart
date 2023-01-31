@@ -39,10 +39,10 @@ class _AuthScreenState extends State<AuthScreen> {
                       textScaleFactor: 1.0,
                       text: TextSpan(
                           style: const TextStyle(
-                            fontSize: 60,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.black,
-                          ),
+                              fontSize: 60,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black,
+                              fontFamily: "Archivo"),
                           children: [
                             const TextSpan(
                               text: "Get ",
@@ -63,7 +63,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   SizedBox(
                     height: screenheight * 0.4,
                     child: const RiveAnimation.asset(
-                      'assets/images/rive/fun_time-3.riv',
+                      'assets/images/rive/fun_time.riv',
                     ),
                   ),
                   SizedBox(height: screenheight * 0.03),
@@ -111,8 +111,9 @@ class _AuthScreenState extends State<AuthScreen> {
                           child: Text(
                             "Already have an account?",
                             style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                decoration: TextDecoration.underline),
+                              color: Theme.of(context).primaryColor,
+                              decoration: TextDecoration.underline,
+                            ),
                           )))
                 ],
               ),

@@ -216,10 +216,10 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           "Clout",
           style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.w900,
-              fontSize: 50,
-              fontStyle: FontStyle.italic),
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.w900,
+            fontSize: 50,
+          ),
           textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,

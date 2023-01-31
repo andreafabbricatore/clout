@@ -68,8 +68,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           "Clout",
           style: TextStyle(
               color: Theme.of(context).primaryColor,
-              fontFamily: "Kristi",
-              fontWeight: FontWeight.w500,
+              fontFamily: "Archivo",
+              fontWeight: FontWeight.w800,
               fontSize: 50),
           textScaleFactor: 1.0,
         ),
@@ -204,7 +204,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 textAlign: TextAlign.justify,
                 textScaleFactor: 1.0,
                 text: TextSpan(
-                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 11,
+                        fontFamily: "Archivo"),
                     children: [
                       const TextSpan(
                           text: "By continuing you are agreeing to the "),

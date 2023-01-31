@@ -213,31 +213,32 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           color: Colors.white,
           child: Container(
               decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
+                color: Color.fromARGB(200, 238, 238, 238),
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
               padding: const EdgeInsets.symmetric(vertical: 2),
               margin: const EdgeInsets.fromLTRB(15, 0, 15, 25),
               child: TextField(
                 controller: _textmessage,
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 14, horizontal: 5),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 10),
                     border: InputBorder.none,
                     hintText: 'Type a message',
                     suffixIcon: IconButton(
-                      icon: const Icon(
-                        CupertinoIcons.arrow_right_square_fill,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {
-                        db.sendmessage(
-                            _textmessage.text.trim(),
-                            widget.curruser,
-                            widget.chatinfo.chatid,
-                            chatname,
-                            widget.chatinfo.type);
-                        _textmessage.clear();
-                      },
+                      icon: const Icon(CupertinoIcons.arrow_right_square_fill,
+                          color: Colors.black),
+                      onPressed: _textmessage.text.isEmpty
+                          ? null
+                          : () {
+                              db.sendmessage(
+                                  _textmessage.text.trim(),
+                                  widget.curruser,
+                                  widget.chatinfo.chatid,
+                                  chatname,
+                                  widget.chatinfo.type);
+                              _textmessage.clear();
+                            },
                     )),
               ))),
     );
