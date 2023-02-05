@@ -15,6 +15,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:location/location.dart';
 
 class EditEventScreen extends StatefulWidget {
   EditEventScreen(
@@ -60,6 +61,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
   bool buttonpressed = false;
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  Location location = Location();
+  List LatLngs = [];
 
   void setup() {
     setState(() {
@@ -101,7 +104,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
-      final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+      final lastIndex = filePath.lastIndexOf(".");
       final splitted = filePath.substring(0, (lastIndex));
       final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
       var result = await FlutterImageCompress.compressAndGetFile(
@@ -410,6 +413,10 @@ class _EditEventScreenState extends State<EditEventScreen> {
           SizedBox(height: screenheight * 0.02),
           InkWell(
             onTap: () async {
+              LocationData _locationData = await location.getLocation();
+              setState(() {
+                LatLngs = [_locationData.latitude, _locationData.longitude];
+              });
               AppLocation chosen = await Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -420,6 +427,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                           city: widget.event.city[0],
                           country: widget.event.country,
                           center: [widget.event.lat, widget.event.lng]),
+                      curruserLatLng: LatLngs,
                     ),
                   ));
               setState(() {

@@ -36,7 +36,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool joined = false;
   String joinedval = "Join";
   bool buttonpressed = false;
-  bool deleteeventpressed = false;
+
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   void displayErrorSnackBar(
@@ -177,7 +177,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       try {
         setState(() {
           buttonpressed = true;
-          deleteeventpressed = true;
         });
         await db.deleteevent(widget.event, widget.curruser);
         Navigator.of(context).push(
@@ -192,7 +191,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         updatescreen(widget.event.docid);
         setState(() {
           buttonpressed = false;
-          deleteeventpressed = false;
         });
       }
     } else {
@@ -262,347 +260,327 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       );
     }
 
-    return deleteeventpressed
-        ? LoadingOverlay(
-            text: "Deleting your event...",
-            color: Colors.black,
-          )
-        : Scaffold(
-            backgroundColor: Colors.white,
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0.0,
-              leading: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(
-                  Icons.arrow_back_ios,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              actions: [
-                widget.curruser.uid == widget.event.hostdocid
-                    ? GestureDetector(
-                        onTap: () async {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  EditEventScreen(
-                                      curruser: widget.curruser,
-                                      allowbackarrow: true,
-                                      event: widget.event),
-                            ),
-                          );
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.black,
-                          ),
-                        ),
-                      )
-                    : Container(),
-                GestureDetector(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.0,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        actions: [
+          widget.curruser.uid == widget.event.hostdocid
+              ? GestureDetector(
                   onTap: () async {
-                    String link = await createShareLink();
-                    //print(link);
-                    String text =
-                        "Join ${widget.event.title} on Clout!\n\n$link";
-                    shareevent(text);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => EditEventScreen(
+                            curruser: widget.curruser,
+                            allowbackarrow: true,
+                            event: widget.event),
+                      ),
+                    );
                   },
                   child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
                     child: Icon(
-                      Icons.ios_share,
+                      Icons.edit,
                       color: Colors.black,
                     ),
                   ),
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    await widget.interactfav(widget.event);
-                    updatecurruser();
+                )
+              : Container(),
+          GestureDetector(
+            onTap: () async {
+              String link = await createShareLink();
+              //print(link);
+              String text = "Join ${widget.event.title} on Clout!\n\n$link";
+              shareevent(text);
+            },
+            child: const Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+              child: Icon(
+                Icons.ios_share,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () async {
+              await widget.interactfav(widget.event);
+              updatecurruser();
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+              child: Icon(
+                widget.curruser.favorites.contains(widget.event.docid)
+                    ? Icons.bookmark
+                    : Icons.bookmark_border,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          widget.curruser.uid != widget.event.hostdocid
+              ? InkWell(
+                  onTap: () {
+                    reportevent(widget.event);
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+                  child: const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(
-                      widget.curruser.favorites.contains(widget.event.docid)
-                          ? Icons.bookmark
-                          : Icons.bookmark_border,
+                      Icons.flag_outlined,
                       color: Colors.black,
                     ),
                   ),
+                )
+              : Container(),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListView(children: [
+          SizedBox(
+            height: screenheight * 0.3,
+            width: screenwidth * 0.7,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15.0),
+                child: Image.network(
+                  widget.event.image,
+                  fit: BoxFit.cover,
                 ),
-                widget.curruser.uid != widget.event.hostdocid
-                    ? InkWell(
-                        onTap: () {
-                          reportevent(widget.event);
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                          child: Icon(
-                            Icons.flag_outlined,
-                            color: Colors.black,
-                          ),
-                        ),
-                      )
-                    : Container(),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          Text(
+            widget.event.title,
+            style: const TextStyle(
+                fontSize: 40, color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: screenheight * 0.005,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.event.interest,
+                style: TextStyle(
+                    fontSize: 25,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold),
+              ),
+              InkWell(
+                onTap: () async {
+                  try {
+                    String hostdocid =
+                        await db.getUserUIDfromUsername(widget.event.host);
+                    AppUser eventhost = await db.getUserFromUID(hostdocid);
+                    usernavigate(eventhost, 0);
+                  } catch (e) {
+                    displayErrorSnackBar("Could not retrieve host information");
+                  }
+                },
+                child: Text(
+                  "@${widget.event.host}",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          Text(
+            "At ${widget.event.address}, ${DateFormat.MMMd().format(widget.event.datetime)} @ ${DateFormat('hh:mm a').format(widget.event.datetime)}",
+            style: const TextStyle(
+                fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          SizedBox(
+            width: screenwidth,
+            height: screenheight * 0.2,
+            child: Stack(
+              alignment: AlignmentDirectional.bottomEnd,
+              children: [
+                GoogleMap(
+                    markers: Set<Marker>.of(markers.values),
+                    myLocationButtonEnabled: false,
+                    zoomGesturesEnabled: true,
+                    initialCameraPosition: CameraPosition(
+                        target: LatLng(widget.event.lat, widget.event.lng),
+                        zoom: 15)),
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                        backgroundColor: Colors.white,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SizedBox(
+                            height: screenheight * 0.18,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Maps.MapLauncher.showMarker(
+                                            mapType: Maps.MapType.apple,
+                                            coords: Maps.Coords(
+                                                widget.event.lat,
+                                                widget.event.lng),
+                                            title: widget.event.address);
+                                      },
+                                      child: RichText(
+                                        text: const TextSpan(
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w300),
+                                            children: [
+                                              TextSpan(text: "Open in "),
+                                              TextSpan(
+                                                  text: "Apple Maps",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Color.fromARGB(
+                                                          255, 255, 48, 117),
+                                                      fontWeight:
+                                                          FontWeight.w300)),
+                                            ]),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(width: 0.05)),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Maps.MapLauncher.showMarker(
+                                            mapType: Maps.MapType.google,
+                                            coords: Maps.Coords(
+                                                widget.event.lat,
+                                                widget.event.lng),
+                                            title: widget.event.address);
+                                      },
+                                      child: RichText(
+                                        text: const TextSpan(
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w300),
+                                            children: [
+                                              TextSpan(text: "Open in "),
+                                              TextSpan(
+                                                  text: "Google Maps",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Color.fromARGB(
+                                                          255, 255, 48, 117),
+                                                      fontWeight:
+                                                          FontWeight.w300)),
+                                            ]),
+                                      ),
+                                    ),
+                                  ]),
+                            ),
+                          );
+                        });
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                  ),
+                )
               ],
             ),
-            body: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ListView(children: [
-                SizedBox(
-                  height: screenheight * 0.3,
-                  width: screenwidth * 0.7,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Image.network(
-                        widget.event.image,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          Text(
+            widget.event.description,
+            style: const TextStyle(
+                fontSize: 15, color: Colors.black, fontWeight: FontWeight.w400),
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          Text(
+            widget.event.participants.length != widget.event.maxparticipants
+                ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
+                : "Participant number reached",
+            style: const TextStyle(
+                fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: screenheight * 0.005,
+          ),
+          SizedBox(
+            height: screenheight * 0.09 * widget.participants.length,
+            width: screenwidth,
+            child: Column(
+              children: [
+                UserListView(
+                  userres: widget.participants,
+                  curruser: widget.curruser,
+                  onTap: usernavigate,
+                  screenwidth: screenwidth,
+                  showcloutscore: false,
+                  showrembutton:
+                      (widget.curruser.uid == widget.event.hostdocid) &&
+                          (joinedval != "Finished"),
+                  removeUser: remuser,
                 ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                Text(
-                  widget.event.title,
-                  style: const TextStyle(
-                      fontSize: 40,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: screenheight * 0.005,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.event.interest,
-                      style: TextStyle(
-                          fontSize: 25,
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        try {
-                          String hostdocid = await db
-                              .getUserUIDfromUsername(widget.event.host);
-                          AppUser eventhost =
-                              await db.getUserFromUID(hostdocid);
-                          usernavigate(eventhost, 0);
-                        } catch (e) {
-                          displayErrorSnackBar(
-                              "Could not retrieve host information");
-                        }
-                      },
-                      child: Text(
-                        "@${widget.event.host}",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                Text(
-                  "At ${widget.event.address}, ${DateFormat.MMMd().format(widget.event.datetime)} @ ${DateFormat('hh:mm a').format(widget.event.datetime)}",
-                  style: const TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                SizedBox(
-                  width: screenwidth,
-                  height: screenheight * 0.2,
-                  child: Stack(
-                    alignment: AlignmentDirectional.bottomEnd,
-                    children: [
-                      GoogleMap(
-                          markers: Set<Marker>.of(markers.values),
-                          myLocationButtonEnabled: false,
-                          zoomGesturesEnabled: true,
-                          initialCameraPosition: CameraPosition(
-                              target:
-                                  LatLng(widget.event.lat, widget.event.lng),
-                              zoom: 15)),
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                              backgroundColor: Colors.white,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return SizedBox(
-                                  height: screenheight * 0.18,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () async {
-                                              await Maps.MapLauncher.showMarker(
-                                                  mapType: Maps.MapType.apple,
-                                                  coords: Maps.Coords(
-                                                      widget.event.lat,
-                                                      widget.event.lng),
-                                                  title: widget.event.address);
-                                            },
-                                            child: RichText(
-                                              text: const TextSpan(
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w300),
-                                                  children: [
-                                                    TextSpan(text: "Open in "),
-                                                    TextSpan(
-                                                        text: "Apple Maps",
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    255,
-                                                                    48,
-                                                                    117),
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w300)),
-                                                  ]),
-                                            ),
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                border:
-                                                    Border.all(width: 0.05)),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              await Maps.MapLauncher.showMarker(
-                                                  mapType: Maps.MapType.google,
-                                                  coords: Maps.Coords(
-                                                      widget.event.lat,
-                                                      widget.event.lng),
-                                                  title: widget.event.address);
-                                            },
-                                            child: RichText(
-                                              text: const TextSpan(
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w300),
-                                                  children: [
-                                                    TextSpan(text: "Open in "),
-                                                    TextSpan(
-                                                        text: "Google Maps",
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    255,
-                                                                    48,
-                                                                    117),
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w300)),
-                                                  ]),
-                                            ),
-                                          ),
-                                        ]),
-                                  ),
-                                );
-                              });
-                        },
-                        child: Container(
-                          color: Colors.transparent,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                Text(
-                  widget.event.description,
-                  style: const TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                Text(
-                  widget.event.participants.length !=
-                          widget.event.maxparticipants
-                      ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
-                      : "Participant number reached",
-                  style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: screenheight * 0.005,
-                ),
-                SizedBox(
-                  height: screenheight * 0.09 * widget.participants.length,
-                  width: screenwidth,
-                  child: Column(
-                    children: [
-                      UserListView(
-                        userres: widget.participants,
-                        curruser: widget.curruser,
-                        onTap: usernavigate,
-                        screenwidth: screenwidth,
-                        showcloutscore: false,
-                        showrembutton:
-                            (widget.curruser.uid == widget.event.hostdocid) &&
-                                (joinedval != "Finished"),
-                        removeUser: remuser,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: screenheight * 0.02,
-                ),
-                InkWell(
-                    onTap: () async {
-                      buttonpressed ? null : interactevent(context);
-                    },
-                    child: PrimaryButton(
-                        screenwidth: screenwidth,
-                        buttonpressed: buttonpressed,
-                        text: joinedval,
-                        buttonwidth: screenwidth * 0.5))
-              ]),
+              ],
             ),
-          );
+          ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          InkWell(
+              onTap: () async {
+                buttonpressed ? null : interactevent(context);
+              },
+              child: joinedval == "Finished"
+                  ? Container(
+                      height: 50,
+                      width: screenwidth * 0.5,
+                      color: Colors.white,
+                      child: Text(
+                        joinedval,
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Theme.of(context).primaryColor),
+                        textScaleFactor: 1.1,
+                      ),
+                    )
+                  : PrimaryButton(
+                      screenwidth: screenwidth,
+                      buttonpressed: buttonpressed,
+                      text: joinedval,
+                      buttonwidth: screenwidth * 0.5))
+        ]),
+      ),
+    );
   }
 }

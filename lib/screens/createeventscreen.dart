@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:location/location.dart';
 
 class CreateEventScreen extends StatefulWidget {
   CreateEventScreen(
@@ -78,6 +79,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   bool buttonpressed = false;
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  Location location = Location();
+  List LatLngs = [];
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -102,7 +105,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
-      final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+      final lastIndex = filePath.lastIndexOf(".");
       final splitted = filePath.substring(0, (lastIndex));
       final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
       var result = await FlutterImageCompress.compressAndGetFile(
@@ -196,17 +199,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
               )
             : Container(),
-        title: GestureDetector(
-          onTap: () {
-            CompressAndGetFile(imagepath);
-          },
-          child: Text(
-            "Create Event",
-            style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 30),
-          ),
+        title: Text(
+          "Create Event",
+          style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 30),
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -415,6 +413,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(height: screenheight * 0.02),
           InkWell(
             onTap: () async {
+              LocationData _locationData = await location.getLocation();
+              setState(() {
+                LatLngs = [_locationData.latitude, _locationData.longitude];
+              });
               AppLocation chosen = emptylocation
                   ? await Navigator.push(
                       context,
@@ -426,6 +428,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                               center: [0.0, 0.0],
                               city: "",
                               country: ""),
+                          curruserLatLng: LatLngs,
                         ),
                       ))
                   : await Navigator.push(
@@ -434,10 +437,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         builder: (context) => SearchLocation(
                           locationchosen: true,
                           startlocation: AppLocation(
-                              address: chosenLocation.address,
-                              center: chosenLocation.center,
-                              city: chosenLocation.city,
-                              country: chosenLocation.country),
+                            address: chosenLocation.address,
+                            center: chosenLocation.center,
+                            city: chosenLocation.city,
+                            country: chosenLocation.country,
+                          ),
+                          curruserLatLng: LatLngs,
                         ),
                       ));
               setState(() {

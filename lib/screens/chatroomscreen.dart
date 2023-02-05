@@ -190,14 +190,21 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           alignment: Alignment.center,
                           child: Container(
                               color: Colors.white,
-                              height: 100,
+                              height: 60,
                               width: screenwidth,
-                              child: Center(
-                                  child: Text(
-                                data['content'].toString().toUpperCase(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              ))));
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Center(
+                                      child: Text(
+                                    data['content'].toString().toUpperCase(),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                    textScaleFactor: 1.0,
+                                  )),
+                                ],
+                              )));
                     } else {
                       return Align(
                           alignment: Alignment.centerLeft,
@@ -228,17 +235,17 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     suffixIcon: IconButton(
                       icon: const Icon(CupertinoIcons.arrow_right_square_fill,
                           color: Colors.black),
-                      onPressed: _textmessage.text.isEmpty
-                          ? null
-                          : () {
-                              db.sendmessage(
-                                  _textmessage.text.trim(),
-                                  widget.curruser,
-                                  widget.chatinfo.chatid,
-                                  chatname,
-                                  widget.chatinfo.type);
-                              _textmessage.clear();
-                            },
+                      onPressed: () {
+                        if (_textmessage.text.trim().isNotEmpty) {
+                          db.sendmessage(
+                              _textmessage.text.trim(),
+                              widget.curruser,
+                              widget.chatinfo.chatid,
+                              chatname,
+                              widget.chatinfo.type);
+                          _textmessage.clear();
+                        }
+                      },
                     )),
               ))),
     );

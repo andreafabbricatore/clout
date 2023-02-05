@@ -436,7 +436,7 @@ class db_conn {
             'hosted_events': FieldValue.arrayRemove([event.docid]),
             'chats': FieldValue.arrayRemove([event.chatid]),
             'visiblechats': FieldValue.arrayRemove([event.chatid]),
-            'clout': FieldValue.increment(decrease),
+            'clout': FieldValue.increment(-decrease),
           }, SetOptions(merge: true));
         } else {
           users.doc(x).set(
@@ -1374,7 +1374,7 @@ class db_conn {
     try {
       String notification = "";
       if (type == "event") {
-        notification = '$sender: $content';
+        notification = '${sender.username}: $content';
       } else {
         notification = content;
       }

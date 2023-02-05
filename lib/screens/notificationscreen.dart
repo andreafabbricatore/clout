@@ -96,24 +96,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     Future<void> usernavigate(String uid, int index) async {
-      AppUser user = await db.getUserFromUID(uid);
-      gotoprofilescreen(user);
+      try {
+        AppUser user = await db.getUserFromUID(uid);
+        gotoprofilescreen(user);
+      } catch (e) {
+        displayErrorSnackBar("Could not display user");
+      }
     }
 
     Future<void> eventnavigate(String eventid, int index) async {
-      Event event = await db.getEventfromDocId(eventid);
-      List<AppUser> participants = [
-        for (String x in event.participants) await db.getUserFromUID(x)
-      ];
-      await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => EventDetailScreen(
-                    event: event,
-                    curruser: widget.curruser,
-                    participants: participants,
-                    interactfav: interactfav,
-                  )));
+      try {
+        Event event = await db.getEventfromDocId(eventid);
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromUID(x)
+        ];
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => EventDetailScreen(
+                      event: event,
+                      curruser: widget.curruser,
+                      participants: participants,
+                      interactfav: interactfav,
+                    )));
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
     }
 
     return Scaffold(

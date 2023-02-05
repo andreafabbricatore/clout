@@ -7,10 +7,14 @@ import 'package:location/location.dart';
 
 class SearchLocation extends StatefulWidget {
   SearchLocation(
-      {Key? key, required this.locationchosen, required this.startlocation})
+      {Key? key,
+      required this.locationchosen,
+      required this.startlocation,
+      required this.curruserLatLng})
       : super(key: key);
   bool locationchosen;
   AppLocation startlocation;
+  List curruserLatLng;
   @override
   State<SearchLocation> createState() => _SearchLocationState();
 }
@@ -26,13 +30,6 @@ class _SearchLocationState extends State<SearchLocation> {
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   GoogleMapController? mapController;
-
-  void getcurrlocation() async {
-    LocationData _locationData = await location.getLocation();
-    setState(() {
-      LatLngs = [_locationData.latitude, _locationData.longitude];
-    });
-  }
 
   void displayErrorSnackBar(
     String error,
@@ -138,13 +135,20 @@ class _SearchLocationState extends State<SearchLocation> {
     );
   }
 
+  void setup() async {
+    setState(() {
+      LatLngs = widget.curruserLatLng;
+      chosenLocation = widget.startlocation;
+    });
+    if (widget.locationchosen) {
+      await _addMarker(
+          LatLng(chosenLocation.center[0], chosenLocation.center[1]));
+    }
+  }
+
   @override
   void initState() {
-    getcurrlocation();
-    chosenLocation = widget.startlocation;
-    if (widget.locationchosen) {
-      _addMarker(LatLng(chosenLocation.center[0], chosenLocation.center[1]));
-    }
+    setup();
     super.initState();
   }
 

@@ -1481,209 +1481,199 @@ class _InterestScreenState extends State<InterestScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    return buttonpressed
-        ? LoadingOverlay(
-            text: "Creating your account...",
-            color: Theme.of(context).primaryColor)
-        : Scaffold(
-            resizeToAvoidBottomInset: true,
-            backgroundColor: Colors.white,
-            appBar: AppBar(
-              leading: GestureDetector(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          backgroundColor: Colors.white,
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                            height: screenheight * 0.35,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            child: Column(children: [
-                              const Text("Cancel SignUp",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25)),
-                              SizedBox(
-                                height: screenheight * 0.02,
-                              ),
-                              const Text(
-                                "Enter password to cancel Sign Up.",
-                                style: TextStyle(fontSize: 15),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(
-                                height: screenheight * 0.02,
-                              ),
-                              textdatafield(
-                                  screenwidth * 0.4, "Enter Password", psw),
-                              SizedBox(
-                                height: screenheight * 0.04,
-                              ),
-                              GestureDetector(
-                                onTap: cancelbuttonpressed
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          cancelbuttonpressed = true;
-                                        });
-                                        try {
-                                          String email = FirebaseAuth.instance
-                                                  .currentUser!.email ??
-                                              "";
-                                          await FirebaseAuth.instance
-                                              .signInWithEmailAndPassword(
-                                                  email: email,
-                                                  password: psw.text.trim());
-                                          await db.cancelsignup(FirebaseAuth
-                                              .instance.currentUser!.uid);
-                                          await FirebaseAuth
-                                              .instance.currentUser!
-                                              .delete();
-                                          psw.clear();
-                                          psw.dispose();
-                                          goauthscreen();
-                                        } catch (e) {
-                                          displayErrorSnackBar(
-                                              "Could not cancel signup, please try again and makes sure password is correct");
-                                        } finally {
-                                          setState(() {
-                                            cancelbuttonpressed = false;
-                                          });
-                                        }
-                                      },
-                                child: SizedBox(
-                                    height: 50,
-                                    width: screenwidth * 0.7,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: Theme.of(context).primaryColor,
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(20))),
-                                      child: const Center(
-                                          child: Text(
-                                        "Cancel Sign Up",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      )),
-                                    )),
-                              ),
-                            ]),
-                          ),
-                        );
-                      });
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              title: Text(
-                "What are your interests?",
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
-              ),
-              bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(4.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: screenwidth,
-                        color: Theme.of(context).primaryColor,
-                        height: 4.0,
-                      ),
-                    ],
-                  )),
-              backgroundColor: Colors.white,
-              shadowColor: Colors.white,
-              elevation: 0.0,
-              automaticallyImplyLeading: false,
-            ),
-            body: Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
-              child: Stack(children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2),
-                        shrinkWrap: true,
-                        itemCount: allinterests.length,
-                        itemBuilder: ((context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                            child: _listviewitem(allinterests[index]),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-              ]),
-            ),
-            floatingActionButton: SizedBox(
-              height: 70,
-              width: 70,
-              child: FloatingActionButton(
-                onPressed: buttonpressed
-                    ? null
-                    : () async {
-                        setState(() {
-                          buttonpressed = true;
-                        });
-                        try {
-                          if (selectedinterests.length >= 3) {
-                            await db.changeinterests(
-                                'interests',
-                                selectedinterests,
-                                FirebaseAuth.instance.currentUser!.uid);
-                            await db.changeattributebool('setinterests', true,
-                                FirebaseAuth.instance.currentUser!.uid);
-                            donesignup();
-                          } else {
-                            displayErrorSnackBar("Choose at least 3 interests");
-                            setState(() {
-                              buttonpressed = false;
-                            });
-                          }
-                        } catch (e) {
-                          displayErrorSnackBar("Could not create user");
-                          setState(() {
-                            buttonpressed = false;
-                          });
-                        }
-                      },
-                backgroundColor: Theme.of(context).primaryColor,
-                child: buttonpressed
-                    ? const Align(
-                        alignment: Alignment.centerLeft,
-                        child: SpinKitThreeInOut(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    backgroundColor: Colors.white,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                      height: screenheight * 0.35,
+                      decoration: const BoxDecoration(
                           color: Colors.white,
-                          size: 12,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Column(children: [
+                        const Text("Cancel SignUp",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25)),
+                        SizedBox(
+                          height: screenheight * 0.02,
                         ),
-                      )
-                    : const Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-              ),
+                        const Text(
+                          "Enter password to cancel Sign Up.",
+                          style: TextStyle(fontSize: 15),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
+                        SizedBox(
+                          height: screenheight * 0.04,
+                        ),
+                        GestureDetector(
+                          onTap: cancelbuttonpressed
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    cancelbuttonpressed = true;
+                                  });
+                                  try {
+                                    String email = FirebaseAuth
+                                            .instance.currentUser!.email ??
+                                        "";
+                                    await FirebaseAuth.instance
+                                        .signInWithEmailAndPassword(
+                                            email: email,
+                                            password: psw.text.trim());
+                                    await db.cancelsignup(
+                                        FirebaseAuth.instance.currentUser!.uid);
+                                    await FirebaseAuth.instance.currentUser!
+                                        .delete();
+                                    psw.clear();
+                                    psw.dispose();
+                                    goauthscreen();
+                                  } catch (e) {
+                                    displayErrorSnackBar(
+                                        "Could not cancel signup, please try again and makes sure password is correct");
+                                  } finally {
+                                    setState(() {
+                                      cancelbuttonpressed = false;
+                                    });
+                                  }
+                                },
+                          child: SizedBox(
+                              height: 50,
+                              width: screenwidth * 0.7,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20))),
+                                child: const Center(
+                                    child: Text(
+                                  "Cancel Sign Up",
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                )),
+                              )),
+                        ),
+                      ]),
+                    ),
+                  );
+                });
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
             ),
-          );
+          ),
+        ),
+        title: Text(
+          "What are your interests?",
+          style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 20),
+        ),
+        bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: Row(
+              children: [
+                Container(
+                  width: screenwidth,
+                  color: Theme.of(context).primaryColor,
+                  height: 4.0,
+                ),
+              ],
+            )),
+        backgroundColor: Colors.white,
+        shadowColor: Colors.white,
+        elevation: 0.0,
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
+        child: Stack(children: [
+          Column(
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  shrinkWrap: true,
+                  itemCount: allinterests.length,
+                  itemBuilder: ((context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                      child: _listviewitem(allinterests[index]),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ]),
+      ),
+      floatingActionButton: SizedBox(
+        height: 70,
+        width: 70,
+        child: FloatingActionButton(
+          onPressed: buttonpressed
+              ? null
+              : () async {
+                  setState(() {
+                    buttonpressed = true;
+                  });
+                  try {
+                    if (selectedinterests.length >= 3) {
+                      await db.changeinterests('interests', selectedinterests,
+                          FirebaseAuth.instance.currentUser!.uid);
+                      await db.changeattributebool('setinterests', true,
+                          FirebaseAuth.instance.currentUser!.uid);
+                      donesignup();
+                    } else {
+                      displayErrorSnackBar("Choose at least 3 interests");
+                      setState(() {
+                        buttonpressed = false;
+                      });
+                    }
+                  } catch (e) {
+                    displayErrorSnackBar("Could not create user");
+                    setState(() {
+                      buttonpressed = false;
+                    });
+                  }
+                },
+          backgroundColor: Theme.of(context).primaryColor,
+          child: buttonpressed
+              ? const Align(
+                  alignment: Alignment.centerLeft,
+                  child: SpinKitThreeInOut(
+                    color: Colors.white,
+                    size: 12,
+                  ),
+                )
+              : const Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  size: 30,
+                  color: Colors.white,
+                ),
+        ),
+      ),
+    );
   }
 }

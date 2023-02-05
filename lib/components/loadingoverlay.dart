@@ -8,7 +8,7 @@ class LoadingOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
         child: Center(
           child: Text(
@@ -16,7 +16,6 @@ class LoadingOverlay extends StatelessWidget {
             style: TextStyle(
               color: color,
               fontSize: 50,
-              fontFamily: "Kristi",
               fontWeight: FontWeight.w500,
             ),
             textScaleFactor: 1.0,
