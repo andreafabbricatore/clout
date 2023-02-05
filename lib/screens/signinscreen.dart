@@ -55,7 +55,7 @@ class _SignInScreenState extends State<SignInScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Clout",
+          "Clout.",
           style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontFamily: "Archivo",

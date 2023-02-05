@@ -64,7 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Clout",
+          "Clout.",
           style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontFamily: "Archivo",

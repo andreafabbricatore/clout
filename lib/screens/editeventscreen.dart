@@ -75,7 +75,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
           address: widget.event.address,
           city: widget.event.city.join(" "),
           country: widget.event.country,
-          center: [widget.event.lng, widget.event.lat]);
+          center: [widget.event.lat, widget.event.lng]);
     });
     _addMarker(LatLng(chosenLocation.center[0], chosenLocation.center[1]));
   }

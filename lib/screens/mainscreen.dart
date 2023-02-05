@@ -24,12 +24,14 @@ class MainScreen extends StatefulWidget {
   List<Event> interesteventlist;
   AppUser curruser;
   AppLocation userlocation;
+  bool justloaded;
   MainScreen(
       {Key? key,
       required this.eventlist,
       required this.interesteventlist,
       required this.curruser,
-      required this.userlocation})
+      required this.userlocation,
+      required this.justloaded})
       : super(key: key);
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -61,15 +63,16 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void parampasser(bool firstsetup) {
+  void parampasser() {
     page = [
       HomeScreen(
-          curruser: widget.curruser,
-          interests: widget.curruser.interests,
-          eventlist: widget.eventlist,
-          interestevents: widget.interesteventlist,
-          firstsetup: firstsetup,
-          userlocation: widget.userlocation),
+        curruser: widget.curruser,
+        interests: widget.curruser.interests,
+        eventlist: widget.eventlist,
+        interestevents: widget.interesteventlist,
+        userlocation: widget.userlocation,
+        justloaded: widget.justloaded,
+      ),
       SearchScreen(
           curruser: widget.curruser, userlocation: widget.userlocation),
       CreateEventScreen(
@@ -259,7 +262,7 @@ class _MainScreenState extends State<MainScreen> {
     requestNotisPermission();
     setupInteractedMessage();
     initDeepLinks();
-    parampasser(true);
+    parampasser();
     canVibrate();
     super.initState();
   }
@@ -332,7 +335,7 @@ class _MainScreenState extends State<MainScreen> {
           ],
           onItemSelected: (newIndex) {
             if (newIndex == 0) {
-              parampasser(false);
+              parampasser();
             }
             setState(() => _index = newIndex);
           },

@@ -67,7 +67,7 @@ class _PreAuthScreenState extends State<PreAuthScreen> {
                   SizedBox(
                     height: currpage == 2
                         ? screenheight * 0.05
-                        : screenheight * 0.05 + 32,
+                        : screenheight * 0.05 + 34,
                   ),
                   GestureDetector(
                     onTap: currpage == 2

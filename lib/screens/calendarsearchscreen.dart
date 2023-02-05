@@ -203,6 +203,9 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                         child: const Icon(Icons.edit))
                   ],
                 ),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
           displaycalendar
               ? Container()
               : filteredEventList.isNotEmpty

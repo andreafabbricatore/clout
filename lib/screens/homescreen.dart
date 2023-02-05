@@ -16,7 +16,7 @@ class HomeScreen extends StatefulWidget {
   List interests = [];
   List<Event> eventlist = [];
   List<Event> interestevents = [];
-  bool firstsetup;
+  bool justloaded;
   AppUser curruser;
   AppLocation userlocation;
   HomeScreen(
@@ -24,7 +24,7 @@ class HomeScreen extends StatefulWidget {
       required this.interests,
       required this.eventlist,
       required this.interestevents,
-      required this.firstsetup,
+      required this.justloaded,
       required this.curruser,
       required this.userlocation})
       : super(key: key);
@@ -171,13 +171,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     userinterests = widget.interests;
-    if (!widget.firstsetup) {
+    if (widget.justloaded) {
       generaleventlist = widget.eventlist;
       interesteventlist = widget.interestevents;
+      totaleventlist = interesteventlist + generaleventlist;
       updatecurruser();
-    }
-    if (generaleventlist.isEmpty || interesteventlist.isEmpty) {
-      getSortedCurrLocEventsList(userinterests);
+    } else {
+      refresh();
     }
 
     super.initState();
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Clout",
+          "Clout.",
           style: TextStyle(
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.w900,

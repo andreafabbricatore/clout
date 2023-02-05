@@ -190,10 +190,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
       context,
       MaterialPageRoute(
           builder: (BuildContext context) => MainScreen(
-              eventlist: eventlist,
-              interesteventlist: interesteventlist,
-              curruser: curruser,
-              userlocation: curruserlocation),
+                eventlist: eventlist,
+                interesteventlist: interesteventlist,
+                curruser: curruser,
+                userlocation: curruserlocation,
+                justloaded: true,
+              ),
           fullscreenDialog: true),
     );
   }
