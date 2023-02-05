@@ -1,5 +1,4 @@
 import 'package:clout/components/event.dart';
-import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';

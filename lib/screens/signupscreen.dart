@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
-import 'package:clout/components/loadingoverlay.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';

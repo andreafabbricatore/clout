@@ -27,6 +27,10 @@ export const sendToDevice = functions.firestore.document("updates/{id}").onCreat
     notification: {
       title: "Clout",
       body: noti.description,
+    }, data: {
+      type: noti.type,
+      eventid: noti.eventid,
+      userid: noti.userid,
     },
   };
 
@@ -64,6 +68,9 @@ export const chatsendToDevices = functions.firestore.document("chats/{chatid}/me
         notification: {
           title: "Clout - " + chat.sender,
           body: chat.notification,
+        }, data: {
+          type: "chat",
+          chatid: chatid,
         },
       };
       return fcm.sendToDevice(finaltokens, payload);
@@ -72,6 +79,9 @@ export const chatsendToDevices = functions.firestore.document("chats/{chatid}/me
         notification: {
           title: "Clout - " + chatdataSnapshot.data()?.chatname[0],
           body: chat.notification,
+        }, data: {
+          type: "chat",
+          chatid: chatid,
         },
       };
       return fcm.sendToDevice(finaltokens, payload);
@@ -108,6 +118,9 @@ export const eventNotifyFollowers = functions.firestore.document("events/{id}").
     notification: {
       title: "Clout",
       body: hostdataSnapshot.data()?.fullname + " is now hosting " + event.title + " near you. Join them!",
+    }, data: {
+      type: "eventcreated",
+      eventid: snapshot.id,
     },
   };
   if (finaltokens.length != 0) {

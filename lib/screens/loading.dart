@@ -87,8 +87,27 @@ class _LoadingScreenState extends State<LoadingScreen> {
     List<AppLocation> response = (responseData.data['features'] as List)
         .map((e) => AppLocation.fromJson(e))
         .toList();
-
     curruserlocation = response[0];
+  }
+
+  Future<void> newgetUserAppLocation() async {
+    //broken
+    String url =
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${_userLocation?.latitude},${_userLocation?.longitude}&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+    url = Uri.parse(url).toString();
+    _dio.options.contentType = Headers.jsonContentType;
+    final responseData = await _dio.get(url);
+    String address =
+        responseData.data['results'][0]['address_components'][1]['short_name'];
+    String city =
+        responseData.data['results'][0]['address_components'][2]['short_name'];
+    String country =
+        responseData.data['results'][0]['address_components'][6]['long_name'];
+    curruserlocation = AppLocation(
+        address: address,
+        city: city,
+        country: country,
+        center: [_userLocation?.longitude, _userLocation?.latitude]);
   }
 
   Future<String> getcitywithoutnums(String city) async {
@@ -111,6 +130,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         error = false;
       });
       Stopwatch stopwatch = Stopwatch()..start();
+      //await newgetUserAppLocation();
       await getUserAppLocation();
       await db.updatelastuserloc(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
@@ -120,9 +140,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
           !listEquals(curruserlocation.center, [0.0, 0.0])) {
         AppUser curruser = await db.getUserFromUID(widget.uid);
         interests = curruser.interests;
+        //
         String city =
             await getcitywithoutnums(curruserlocation.city.toLowerCase());
-
+        //
         curruserlocation.city = city;
 
         currloceventlist = await db.getLngLatEvents(curruserlocation.center[0],

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/chatroomscreen.dart';
 import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/deeplinkeventdetailscreen.dart';
 import 'package:clout/screens/favscreen.dart';
@@ -136,6 +138,25 @@ class _MainScreenState extends State<MainScreen> {
                 )));
   }
 
+  void gochatroomscreen(Chat chat) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) =>
+                ChatRoomScreen(chatinfo: chat, curruser: widget.curruser)));
+  }
+
+  void gotoprofilescreen(AppUser user) {
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ProfileScreen(
+                  user: user,
+                  curruser: widget.curruser,
+                  visit: true,
+                )));
+  }
+
   void openAppLink(Uri uri) async {
     //print(uri.toString().split("/").last);
     //print(uri.queryParameters['link']);
@@ -171,7 +192,63 @@ class _MainScreenState extends State<MainScreen> {
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
-  void _handleMessage(RemoteMessage message) {}
+  void _handleMessage(RemoteMessage message) async {
+    if (message.data['type'] == "chat") {
+      try {
+        Chat chat = await db.getChatfromDocId(message.data['chatid']);
+        gochatroomscreen(chat);
+      } catch (e) {
+        displayErrorSnackBar("Could not display chat");
+      }
+    } else if (message.data["type"] == "eventcreated") {
+      try {
+        Event event = await db.getEventfromDocId(message.data["eventid"]);
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromUID(x)
+        ];
+        godeeplinkeventdetailscreen(event, participants);
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
+    } else if (message.data["type"] == "joined") {
+      try {
+        Event event = await db.getEventfromDocId(message.data["eventid"]);
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromUID(x)
+        ];
+        godeeplinkeventdetailscreen(event, participants);
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
+    } else if (message.data["type"] == "modified") {
+      try {
+        Event event = await db.getEventfromDocId(message.data["eventid"]);
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromUID(x)
+        ];
+        godeeplinkeventdetailscreen(event, participants);
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
+    } else if (message.data["type"] == "followed") {
+      try {
+        AppUser user = await db.getUserFromUID(message.data["userid"]);
+        gotoprofilescreen(user);
+      } catch (e) {
+        displayErrorSnackBar("Could not display user");
+      }
+    } else if (message.data["type"] == "kicked") {
+      try {
+        Event event = await db.getEventfromDocId(message.data["eventid"]);
+        List<AppUser> participants = [
+          for (String x in event.participants) await db.getUserFromUID(x)
+        ];
+        godeeplinkeventdetailscreen(event, participants);
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
+    }
+  }
 
   Future<void> canVibrate() async {
     canvibrate = await Vibrate.canVibrate;
@@ -180,11 +257,17 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     requestNotisPermission();
-    //getforegroundnotis();
+    setupInteractedMessage();
     initDeepLinks();
     parampasser(true);
     canVibrate();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
