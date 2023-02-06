@@ -89,10 +89,12 @@ class _PswResetScreenState extends State<PswResetScreen> {
                           }
                         },
                   child: PrimaryButton(
-                      screenwidth: screenwidth,
-                      buttonpressed: resetbuttonpressed,
-                      text: "Send Password Reset Email",
-                      buttonwidth: screenwidth * 0.8)),
+                    screenwidth: screenwidth,
+                    buttonpressed: resetbuttonpressed,
+                    text: "Send Password Reset Email",
+                    buttonwidth: screenwidth * 0.8,
+                    bold: false,
+                  )),
             ],
           ),
         ),

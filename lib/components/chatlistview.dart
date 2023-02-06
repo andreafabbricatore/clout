@@ -36,49 +36,72 @@ class ChatListView extends StatelessWidget {
       chatname = temp1[0];
       iconurl = temp2[0];
     }
-    widget = Row(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
-          child: SizedBox(
-            height: 50,
-            width: 50,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(100.0),
-              child: Image.network(
-                iconurl,
-                fit: BoxFit.cover,
+    widget = SizedBox(
+      width: screenwidth,
+      height: 50,
+      child: Stack(children: [
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
+              child: SizedBox(
+                height: 50,
+                width: 50,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100.0),
+                  child: Image.network(
+                    iconurl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        SizedBox(
-          width: screenwidth * 0.7,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                chatname,
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            SizedBox(
+              width: screenwidth * 0.7,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    chatname,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    chat.mostrecentmessage,
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.grey),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              Text(
-                chat.mostrecentmessage,
-                style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.grey),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+        !chat.readby.contains(curruser.uid)
+            ? Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, screenwidth * 0.1, 0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100.0),
+                    child: Container(
+                      height: 10,
+                      width: 10,
+                      color: const Color.fromARGB(255, 255, 48, 117),
+                    ),
+                  ),
+                ),
+              )
+            : Container(),
+      ]),
     );
     return GestureDetector(
       onTap: () => onTap?.call(chat, index),

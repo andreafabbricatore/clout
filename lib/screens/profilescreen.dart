@@ -388,7 +388,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: Theme.of(context).primaryColor,
         child: SingleChildScrollView(
           child: SizedBox(
-            height: screenheight,
+            height: joinedevents
+                ? screenheight * 0.3 + (joinedEvents.length * 180)
+                : screenheight * 0.3 + (hostedEvents.length * 180),
             width: screenwidth,
             child: Column(children: [
               ProfileTopContainer(

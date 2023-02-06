@@ -577,7 +577,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       screenwidth: screenwidth,
                       buttonpressed: buttonpressed,
                       text: joinedval,
-                      buttonwidth: screenwidth * 0.5))
+                      buttonwidth: screenwidth * 0.5,
+                      bold: false,
+                    ))
         ]),
       ),
     );

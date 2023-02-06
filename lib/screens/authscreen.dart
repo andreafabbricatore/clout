@@ -90,7 +90,9 @@ class _AuthScreenState extends State<AuthScreen> {
                                   child: Text(
                                 "Sign Up",
                                 style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800),
                               )),
                             )),
                       )

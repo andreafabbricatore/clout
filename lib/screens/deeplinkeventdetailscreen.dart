@@ -553,7 +553,9 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                     screenwidth: screenwidth,
                     buttonpressed: buttonpressed,
                     text: joinedval,
-                    buttonwidth: screenwidth * 0.5),
+                    buttonwidth: screenwidth * 0.5,
+                    bold: false,
+                  ),
           )
         ]),
       ),

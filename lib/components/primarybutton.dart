@@ -7,12 +7,14 @@ class PrimaryButton extends StatefulWidget {
       required this.screenwidth,
       required this.buttonpressed,
       required this.text,
-      required this.buttonwidth});
+      required this.buttonwidth,
+      required this.bold});
 
   final double screenwidth;
   final bool buttonpressed;
   final String text;
   final double buttonwidth;
+  final bool bold;
 
   @override
   State<PrimaryButton> createState() => _PrimaryButtonState();
@@ -108,8 +110,12 @@ class _PrimaryButtonState extends State<PrimaryButton>
                   : Center(
                       child: Text(
                         widget.text,
-                        style:
-                            const TextStyle(fontSize: 20, color: Colors.white),
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: widget.bold
+                                ? FontWeight.bold
+                                : FontWeight.normal),
                         textScaleFactor: 1.1,
                       ),
                     )),

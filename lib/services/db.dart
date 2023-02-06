@@ -85,7 +85,9 @@ class db_conn {
         'setmisc': false,
         'setinterests': false,
         'lastknownlat': 0.0,
-        'lastknownlng': 0.0
+        'lastknownlng': 0.0,
+        'notificationcounter': 0,
+        'chatnotificationcounter': 0
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -1305,9 +1307,9 @@ class db_conn {
                   .collection('users')
                   .doc(element.id);
 
-              users
-                  .doc(element.id)
-                  .set({'visiblechats': []}, SetOptions(merge: true));
+              users.doc(element.id).set(
+                  {'notificationcounter': 0, 'chatnotificationcounter': 0},
+                  SetOptions(merge: true));
             },
           ),
         );
@@ -1386,9 +1388,10 @@ class db_conn {
         'notification': notification,
         'notititle': notititle,
       });
-      return chats
-          .doc(docid)
-          .update({'mostrecentmessage': '${sender.username}: $content'});
+      return chats.doc(docid).set({
+        'mostrecentmessage': '${sender.username}: $content',
+        'readby': [sender.uid]
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception();
     }
@@ -1400,6 +1403,12 @@ class db_conn {
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots();
+  }
+
+  Future<void> setReadReceipt(String chatid, String readerid) {
+    return chats.doc(chatid).set({
+      'readby': [readerid]
+    }, SetOptions(merge: true));
   }
 
   Future<void> clearnotis(String docid) async {
@@ -1527,6 +1536,22 @@ class db_conn {
     try {
       await users.doc(uid).set(
           {'lastknownlat': lat, 'lastknownlng': lng}, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> resetnotificationcounter(String uid) async {
+    try {
+      await users.doc(uid).update({'notificationcounter': 0});
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> resetchatnotificationcounter(String uid) async {
+    try {
+      await users.doc(uid).update({'chatnotificationcounter': 0});
     } catch (e) {
       throw Exception();
     }

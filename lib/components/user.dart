@@ -26,6 +26,8 @@ class AppUser {
   bool setinterests;
   double lastknownlat;
   double lastknownlng;
+  int notificationcounter;
+  int chatnotificationcounter;
 
   AppUser(
       {required this.username,
@@ -54,7 +56,9 @@ class AppUser {
       required this.setmisc,
       required this.setinterests,
       required this.lastknownlat,
-      required this.lastknownlng});
+      required this.lastknownlng,
+      required this.notificationcounter,
+      required this.chatnotificationcounter});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -84,6 +88,8 @@ class AppUser {
         setmisc: json['setmisc'] as bool,
         setinterests: json['setinterests'] as bool,
         lastknownlat: json['lastknownlat'],
-        lastknownlng: json['lastknownlng']);
+        lastknownlng: json['lastknownlng'],
+        notificationcounter: json['notificationcounter'],
+        chatnotificationcounter: json['chatnotificationcounter']);
   }
 }

@@ -553,10 +553,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       });
                     },
               child: PrimaryButton(
-                  screenwidth: screenwidth,
-                  buttonpressed: buttonpressed,
-                  text: "Update Event",
-                  buttonwidth: screenwidth * 0.6)),
+                screenwidth: screenwidth,
+                buttonpressed: buttonpressed,
+                text: "Update Event",
+                buttonwidth: screenwidth * 0.6,
+                bold: false,
+              )),
           SizedBox(
             height: screenheight * 0.04,
           ),

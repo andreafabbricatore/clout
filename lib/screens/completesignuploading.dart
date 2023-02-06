@@ -41,7 +41,9 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       setmisc: false,
       setinterests: false,
       lastknownlat: 0.0,
-      lastknownlng: 0.0);
+      lastknownlng: 0.0,
+      notificationcounter: 0,
+      chatnotificationcounter: 0);
 
   db_conn db = db_conn();
 

@@ -6,6 +6,7 @@ class Chat {
   List connectedid;
   String chatid;
   String type;
+  List readby;
 
   Chat(
       {required this.participants,
@@ -14,7 +15,8 @@ class Chat {
       required this.mostrecentmessage,
       required this.connectedid,
       required this.chatid,
-      required this.type});
+      required this.type,
+      required this.readby});
 
   factory Chat.fromJson(dynamic json, String docid) {
     return Chat(
@@ -24,6 +26,7 @@ class Chat {
         mostrecentmessage: json['mostrecentmessage'],
         connectedid: json['connectedid'] as List,
         type: json['type'],
-        chatid: docid);
+        chatid: docid,
+        readby: json['readby'] as List);
   }
 }

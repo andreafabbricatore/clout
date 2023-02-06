@@ -61,6 +61,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       setState(() {
         widget.curruser = curruser;
       });
+      db.resetchatnotificationcounter(widget.curruser.uid);
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
     }

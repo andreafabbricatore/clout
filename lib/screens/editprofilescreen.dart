@@ -561,10 +561,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       }
                     },
               child: PrimaryButton(
-                  screenwidth: screenwidth,
-                  buttonpressed: buttonpressed,
-                  text: "Update Profile",
-                  buttonwidth: screenwidth * 0.6))
+                screenwidth: screenwidth,
+                buttonpressed: buttonpressed,
+                text: "Update Profile",
+                buttonwidth: screenwidth * 0.6,
+                bold: false,
+              ))
         ]),
       ),
     );

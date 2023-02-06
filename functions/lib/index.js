@@ -31,7 +31,7 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
         },
     };
     querySnapshot.docs.forEach(async (element) => {
-        await db.collection("users").doc(element.id).set({ "notifications": firebase_admin_1.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": firebase_admin_1.firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid }) }, { merge: true });
+        await db.collection("users").doc(element.id).set({ "notificationcounter": firebase_admin_1.firestore.FieldValue.increment(1), "notifications": firebase_admin_1.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": firebase_admin_1.firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid }) }, { merge: true });
     });
     await db.collection("updates").doc(snapshot.id).delete();
     return fcm.sendToDevice(finaltokens, payload);
@@ -71,6 +71,9 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
                     chatid: chatid,
                 },
             };
+            querySnapshot.docs.forEach(async (element) => {
+                await db.collection("users").doc(element.id).set({ "chatnotificationcounter": firebase_admin_1.firestore.FieldValue.increment(1) }, { merge: true });
+            });
             return fcm.sendToDevice(finaltokens, payload);
         }
     }

@@ -43,6 +43,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
       notis.insert(
           0, NotificationElement.fromJson(widget.curruser.notifications[i]));
     }
+    try {
+      db.resetnotificationcounter(widget.curruser.uid);
+    } catch (e) {
+      displayErrorSnackBar("Could not clear notifications");
+    }
   }
 
   Future<void> refresh() async {

@@ -180,6 +180,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       snapshot.data!.docs.map((DocumentSnapshot document) {
                     Map<String, dynamic> data =
                         document.data()! as Map<String, dynamic>;
+                    db.setReadReceipt(
+                        widget.chatinfo.chatid, widget.curruser.uid);
                     if (widget.curruser.username == data['sender']) {
                       return Align(
                           alignment: Alignment.centerRight,

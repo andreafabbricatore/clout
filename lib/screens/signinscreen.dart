@@ -163,6 +163,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   buttonwidth: screenwidth * 0.5,
                   buttonpressed: signinbuttonpressed,
                   text: "Sign In",
+                  bold: true,
                 )),
             SizedBox(height: screenheight * 0.02),
             GestureDetector(

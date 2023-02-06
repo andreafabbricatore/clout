@@ -192,10 +192,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         });
                       },
                 child: PrimaryButton(
-                    screenwidth: screenwidth,
-                    buttonwidth: screenwidth * 0.5,
-                    buttonpressed: signupbuttonpressed,
-                    text: "Sign Up")),
+                  screenwidth: screenwidth,
+                  buttonwidth: screenwidth * 0.5,
+                  buttonpressed: signupbuttonpressed,
+                  text: "Sign Up",
+                  bold: true,
+                )),
             SizedBox(height: screenheight * 0.3),
             SizedBox(
               width: screenwidth * 0.6,
@@ -542,10 +544,12 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                     }
                   },
             child: PrimaryButton(
-                screenwidth: screenwidth,
-                buttonpressed: continuebuttonpressed,
-                text: "Continue",
-                buttonwidth: screenwidth * 0.6),
+              screenwidth: screenwidth,
+              buttonpressed: continuebuttonpressed,
+              text: "Continue",
+              buttonwidth: screenwidth * 0.6,
+              bold: false,
+            ),
           )
         ],
       )),
@@ -778,7 +782,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
                 screenwidth: screenwidth,
                 buttonpressed: continuebuttonpressed,
                 text: "Continue",
-                buttonwidth: screenwidth * 0.6),
+                buttonwidth: screenwidth * 0.6,
+                bold: false),
           )
         ],
       )),
@@ -1355,10 +1360,12 @@ class _MiscScreenState extends State<MiscScreen> {
                       });
                     },
               child: PrimaryButton(
-                  screenwidth: screenwidth,
-                  buttonpressed: continuebuttonpressed,
-                  text: "Continue",
-                  buttonwidth: screenwidth * 0.6),
+                screenwidth: screenwidth,
+                buttonpressed: continuebuttonpressed,
+                text: "Continue",
+                buttonwidth: screenwidth * 0.6,
+                bold: false,
+              ),
             )
           ],
         ),

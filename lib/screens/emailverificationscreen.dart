@@ -138,10 +138,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     });
                                   },
                             child: PrimaryButton(
-                                screenwidth: screenwidth,
-                                buttonpressed: sendbuttonpressed,
-                                text: "Resend Email",
-                                buttonwidth: screenwidth * 0.6))),
+                              screenwidth: screenwidth,
+                              buttonpressed: sendbuttonpressed,
+                              text: "Resend Email",
+                              buttonwidth: screenwidth * 0.6,
+                              bold: false,
+                            ))),
                     SizedBox(
                       height: screenheight * 0.35,
                     ),

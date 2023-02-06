@@ -90,7 +90,9 @@ class _PreAuthScreenState extends State<PreAuthScreen> {
                             screenwidth: screenwidth,
                             buttonpressed: buttonpressed,
                             text: "Continue",
-                            buttonwidth: screenwidth * 0.5)
+                            buttonwidth: screenwidth * 0.5,
+                            bold: true,
+                          )
                         : const Text(
                             "Skip",
                             style: TextStyle(

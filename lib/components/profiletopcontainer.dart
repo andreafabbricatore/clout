@@ -132,7 +132,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   SizedBox(
                     width: screenwidth * 0.55,
                     child: Text(
-                      "${widget.user.fullname},${calculateAge(widget.user.birthday)}",
+                      "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
                       textAlign: TextAlign.start,
                       style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w500),
