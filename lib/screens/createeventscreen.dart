@@ -209,6 +209,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(

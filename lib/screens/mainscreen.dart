@@ -18,17 +18,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class MainScreen extends StatefulWidget {
-  List<Event> eventlist;
-  List<Event> interesteventlist;
   AppUser curruser;
   AppLocation userlocation;
   bool justloaded;
   MainScreen(
       {Key? key,
-      required this.eventlist,
-      required this.interesteventlist,
       required this.curruser,
       required this.userlocation,
       required this.justloaded})
@@ -67,9 +64,6 @@ class _MainScreenState extends State<MainScreen> {
     page = [
       HomeScreen(
         curruser: widget.curruser,
-        interests: widget.curruser.interests,
-        eventlist: widget.eventlist,
-        interestevents: widget.interesteventlist,
         userlocation: widget.userlocation,
         justloaded: widget.justloaded,
       ),
@@ -253,6 +247,28 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  void initMessaging() {
+    var androiInit =
+        const AndroidInitializationSettings('@mipmap/ic_launcher'); //for logo
+    var iosInit = const DarwinInitializationSettings();
+    var initSetting = InitializationSettings(android: androiInit, iOS: iosInit);
+    var fltNotification = FlutterLocalNotificationsPlugin();
+    fltNotification.initialize(initSetting);
+    var androidDetails = const AndroidNotificationDetails('1', 'channelName',
+        channelDescription: 'channel Description');
+    var iosDetails = const DarwinNotificationDetails();
+    var generalNotificationDetails =
+        NotificationDetails(android: androidDetails, iOS: iosDetails);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        fltNotification.show(notification.hashCode, notification.title,
+            notification.body, generalNotificationDetails);
+      }
+    });
+  }
+
   Future<void> canVibrate() async {
     canvibrate = await Vibrate.canVibrate;
   }
@@ -260,6 +276,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     requestNotisPermission();
+    initMessaging();
     setupInteractedMessage();
     initDeepLinks();
     parampasser();

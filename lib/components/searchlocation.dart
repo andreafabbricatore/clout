@@ -165,6 +165,7 @@ class _SearchLocationState extends State<SearchLocation> {
         ),
         backgroundColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context, chosenLocation);

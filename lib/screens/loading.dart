@@ -29,11 +29,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
   Dio _dio = Dio();
   db_conn db = db_conn();
-  String docid = "";
-  List interests = [];
-  List<Event> currloceventlist = [];
-  List<Event> eventlist = [];
-  List<Event> interesteventlist = [];
   List allinterests = [
     "Sports",
     "Nature",
@@ -139,30 +134,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
           curruserlocation.country != "" &&
           !listEquals(curruserlocation.center, [0.0, 0.0])) {
         AppUser curruser = await db.getUserFromUID(widget.uid);
-        interests = curruser.interests;
+
         //
         String city =
             await getcitywithoutnums(curruserlocation.city.toLowerCase());
         //
         curruserlocation.city = city;
 
-        currloceventlist = await db.getLngLatEvents(curruserlocation.center[0],
-            curruserlocation.center[1], curruserlocation.country, curruser);
-        for (int i = 0; i < currloceventlist.length; i++) {
-          if (interests.contains(currloceventlist[i].interest)) {
-            if (curruser.following.contains(currloceventlist[i].hostdocid)) {
-              interesteventlist.insert(0, currloceventlist[i]);
-            } else {
-              interesteventlist.add(currloceventlist[i]);
-            }
-          } else {
-            if (curruser.following.contains(currloceventlist[i].hostdocid)) {
-              interesteventlist.insert(0, currloceventlist[i]);
-            } else {
-              eventlist.add(currloceventlist[i]);
-            }
-          }
-        }
         stopwatch.stop();
 
         int diff = stopwatch.elapsed.inSeconds.ceil() > 2
@@ -177,7 +155,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         error = true;
       });
-      print(e);
       if (e.toString() == "Exception: Error with userdocid" ||
           e.toString() == "Exception: Could not retrieve user") {
         FirebaseAuth.instance.signOut();
@@ -190,8 +167,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
       context,
       MaterialPageRoute(
           builder: (BuildContext context) => MainScreen(
-                eventlist: eventlist,
-                interesteventlist: interesteventlist,
                 curruser: curruser,
                 userlocation: curruserlocation,
                 justloaded: true,

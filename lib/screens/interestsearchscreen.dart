@@ -140,6 +140,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);

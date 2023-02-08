@@ -105,6 +105,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: Padding(

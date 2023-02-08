@@ -75,6 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         leading: InkWell(
             onTap: () {
               Navigator.pop(context);
@@ -435,6 +436,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
+        centerTitle: true,
         bottom: PreferredSize(
             preferredSize: const Size.fromHeight(4.0),
             child: Row(
@@ -723,6 +725,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
+        centerTitle: true,
         bottom: PreferredSize(
             preferredSize: const Size.fromHeight(4.0),
             child: Row(
@@ -1216,6 +1219,7 @@ class _MiscScreenState extends State<MiscScreen> {
         shadowColor: Colors.white,
         elevation: 0.0,
         automaticallyImplyLeading: false,
+        centerTitle: true,
         bottom: PreferredSize(
             preferredSize: const Size.fromHeight(4.0),
             child: Row(
@@ -1594,6 +1598,7 @@ class _InterestScreenState extends State<InterestScreen> {
               fontWeight: FontWeight.bold,
               fontSize: 20),
         ),
+        centerTitle: true,
         bottom: PreferredSize(
             preferredSize: const Size.fromHeight(4.0),
             child: Row(

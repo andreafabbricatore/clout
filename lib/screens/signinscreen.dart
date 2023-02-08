@@ -66,6 +66,7 @@ class _SignInScreenState extends State<SignInScreen> {
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         leading: InkWell(
             onTap: () {
               Navigator.pop(context);

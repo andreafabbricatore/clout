@@ -154,6 +154,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         automaticallyImplyLeading: false,
         leading: GestureDetector(
           onTap: () {

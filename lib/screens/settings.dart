@@ -91,6 +91,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -558,6 +559,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
           GestureDetector(
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
+                await db.cleartokens(widget.curruser);
                 goauthwrapper();
               },
               child: Center(

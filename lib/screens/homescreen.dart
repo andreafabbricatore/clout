@@ -13,17 +13,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  List interests = [];
-  List<Event> eventlist = [];
-  List<Event> interestevents = [];
   bool justloaded;
   AppUser curruser;
   AppLocation userlocation;
   HomeScreen(
       {Key? key,
-      required this.interests,
-      required this.eventlist,
-      required this.interestevents,
       required this.justloaded,
       required this.curruser,
       required this.userlocation})
@@ -36,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   db_conn db = db_conn();
   List<Event> generaleventlist = [];
   List<Event> interesteventlist = [];
-  List userinterests = [];
   List<Event> totaleventlist = [];
   final double _offsetToArmed = 200;
 
@@ -85,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void getSortedCurrLocEventsList(interests) async {
+  void getSortedCurrLocEventsList() async {
     try {
       interesteventlist = [];
       generaleventlist = [];
@@ -96,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
           widget.userlocation.country,
           widget.curruser);
       for (int i = 0; i < currloceventlist.length; i++) {
-        if (userinterests.contains(currloceventlist[i].interest)) {
+        if (widget.curruser.interests.contains(currloceventlist[i].interest)) {
           if (widget.curruser.following
               .contains(currloceventlist[i].hostdocid)) {
             interesteventlist.insert(0, currloceventlist[i]);
@@ -128,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //  generaleventlist = events;
       //  interesteventlist = interestevents;
       //});
-      getSortedCurrLocEventsList(userinterests);
+      getSortedCurrLocEventsList();
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");
     }
@@ -170,12 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    userinterests = widget.interests;
     if (widget.justloaded) {
-      generaleventlist = widget.eventlist;
-      interesteventlist = widget.interestevents;
-      totaleventlist = interesteventlist + generaleventlist;
-      updatecurruser();
+      refreshevents();
     } else {
       refresh();
     }
@@ -213,16 +202,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: GestureDetector(
-          child: Text(
-            "Clout.",
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.w900,
-              fontSize: 50,
-            ),
-            textScaleFactor: 1.0,
+        title: Text(
+          "Clout.",
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.w900,
+            fontSize: 50,
           ),
+          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,

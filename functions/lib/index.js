@@ -52,19 +52,7 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
         if (((_b = chatdataSnapshot.data()) === null || _b === void 0 ? void 0 : _b.type) == "user") {
             const payload = {
                 notification: {
-                    title: "Clout - " + chat.sender,
-                    body: chat.notification,
-                }, data: {
-                    type: "chat",
-                    chatid: chatid,
-                },
-            };
-            return fcm.sendToDevice(finaltokens, payload);
-        }
-        else {
-            const payload = {
-                notification: {
-                    title: "Clout - " + ((_c = chatdataSnapshot.data()) === null || _c === void 0 ? void 0 : _c.chatname[0]),
+                    title: chat.sender,
                     body: chat.notification,
                 }, data: {
                     type: "chat",
@@ -74,6 +62,23 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
             querySnapshot.docs.forEach(async (element) => {
                 await db.collection("users").doc(element.id).set({ "chatnotificationcounter": firebase_admin_1.firestore.FieldValue.increment(1) }, { merge: true });
             });
+            await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + chat.content });
+            return fcm.sendToDevice(finaltokens, payload);
+        }
+        else {
+            const payload = {
+                notification: {
+                    title: (_c = chatdataSnapshot.data()) === null || _c === void 0 ? void 0 : _c.chatname[0],
+                    body: chat.notification,
+                }, data: {
+                    type: "chat",
+                    chatid: chatid,
+                },
+            };
+            querySnapshot.docs.forEach(async (element) => {
+                await db.collection("users").doc(element.id).set({ "chatnotificationcounter": firebase_admin_1.firestore.FieldValue.increment(1) }, { merge: true });
+            });
+            await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + chat.content });
             return fcm.sendToDevice(finaltokens, payload);
         }
     }

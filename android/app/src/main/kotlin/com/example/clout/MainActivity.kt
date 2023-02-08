@@ -1,4 +1,4 @@
-package com.example.clout
+package com.outwithclout.clout
 
 import io.flutter.embedding.android.FlutterActivity
 

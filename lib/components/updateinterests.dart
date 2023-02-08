@@ -82,6 +82,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
         ),
         backgroundColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         leading: GestureDetector(
           onTap: () {
             if (widget.curruser.interests.length >= 3) {

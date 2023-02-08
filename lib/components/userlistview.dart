@@ -2,7 +2,7 @@ import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
-class UserListView extends StatelessWidget {
+class UserListView extends StatefulWidget {
   UserListView(
       {Key? key,
       required this.userres,
@@ -26,10 +26,24 @@ class UserListView extends StatelessWidget {
   final Function(AppUser user, int index)? onTap;
   final Function(AppUser user, int index)? removeUser;
 
+  @override
+  State<UserListView> createState() => _UserListViewState();
+}
+
+class _UserListViewState extends State<UserListView> {
+  bool ontappressed = false;
+  bool removeuserpressed = false;
+
   Widget _listviewitem(
-    AppUser user,
-    int index,
-  ) {
+      AppUser user,
+      int index,
+      double screenwidth,
+      AppUser curruser,
+      bool showcloutscore,
+      bool showrembutton,
+      bool removebuttonblack,
+      Function(AppUser user, int index)? removeUser,
+      Function(AppUser user, int index)? onTap) {
     Widget widget;
     widget = Row(
       children: [
@@ -81,9 +95,17 @@ class UserListView extends StatelessWidget {
             : Container(),
         showrembutton && user.uid != curruser.uid
             ? GestureDetector(
-                onTap: () {
-                  removeUser?.call(user, index);
-                },
+                onTap: removeuserpressed
+                    ? null
+                    : () {
+                        setState(() {
+                          removeuserpressed = true;
+                        });
+                        removeUser?.call(user, index);
+                        setState(() {
+                          removeuserpressed = false;
+                        });
+                      },
                 child: Icon(
                   Icons.remove_circle_outline,
                   color: removebuttonblack
@@ -96,7 +118,17 @@ class UserListView extends StatelessWidget {
     );
 
     return GestureDetector(
-      onTap: () => onTap?.call(user, index),
+      onTap: ontappressed
+          ? null
+          : () async {
+              setState(() {
+                ontappressed = true;
+              });
+              await onTap?.call(user, index);
+              setState(() {
+                ontappressed = false;
+              });
+            },
       child: widget,
     );
   }
@@ -105,14 +137,23 @@ class UserListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: ListView.builder(
-          physics: physics,
+          physics: widget.physics,
           padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
           shrinkWrap: true,
-          itemCount: userres.length,
+          itemCount: widget.userres.length,
           itemBuilder: (_, index) {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                child: _listviewitem(userres[index], index));
+                child: _listviewitem(
+                    widget.userres[index],
+                    index,
+                    widget.screenwidth,
+                    widget.curruser,
+                    widget.showcloutscore,
+                    widget.showrembutton,
+                    widget.removebuttonblack,
+                    widget.removeUser,
+                    widget.onTap));
           }),
     );
   }

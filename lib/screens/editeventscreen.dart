@@ -198,18 +198,14 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 ),
               )
             : Container(),
-        title: GestureDetector(
-          onTap: () {
-            CompressAndGetFile(imagepath);
-          },
-          child: Text(
-            "Edit Event",
-            style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 30),
-          ),
+        title: Text(
+          "Edit Event",
+          style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 30),
         ),
+        centerTitle: true,
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,

@@ -3,7 +3,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 
-class ChatListView extends StatelessWidget {
+class ChatListView extends StatefulWidget {
   ChatListView(
       {Key? key,
       required this.chatlist,
@@ -16,12 +16,15 @@ class ChatListView extends StatelessWidget {
   final Function(Chat chat, int index)? onTap;
   AppUser curruser;
 
-  db_conn db = db_conn();
+  @override
+  State<ChatListView> createState() => _ChatListViewState();
+}
 
-  Widget _listviewitem(
-    Chat chat,
-    int index,
-  ) {
+class _ChatListViewState extends State<ChatListView> {
+  db_conn db = db_conn();
+  bool ontappressed = false;
+  Widget _listviewitem(Chat chat, int index, AppUser curruser,
+      double screenwidth, Function(Chat chat, int index)? onTap) {
     String chatname = "";
     String iconurl = "";
     Widget widget;
@@ -104,7 +107,17 @@ class ChatListView extends StatelessWidget {
       ]),
     );
     return GestureDetector(
-      onTap: () => onTap?.call(chat, index),
+      onTap: ontappressed
+          ? null
+          : () async {
+              setState(() {
+                ontappressed = true;
+              });
+              onTap?.call(chat, index);
+              setState(() {
+                ontappressed = false;
+              });
+            },
       child: widget,
     );
   }
@@ -115,7 +128,7 @@ class ChatListView extends StatelessWidget {
       child: ListView.builder(
           padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
           shrinkWrap: true,
-          itemCount: chatlist.length,
+          itemCount: widget.chatlist.length,
           itemBuilder: (_, index) {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
@@ -132,17 +145,18 @@ class ChatListView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    direction: chatlist[index].type == "user"
+                    direction: widget.chatlist[index].type == "user"
                         ? DismissDirection.endToStart
                         : DismissDirection.none,
-                    key: Key(chatlist[index].chatid),
-                    onDismissed: chatlist[index].type == "user"
+                    key: Key(widget.chatlist[index].chatid),
+                    onDismissed: widget.chatlist[index].type == "user"
                         ? (direction) async {
                             await db.removeuserchatvisibility(
-                                curruser, chatlist[index].chatid);
+                                widget.curruser, widget.chatlist[index].chatid);
                           }
                         : (direction) {},
-                    child: _listviewitem(chatlist[index], index)));
+                    child: _listviewitem(widget.chatlist[index], index,
+                        widget.curruser, widget.screenwidth, widget.onTap)));
           }),
     );
   }

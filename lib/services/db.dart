@@ -94,6 +94,23 @@ class db_conn {
     }
   }
 
+  Future cleartokens(AppUser curruser) async {
+    try {
+      final instance = FirebaseFirestore.instance;
+      final batch = instance.batch();
+      var collection =
+          instance.collection('users').doc(curruser.uid).collection('tokens');
+      var snapshots = await collection.get();
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      users.doc(curruser.uid).update({"tokens": []});
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   Future deleteuser(AppUser curruser) async {
     try {
       DocumentSnapshot userSnapshot = await users.doc(curruser.uid).get();
@@ -220,6 +237,7 @@ class db_conn {
           "iconurl": [bannerUrl],
           "mostrecentmessage": "${newevent.title} was just created!",
           "type": "event",
+          "readby": []
         }).then((value) => chatid = value.id);
         await chats.doc(chatid).collection('messages').add({
           'content': "${newevent.title} was just created!",
@@ -1062,7 +1080,7 @@ class db_conn {
   Future<List<AppUser>> getAllUsersRankedByCloutScore() async {
     try {
       QuerySnapshot querySnapshot =
-          await users.orderBy('clout', descending: true).getSavy();
+          await users.orderBy('clout', descending: true).get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
         usersearches.add(AppUser.fromJson(element.data(), element.id));
@@ -1389,7 +1407,6 @@ class db_conn {
         'notititle': notititle,
       });
       return chats.doc(docid).set({
-        'mostrecentmessage': '${sender.username}: $content',
         'readby': [sender.uid]
       }, SetOptions(merge: true));
     } catch (e) {
@@ -1407,7 +1424,7 @@ class db_conn {
 
   Future<void> setReadReceipt(String chatid, String readerid) {
     return chats.doc(chatid).set({
-      'readby': [readerid]
+      'readby': FieldValue.arrayUnion([readerid])
     }, SetOptions(merge: true));
   }
 
@@ -1427,6 +1444,7 @@ class db_conn {
       "iconurl": [curruser.pfpurl, otheruser.pfpurl],
       "mostrecentmessage": "",
       "type": "user",
+      "readby": []
     }).then((value) => chatid = value.id);
     await users.doc(curruser.uid).set({
       "chats": FieldValue.arrayUnion([chatid])

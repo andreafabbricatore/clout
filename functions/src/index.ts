@@ -66,18 +66,7 @@ export const chatsendToDevices = functions.firestore.document("chats/{chatid}/me
     if (chatdataSnapshot.data()?.type == "user") {
       const payload: admin.messaging.MessagingPayload = {
         notification: {
-          title: "Clout - " + chat.sender,
-          body: chat.notification,
-        }, data: {
-          type: "chat",
-          chatid: chatid,
-        },
-      };
-      return fcm.sendToDevice(finaltokens, payload);
-    } else {
-      const payload: admin.messaging.MessagingPayload = {
-        notification: {
-          title: "Clout - " + chatdataSnapshot.data()?.chatname[0],
+          title: chat.sender,
           body: chat.notification,
         }, data: {
           type: "chat",
@@ -87,6 +76,22 @@ export const chatsendToDevices = functions.firestore.document("chats/{chatid}/me
       querySnapshot.docs.forEach(async (element) => {
         await db.collection("users").doc(element.id).set({"chatnotificationcounter": firestore.FieldValue.increment(1)}, {merge: true});
       });
+      await db.collection("chats").doc(chatid).update({"mostrecentmessage": chat.sender + ": " + chat.content});
+      return fcm.sendToDevice(finaltokens, payload);
+    } else {
+      const payload: admin.messaging.MessagingPayload = {
+        notification: {
+          title: chatdataSnapshot.data()?.chatname[0],
+          body: chat.notification,
+        }, data: {
+          type: "chat",
+          chatid: chatid,
+        },
+      };
+      querySnapshot.docs.forEach(async (element) => {
+        await db.collection("users").doc(element.id).set({"chatnotificationcounter": firestore.FieldValue.increment(1)}, {merge: true});
+      });
+      await db.collection("chats").doc(chatid).update({"mostrecentmessage": chat.sender + ": " + chat.content});
       return fcm.sendToDevice(finaltokens, payload);
     }
   } else {
