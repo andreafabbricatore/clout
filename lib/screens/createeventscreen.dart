@@ -49,7 +49,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       docid: "",
       lat: 0,
       lng: 0,
-      chatid: "");
+      chatid: "",
+      isinviteonly: false);
 
   List<String> allinterests = [
     "Sports",

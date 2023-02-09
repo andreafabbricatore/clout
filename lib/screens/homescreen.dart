@@ -67,17 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void getInterestEventsList(interests) async {
-    try {
-      List<Event> interestevents = await db.getInterestEvents(interests);
-      setState(() {
-        interesteventlist = interestevents;
-      });
-    } catch (e) {
-      displayErrorSnackBar("Could not retrieve events");
-    }
-  }
-
   void getSortedCurrLocEventsList() async {
     try {
       interesteventlist = [];

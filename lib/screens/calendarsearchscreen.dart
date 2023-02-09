@@ -219,7 +219,8 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                       curruser: widget.curruser,
                       interactfav: interactfav,
                       screenwidth: screenwidth,
-                      screenheight: screenheight)
+                      screenheight: screenheight,
+                    )
                   : Column(
                       children: [
                         SizedBox(

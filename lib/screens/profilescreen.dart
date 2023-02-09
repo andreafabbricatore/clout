@@ -115,7 +115,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       for (int i = 0; i < events.length; i++) {
         Event event = await db.getEventfromDocId(events[i]);
-        temp.add(event);
+        if (event.isinviteonly && widget.iscurruser) {
+          temp.add(event);
+        } else if (event.isinviteonly && !widget.iscurruser) {
+        } else {
+          temp.add(event);
+        }
       }
       if (joined) {
         setState(() {

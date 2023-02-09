@@ -192,10 +192,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           alignment: Alignment.center,
                           child: Container(
                               color: Colors.white,
-                              height: 60,
+                              height: 50,
                               width: screenwidth,
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Center(
                                       child: Text(

@@ -1,7 +1,9 @@
+import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
+import 'package:clout/screens/chatroomscreen.dart';
 import 'package:clout/screens/editeventscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
@@ -34,6 +36,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   String joinedval = "Join";
   bool buttonpressed = false;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  bool gotochatbuttonpressed = false;
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -220,6 +223,17 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     }
   }
 
+  Future<void> chatnavigate(Chat chat) async {
+    await Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ChatRoomScreen(
+                  chatinfo: chat,
+                  curruser: widget.curruser,
+                )));
+    updatescreen(widget.event.docid);
+  }
+
   @override
   void initState() {
     checkifjoined();
@@ -256,6 +270,13 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
+        title: widget.event.isinviteonly
+            ? const Text(
+                "Invite Only",
+                style: TextStyle(color: Colors.black),
+              )
+            : null,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -266,35 +287,13 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           ),
         ),
         actions: [
-          widget.curruser.uid == widget.event.hostdocid
-              ? GestureDetector(
-                  onTap: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => EditEventScreen(
-                            curruser: widget.curruser,
-                            allowbackarrow: true,
-                            event: widget.event),
-                      ),
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.black,
-                    ),
-                  ),
-                )
-              : Container(),
           GestureDetector(
             onTap: () async {
               await interactfav(widget.event);
               updatecurruser();
             },
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
               child: Icon(
                 widget.curruser.favorites.contains(widget.event.docid)
                     ? Icons.bookmark
@@ -303,20 +302,134 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
               ),
             ),
           ),
-          widget.curruser.uid != widget.event.hostdocid
-              ? InkWell(
-                  onTap: () {
-                    reportevent(widget.event);
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                    child: Icon(
-                      Icons.flag_outlined,
-                      color: Colors.black,
-                    ),
-                  ),
-                )
-              : Container(),
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                  backgroundColor: Colors.white,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return SizedBox(
+                        height: screenheight * 0.3,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                              20, screenheight * 0.05, 20, 20),
+                          child: Column(
+                            children: [
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: gotochatbuttonpressed
+                                          ? null
+                                          : () async {
+                                              setState(() {
+                                                gotochatbuttonpressed = true;
+                                              });
+                                              try {
+                                                if (widget.event.participants
+                                                    .contains(
+                                                        widget.curruser.uid)) {
+                                                  Chat chat =
+                                                      await db.getChatfromDocId(
+                                                          widget.event.chatid);
+                                                  chatnavigate(chat);
+                                                } else {
+                                                  displayErrorSnackBar(
+                                                      "Please join event first");
+                                                }
+                                              } catch (e) {
+                                                displayErrorSnackBar(
+                                                    "Could not display chat");
+                                              }
+                                              setState(() {
+                                                gotochatbuttonpressed = false;
+                                              });
+                                            },
+                                      child: Container(
+                                        height: screenheight * 0.1,
+                                        width: screenwidth * 0.85,
+                                        decoration: BoxDecoration(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(20))),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.chat_bubble_outline_rounded,
+                                              color: Colors.white,
+                                              size: 30,
+                                            ),
+                                            SizedBox(
+                                              height: screenheight * 0.01,
+                                            ),
+                                            const Text(
+                                              "Go to Chat",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ]),
+                              SizedBox(
+                                height: screenheight * 0.02,
+                              ),
+                              GestureDetector(
+                                onTap: widget.curruser.uid ==
+                                        widget.event.hostdocid
+                                    ? () async {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                EditEventScreen(
+                                                    curruser: widget.curruser,
+                                                    allowbackarrow: true,
+                                                    event: widget.event),
+                                          ),
+                                        );
+                                      }
+                                    : () {
+                                        reportevent(widget.event);
+                                      },
+                                child: Container(
+                                  height: screenheight * 0.1,
+                                  width: screenwidth * 0.85,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(20))),
+                                  child: Center(
+                                    child: Text(
+                                        widget.curruser.uid ==
+                                                widget.event.hostdocid
+                                            ? "Edit Event"
+                                            : "Report Event",
+                                        style: const TextStyle(
+                                            fontSize: 25, color: Colors.white)),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ));
+                  });
+            },
+            child: const Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+              child: Icon(
+                Icons.more_vert_outlined,
+                color: Colors.black,
+              ),
+            ),
+          ),
         ],
       ),
       body: Padding(

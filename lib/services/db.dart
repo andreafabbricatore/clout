@@ -215,7 +215,8 @@ class db_conn {
           'lat': newevent.lat,
           'lng': newevent.lng,
           'searchfield': searchfield,
-          'chatid': ''
+          'chatid': '',
+          'isinviteonly': newevent.isinviteonly
         }).then((value) {
           eventid = value.id;
         });
@@ -905,6 +906,7 @@ class db_conn {
           .orderBy('time')
           .startAfter([DateTime.now()])
           .where('country', isEqualTo: country.toLowerCase())
+          .where('isinviteonly', isEqualTo: false)
           .get();
       List<Event> tempeventlist = [];
       List<Event> eventlist = [];
@@ -937,6 +939,7 @@ class db_conn {
           .startAfter([DateTime.now()])
           .where('country', isEqualTo: country.toLowerCase())
           .where('interest', isEqualTo: interest)
+          .where('isinviteonly', isEqualTo: false)
           .get();
       List<Event> tempeventlist = [];
       List<Event> eventlist = [];
@@ -992,26 +995,13 @@ class db_conn {
     }
   }
 
-  Future<List<Event>> getInterestEvents(List interests) async {
-    try {
-      QuerySnapshot querySnapshot =
-          await events.where('interest', whereIn: interests).get();
-      List<Event> interesteventlist = [];
-      querySnapshot.docs.forEach((element) {
-        interesteventlist.add(Event.fromJson(element.data(), element.id));
-      });
-      return interesteventlist;
-    } catch (e) {
-      throw Exception("Could not retreive events");
-    }
-  }
-
   Future<List<Event>> searchEvents(String searchquery, AppUser curruser) async {
     try {
       QuerySnapshot querySnapshot = await events
           .orderBy('time')
           .startAfter([DateTime.now()])
           .where('searchfield', arrayContains: searchquery.toLowerCase())
+          .where('isinviteonly', isEqualTo: false)
           .get();
       List<Event> eventsearchres = [];
       querySnapshot.docs.forEach((element) {
@@ -1034,6 +1024,7 @@ class db_conn {
           .startAfter([date])
           .endBefore([DateTime(date.year, date.month, date.day + 1)])
           .where('country', isEqualTo: country.toLowerCase())
+          .where('isinviteonly', isEqualTo: false)
           .get();
       List<Event> tempeventlist = [];
       List<Event> eventlist = [];
