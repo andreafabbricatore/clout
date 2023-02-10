@@ -275,6 +275,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
             ? const Text(
                 "Invite Only",
                 style: TextStyle(color: Colors.black),
+                textScaleFactor: 1.0,
               )
             : null,
         leading: GestureDetector(

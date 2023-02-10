@@ -283,6 +283,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ? const Text(
                 "Invite Only",
                 style: TextStyle(color: Colors.black),
+                textScaleFactor: 1.0,
               )
             : null,
         leading: GestureDetector(

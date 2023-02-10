@@ -227,7 +227,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                           height: screenheight * 0.1,
                         ),
                         const Text(
-                          "No Events yet :(",
+                          "No Events Yet :(",
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 20,

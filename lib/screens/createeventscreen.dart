@@ -78,6 +78,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
   bool emptylocation = true;
   bool buttonpressed = false;
+  bool isinviteonly = false;
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Location location = Location();
@@ -508,6 +509,71 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     },
                   ),
                 ),
+          Container(
+            height: screenwidth * 0.13,
+            width: screenwidth * 0.6,
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+            ),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isinviteonly = false;
+                  });
+                },
+                child: Container(
+                  width:
+                      isinviteonly ? screenwidth * 0.24 : screenwidth * 0.354,
+                  color: isinviteonly
+                      ? Colors.white
+                      : Theme.of(context).primaryColor,
+                  child: Center(
+                    child: Text(
+                      "Public",
+                      style: TextStyle(
+                          fontSize: isinviteonly ? 16 : 20,
+                          color: isinviteonly ? Colors.black : Colors.white),
+                      textScaleFactor: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isinviteonly = true;
+                  });
+                },
+                child: Container(
+                  width:
+                      isinviteonly ? screenwidth * 0.354 : screenwidth * 0.24,
+                  color: isinviteonly
+                      ? Theme.of(context).primaryColor
+                      : Colors.white,
+                  child: Center(
+                    child: Text(
+                      "Invite-Only",
+                      style: TextStyle(
+                          fontSize: isinviteonly ? 18 : 14,
+                          color: isinviteonly ? Colors.white : Colors.black),
+                      textScaleFactor: 1.0,
+                    ),
+                  ),
+                ),
+              )
+            ]),
+          ),
+          SizedBox(
+            height: screenheight * 0.01,
+          ),
+          Text(
+            isinviteonly
+                ? "Can only join through shared link"
+                : "Anyone can join the event",
+            style: const TextStyle(color: Color.fromARGB(53, 0, 0, 0)),
+            textScaleFactor: 1.0,
+          ),
           SizedBox(
             height: screenheight * 0.02,
           ),
@@ -549,6 +615,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.hostdocid = widget.curruser.uid;
                           event.lat = chosenLocation.center[0];
                           event.lng = chosenLocation.center[1];
+                          event.isinviteonly = isinviteonly;
                         });
                         try {
                           if (imagepath == null) {
