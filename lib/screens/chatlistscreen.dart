@@ -43,12 +43,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Future<void> getchatlist() async {
     List<Chat> chats = [];
     try {
-      for (int i = 0; i < widget.curruser.visiblechats.length; i++) {
-        Chat temp = await db.getChatfromDocId(widget.curruser.chats[i]);
-        chats.add(temp);
-      }
+      List<Chat> chats = await db.getChatsfromUserUID(widget.curruser.uid);
       setState(() {
-        chatlist = chats;
+        chatlist = chats.reversed.toList();
       });
     } catch (e) {
       displayErrorSnackBar("Could not retrieve chats");

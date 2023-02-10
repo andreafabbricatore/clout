@@ -50,7 +50,11 @@ class MyApp extends StatelessWidget {
       home: AuthenticationWrapper(),
       theme: ThemeData(
           primaryColor: const Color.fromARGB(255, 255, 48, 117),
-          fontFamily: "Archivo"),
+          fontFamily: "Archivo",
+          textSelectionTheme: const TextSelectionThemeData(
+              cursorColor: Color.fromARGB(255, 255, 48, 117),
+              selectionColor: Color.fromARGB(255, 255, 48, 117),
+              selectionHandleColor: Color.fromARGB(255, 255, 48, 117))),
     );
   }
 }

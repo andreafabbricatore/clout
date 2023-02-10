@@ -238,7 +238,8 @@ class db_conn {
           "iconurl": [bannerUrl],
           "mostrecentmessage": "${newevent.title} was just created!",
           "type": "event",
-          "readby": []
+          "readby": [],
+          "lastmessagetime": DateTime.now()
         }).then((value) => chatid = value.id);
         await chats.doc(chatid).collection('messages').add({
           'content': "${newevent.title} was just created!",
@@ -363,8 +364,10 @@ class db_conn {
             'sender': 'server',
             'timestamp': DateTime.now()
           });
-          chats.doc(event.chatid).update(
-              {'mostrecentmessage': "${curruser.username} joined the event"});
+          chats.doc(event.chatid).update({
+            'mostrecentmessage': "${curruser.username} joined the event",
+            "lastmessagetime": DateTime.now()
+          });
         }
       } catch (e) {
         throw Exception("Could not notify host that you joined");
@@ -402,8 +405,10 @@ class db_conn {
           'sender': 'server',
           'timestamp': DateTime.now()
         });
-        chats.doc(event.chatid).update(
-            {'mostrecentmessage': "${curruser.username} left the event"});
+        chats.doc(event.chatid).update({
+          'mostrecentmessage': "${curruser.username} left the event",
+          "lastmessagetime": DateTime.now()
+        });
       }
     } catch (e) {
       throw Exception("Could not leave event");
@@ -432,8 +437,10 @@ class db_conn {
         'sender': 'server',
         'timestamp': DateTime.now()
       });
-      chats.doc(event.chatid).update(
-          {'mostrecentmessage': "${user.username} was removed from the event"});
+      chats.doc(event.chatid).update({
+        'mostrecentmessage': "${user.username} was removed from the event",
+        "lastmessagetime": DateTime.now()
+      });
       updates.add({
         'target': [user.uid],
         'description': 'You were kicked out of the event: ${event.title}',
@@ -996,6 +1003,22 @@ class db_conn {
     }
   }
 
+  Future<List<Chat>> getChatsfromUserUID(String uid) async {
+    try {
+      QuerySnapshot querySnapshot = await chats
+          .orderBy('lastmessagetime')
+          .where('participants', arrayContains: uid)
+          .get();
+      List<Chat> chatlist = [];
+      querySnapshot.docs.forEach((element) {
+        chatlist.add(Chat.fromJson(element.data(), element.id));
+      });
+      return chatlist;
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   Future<List<Event>> searchEvents(String searchquery, AppUser curruser) async {
     try {
       QuerySnapshot querySnapshot = await events
@@ -1075,11 +1098,13 @@ class db_conn {
           await users.orderBy('clout', descending: true).get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
+        print(element.id);
         usersearches.add(AppUser.fromJson(element.data(), element.id));
       });
 
       return usersearches;
     } catch (e) {
+      print(e);
       throw Exception("Could not search for users");
     }
   }
@@ -1310,16 +1335,15 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await users.get().then(
+    await chats.get().then(
           (value) => value.docs.forEach(
             (element) async {
               var docRef = FirebaseFirestore.instance
-                  .collection('users')
+                  .collection('chats')
                   .doc(element.id);
 
-              users.doc(element.id).set(
-                  {'notificationcounter': 0, 'chatnotificationcounter': 0},
-                  SetOptions(merge: true));
+              chats.doc(element.id).set(
+                  {'lastmessagetime': DateTime.now()}, SetOptions(merge: true));
             },
           ),
         );
@@ -1399,7 +1423,8 @@ class db_conn {
         'notititle': notititle,
       });
       return chats.doc(docid).set({
-        'readby': [sender.uid]
+        'readby': [sender.uid],
+        "lastmessagetime": DateTime.now()
       }, SetOptions(merge: true));
     } catch (e) {
       throw Exception();
@@ -1436,7 +1461,8 @@ class db_conn {
       "iconurl": [curruser.pfpurl, otheruser.pfpurl],
       "mostrecentmessage": "",
       "type": "user",
-      "readby": []
+      "readby": [],
+      "lastimemessage": DateTime.now()
     }).then((value) => chatid = value.id);
     await users.doc(curruser.uid).set({
       "chats": FieldValue.arrayUnion([chatid])

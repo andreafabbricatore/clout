@@ -7,6 +7,7 @@ class Chat {
   String chatid;
   String type;
   List readby;
+  DateTime lastmessagetime;
 
   Chat(
       {required this.participants,
@@ -16,7 +17,8 @@ class Chat {
       required this.connectedid,
       required this.chatid,
       required this.type,
-      required this.readby});
+      required this.readby,
+      required this.lastmessagetime});
 
   factory Chat.fromJson(dynamic json, String docid) {
     return Chat(
@@ -27,6 +29,7 @@ class Chat {
         connectedid: json['connectedid'] as List,
         type: json['type'],
         chatid: docid,
-        readby: json['readby'] as List);
+        readby: json['readby'] as List,
+        lastmessagetime: json['lastmessagetime'].toDate());
   }
 }
