@@ -102,37 +102,41 @@ export const chatsendToDevices = functions.firestore.document("chats/{chatid}/me
 export const eventNotifyFollowers = functions.firestore.document("events/{id}").onCreate(async (snapshot) => {
   const event = snapshot.data();
 
-  const hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
+  if (event.isinviteonly == false) {
+    const hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
 
-  const followers:string[] = hostdataSnapshot.data()?.followers;
+    const followers:string[] = hostdataSnapshot.data()?.followers;
 
-  const followersQuerySnapshot = await db.collection("users").where("uid", "in", followers).get();
+    const followersQuerySnapshot = await db.collection("users").where("uid", "in", followers).get();
 
-  let finaltokens:string[] = [];
+    let finaltokens:string[] = [];
 
-  followersQuerySnapshot.docs.forEach((doc) => {
-    const userlat = doc.data()?.lastknownlat;
-    const userlng = doc.data()?.lastknownlng;
+    followersQuerySnapshot.docs.forEach((doc) => {
+      const userlat = doc.data()?.lastknownlat;
+      const userlng = doc.data()?.lastknownlng;
 
-    if (userlat < event.lat + 0.04 &&
-      userlat > event.lat - 0.04 &&
-      userlng < event.lng + 0.04 &&
-      userlng > event.lng - 0.04) {
-      finaltokens = finaltokens.concat(doc.data()?.tokens);
+      if (userlat < event.lat + 0.04 &&
+        userlat > event.lat - 0.04 &&
+        userlng < event.lng + 0.04 &&
+        userlng > event.lng - 0.04) {
+        finaltokens = finaltokens.concat(doc.data()?.tokens);
+      }
+    });
+
+    const payload: admin.messaging.MessagingPayload = {
+      notification: {
+        title: "Clout",
+        body: hostdataSnapshot.data()?.fullname + " is now hosting " + event.title + " near you. Join them!",
+      }, data: {
+        type: "eventcreated",
+        eventid: snapshot.id,
+      },
+    };
+    if (finaltokens.length != 0) {
+      return fcm.sendToDevice(finaltokens, payload);
+    } else {
+      return;
     }
-  });
-
-  const payload: admin.messaging.MessagingPayload = {
-    notification: {
-      title: "Clout",
-      body: hostdataSnapshot.data()?.fullname + " is now hosting " + event.title + " near you. Join them!",
-    }, data: {
-      type: "eventcreated",
-      eventid: snapshot.id,
-    },
-  };
-  if (finaltokens.length != 0) {
-    return fcm.sendToDevice(finaltokens, payload);
   } else {
     return;
   }

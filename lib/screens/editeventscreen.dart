@@ -489,12 +489,15 @@ class _EditEventScreenState extends State<EditEventScreen> {
                     },
                   ),
                 ),
+          SizedBox(
+            height: screenheight * 0.03,
+          ),
           Container(
             height: screenwidth * 0.13,
             width: screenwidth * 0.6,
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
-            ),
+                border: Border.all(width: 1, color: Colors.black),
+                borderRadius: BorderRadius.circular(21)),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               GestureDetector(
                 onTap: () {
@@ -505,9 +508,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 child: Container(
                   width:
                       isinviteonly ? screenwidth * 0.24 : screenwidth * 0.354,
-                  color: isinviteonly
-                      ? Colors.white
-                      : Theme.of(context).primaryColor,
+                  decoration: BoxDecoration(
+                      color: isinviteonly
+                          ? Colors.white
+                          : Theme.of(context).primaryColor,
+                      border: Border.all(color: Colors.transparent),
+                      borderRadius: BorderRadius.circular(20)),
                   child: Center(
                     child: Text(
                       "Public",
@@ -528,9 +534,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 child: Container(
                   width:
                       isinviteonly ? screenwidth * 0.354 : screenwidth * 0.24,
-                  color: isinviteonly
-                      ? Theme.of(context).primaryColor
-                      : Colors.white,
+                  decoration: BoxDecoration(
+                      color: isinviteonly
+                          ? Theme.of(context).primaryColor
+                          : Colors.white,
+                      border: Border.all(color: Colors.transparent),
+                      borderRadius: BorderRadius.circular(20)),
                   child: Center(
                     child: Text(
                       "Invite-Only",
@@ -555,7 +564,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             textScaleFactor: 1.0,
           ),
           SizedBox(
-            height: screenheight * 0.02,
+            height: screenheight * 0.03,
           ),
           GestureDetector(
               onTap: buttonpressed

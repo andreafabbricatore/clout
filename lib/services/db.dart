@@ -295,7 +295,8 @@ class db_conn {
         'image': bannerUrl,
         'lat': event.lat,
         'lng': event.lng,
-        'searchfield': searchfield
+        'searchfield': searchfield,
+        'isinviteonly': event.isinviteonly
       });
       event.participants.removeWhere((element) => element == event.hostdocid);
       updates.add({

@@ -89,32 +89,37 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
 exports.eventNotifyFollowers = functions.firestore.document("events/{id}").onCreate(async (snapshot) => {
     var _a, _b;
     const event = snapshot.data();
-    const hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
-    const followers = (_a = hostdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.followers;
-    const followersQuerySnapshot = await db.collection("users").where("uid", "in", followers).get();
-    let finaltokens = [];
-    followersQuerySnapshot.docs.forEach((doc) => {
-        var _a, _b, _c;
-        const userlat = (_a = doc.data()) === null || _a === void 0 ? void 0 : _a.lastknownlat;
-        const userlng = (_b = doc.data()) === null || _b === void 0 ? void 0 : _b.lastknownlng;
-        if (userlat < event.lat + 0.04 &&
-            userlat > event.lat - 0.04 &&
-            userlng < event.lng + 0.04 &&
-            userlng > event.lng - 0.04) {
-            finaltokens = finaltokens.concat((_c = doc.data()) === null || _c === void 0 ? void 0 : _c.tokens);
+    if (event.isinviteonly == false) {
+        const hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
+        const followers = (_a = hostdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.followers;
+        const followersQuerySnapshot = await db.collection("users").where("uid", "in", followers).get();
+        let finaltokens = [];
+        followersQuerySnapshot.docs.forEach((doc) => {
+            var _a, _b, _c;
+            const userlat = (_a = doc.data()) === null || _a === void 0 ? void 0 : _a.lastknownlat;
+            const userlng = (_b = doc.data()) === null || _b === void 0 ? void 0 : _b.lastknownlng;
+            if (userlat < event.lat + 0.04 &&
+                userlat > event.lat - 0.04 &&
+                userlng < event.lng + 0.04 &&
+                userlng > event.lng - 0.04) {
+                finaltokens = finaltokens.concat((_c = doc.data()) === null || _c === void 0 ? void 0 : _c.tokens);
+            }
+        });
+        const payload = {
+            notification: {
+                title: "Clout",
+                body: ((_b = hostdataSnapshot.data()) === null || _b === void 0 ? void 0 : _b.fullname) + " is now hosting " + event.title + " near you. Join them!",
+            }, data: {
+                type: "eventcreated",
+                eventid: snapshot.id,
+            },
+        };
+        if (finaltokens.length != 0) {
+            return fcm.sendToDevice(finaltokens, payload);
         }
-    });
-    const payload = {
-        notification: {
-            title: "Clout",
-            body: ((_b = hostdataSnapshot.data()) === null || _b === void 0 ? void 0 : _b.fullname) + " is now hosting " + event.title + " near you. Join them!",
-        }, data: {
-            type: "eventcreated",
-            eventid: snapshot.id,
-        },
-    };
-    if (finaltokens.length != 0) {
-        return fcm.sendToDevice(finaltokens, payload);
+        else {
+            return;
+        }
     }
     else {
         return;

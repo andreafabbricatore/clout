@@ -313,9 +313,21 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                         height: screenheight * 0.3,
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(
-                              20, screenheight * 0.05, 20, 20),
+                              20, screenheight * 0.01, 20, 20),
                           child: Column(
                             children: [
+                              Container(
+                                width: 40,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.transparent),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: const Color.fromARGB(60, 0, 0, 0),
+                                ),
+                              ),
+                              SizedBox(
+                                height: screenheight * 0.015,
+                              ),
                               Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,6 +385,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                               style: TextStyle(
                                                   fontSize: 20,
                                                   color: Colors.white),
+                                              textScaleFactor: 1.0,
                                             )
                                           ],
                                         ),
@@ -409,12 +422,14 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                           Radius.circular(20))),
                                   child: Center(
                                     child: Text(
-                                        widget.curruser.uid ==
-                                                widget.event.hostdocid
-                                            ? "Edit Event"
-                                            : "Report Event",
-                                        style: const TextStyle(
-                                            fontSize: 25, color: Colors.white)),
+                                      widget.curruser.uid ==
+                                              widget.event.hostdocid
+                                          ? "Edit Event"
+                                          : "Report Event",
+                                      style: const TextStyle(
+                                          fontSize: 25, color: Colors.white),
+                                      textScaleFactor: 1.0,
+                                    ),
                                   ),
                                 ),
                               )
