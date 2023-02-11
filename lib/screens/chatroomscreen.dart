@@ -192,18 +192,22 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           alignment: Alignment.center,
                           child: Container(
                               color: Colors.white,
-                              height: 50,
-                              width: screenwidth,
+                              width: screenwidth * 0.8,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Center(
-                                      child: Text(
-                                    data['content'].toString().toUpperCase(),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15),
-                                    textScaleFactor: 1.0,
+                                      child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 0.0),
+                                    child: Text(
+                                      data['content'].toString().toUpperCase(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15),
+                                      textScaleFactor: 1.0,
+                                      maxLines: 2,
+                                    ),
                                   )),
                                 ],
                               )));

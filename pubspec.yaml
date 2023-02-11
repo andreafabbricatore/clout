@@ -76,6 +76,7 @@ dependencies:
   smooth_page_indicator: ^1.0.0+2
   custom_refresh_indicator: ^2.0.1
   rive: ^0.10.1
+  flutter_stripe: ^8.0.0+1
 
 flutter_icons:
   #  image_path: "assets/images/icon-128x128.png"
