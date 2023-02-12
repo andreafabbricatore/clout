@@ -107,6 +107,7 @@ class db_conn {
       await batch.commit();
       users.doc(curruser.uid).update({"tokens": []});
     } catch (e) {
+      print(e);
       throw Exception();
     }
   }

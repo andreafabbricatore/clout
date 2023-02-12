@@ -5,9 +5,9 @@ import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
@@ -515,35 +515,46 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                     setState(() {
                       continuebuttonpressed = true;
                     });
-                    try {
-                      if (imagepath != null &&
-                          fullnamecontroller.text.trim().isNotEmpty) {
+                    bool compressedimgpathgood = false;
+                    if (imagepath != null &&
+                        fullnamecontroller.text.trim().isNotEmpty) {
+                      try {
                         compressedimgpath = await CompressAndGetFile(imagepath);
-                        await db.changepfp(compressedimgpath,
-                            FirebaseAuth.instance.currentUser!.uid);
-                        await db.changeattribute(
-                            'fullname',
-                            fullnamecontroller.text.trim(),
-                            FirebaseAuth.instance.currentUser!.uid);
-                        await db.changeattributebool('setnameandpfp', true,
-                            FirebaseAuth.instance.currentUser!.uid);
-                        gousernamescreen();
-                      } else if (imagepath == null) {
-                        displayErrorSnackBar("Please upload Profile Picture");
-                      } else if (fullnamecontroller.text.trim().isEmpty) {
-                        displayErrorSnackBar("Please enter your full name");
-                      } else {
+                        setState(() {
+                          compressedimgpathgood = true;
+                        });
+                      } catch (e) {
                         displayErrorSnackBar(
-                            "Error with full name or profile picture");
+                            "Error with profile picture, might be an invalid format");
                       }
-                    } catch (e) {
+                      if (compressedimgpathgood) {
+                        try {
+                          await db.changepfp(compressedimgpath,
+                              FirebaseAuth.instance.currentUser!.uid);
+                          await db.changeattribute(
+                              'fullname',
+                              fullnamecontroller.text.trim(),
+                              FirebaseAuth.instance.currentUser!.uid);
+                          await db.changeattributebool('setnameandpfp', true,
+                              FirebaseAuth.instance.currentUser!.uid);
+                          gousernamescreen();
+                        } catch (e) {
+                          displayErrorSnackBar(
+                              "Could not proceed with signup, please check internet connection and try again");
+                        }
+                      }
+                    } else if (imagepath == null) {
+                      displayErrorSnackBar("Please upload Profile Picture");
+                    } else if (fullnamecontroller.text.trim().isEmpty) {
+                      displayErrorSnackBar("Please enter your full name");
+                    } else {
                       displayErrorSnackBar(
-                          "Could not complete step, please try again or cancel sign up if error persists");
-                    } finally {
-                      setState(() {
-                        continuebuttonpressed = false;
-                      });
+                          "Error with full name or profile picture");
                     }
+
+                    setState(() {
+                      continuebuttonpressed = false;
+                    });
                   },
             child: PrimaryButton(
               screenwidth: screenwidth,
@@ -755,31 +766,37 @@ class _UsernameScreenState extends State<UsernameScreen> {
             onTap: continuebuttonpressed
                 ? null
                 : () async {
-                    try {
-                      bool uniqueness =
-                          await db.usernameUnique(usernamecontroller.text);
-                      if (!uniqueness && usernamecontroller.text.isNotEmpty) {
-                        setState(() {
-                          displayErrorSnackBar("Username already taken");
-                        });
-                      } else if (usernamecontroller.text.isEmpty) {
-                        displayErrorSnackBar("Invalid Username");
-                      } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
-                          .hasMatch(usernamecontroller.text.trim())) {
-                        displayErrorSnackBar(
-                            "Please only enter alphanumeric characters");
-                      } else {
+                    setState(() {
+                      continuebuttonpressed = true;
+                    });
+                    bool uniqueness =
+                        await db.usernameUnique(usernamecontroller.text);
+                    if (!uniqueness && usernamecontroller.text.isNotEmpty) {
+                      setState(() {
+                        displayErrorSnackBar("Username already taken");
+                      });
+                    } else if (usernamecontroller.text.isEmpty) {
+                      displayErrorSnackBar("Invalid Username");
+                    } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
+                        .hasMatch(usernamecontroller.text.trim())) {
+                      displayErrorSnackBar(
+                          "Please only enter alphanumeric characters");
+                    } else {
+                      try {
                         await db.changeusername(
                             usernamecontroller.text.trim().toLowerCase(),
                             FirebaseAuth.instance.currentUser!.uid);
                         await db.changeattributebool('setusername', true,
                             FirebaseAuth.instance.currentUser!.uid);
                         gotomiscscreen();
+                      } catch (e) {
+                        displayErrorSnackBar(
+                            "Could not proceed with signup, please check internet connection and try again");
                       }
-                    } catch (e) {
-                      displayErrorSnackBar(
-                          "Could not complete step, please try again");
                     }
+                    setState(() {
+                      continuebuttonpressed = false;
+                    });
                   },
             child: PrimaryButton(
                 screenwidth: screenwidth,
@@ -1299,17 +1316,35 @@ class _MiscScreenState extends State<MiscScreen> {
             SizedBox(height: screenheight * 0.02),
             InkWell(
               onTap: () {
-                DatePicker.showDatePicker(context,
-                    showTitleActions: true,
-                    minTime: DateTime(1950, 1, 1),
-                    maxTime: DateTime(DateTime.now().year - 18,
-                        DateTime.now().month, DateTime.now().day),
-                    onChanged: (date) {}, onConfirm: (date) {
-                  setState(() {
-                    birthday = date;
-                  });
-                  //print(birthday);
-                }, currentTime: DateTime.now());
+                showCupertinoModalPopup(
+                    context: context,
+                    builder: (_) => Container(
+                          height: screenheight * 0.4,
+                          color: Colors.white,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: screenheight * 0.4,
+                                child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    maximumDate: DateTime(
+                                        DateTime.now().year - 18,
+                                        DateTime.now().month,
+                                        DateTime.now().day),
+                                    minimumDate: DateTime(1950, 1, 1),
+                                    initialDateTime: DateTime(
+                                        DateTime.now().year - 18,
+                                        DateTime.now().month,
+                                        DateTime.now().day),
+                                    onDateTimeChanged: (val) {
+                                      setState(() {
+                                        birthday = val;
+                                      });
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ));
               },
               child: Container(
                 height: screenwidth * 0.13,
@@ -1345,16 +1380,22 @@ class _MiscScreenState extends State<MiscScreen> {
                       setState(() {
                         continuebuttonpressed = true;
                       });
+
                       if (birthday != DateTime(0, 0, 0)) {
-                        await db.changeattribute('gender', gender,
-                            FirebaseAuth.instance.currentUser!.uid);
-                        await db.changeattribute('nationality', nationality,
-                            FirebaseAuth.instance.currentUser!.uid);
-                        await db.changebirthday(
-                            birthday, FirebaseAuth.instance.currentUser!.uid);
-                        await db.changeattributebool('setmisc', true,
-                            FirebaseAuth.instance.currentUser!.uid);
-                        gointerestscreen();
+                        try {
+                          await db.changeattribute('gender', gender,
+                              FirebaseAuth.instance.currentUser!.uid);
+                          await db.changeattribute('nationality', nationality,
+                              FirebaseAuth.instance.currentUser!.uid);
+                          await db.changebirthday(
+                              birthday, FirebaseAuth.instance.currentUser!.uid);
+                          await db.changeattributebool('setmisc', true,
+                              FirebaseAuth.instance.currentUser!.uid);
+                          gointerestscreen();
+                        } catch (e) {
+                          displayErrorSnackBar(
+                              "Could not proceed with signup, please check internet connection and try again");
+                        }
                       } else {
                         displayErrorSnackBar(
                             "Please try again and make sure all fields are filled correctly");

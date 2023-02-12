@@ -5,10 +5,10 @@ import 'package:clout/components/searchlocation.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/db.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -373,15 +373,28 @@ class _EditEventScreenState extends State<EditEventScreen> {
           SizedBox(height: screenheight * 0.02),
           InkWell(
             onTap: () {
-              DatePicker.showDateTimePicker(context,
-                  showTitleActions: true,
-                  minTime: DateTime.now(),
-                  onChanged: (date) {}, onConfirm: (date) {
-                setState(() {
-                  eventdate = date;
-                });
-                //print(eventdate);
-              }, currentTime: DateTime.now());
+              showCupertinoModalPopup(
+                  context: context,
+                  builder: (_) => Container(
+                        height: screenheight * 0.4,
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: screenheight * 0.4,
+                              child: CupertinoDatePicker(
+                                  mode: CupertinoDatePickerMode.dateAndTime,
+                                  minimumDate: DateTime.now(),
+                                  initialDateTime: eventdate,
+                                  onDateTimeChanged: (val) {
+                                    setState(() {
+                                      eventdate = val;
+                                    });
+                                  }),
+                            ),
+                          ],
+                        ),
+                      ));
             },
             child: Container(
               height: screenwidth * 0.13,
