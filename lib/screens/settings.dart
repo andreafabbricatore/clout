@@ -559,7 +559,7 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
           GestureDetector(
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
-                await db.cleartokens(widget.curruser);
+                
                 goauthwrapper();
               },
               child: Center(
