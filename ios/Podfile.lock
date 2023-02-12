@@ -857,42 +857,6 @@ PODS:
   - sqflite (0.0.2):
     - Flutter
     - FMDB (>= 2.7.5)
-  - Stripe (23.3.3):
-    - StripeApplePay (= 23.3.3)
-    - StripeCore (= 23.3.3)
-    - StripePayments (= 23.3.3)
-    - StripePaymentsUI (= 23.3.3)
-    - StripeUICore (= 23.3.3)
-  - stripe_ios (0.0.1):
-    - Flutter
-    - Stripe (~> 23.3.0)
-    - StripeApplePay (~> 23.3.0)
-    - StripeFinancialConnections (~> 23.3.0)
-    - StripePayments (~> 23.3.0)
-    - StripePaymentSheet (~> 23.3.0)
-    - StripePaymentsUI (~> 23.3.0)
-  - StripeApplePay (23.3.3):
-    - StripeCore (= 23.3.3)
-  - StripeCore (23.3.3)
-  - StripeFinancialConnections (23.3.3):
-    - StripeCore (= 23.3.3)
-    - StripeUICore (= 23.3.3)
-  - StripePayments (23.3.3):
-    - StripeCore (= 23.3.3)
-    - StripePayments/Stripe3DS2 (= 23.3.3)
-  - StripePayments/Stripe3DS2 (23.3.3):
-    - StripeCore (= 23.3.3)
-  - StripePaymentSheet (23.3.3):
-    - StripeApplePay (= 23.3.3)
-    - StripeCore (= 23.3.3)
-    - StripePayments (= 23.3.3)
-    - StripePaymentsUI (= 23.3.3)
-  - StripePaymentsUI (23.3.3):
-    - StripeCore (= 23.3.3)
-    - StripePayments (= 23.3.3)
-    - StripeUICore (= 23.3.3)
-  - StripeUICore (23.3.3):
-    - StripeCore (= 23.3.3)
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -923,7 +887,6 @@ DEPENDENCIES:
   - rive_common (from `.symlinks/plugins/rive_common/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
-  - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
@@ -960,14 +923,6 @@ SPEC REPOS:
     - PromisesObjC
     - SDWebImage
     - SDWebImageWebPCoder
-    - Stripe
-    - StripeApplePay
-    - StripeCore
-    - StripeFinancialConnections
-    - StripePayments
-    - StripePaymentSheet
-    - StripePaymentsUI
-    - StripeUICore
 
 EXTERNAL SOURCES:
   app_links:
@@ -1022,8 +977,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/share_plus/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
-  stripe_ios:
-    :path: ".symlinks/plugins/stripe_ios/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
@@ -1086,15 +1039,6 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 07b5d53b3adcc3d491312a58ea103e36af1692c1
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
-  Stripe: e12dd4f24d372fbae7b3090967bd416537a05324
-  stripe_ios: f93762c5b513f456e82ac57cf7cab2aacc6ec7f7
-  StripeApplePay: b288df6ea5237bec30ff00b8e12b9465684813e6
-  StripeCore: 05ca3061651987b6aeb52028a8de087ad015d555
-  StripeFinancialConnections: eae5e14983f26bc23165f2b897f708e366239f46
-  StripePayments: 63a4c0b41148c83c4197e8ff9f0295dd0829660b
-  StripePaymentSheet: f5e74b3c1fdd9d6ecd0e1075c1ad48d3b574cd26
-  StripePaymentsUI: f9c8a63faf4858f66e2302a717ebb7c928197f53
-  StripeUICore: 784efbcb5ed1e3dc69e4179e1a8feb247d792d81
   url_launcher_ios: fb12c43172927bb5cf75aeebd073f883801f1993
 
 PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b

@@ -49,6 +49,10 @@
 	<string>The app requires your location to find events nearby you</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>The app requires access to your photo library to setup a profile picture and allow choosing of potential event banners</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The app requires access to your camera to setup a profile picture and allow choosing of potential event banners</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The app requires access to your location in order to display events nearby you</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
