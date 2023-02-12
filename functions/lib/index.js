@@ -5,6 +5,7 @@ exports.eventNotifyFollowers = exports.chatsendToDevices = exports.sendToDevice 
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const firebase_admin_1 = require("firebase-admin");
+
 admin.initializeApp();
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -125,4 +126,6 @@ exports.eventNotifyFollowers = functions.firestore.document("events/{id}").onCre
         return;
     }
 });
+
+
 //# sourceMappingURL=index.js.map

@@ -8,6 +8,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/notificationscreen.dart';
+import 'package:clout/screens/paymentscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -193,7 +194,8 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: GestureDetector(
           onTap: () {
-            db.addAttributetoAllDocuments();
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => PaymentScreen()));
           },
           child: Text(
             "Clout.",

@@ -2,6 +2,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {firestore} from "firebase-admin";
+const stripe = require("stripe")(functions.config().stripe.testkey)
 admin.initializeApp();
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -141,3 +142,6 @@ export const eventNotifyFollowers = functions.firestore.document("events/{id}").
     return;
   }
 });
+
+export const StripePayEndpointMethodId = functions.https.onRequest(async (req, res) => {});
+export const StripePayEndpointIntentId = functions.https.onRequest(async (req, res) => {});

@@ -5,9 +5,9 @@ import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1299,17 +1299,35 @@ class _MiscScreenState extends State<MiscScreen> {
             SizedBox(height: screenheight * 0.02),
             InkWell(
               onTap: () {
-                DatePicker.showDatePicker(context,
-                    showTitleActions: true,
-                    minTime: DateTime(1950, 1, 1),
-                    maxTime: DateTime(DateTime.now().year - 18,
-                        DateTime.now().month, DateTime.now().day),
-                    onChanged: (date) {}, onConfirm: (date) {
-                  setState(() {
-                    birthday = date;
-                  });
-                  //print(birthday);
-                }, currentTime: DateTime.now());
+                showCupertinoModalPopup(
+                    context: context,
+                    builder: (_) => Container(
+                          height: screenheight * 0.4,
+                          color: Colors.white,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: screenheight * 0.4,
+                                child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    maximumDate: DateTime(
+                                        DateTime.now().year - 18,
+                                        DateTime.now().month,
+                                        DateTime.now().day),
+                                    minimumDate: DateTime(1950, 1, 1),
+                                    initialDateTime: DateTime(
+                                        DateTime.now().year - 18,
+                                        DateTime.now().month,
+                                        DateTime.now().day),
+                                    onDateTimeChanged: (val) {
+                                      setState(() {
+                                        birthday = val;
+                                      });
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ));
               },
               child: Container(
                 height: screenwidth * 0.13,
