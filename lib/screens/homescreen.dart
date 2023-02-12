@@ -191,19 +191,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: () {
-            db.addAttributetoAllDocuments();
-          },
-          child: Text(
-            "Clout.",
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.w900,
-              fontSize: 50,
-            ),
-            textScaleFactor: 1.0,
+        title: Text(
+          "Clout.",
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.w900,
+            fontSize: 50,
           ),
+          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
