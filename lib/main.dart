@@ -7,8 +7,11 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+
+import 'blocs/payment/payment_bloc.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -47,17 +50,20 @@ class MyApp extends StatelessWidget {
   MyApp({super.key, initialLink});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'clout',
-      debugShowCheckedModeBanner: false,
-      home: AuthenticationWrapper(),
-      theme: ThemeData(
-          primaryColor: const Color.fromARGB(255, 255, 48, 117),
-          fontFamily: "Archivo",
-          textSelectionTheme: const TextSelectionThemeData(
-              cursorColor: Color.fromARGB(255, 255, 48, 117),
-              selectionColor: Color.fromARGB(255, 255, 48, 117),
-              selectionHandleColor: Color.fromARGB(255, 255, 48, 117))),
+    return BlocProvider(
+      create: (context) => PaymentBloc(),
+      child: MaterialApp(
+        title: 'clout',
+        debugShowCheckedModeBanner: false,
+        home: AuthenticationWrapper(),
+        theme: ThemeData(
+            primaryColor: const Color.fromARGB(255, 255, 48, 117),
+            fontFamily: "Archivo",
+            textSelectionTheme: const TextSelectionThemeData(
+                cursorColor: Color.fromARGB(255, 255, 48, 117),
+                selectionColor: Color.fromARGB(255, 255, 48, 117),
+                selectionHandleColor: Color.fromARGB(255, 255, 48, 117))),
+      ),
     );
   }
 }
