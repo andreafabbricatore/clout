@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/emailverificationscreen.dart';
+import 'package:clout/screens/preauthscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CompleteSignUpLoading extends StatefulWidget {
@@ -49,6 +52,8 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
 
   bool error = false;
 
+  bool showrefresh = false;
+
   Future<void> getUser() async {
     try {
       AppUser user = await db.getUserFromUID(widget.uid);
@@ -59,6 +64,16 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       setState(() {
         error = true;
       });
+      String email = FirebaseAuth.instance.currentUser!.email ?? "";
+      List<String> res =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (res.isEmpty) {
+        throw Exception();
+      } else {
+        setState(() {
+          showrefresh = true;
+        });
+      }
     }
   }
 
@@ -102,17 +117,28 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
   }
 
   refresh() async {
-    Stopwatch stopwatch = Stopwatch()..start();
-    await getUser();
-    int diff = stopwatch.elapsed.inSeconds.ceil() > 2
-        ? stopwatch.elapsed.inSeconds.ceil()
-        : 2 - stopwatch.elapsed.inSeconds.ceil();
-    Timer(Duration(seconds: diff), () => logic());
+    try {
+      Stopwatch stopwatch = Stopwatch()..start();
+      await getUser();
+      int diff = stopwatch.elapsed.inSeconds.ceil() > 3
+          ? stopwatch.elapsed.inSeconds.ceil()
+          : 3 - stopwatch.elapsed.inSeconds.ceil();
+      Timer(Duration(seconds: diff), () => logic());
+    } catch (e) {
+      FirebaseAuth.instance.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => PreAuthScreen(),
+            fullscreenDialog: true),
+      );
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    showrefresh = false;
     refresh();
   }
 
@@ -135,26 +161,28 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
                       SizedBox(
                         height: screenheight * 0.02,
                       ),
-                      InkWell(
-                        onTap: () {
-                          refresh();
-                        },
-                        child: SizedBox(
-                            height: 50,
-                            width: screenwidth * 0.6,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(20))),
-                              child: const Center(
-                                  child: Text(
-                                "Refresh",
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
-                              )),
-                            )),
-                      ),
+                      showrefresh
+                          ? InkWell(
+                              onTap: () {
+                                refresh();
+                              },
+                              child: SizedBox(
+                                  height: 50,
+                                  width: screenwidth * 0.6,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context).primaryColor,
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(20))),
+                                    child: const Center(
+                                        child: Text(
+                                      "Refresh",
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.white),
+                                    )),
+                                  )),
+                            )
+                          : Container(),
                     ],
                   ),
                 )

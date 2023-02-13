@@ -1,5 +1,6 @@
 import 'package:clout/screens/signinscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
