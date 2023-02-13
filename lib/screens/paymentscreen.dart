@@ -1,152 +1,154 @@
-import 'package:clout/blocs/payment/payment_bloc.dart';
+import 'dart:convert';
+
 import 'package:clout/components/primarybutton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:http/http.dart' as http;
 
-class PaymentScreen extends StatelessWidget {
+class PaymentScreen extends StatefulWidget {
   PaymentScreen({super.key});
 
-  bool buttonpressed = false;
+  @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
+  Map<String, dynamic>? paymentIntent;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> makePayment() async {
+    try {
+      //STEP 1: Create Payment Intent
+      paymentIntent = await createPaymentIntent(10, 'EUR');
+
+      //STEP 2: Initialize Payment Sheet
+      await Stripe.instance
+          .initPaymentSheet(
+              paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret:
+                paymentIntent!['client_secret'], //Gotten from payment intent
+            style: ThemeMode.light,
+            merchantDisplayName: 'Clout',
+          ))
+          .then((value) {});
+
+      //STEP 3: Display Payment sheet
+      displayPaymentSheet();
+    } catch (err) {
+      throw Exception(err);
+    }
+  }
+
+  createPaymentIntent(double amount, String currency) async {
+    try {
+      //Request body
+      Map<String, dynamic> body = {
+        'amount': amount,
+        'currency': currency,
+      };
+
+      //Make post request to Stripe
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization': 'Bearer ${dotenv.env['stripeSecretKey']}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body,
+      );
+      return json.decode(response.body);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 100.0,
+                      ),
+                      SizedBox(height: 10.0),
+                      Text("Payment Successful!"),
+                    ],
+                  ),
+                ));
+
+        paymentIntent = null;
+      }).onError((error, stackTrace) {
+        throw Exception(error);
+      });
+    } on StripeException catch (e) {
+      print('Error is:---> $e');
+      AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: const [
+                Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                ),
+                Text("Payment Failed"),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      print('$e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenheight = MediaQuery.of(context).size.height;
     final screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Pay",
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
-        ),
-        backgroundColor: Colors.white,
-        shadowColor: Colors.white,
-        elevation: 0.0,
-        centerTitle: true,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
+        appBar: AppBar(
+          title: const Text(
+            "Pay",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+          ),
+          backgroundColor: Colors.white,
+          shadowColor: Colors.white,
+          elevation: 0.0,
+          centerTitle: true,
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
             ),
           ),
         ),
-      ),
-      body: BlocBuilder<PaymentBloc, PaymentState>(
-        builder: (context, state) {
-          CardFormEditController controller = CardFormEditController(
-              initialDetails: state.cardFieldInputDetails);
-          if (state.status == PaymentStatus.initial) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: screenheight * 0.02,
-                  ),
-                  Container(
-                    height: screenheight * 0.06,
-                    color: Colors.black,
-                    child: Center(
-                      child: Text(
-                        "Apple Pay",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: screenheight * 0.02,
-                  ),
-                  Center(
-                    child: const Text(
-                      "or",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15),
-                    ),
-                  ),
-                  SizedBox(
-                    height: screenheight * 0.02,
-                  ),
-                  CardFormField(
-                    style: CardFormStyle(
-                        textColor: Colors.black,
-                        placeholderColor: Colors.black,
-                        backgroundColor: Colors.black),
-                    controller: CardFormEditController(),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      (controller.details.complete)
-                          ? context.read<PaymentBloc>().add(PaymentCreateIntent(
-                                  billingDetails: const BillingDetails(
-                                      email: "andrea.fabbricatore@outlook.com"),
-                                  items: const [
-                                    {"id": 0}
-                                  ]))
-                          : null;
-                    },
-                    child: SizedBox(
-                        height: 50,
-                        width: screenwidth * 0.5,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(20))),
-                          child: const Center(
-                              child: Text(
-                            "Pay Event",
-                            style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800),
-                          )),
-                        )),
-                  ),
-                ],
-              ),
-            );
-          } else if (state.status == PaymentStatus.success) {
-            return Column(children: [
-              const Text("Payment is successful"),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<PaymentBloc>().add(PaymentStart());
-                },
-                child: Text("Back to home"),
-              )
-            ]);
-          } else if (state.status == PaymentStatus.failure) {
-            return Column(children: [
-              const Text("Payment failed"),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<PaymentBloc>().add(PaymentStart());
-                },
-                child: Text("Back to home"),
-              )
-            ]);
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
-    );
+        body: GestureDetector(
+          onTap: () {
+            makePayment();
+          },
+          child: Center(
+            child: Text("Pay"),
+          ),
+        ));
   }
 }

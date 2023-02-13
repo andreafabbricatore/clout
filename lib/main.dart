@@ -11,8 +11,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
-import 'blocs/payment/payment_bloc.dart';
-
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
@@ -26,6 +24,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await dotenv.load(fileName: "assets/.env");
   Stripe.publishableKey = dotenv.get('stripePublishableKey');
+  Stripe.merchantIdentifier = "Clout";
   await Stripe.instance.applySettings();
 
   if (FirebaseAuth.instance.currentUser != null) {
@@ -50,20 +49,17 @@ class MyApp extends StatelessWidget {
   MyApp({super.key, initialLink});
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PaymentBloc(),
-      child: MaterialApp(
-        title: 'clout',
-        debugShowCheckedModeBanner: false,
-        home: AuthenticationWrapper(),
-        theme: ThemeData(
-            primaryColor: const Color.fromARGB(255, 255, 48, 117),
-            fontFamily: "Archivo",
-            textSelectionTheme: const TextSelectionThemeData(
-                cursorColor: Color.fromARGB(255, 255, 48, 117),
-                selectionColor: Color.fromARGB(255, 255, 48, 117),
-                selectionHandleColor: Color.fromARGB(255, 255, 48, 117))),
-      ),
+    return MaterialApp(
+      title: 'clout',
+      debugShowCheckedModeBanner: false,
+      home: AuthenticationWrapper(),
+      theme: ThemeData(
+          primaryColor: const Color.fromARGB(255, 255, 48, 117),
+          fontFamily: "Archivo",
+          textSelectionTheme: const TextSelectionThemeData(
+              cursorColor: Color.fromARGB(255, 255, 48, 117),
+              selectionColor: Color.fromARGB(255, 255, 48, 117),
+              selectionHandleColor: Color.fromARGB(255, 255, 48, 117))),
     );
   }
 }
