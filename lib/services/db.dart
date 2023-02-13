@@ -1463,7 +1463,7 @@ class db_conn {
       "mostrecentmessage": "",
       "type": "user",
       "readby": [],
-      "lastimemessage": DateTime.now()
+      "lastmessagetime": DateTime.now()
     }).then((value) => chatid = value.id);
     await users.doc(curruser.uid).set({
       "chats": FieldValue.arrayUnion([chatid])
@@ -1558,7 +1558,8 @@ class db_conn {
             querySnapshot.docs.forEach((doc) {
               if ((doc['type'] == 'user') &&
                   userchatparticipantsequality(
-                      doc['participants'], otheruserdocid, curruser.uid)) {
+                      doc['participants'], otheruserdocid, curruser.uid) &&
+                  doc['participants'].length == 2) {
                 userchat = Chat.fromJson(doc.data(), doc.id);
               }
             })
