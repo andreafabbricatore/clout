@@ -23,8 +23,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Future<void> makePayment() async {
     try {
-      //STEP 1: Create Payment Intent
-      paymentIntent = await createPaymentIntent(10, 'EUR');
+      paymentIntent = await createPaymentIntent('100', 'USD');
 
       //STEP 2: Initialize Payment Sheet
       await Stripe.instance
@@ -44,29 +43,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  createPaymentIntent(double amount, String currency) async {
-    try {
-      //Request body
-      Map<String, dynamic> body = {
-        'amount': amount,
-        'currency': currency,
-      };
-
-      //Make post request to Stripe
-      var response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
-        headers: {
-          'Authorization': 'Bearer ${dotenv.env['stripeSecretKey']}',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body,
-      );
-      return json.decode(response.body);
-    } catch (err) {
-      throw Exception(err.toString());
-    }
-  }
-
   displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) {
@@ -75,7 +51,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             builder: (_) => AlertDialog(
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(
                         Icons.check_circle,
                         color: Colors.green,
@@ -112,6 +88,34 @@ class _PaymentScreenState extends State<PaymentScreen> {
     } catch (e) {
       print('$e');
     }
+  }
+
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      //Request body
+      Map<String, dynamic> body = {
+        'amount': calculateAmount(amount),
+        'currency': currency,
+      };
+
+      //Make post request to Stripe
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization': 'Bearer ${dotenv.env['stripeSecretKey']}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body,
+      );
+      return json.decode(response.body);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+
+  calculateAmount(String amount) {
+    final calculatedAmout = (int.parse(amount)) * 100;
+    return calculatedAmout.toString();
   }
 
   @override

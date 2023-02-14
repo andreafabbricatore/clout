@@ -105,7 +105,7 @@ class db_conn {
         batch.delete(doc.reference);
       }
       await batch.commit();
-      users.doc(curruser.uid).update({"tokens": []});
+      await users.doc(curruser.uid).update({"tokens": []});
     } catch (e) {
       throw Exception();
     }
@@ -1462,7 +1462,7 @@ class db_conn {
       "mostrecentmessage": "",
       "type": "user",
       "readby": [],
-      "lastimemessage": DateTime.now()
+      "lastmessagetime": DateTime.now()
     }).then((value) => chatid = value.id);
     await users.doc(curruser.uid).set({
       "chats": FieldValue.arrayUnion([chatid])
