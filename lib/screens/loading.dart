@@ -9,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -28,7 +27,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
   Dio _dio = Dio();
   db_conn db = db_conn();
-  Location location = Location();
   Future<bool> _getUserLocation() async {
     // Check if location service is enable
     try {

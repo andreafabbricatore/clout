@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 
 class SearchLocation extends StatefulWidget {
   SearchLocation(
@@ -25,7 +24,6 @@ class _SearchLocationState extends State<SearchLocation> {
   Dio _dio = Dio();
   List<AppLocation> res = [];
   late AppLocation chosenLocation;
-  Location location = Location();
   List LatLngs = [];
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
