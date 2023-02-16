@@ -195,7 +195,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: GestureDetector(
           onTap: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (_) => PaymentScreen()));
+                context,
+                MaterialPageRoute(
+                    builder: (_) => PaymentScreen(
+                          curruser: widget.curruser,
+                        )));
           },
           child: Text(
             "Clout.",

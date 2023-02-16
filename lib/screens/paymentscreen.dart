@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:clout/components/primarybutton.dart';
+import 'package:clout/components/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,8 +9,8 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 
 class PaymentScreen extends StatefulWidget {
-  PaymentScreen({super.key});
-
+  PaymentScreen({super.key, required this.curruser});
+  AppUser curruser;
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
@@ -23,7 +24,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Future<void> makePayment() async {
     try {
-      paymentIntent = await createPaymentIntent('100', 'USD');
+      paymentIntent = await createPaymentIntent('100', 'EUR');
 
       //STEP 2: Initialize Payment Sheet
       await Stripe.instance
