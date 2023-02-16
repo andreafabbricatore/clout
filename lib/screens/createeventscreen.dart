@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +17,6 @@ import 'package:intl/intl.dart';
 
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:location/location.dart';
 
 class CreateEventScreen extends StatefulWidget {
   CreateEventScreen(
@@ -81,7 +81,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   bool isinviteonly = false;
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-  Location location = Location();
   List LatLngs = [];
 
   Future _addMarker(LatLng latlang) async {
@@ -430,7 +429,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(height: screenheight * 0.02),
           InkWell(
             onTap: () async {
-              LocationData _locationData = await location.getLocation();
+              Position _locationData = await Geolocator.getCurrentPosition();
               setState(() {
                 LatLngs = [_locationData.latitude, _locationData.longitude];
               });
