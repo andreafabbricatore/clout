@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/mainscreen.dart';
@@ -10,8 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 
 class LoadingScreen extends StatefulWidget {
   LoadingScreen({Key? key, required this.uid}) : super(key: key);
@@ -22,50 +21,42 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen> {
   late bool _serviceEnabled;
-  late PermissionStatus _permissionGranted;
-  LocationData? _userLocation;
+  late LocationPermission permission;
+  Position? _userLocation;
   bool error = false;
   AppLocation curruserlocation =
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
   Dio _dio = Dio();
   db_conn db = db_conn();
-  List allinterests = [
-    "Sports",
-    "Nature",
-    "Music",
-    "Dance",
-    "Movies",
-    "Acting",
-    "Singing",
-    "Drinking",
-    "Food",
-    "Art"
-  ];
   Location location = Location();
   Future<bool> _getUserLocation() async {
     // Check if location service is enable
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
+    try {
+      _serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!_serviceEnabled) {
-        return false;
+        throw Exception();
       }
-    }
 
-    // Check if permission is granted
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return false;
+      // Check if permission is granted
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception();
+        }
       }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception();
+      }
+
+      final _locationData = await Geolocator.getCurrentPosition();
+
+      _userLocation = _locationData;
+      return true;
+    } catch (e) {
+      return false;
     }
-
-    final _locationData = await location.getLocation();
-
-    _userLocation = _locationData;
-
-    return true;
   }
 
   //change to google maps
@@ -176,29 +167,24 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<void> ensurelocation() async {
+    setState(() {
+      error = false;
+    });
+    bool gotuserlocation = await _getUserLocation();
+    if (!gotuserlocation) {
+      throw Exception();
+    }
+  }
+
+  void loadinglogic() async {
     try {
-      setState(() {
-        error = false;
-      });
-      bool gotpermissions = false;
-      int counter = 0;
-      while (gotpermissions == false) {
-        gotpermissions = await _getUserLocation();
-        counter += 1;
-        if (counter >= 3) {
-          throw Exception();
-        }
-      }
+      await ensurelocation();
+      await appinit();
     } catch (e) {
       setState(() {
         error = true;
       });
     }
-  }
-
-  void loadinglogic() async {
-    await ensurelocation();
-    await appinit();
   }
 
   @override
@@ -234,7 +220,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        appinit();
+                        loadinglogic();
                       },
                       child: SizedBox(
                           height: 50,
