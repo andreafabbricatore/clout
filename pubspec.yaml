@@ -74,6 +74,8 @@ dependencies:
   smooth_page_indicator: ^1.0.0+2
   custom_refresh_indicator: ^2.0.1
   rive: ^0.10.1
+  qr_flutter: ^4.0.0
+  qr_code_scanner: ^1.0.1
 
 flutter_icons:
   #  image_path: "assets/images/icon-128x128.png"

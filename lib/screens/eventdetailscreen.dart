@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/primarybutton.dart';
@@ -15,6 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as Maps;
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -38,6 +42,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   String joinedval = "Join";
   bool buttonpressed = false;
   bool gotochatbuttonpressed = false;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  Barcode? result;
+  QRViewController? qrcontroller;
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
@@ -241,6 +248,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   @override
+  void reassemble() {
+    // TODO: implement reassemble
+    super.reassemble();
+    try {
+      if (Platform.isAndroid) {
+        qrcontroller!.pauseCamera();
+      } else if (Platform.isIOS) {
+        qrcontroller!.resumeCamera();
+      }
+    } catch (e) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
@@ -440,43 +460,200 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               SizedBox(
                                 height: screenheight * 0.02,
                               ),
-                              GestureDetector(
-                                onTap: widget.curruser.uid ==
-                                        widget.event.hostdocid
-                                    ? () async {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                EditEventScreen(
-                                                    curruser: widget.curruser,
-                                                    allowbackarrow: true,
-                                                    event: widget.event),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: widget.curruser.uid ==
+                                            widget.event.hostdocid
+                                        ? () async {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (BuildContext
+                                                        context) =>
+                                                    EditEventScreen(
+                                                        curruser:
+                                                            widget.curruser,
+                                                        allowbackarrow: true,
+                                                        event: widget.event),
+                                              ),
+                                            );
+                                          }
+                                        : () {
+                                            reportevent(widget.event);
+                                          },
+                                    child: Container(
+                                      height: screenheight * 0.1,
+                                      width: screenwidth * 0.4,
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            widget.curruser.uid ==
+                                                    widget.event.hostdocid
+                                                ? Icons.edit
+                                                : Icons.flag_outlined,
+                                            color: Colors.white,
+                                            size: 30,
                                           ),
-                                        );
-                                      }
-                                    : () {
-                                        reportevent(widget.event);
-                                      },
-                                child: Container(
-                                  height: screenheight * 0.1,
-                                  width: screenwidth * 0.85,
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).primaryColor,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(20))),
-                                  child: Center(
-                                    child: Text(
-                                      widget.curruser.uid ==
-                                              widget.event.hostdocid
-                                          ? "Edit Event"
-                                          : "Report Event",
-                                      style: const TextStyle(
-                                          fontSize: 25, color: Colors.white),
-                                      textScaleFactor: 1.0,
+                                          SizedBox(
+                                            height: screenheight * 0.01,
+                                          ),
+                                          Text(
+                                            widget.curruser.uid ==
+                                                    widget.event.hostdocid
+                                                ? "Edit Event"
+                                                : "Report Event",
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.white),
+                                            textScaleFactor: 1.0,
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  GestureDetector(
+                                    onTap: widget.curruser.uid ==
+                                            widget.event.hostdocid
+                                        ? () {
+                                            Navigator.pop(context);
+                                            showModalBottomSheet(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return SizedBox(
+                                                    height: screenheight * 0.6,
+                                                    child: QRView(
+                                                      key: qrKey,
+                                                      overlay:
+                                                          QrScannerOverlayShape(
+                                                              cutOutSize:
+                                                                  screenheight *
+                                                                      0.4),
+                                                      onPermissionSet:
+                                                          (p0, permission) {
+                                                        if (!permission) {
+                                                          displayErrorSnackBar(
+                                                              "Could not open camera, please ensure Clout has access to camera");
+                                                        }
+                                                      },
+                                                      onQRViewCreated:
+                                                          (QRViewController
+                                                              controller) {
+                                                        setState(() {
+                                                          this.qrcontroller =
+                                                              controller;
+                                                          controller
+                                                              .scannedDataStream
+                                                              .listen(
+                                                                  (scanData) {
+                                                            setState(() {
+                                                              result = scanData;
+                                                            });
+                                                          });
+                                                        });
+                                                      },
+                                                    ),
+                                                  );
+                                                });
+                                          }
+                                        : () {
+                                            Navigator.pop(context);
+                                            showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Dialog(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10, 10, 10, 10),
+                                                      height:
+                                                          screenheight * 0.35,
+                                                      decoration: const BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          10))),
+                                                      child: Center(
+                                                        child: CustomPaint(
+                                                            size: Size.square(
+                                                                screenwidth *
+                                                                    0.6),
+                                                            painter: QrPainter(
+                                                                data:
+                                                                    "${widget.event.docid}/${widget.curruser.uid}",
+                                                                version:
+                                                                    QrVersions
+                                                                        .auto,
+                                                                eyeStyle: QrEyeStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    eyeShape:
+                                                                        QrEyeShape
+                                                                            .square),
+                                                                embeddedImageStyle:
+                                                                    QrEmbeddedImageStyle(
+                                                                        color: Theme.of(context)
+                                                                            .primaryColor))),
+                                                      ),
+                                                    ),
+                                                  );
+                                                });
+                                          },
+                                    child: Container(
+                                      height: screenheight * 0.1,
+                                      width: screenwidth * 0.4,
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.qr_code,
+                                            color: Colors.white,
+                                            size: 30,
+                                          ),
+                                          SizedBox(
+                                            height: screenheight * 0.01,
+                                          ),
+                                          Text(
+                                            widget.curruser.uid ==
+                                                    widget.event.hostdocid
+                                                ? "Scan QR"
+                                                : "Show QR",
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.white),
+                                            textScaleFactor: 1.0,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               )
                             ],
                           ),
