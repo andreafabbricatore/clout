@@ -24,7 +24,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await dotenv.load(fileName: "assets/.env");
   Stripe.publishableKey = dotenv.get('stripePublishableKey');
-  Stripe.merchantIdentifier = "Clout";
+  Stripe.merchantIdentifier = "merchant.com.outwithclout.clout";
   await Stripe.instance.applySettings();
 
   if (FirebaseAuth.instance.currentUser != null) {

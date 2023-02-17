@@ -201,3 +201,63 @@ exports.StripePayEndpointIntentId = functions.https.onRequest(async (req, res) =
         return res.send({ error: e.message });
     }
   });
+
+exports.StripePaymentSheet = functions.http.onRequest(async (_, res) => {
+    const { secret_key } = stripe.testkey;
+
+  const stripe = new stripe(String(secret_key), {
+    apiVersion: '2022-08-01',
+  });
+
+  const customers = await stripe.customers.list();
+
+  // Here, we're getting latest customer only for example purposes.
+  const customer = customers.data[0];
+
+  if (!customer) {
+    return res.send({
+      error: 'You have no customer created',
+    });
+  }
+
+  const ephemeralKey = await stripe.ephemeralKeys.create(
+    { customer: customer.id },
+    { apiVersion: '2022-08-01' }
+  );
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: 5099,
+    currency: 'usd',
+    customer: customer.id,
+    shipping: {
+      name: 'Andrea Fabbricatore',
+      address: {
+        state: 'Lombardia',
+        city: 'Milan',
+        line1: 'Via Francesco Brioschi 7',
+        postal_code: '20136',
+        country: 'IT',
+      },
+    },
+    // Edit the following to support different payment methods in your PaymentSheet
+    // Note: some payment methods have different requirements: https://stripe.com/docs/payments/payment-methods/integration-options
+    payment_method_types: [
+      'card',
+      'mobilepay'
+      // 'ideal',
+      // 'sepa_debit',
+      // 'sofort',
+      // 'bancontact',
+      // 'p24',
+      // 'giropay',
+      // 'eps',
+      // 'afterpay_clearpay',
+      // 'klarna',
+      // 'us_bank_account',
+    ],
+  });
+  return res.json({
+    paymentIntent: paymentIntent.client_secret,
+    ephemeralKey: ephemeralKey.secret,
+    customer: customer.id,
+  });
+});

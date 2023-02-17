@@ -24,17 +24,37 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Future<void> makePayment() async {
     try {
-      paymentIntent = await createPaymentIntent('100', 'EUR');
+      paymentIntent = await createPaymentIntent('1', 'EUR');
 
       //STEP 2: Initialize Payment Sheet
       await Stripe.instance
           .initPaymentSheet(
               paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret:
-                paymentIntent!['client_secret'], //Gotten from payment intent
-            style: ThemeMode.light,
-            merchantDisplayName: 'Clout',
-          ))
+                  paymentIntentClientSecret: paymentIntent![
+                      'client_secret'], //Gotten from payment intent
+                  style: ThemeMode.light,
+                  appearance: const PaymentSheetAppearance(
+                      colors:
+                          PaymentSheetAppearanceColors(primary: Colors.black),
+                      primaryButton: PaymentSheetPrimaryButtonAppearance(
+                          colors: PaymentSheetPrimaryButtonTheme(
+                        light: PaymentSheetPrimaryButtonThemeColors(
+                            background: Color.fromARGB(255, 255, 48, 117)),
+                        dark: PaymentSheetPrimaryButtonThemeColors(
+                            background: Color.fromARGB(255, 255, 48, 117)),
+                      ))),
+                  merchantDisplayName: 'Clout',
+                  customerId: widget.curruser.uid,
+                  googlePay: const PaymentSheetGooglePay(
+                      merchantCountryCode: "IT",
+                      testEnv: true,
+                      currencyCode: "EUR"),
+                  applePay: const PaymentSheetApplePay(
+                      merchantCountryCode: "IT",
+                      paymentSummaryItems: [
+                        ApplePayCartSummaryItem.immediate(
+                            label: "test", amount: "1")
+                      ])))
           .then((value) {});
 
       //STEP 3: Display Payment sheet
@@ -49,7 +69,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       await Stripe.instance.presentPaymentSheet().then((value) {
         showDialog(
             context: context,
-            builder: (_) => AlertDialog(
+            builder: (_) => const AlertDialog(
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -70,12 +90,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
       });
     } on StripeException catch (e) {
       print('Error is:---> $e');
-      AlertDialog(
+      const AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              children: const [
+              children: [
                 Icon(
                   Icons.cancel,
                   color: Colors.red,
