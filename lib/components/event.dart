@@ -16,6 +16,7 @@ class Event {
   String docid;
   String chatid;
   bool isinviteonly;
+  List presentparticipants;
 
   Event(
       {required this.title,
@@ -34,7 +35,8 @@ class Event {
       required this.lat,
       required this.lng,
       required this.chatid,
-      required this.isinviteonly});
+      required this.isinviteonly,
+      required this.presentparticipants});
 
   factory Event.fromJson(dynamic json, String docid) {
     return Event(
@@ -54,6 +56,7 @@ class Event {
         lat: json['lat'],
         lng: json['lng'],
         chatid: json['chatid'],
-        isinviteonly: json['isinviteonly'] as bool);
+        isinviteonly: json['isinviteonly'] as bool,
+        presentparticipants: json['presentparticipants'] as List);
   }
 }

@@ -217,7 +217,8 @@ class db_conn {
           'lng': newevent.lng,
           'searchfield': searchfield,
           'chatid': '',
-          'isinviteonly': newevent.isinviteonly
+          'isinviteonly': newevent.isinviteonly,
+          'presentparticipants': newevent.presentparticipants
         }).then((value) {
           eventid = value.id;
         });
@@ -322,12 +323,8 @@ class db_conn {
       if (participants.length + 1 > event.maxparticipants) {
         throw Exception("Too many participants");
       } else {
-        users
-            .doc(event.hostdocid)
-            .set({'clout': FieldValue.increment(5)}, SetOptions(merge: true));
         users.doc(curruser.uid).set({
           'joined_events': FieldValue.arrayUnion([eventid]),
-          'clout': FieldValue.increment(10)
         }, SetOptions(merge: true));
         events.doc(eventid).set({
           'participants': FieldValue.arrayUnion([curruser.uid])
@@ -386,12 +383,8 @@ class db_conn {
         throw Exception("Cannot leave event");
       } else {
         chatparticipants.removeWhere((element) => element == curruser.uid);
-        users
-            .doc(event.hostdocid)
-            .set({'clout': FieldValue.increment(-5)}, SetOptions(merge: true));
         users.doc(curruser.uid).set({
           'joined_events': FieldValue.arrayRemove([event.docid]),
-          'clout': FieldValue.increment(-10),
           'chats': FieldValue.arrayRemove([event.chatid]),
           'visiblechats': FieldValue.arrayRemove([event.chatid])
         }, SetOptions(merge: true));
@@ -420,16 +413,12 @@ class db_conn {
     try {
       users.doc(user.uid).set({
         'joined_events': FieldValue.arrayRemove([event.docid]),
-        'clout': FieldValue.increment(-10),
         'chats': FieldValue.arrayRemove([event.chatid]),
         'visiblechats': FieldValue.arrayRemove([event.chatid]),
       }, SetOptions(merge: true));
       events.doc(event.docid).set({
         'participants': FieldValue.arrayRemove([user.uid])
       }, SetOptions(merge: true));
-      users
-          .doc(event.hostdocid)
-          .set({'clout': FieldValue.increment(-5)}, SetOptions(merge: true));
       chats.doc(event.chatid).set({
         'participants': FieldValue.arrayRemove([user.uid])
       }, SetOptions(merge: true));
@@ -461,16 +450,12 @@ class db_conn {
       List participants = eventSnapshot['participants'];
       for (String x in participants) {
         if (x == host.uid) {
-          int decrease = (participants.length - 1) * 5 + 20;
           users.doc(x).set({
             'hosted_events': FieldValue.arrayRemove([event.docid]),
             'chats': FieldValue.arrayRemove([event.chatid]),
             'visiblechats': FieldValue.arrayRemove([event.chatid]),
-            'clout': FieldValue.increment(-decrease),
+            'clout': FieldValue.increment(-20),
           }, SetOptions(merge: true));
-        } else {
-          users.doc(x).set(
-              {'clout': FieldValue.increment(-10)}, SetOptions(merge: true));
         }
         users.doc(x).set({
           'joined_events': FieldValue.arrayRemove([event.docid])
@@ -927,10 +912,10 @@ class db_conn {
         if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
           continue;
         }
-        if ((tempeventlist[i].lat < lat + 0.04 &&
-            tempeventlist[i].lat > lat - 0.04 &&
-            tempeventlist[i].lng < lng + 0.04 &&
-            tempeventlist[i].lng > lng - 0.04)) {
+        if ((tempeventlist[i].lat < lat + 0.06 &&
+            tempeventlist[i].lat > lat - 0.06 &&
+            tempeventlist[i].lng < lng + 0.06 &&
+            tempeventlist[i].lng > lng - 0.06)) {
           eventlist.add(tempeventlist[i]);
         }
       }
@@ -960,10 +945,10 @@ class db_conn {
         if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
           continue;
         }
-        if ((tempeventlist[i].lat < lat + 0.04 &&
-            tempeventlist[i].lat > lat - 0.04 &&
-            tempeventlist[i].lng < lng + 0.04 &&
-            tempeventlist[i].lng > lng - 0.04)) {
+        if ((tempeventlist[i].lat < lat + 0.06 &&
+            tempeventlist[i].lat > lat - 0.06 &&
+            tempeventlist[i].lng < lng + 0.06 &&
+            tempeventlist[i].lng > lng - 0.06)) {
           eventlist.add(tempeventlist[i]);
         }
       }
@@ -1061,10 +1046,10 @@ class db_conn {
         if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
           continue;
         }
-        if ((tempeventlist[i].lat < lat + 0.04 &&
-            tempeventlist[i].lat > lat - 0.04 &&
-            tempeventlist[i].lng < lng + 0.04 &&
-            tempeventlist[i].lng > lng - 0.04)) {
+        if ((tempeventlist[i].lat < lat + 0.06 &&
+            tempeventlist[i].lat > lat - 0.06 &&
+            tempeventlist[i].lng < lng + 0.06 &&
+            tempeventlist[i].lng > lng - 0.06)) {
           eventlist.add(tempeventlist[i]);
         }
       }
@@ -1592,6 +1577,23 @@ class db_conn {
       await users.doc(uid).update({'chatnotificationcounter': 0});
     } catch (e) {
       throw Exception();
+    }
+  }
+
+  Future<void> setpresence(
+      String eventid, String useruid, String curruserid) async {
+    try {
+      await events.doc(eventid).set({
+        "presentparticipants": FieldValue.arrayUnion([useruid])
+      }, SetOptions(merge: true));
+      await users
+          .doc(useruid)
+          .set({"clout": FieldValue.increment(10)}, SetOptions(merge: true));
+      await users
+          .doc(curruserid)
+          .set({"clout": FieldValue.increment(5)}, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception("Could not validate, please try again");
     }
   }
 }

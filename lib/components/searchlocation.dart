@@ -212,7 +212,7 @@ class _SearchLocationState extends State<SearchLocation> {
                     onChanged: (String searchquery) async {
                       searchquery.replaceAll(" ", "%20");
                       String url =
-                          'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${LatLngs[0]},${LatLngs[1]}&radius=5000&keyword=$searchquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+                          'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${LatLngs[0]},${LatLngs[1]}&radius=5500&keyword=$searchquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
                       //String url =
                       //    'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$searchquery&inputtype=textquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
                       url = Uri.parse(url).toString();

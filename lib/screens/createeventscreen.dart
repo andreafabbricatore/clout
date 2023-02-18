@@ -50,7 +50,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       lat: 0,
       lng: 0,
       chatid: "",
-      isinviteonly: false);
+      isinviteonly: false,
+      presentparticipants: []);
 
   List<String> allinterests = [
     "Sports",
@@ -639,6 +640,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.lat = chosenLocation.center[0];
                           event.lng = chosenLocation.center[1];
                           event.isinviteonly = isinviteonly;
+                          event.presentparticipants = [widget.curruser.uid];
                         });
                         try {
                           if (imagepath == null) {

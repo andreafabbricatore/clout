@@ -24,6 +24,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? timer;
   TextEditingController psw = TextEditingController();
   db_conn db = db_conn();
+  String sendagain = "Press below to send";
+  String sendbuttontext = "Send Email";
 
   Future<void> sendverificationemail() async {
     await FirebaseAuth.instance.currentUser!.sendEmailVerification();
@@ -59,9 +61,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   }
 
   void checker() {
-    if (!isemailverified) {
-      sendverificationemail();
-    }
     timer =
         Timer.periodic(const Duration(seconds: 3), (_) => checkemailverified());
   }
@@ -106,7 +105,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     ),
                     Center(
                         child: Text(
-                      "Sent verification email to: \n${FirebaseAuth.instance.currentUser!.email}",
+                      "Verification for:\n${FirebaseAuth.instance.currentUser!.email}",
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20),
                       textAlign: TextAlign.center,
@@ -115,10 +114,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     SizedBox(
                       height: screenheight * 0.02,
                     ),
-                    const Center(
+                    Center(
                         child: Text(
-                      "Press below to send again",
-                      style: TextStyle(fontSize: 15),
+                      sendagain,
+                      style: const TextStyle(fontSize: 15),
                       textScaleFactor: 1.0,
                     )),
                     SizedBox(
@@ -134,13 +133,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     });
                                     sendverificationemail();
                                     setState(() {
+                                      sendagain = "Press below to send again";
+                                      sendbuttontext = "Resend email";
                                       sendbuttonpressed = false;
                                     });
                                   },
                             child: PrimaryButton(
                               screenwidth: screenwidth,
                               buttonpressed: sendbuttonpressed,
-                              text: "Resend Email",
+                              text: sendbuttontext,
                               buttonwidth: screenwidth * 0.6,
                               bold: false,
                             ))),

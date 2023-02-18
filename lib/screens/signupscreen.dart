@@ -106,7 +106,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                               color: Theme.of(context).primaryColor)),
-                      hintText: 'e.g. example@example.com',
+                      hintText: 'e.g. example@outwithclout.com',
                       hintStyle:
                           const TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
                   controller: emailController,

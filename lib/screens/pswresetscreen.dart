@@ -64,7 +64,25 @@ class _PswResetScreenState extends State<PswResetScreen> {
               SizedBox(
                 height: screenheight * 0.02,
               ),
-              textdatafield(screenwidth, "e.g. timcook@gmail.com", email),
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
+                  child: TextField(
+                    decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor)),
+                        hintText: 'e.g. example@outwithclout.com',
+                        hintStyle: const TextStyle(
+                            color: Color.fromARGB(39, 0, 0, 0))),
+                    controller: email,
+                    keyboardType: TextInputType.emailAddress,
+                    textAlign: TextAlign.center,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                  ),
+                ),
+              ),
               SizedBox(
                 height: screenheight * 0.03,
               ),

@@ -13,7 +13,8 @@ class UserListView extends StatefulWidget {
       required this.showrembutton,
       this.removeUser,
       this.removebuttonblack = false,
-      this.physics = const AlwaysScrollableScrollPhysics()})
+      this.physics = const AlwaysScrollableScrollPhysics(),
+      this.presentparticipants = const []})
       : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
@@ -21,6 +22,7 @@ class UserListView extends StatefulWidget {
   bool showcloutscore;
   bool showrembutton;
   bool removebuttonblack;
+  List presentparticipants;
   var physics;
 
   final Function(AppUser user, int index)? onTap;
@@ -43,7 +45,8 @@ class _UserListViewState extends State<UserListView> {
       bool showrembutton,
       bool removebuttonblack,
       Function(AppUser user, int index)? removeUser,
-      Function(AppUser user, int index)? onTap) {
+      Function(AppUser user, int index)? onTap,
+      List presentparticipants) {
     Widget widget;
     widget = Row(
       children: [
@@ -113,7 +116,12 @@ class _UserListViewState extends State<UserListView> {
                       : const Color.fromARGB(255, 255, 48, 117),
                 ),
               )
-            : Container()
+            : presentparticipants.contains(user.uid)
+                ? const Icon(
+                    Icons.check,
+                    color: Color.fromARGB(255, 255, 48, 117),
+                  )
+                : Container(),
       ],
     );
 
@@ -153,7 +161,8 @@ class _UserListViewState extends State<UserListView> {
                     widget.showrembutton,
                     widget.removebuttonblack,
                     widget.removeUser,
-                    widget.onTap));
+                    widget.onTap,
+                    widget.presentparticipants));
           }),
     );
   }
