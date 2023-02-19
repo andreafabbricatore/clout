@@ -169,9 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Future<void> navigate(Event event, int index) async {
       try {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
-        List<AppUser> participants = [
-          for (String x in chosenEvent.participants) await db.getUserFromUID(x)
-        ];
+        List<AppUser> participants =
+            await db.geteventparticipantslist(chosenEvent);
 
         await Navigator.push(
             context,

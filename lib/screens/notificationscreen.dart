@@ -112,9 +112,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     Future<void> eventnavigate(String eventid, int index) async {
       try {
         Event event = await db.getEventfromDocId(eventid);
-        List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromUID(x)
-        ];
+        List<AppUser> participants = await db.geteventparticipantslist(event);
         await Navigator.push(
             context,
             MaterialPageRoute(

@@ -107,15 +107,15 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     final screenheight = MediaQuery.of(context).size.height;
     Future<void> eventnavigate(Event event, int index) async {
       try {
-        List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromUID(x)
-        ];
+        Event chosenEvent = await db.getEventfromDocId(event.docid);
+        List<AppUser> participants =
+            await db.geteventparticipantslist(chosenEvent);
 
         await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (_) => EventDetailScreen(
-                      event: event,
+                      event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,

@@ -200,9 +200,7 @@ class _MainScreenState extends State<MainScreen> {
     } else if (message.data["type"] == "eventcreated") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromUID(x)
-        ];
+        List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
         displayErrorSnackBar("Could not display event");
@@ -210,9 +208,7 @@ class _MainScreenState extends State<MainScreen> {
     } else if (message.data["type"] == "joined") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromUID(x)
-        ];
+        List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
         displayErrorSnackBar("Could not display event");
@@ -220,9 +216,7 @@ class _MainScreenState extends State<MainScreen> {
     } else if (message.data["type"] == "modified") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromUID(x)
-        ];
+        List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
         displayErrorSnackBar("Could not display event");
@@ -237,9 +231,7 @@ class _MainScreenState extends State<MainScreen> {
     } else if (message.data["type"] == "kicked") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = [
-          for (String x in event.participants) await db.getUserFromUID(x)
-        ];
+        List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
         displayErrorSnackBar("Could not display event");

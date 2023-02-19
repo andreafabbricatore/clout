@@ -979,6 +979,48 @@ class db_conn {
     }
   }
 
+  Future<List<AppUser>> getfollowinglist(AppUser user) async {
+    try {
+      List<AppUser> following = [];
+      QuerySnapshot querySnapshot =
+          await users.where("uid", whereIn: user.following).getSavy();
+      querySnapshot.docs.forEach((element) {
+        following.add(AppUser.fromJson(element.data(), element.id));
+      });
+      return following;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<List<AppUser>> getfollowerslist(AppUser user) async {
+    try {
+      List<AppUser> followers = [];
+      QuerySnapshot querySnapshot =
+          await users.where("uid", whereIn: user.followers).getSavy();
+      querySnapshot.docs.forEach((element) {
+        followers.add(AppUser.fromJson(element.data(), element.id));
+      });
+      return followers;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<List<AppUser>> geteventparticipantslist(Event event) async {
+    try {
+      List<AppUser> participants = [];
+      QuerySnapshot querySnapshot =
+          await users.where("uid", whereIn: event.participants).getSavy();
+      querySnapshot.docs.forEach((element) {
+        participants.add(AppUser.fromJson(element.data(), element.id));
+      });
+      return participants;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<Event>> getLngLatEventsByInterest(double lng, double lat,
       String interest, String country, AppUser curruser) async {
     try {

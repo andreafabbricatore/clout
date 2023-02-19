@@ -49,12 +49,10 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
   Future<void> getfollowerslist() async {
     followers = [];
     try {
-      for (int i = 0; i < widget.user.followers.length; i++) {
-        AppUser temp = await db.getUserFromUIDSavy(widget.user.followers[i]);
-        setState(() {
-          followers.add(temp);
-        });
-      }
+      List<AppUser> temp = await db.getfollowerslist(widget.user);
+      setState(() {
+        followers = temp;
+      });
     } catch (e) {
       displayErrorSnackBar("Could not retrieve followers");
     }
@@ -63,12 +61,10 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
   Future<void> getfollowinglist() async {
     following = [];
     try {
-      for (int i = 0; i < widget.user.following.length; i++) {
-        AppUser temp = await db.getUserFromUIDSavy(widget.user.following[i]);
-        setState(() {
-          following.add(temp);
-        });
-      }
+      List<AppUser> temp = await db.getfollowinglist(widget.user);
+      setState(() {
+        following = temp;
+      });
     } catch (e) {
       displayErrorSnackBar("Could not retrieve following");
     }

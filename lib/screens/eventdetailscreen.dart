@@ -167,9 +167,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       setState(() {
         widget.event = updatedevent;
       });
-      List<AppUser> temp = [
-        for (String x in widget.event.participants) await db.getUserFromUID(x)
-      ];
+      List<AppUser> temp = await db.geteventparticipantslist(widget.event);
       setState(() {
         widget.participants = temp;
       });
