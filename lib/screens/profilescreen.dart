@@ -81,8 +81,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await updateuser();
       await updatecurruser();
-      geteventlist(widget.user.joinedEvents, true);
-      geteventlist(widget.user.hostedEvents, false);
+      //geteventlist(widget.user.joinedEvents, true);
+      //geteventlist(widget.user.hostedEvents, false);
+      await getevents();
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
     }
@@ -110,29 +111,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> geteventlist(List events, bool joined) async {
-    List<Event> temp = [];
-    try {
-      for (int i = 0; i < events.length; i++) {
-        Event event = await db.getEventfromDocId(events[i]);
-        if (event.isinviteonly && widget.iscurruser) {
-          temp.add(event);
-        } else if (event.isinviteonly && !widget.iscurruser) {
-        } else {
-          temp.add(event);
-        }
-      }
-      if (joined) {
-        setState(() {
-          joinedEvents = temp;
-        });
-      } else {
-        setState(() {
-          hostedEvents = temp;
-        });
-      }
-    } catch (e) {
-      displayErrorSnackBar("Could not retrieve events");
+  Future<void> getevents() async {
+    if (widget.iscurruser) {
+      List<Event> temp1 =
+          await db.getProfileScreenJoinedEvents(widget.user, true);
+      List<Event> temp2 =
+          await db.getProfileScreenHostedEvents(widget.user, true);
+      setState(() {
+        joinedEvents = temp1;
+        hostedEvents = temp2;
+      });
+    } else {
+      List<Event> temp1 =
+          await db.getProfileScreenJoinedEvents(widget.user, false);
+      List<Event> temp2 =
+          await db.getProfileScreenHostedEvents(widget.user, false);
+      setState(() {
+        joinedEvents = temp1;
+        hostedEvents = temp2;
+      });
     }
   }
 
@@ -260,29 +257,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
       refresh();
     }
-
-    AlertDialog alert = AlertDialog(
-      title: const Text("Block Account"),
-      content: const Text("Would you also like to block this account?"),
-      actions: [
-        TextButton(
-          child: const Text("Block Account"),
-          onPressed: () async {
-            await db.blockUser(widget.curruser.uid, widget.user.uid);
-            displayErrorSnackBar(
-                "Blocked User! To unblock, please visit Settings.");
-            Navigator.pop(context);
-            Navigator.pop(context);
-          },
-        ),
-        TextButton(
-          child: const Text("Cancel"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ],
-    );
 
     return Scaffold(
       backgroundColor: Colors.white,

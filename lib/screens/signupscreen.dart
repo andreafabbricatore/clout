@@ -331,89 +331,86 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return Dialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    backgroundColor: Colors.white,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                      height: screenheight * 0.35,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      child: Column(children: [
-                        const Text("Cancel SignUp",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25)),
-                        SizedBox(
-                          height: screenheight * 0.02,
+                  return StatefulBuilder(
+                    builder: (BuildContext context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          height: screenheight * 0.35,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(children: [
+                            const Text("Cancel SignUp",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25)),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            const Text(
+                              "Enter password to cancel Sign Up.",
+                              style: TextStyle(fontSize: 15),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            textdatafield(
+                                screenwidth * 0.4, "Enter Password", psw),
+                            SizedBox(
+                              height: screenheight * 0.04,
+                            ),
+                            GestureDetector(
+                                onTap: cancelbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          cancelbuttonpressed = true;
+                                        });
+                                        try {
+                                          String email = FirebaseAuth.instance
+                                                  .currentUser!.email ??
+                                              "";
+                                          try {
+                                            await FirebaseAuth.instance
+                                                .signInWithEmailAndPassword(
+                                                    email: email,
+                                                    password: psw.text.trim());
+                                          } catch (e) {
+                                            displayErrorSnackBar(
+                                                "Could not cancel Sign Up, pleaes make sure password is correct");
+                                          }
+                                          await db.firstcancelsignup(
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid);
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .delete();
+                                          psw.clear();
+                                          goauthscreen();
+                                        } catch (e) {
+                                        } finally {
+                                          setState(() {
+                                            cancelbuttonpressed = false;
+                                          });
+                                        }
+                                      },
+                                child: PrimaryButton(
+                                    screenwidth: screenwidth,
+                                    buttonpressed: cancelbuttonpressed,
+                                    text: "Cancel Sign Up",
+                                    buttonwidth: screenwidth * 0.7,
+                                    bold: false)),
+                          ]),
                         ),
-                        const Text(
-                          "Enter password to cancel Sign Up.",
-                          style: TextStyle(fontSize: 15),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: screenheight * 0.02,
-                        ),
-                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
-                        SizedBox(
-                          height: screenheight * 0.04,
-                        ),
-                        GestureDetector(
-                          onTap: cancelbuttonpressed
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    cancelbuttonpressed = true;
-                                  });
-                                  try {
-                                    String email = FirebaseAuth
-                                            .instance.currentUser!.email ??
-                                        "";
-                                    try {
-                                      await FirebaseAuth.instance
-                                          .signInWithEmailAndPassword(
-                                              email: email,
-                                              password: psw.text.trim());
-                                    } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Could not cancel Sign Up, pleaes make sure password is correct");
-                                    }
-                                    await db.firstcancelsignup(
-                                        FirebaseAuth.instance.currentUser!.uid);
-                                    await FirebaseAuth.instance.currentUser!
-                                        .delete();
-                                    psw.clear();
-                                    psw.dispose();
-                                    goauthscreen();
-                                  } catch (e) {
-                                  } finally {
-                                    setState(() {
-                                      cancelbuttonpressed = false;
-                                    });
-                                  }
-                                },
-                          child: SizedBox(
-                              height: 50,
-                              width: screenwidth * 0.7,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20))),
-                                child: const Center(
-                                    child: Text(
-                                  "Cancel Sign Up",
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                )),
-                              )),
-                        ),
-                      ]),
-                    ),
+                      );
+                    },
                   );
                 });
           },
@@ -634,86 +631,82 @@ class _UsernameScreenState extends State<UsernameScreen> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return Dialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    backgroundColor: Colors.white,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                      height: screenheight * 0.35,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      child: Column(children: [
-                        const Text("Cancel SignUp",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25)),
-                        SizedBox(
-                          height: screenheight * 0.02,
+                  return StatefulBuilder(
+                    builder: (BuildContext context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          height: screenheight * 0.35,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(children: [
+                            const Text("Cancel SignUp",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25)),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            const Text(
+                              "Enter password to cancel Sign Up.",
+                              style: TextStyle(fontSize: 15),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            textdatafield(
+                                screenwidth * 0.4, "Enter Password", psw),
+                            SizedBox(
+                              height: screenheight * 0.04,
+                            ),
+                            GestureDetector(
+                                onTap: cancelbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          cancelbuttonpressed = true;
+                                        });
+                                        try {
+                                          String email = FirebaseAuth.instance
+                                                  .currentUser!.email ??
+                                              "";
+                                          await FirebaseAuth.instance
+                                              .signInWithEmailAndPassword(
+                                                  email: email,
+                                                  password: psw.text.trim());
+                                          await db.cancelsignup(FirebaseAuth
+                                              .instance.currentUser!.uid);
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .delete();
+                                          psw.clear();
+                                          goauthscreen();
+                                        } catch (e) {
+                                          displayErrorSnackBar(
+                                              "Could not cancel signup, please try again and makes sure password is correct");
+                                        } finally {
+                                          setState(() {
+                                            cancelbuttonpressed = false;
+                                          });
+                                        }
+                                      },
+                                child: PrimaryButton(
+                                    screenwidth: screenwidth,
+                                    buttonpressed: cancelbuttonpressed,
+                                    text: "Cancel Sign Up",
+                                    buttonwidth: screenwidth * 0.7,
+                                    bold: false)),
+                          ]),
                         ),
-                        const Text(
-                          "Enter password to cancel Sign Up.",
-                          style: TextStyle(fontSize: 15),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: screenheight * 0.02,
-                        ),
-                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
-                        SizedBox(
-                          height: screenheight * 0.04,
-                        ),
-                        GestureDetector(
-                          onTap: cancelbuttonpressed
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    cancelbuttonpressed = true;
-                                  });
-                                  try {
-                                    String email = FirebaseAuth
-                                            .instance.currentUser!.email ??
-                                        "";
-                                    await FirebaseAuth.instance
-                                        .signInWithEmailAndPassword(
-                                            email: email,
-                                            password: psw.text.trim());
-                                    await db.cancelsignup(
-                                        FirebaseAuth.instance.currentUser!.uid);
-                                    await FirebaseAuth.instance.currentUser!
-                                        .delete();
-                                    psw.clear();
-                                    psw.dispose();
-                                    goauthscreen();
-                                  } catch (e) {
-                                    displayErrorSnackBar(
-                                        "Could not cancel signup, please try again and makes sure password is correct");
-                                  } finally {
-                                    setState(() {
-                                      cancelbuttonpressed = false;
-                                    });
-                                  }
-                                },
-                          child: SizedBox(
-                              height: 50,
-                              width: screenwidth * 0.7,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20))),
-                                child: const Center(
-                                    child: Text(
-                                  "Cancel Sign Up",
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                )),
-                              )),
-                        ),
-                      ]),
-                    ),
+                      );
+                    },
                   );
                 });
           },
@@ -1134,86 +1127,82 @@ class _MiscScreenState extends State<MiscScreen> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return Dialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    backgroundColor: Colors.white,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                      height: screenheight * 0.35,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      child: Column(children: [
-                        const Text("Cancel SignUp",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25)),
-                        SizedBox(
-                          height: screenheight * 0.02,
+                  return StatefulBuilder(
+                    builder: (BuildContext context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          height: screenheight * 0.35,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(children: [
+                            const Text("Cancel SignUp",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25)),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            const Text(
+                              "Enter password to cancel Sign Up.",
+                              style: TextStyle(fontSize: 15),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            textdatafield(
+                                screenwidth * 0.4, "Enter Password", psw),
+                            SizedBox(
+                              height: screenheight * 0.04,
+                            ),
+                            GestureDetector(
+                                onTap: cancelbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          cancelbuttonpressed = true;
+                                        });
+                                        try {
+                                          String email = FirebaseAuth.instance
+                                                  .currentUser!.email ??
+                                              "";
+                                          await FirebaseAuth.instance
+                                              .signInWithEmailAndPassword(
+                                                  email: email,
+                                                  password: psw.text.trim());
+                                          await db.cancelsignup(FirebaseAuth
+                                              .instance.currentUser!.uid);
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .delete();
+                                          psw.clear();
+                                          goauthscreen();
+                                        } catch (e) {
+                                          displayErrorSnackBar(
+                                              "Could not cancel signup, please try again and makes sure password is correct");
+                                        } finally {
+                                          setState(() {
+                                            cancelbuttonpressed = false;
+                                          });
+                                        }
+                                      },
+                                child: PrimaryButton(
+                                    screenwidth: screenwidth,
+                                    buttonpressed: cancelbuttonpressed,
+                                    text: "Cancel Sign Up",
+                                    buttonwidth: screenwidth * 0.7,
+                                    bold: false)),
+                          ]),
                         ),
-                        const Text(
-                          "Enter password to cancel Sign Up.",
-                          style: TextStyle(fontSize: 15),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: screenheight * 0.02,
-                        ),
-                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
-                        SizedBox(
-                          height: screenheight * 0.04,
-                        ),
-                        GestureDetector(
-                          onTap: cancelbuttonpressed
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    cancelbuttonpressed = true;
-                                  });
-                                  try {
-                                    String email = FirebaseAuth
-                                            .instance.currentUser!.email ??
-                                        "";
-                                    await FirebaseAuth.instance
-                                        .signInWithEmailAndPassword(
-                                            email: email,
-                                            password: psw.text.trim());
-                                    await db.cancelsignup(
-                                        FirebaseAuth.instance.currentUser!.uid);
-                                    await FirebaseAuth.instance.currentUser!
-                                        .delete();
-                                    psw.clear();
-                                    psw.dispose();
-                                    goauthscreen();
-                                  } catch (e) {
-                                    displayErrorSnackBar(
-                                        "Could not cancel signup, please try again and makes sure password is correct");
-                                  } finally {
-                                    setState(() {
-                                      cancelbuttonpressed = false;
-                                    });
-                                  }
-                                },
-                          child: SizedBox(
-                              height: 50,
-                              width: screenwidth * 0.7,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20))),
-                                child: const Center(
-                                    child: Text(
-                                  "Cancel Sign Up",
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                )),
-                              )),
-                        ),
-                      ]),
-                    ),
+                      );
+                    },
                   );
                 });
           },
@@ -1541,86 +1530,82 @@ class _InterestScreenState extends State<InterestScreen> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return Dialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    backgroundColor: Colors.white,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                      height: screenheight * 0.35,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      child: Column(children: [
-                        const Text("Cancel SignUp",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25)),
-                        SizedBox(
-                          height: screenheight * 0.02,
+                  return StatefulBuilder(
+                    builder: (BuildContext context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          height: screenheight * 0.35,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(children: [
+                            const Text("Cancel SignUp",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25)),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            const Text(
+                              "Enter password to cancel Sign Up.",
+                              style: TextStyle(fontSize: 15),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            textdatafield(
+                                screenwidth * 0.4, "Enter Password", psw),
+                            SizedBox(
+                              height: screenheight * 0.04,
+                            ),
+                            GestureDetector(
+                                onTap: cancelbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          cancelbuttonpressed = true;
+                                        });
+                                        try {
+                                          String email = FirebaseAuth.instance
+                                                  .currentUser!.email ??
+                                              "";
+                                          await FirebaseAuth.instance
+                                              .signInWithEmailAndPassword(
+                                                  email: email,
+                                                  password: psw.text.trim());
+                                          await db.cancelsignup(FirebaseAuth
+                                              .instance.currentUser!.uid);
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .delete();
+                                          psw.clear();
+                                          goauthscreen();
+                                        } catch (e) {
+                                          displayErrorSnackBar(
+                                              "Could not cancel signup, please try again and makes sure password is correct");
+                                        } finally {
+                                          setState(() {
+                                            cancelbuttonpressed = false;
+                                          });
+                                        }
+                                      },
+                                child: PrimaryButton(
+                                    screenwidth: screenwidth,
+                                    buttonpressed: cancelbuttonpressed,
+                                    text: "Cancel Sign Up",
+                                    buttonwidth: screenwidth * 0.7,
+                                    bold: false)),
+                          ]),
                         ),
-                        const Text(
-                          "Enter password to cancel Sign Up.",
-                          style: TextStyle(fontSize: 15),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: screenheight * 0.02,
-                        ),
-                        textdatafield(screenwidth * 0.4, "Enter Password", psw),
-                        SizedBox(
-                          height: screenheight * 0.04,
-                        ),
-                        GestureDetector(
-                          onTap: cancelbuttonpressed
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    cancelbuttonpressed = true;
-                                  });
-                                  try {
-                                    String email = FirebaseAuth
-                                            .instance.currentUser!.email ??
-                                        "";
-                                    await FirebaseAuth.instance
-                                        .signInWithEmailAndPassword(
-                                            email: email,
-                                            password: psw.text.trim());
-                                    await db.cancelsignup(
-                                        FirebaseAuth.instance.currentUser!.uid);
-                                    await FirebaseAuth.instance.currentUser!
-                                        .delete();
-                                    psw.clear();
-                                    psw.dispose();
-                                    goauthscreen();
-                                  } catch (e) {
-                                    displayErrorSnackBar(
-                                        "Could not cancel signup, please try again and makes sure password is correct");
-                                  } finally {
-                                    setState(() {
-                                      cancelbuttonpressed = false;
-                                    });
-                                  }
-                                },
-                          child: SizedBox(
-                              height: 50,
-                              width: screenwidth * 0.7,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20))),
-                                child: const Center(
-                                    child: Text(
-                                  "Cancel Sign Up",
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                )),
-                              )),
-                        ),
-                      ]),
-                    ),
+                      );
+                    },
                   );
                 });
           },

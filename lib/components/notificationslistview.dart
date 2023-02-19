@@ -120,7 +120,7 @@ class NotificationsListView extends StatelessWidget {
                 SizedBox(
                   width: screenwidth * 0.8,
                   child: RichText(
-                      textAlign: TextAlign.justify,
+                      textAlign: TextAlign.start,
                       textScaleFactor: 1.0,
                       text: finaltext),
                 ),

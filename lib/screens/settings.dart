@@ -1,4 +1,5 @@
 import 'package:clout/components/datatextfield.dart';
+import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
@@ -175,105 +176,99 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      backgroundColor: Colors.white,
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                        height: screenheight * 0.33,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: Column(children: [
-                          const Text("Report a Bug",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25)),
-                          SizedBox(
-                            height: screenheight * 0.02,
-                          ),
-                          const Text(
-                            "Please describe the bug",
-                            style: TextStyle(
-                              fontSize: 15,
+                    return StatefulBuilder(builder: ((context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          height: screenheight * 0.33,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(children: [
+                            const Text("Report a Bug",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25)),
+                            SizedBox(
+                              height: screenheight * 0.02,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(
-                            height: screenheight * 0.02,
-                          ),
-                          SizedBox(
-                            width: screenwidth * 0.6,
-                            child: TextField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w300,
+                            const Text(
+                              "Please describe the bug",
+                              style: TextStyle(
                                 fontSize: 15,
                               ),
-                              decoration: InputDecoration(
-                                focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Theme.of(context).primaryColor)),
-                                hintText: "Bug Description",
-                                hintStyle: const TextStyle(
-                                  color: Color.fromARGB(39, 0, 0, 0),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            SizedBox(
+                              width: screenwidth * 0.6,
+                              child: TextField(
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w300,
                                   fontSize: 15,
                                 ),
+                                decoration: InputDecoration(
+                                  focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                                  hintText: "Bug Description",
+                                  hintStyle: const TextStyle(
+                                    color: Color.fromARGB(39, 0, 0, 0),
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                textAlign: TextAlign.start,
+                                enableSuggestions: true,
+                                autocorrect: true,
+                                controller: bugcontroller,
+                                keyboardType: TextInputType.text,
+                                minLines: 1,
+                                maxLines: 3,
                               ),
-                              textAlign: TextAlign.start,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              controller: bugcontroller,
-                              keyboardType: TextInputType.text,
-                              minLines: 1,
-                              maxLines: 3,
                             ),
-                          ),
-                          SizedBox(
-                            height: screenheight * 0.04,
-                          ),
-                          GestureDetector(
-                            onTap: bugbuttonpressed
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      bugbuttonpressed = true;
-                                    });
-                                    try {
-                                      await db.reportbug(
-                                          bugcontroller.text.trim(),
-                                          widget.curruser.uid);
-                                      bugcontroller.clear();
-                                      Navigator.pop(context);
-                                    } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Invalid Action, try again");
-                                    } finally {
-                                      bugbuttonpressed = false;
-                                    }
-                                  },
-                            child: SizedBox(
-                                height: 50,
-                                width: screenwidth * 0.6,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).primaryColor,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(20))),
-                                  child: const Center(
-                                      child: Text(
-                                    "Report",
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white),
-                                  )),
+                            SizedBox(
+                              height: screenheight * 0.04,
+                            ),
+                            GestureDetector(
+                                onTap: bugbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          bugbuttonpressed = true;
+                                        });
+                                        try {
+                                          await db.reportbug(
+                                              bugcontroller.text.trim(),
+                                              widget.curruser.uid);
+                                          bugcontroller.clear();
+                                          Navigator.pop(context);
+                                        } catch (e) {
+                                          displayErrorSnackBar(
+                                              "Invalid Action, try again");
+                                        } finally {
+                                          bugbuttonpressed = false;
+                                        }
+                                      },
+                                child: PrimaryButton(
+                                  bold: false,
+                                  buttonwidth: screenwidth * 0.6,
+                                  screenwidth: screenwidth,
+                                  buttonpressed: bugbuttonpressed,
+                                  text: "Report",
                                 )),
-                          ),
-                        ]),
-                      ),
-                    );
+                          ]),
+                        ),
+                      );
+                    }));
                   });
             },
             child: Row(
@@ -305,99 +300,91 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      backgroundColor: Colors.white,
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                        height: screenheight * 0.4,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: Column(children: [
-                          const Text("Change Email",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25)),
-                          SizedBox(
-                            height: screenheight * 0.02,
-                          ),
-                          const Text(
-                            "In order to change email address,\nenter new address and re-enter password",
-                            style: TextStyle(
-                              fontSize: 15,
+                    return StatefulBuilder(builder: ((context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          height: screenheight * 0.4,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(children: [
+                            const Text("Change Email",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25)),
+                            SizedBox(
+                              height: screenheight * 0.02,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(
-                            height: screenheight * 0.02,
-                          ),
-                          textdatafield(
-                              screenwidth * 0.4, "New Email", emailaddress),
-                          textdatafield(screenwidth * 0.4, "Password", psw),
-                          SizedBox(
-                            height: screenheight * 0.04,
-                          ),
-                          GestureDetector(
-                            onTap: updateemailbuttonpressed
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      updateemailbuttonpressed = true;
-                                    });
-                                    try {
-                                      await FirebaseAuth.instance
-                                          .signInWithEmailAndPassword(
-                                              email: widget.curruser.email,
-                                              password: psw.text.trim());
-                                      if (emailaddress.text.trim().isEmpty) {
-                                        throw Exception(
-                                            "Please enter new email address");
-                                      }
-                                      await db.changeattribute(
-                                          'email',
-                                          emailaddress.text.trim(),
-                                          FirebaseAuth
-                                              .instance.currentUser!.uid);
-                                      await FirebaseAuth.instance.currentUser!
-                                          .updateEmail(
-                                              emailaddress.text.trim());
-                                      emailaddress.clear();
-                                      psw.clear();
-                                      newpsw.clear();
-                                      emailaddress.dispose();
-                                      psw.dispose();
-                                      newpsw.dispose();
-                                      goauthwrapper();
-                                    } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Invalid Action, try again");
-                                    } finally {
-                                      updateemailbuttonpressed = false;
-                                    }
-                                  },
-                            child: SizedBox(
-                                height: 50,
-                                width: screenwidth * 0.7,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).primaryColor,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(20))),
-                                  child: const Center(
-                                      child: Text(
-                                    "Update",
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white),
-                                  )),
-                                )),
-                          ),
-                        ]),
-                      ),
-                    );
+                            const Text(
+                              "In order to change email address,\nenter new address and re-enter password",
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            textdatafield(
+                                screenwidth * 0.4, "New Email", emailaddress),
+                            textdatafield(screenwidth * 0.4, "Password", psw),
+                            SizedBox(
+                              height: screenheight * 0.04,
+                            ),
+                            GestureDetector(
+                                onTap: updateemailbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          updateemailbuttonpressed = true;
+                                        });
+                                        try {
+                                          await FirebaseAuth.instance
+                                              .signInWithEmailAndPassword(
+                                                  email: widget.curruser.email,
+                                                  password: psw.text.trim());
+                                          if (emailaddress.text
+                                              .trim()
+                                              .isEmpty) {
+                                            throw Exception(
+                                                "Please enter new email address");
+                                          }
+                                          await db.changeattribute(
+                                              'email',
+                                              emailaddress.text.trim(),
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid);
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .updateEmail(
+                                                  emailaddress.text.trim());
+                                          emailaddress.clear();
+                                          psw.clear();
+                                          newpsw.clear();
+                                          goauthwrapper();
+                                        } catch (e) {
+                                          displayErrorSnackBar(
+                                              "Invalid Action, try again");
+                                        } finally {
+                                          updateemailbuttonpressed = false;
+                                        }
+                                      },
+                                child: PrimaryButton(
+                                    screenwidth: screenwidth,
+                                    buttonpressed: updateemailbuttonpressed,
+                                    text: "Update",
+                                    buttonwidth: screenwidth * 0.7,
+                                    bold: false)),
+                          ]),
+                        ),
+                      );
+                    }));
                   });
             },
             child: Row(
@@ -426,92 +413,84 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      backgroundColor: Colors.white,
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                        height: screenheight * 0.4,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: Column(children: [
-                          const Text("Change Password",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25)),
-                          SizedBox(
-                            height: screenheight * 0.02,
-                          ),
-                          const Text(
-                            "In order to change password,\nenter old and new password",
-                            style: TextStyle(fontSize: 15),
-                          ),
-                          SizedBox(
-                            height: screenheight * 0.02,
-                          ),
-                          textdatafield(screenwidth * 0.4, "Old Password", psw),
-                          textdatafield(
-                              screenwidth * 0.4, "New Password", newpsw),
-                          SizedBox(
-                            height: screenheight * 0.04,
-                          ),
-                          GestureDetector(
-                            onTap: updatepswbuttonpressed
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      updatepswbuttonpressed = true;
-                                    });
-                                    try {
-                                      await FirebaseAuth.instance
-                                          .signInWithEmailAndPassword(
-                                              email: widget.curruser.email,
-                                              password: psw.text.trim());
-                                      if (newpsw.text.trim().isEmpty) {
-                                        throw Exception(
-                                            "Please enter new password");
-                                      }
-                                      await FirebaseAuth.instance.currentUser!
-                                          .updatePassword(newpsw.text.trim());
-                                      emailaddress.clear();
-                                      psw.clear();
-                                      newpsw.clear();
-                                      emailaddress.dispose();
-                                      psw.dispose();
-                                      newpsw.dispose();
-                                      goauthwrapper();
-                                    } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Invalid Action, try again");
-                                    } finally {
-                                      setState(() {
-                                        updatepswbuttonpressed = false;
-                                      });
-                                    }
-                                  },
-                            child: SizedBox(
-                                height: 50,
-                                width: screenwidth * 0.7,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).primaryColor,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(20))),
-                                  child: const Center(
-                                      child: Text(
-                                    "Update",
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white),
-                                  )),
-                                )),
-                          ),
-                        ]),
-                      ),
-                    );
+                    return StatefulBuilder(builder: (context, setState) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                          height: screenheight * 0.4,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(children: [
+                            const Text("Change Password",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25)),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            const Text(
+                              "In order to change password,\nenter old and new password",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                            SizedBox(
+                              height: screenheight * 0.02,
+                            ),
+                            textdatafield(
+                                screenwidth * 0.4, "Old Password", psw),
+                            textdatafield(
+                                screenwidth * 0.4, "New Password", newpsw),
+                            SizedBox(
+                              height: screenheight * 0.04,
+                            ),
+                            GestureDetector(
+                                onTap: updatepswbuttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          updatepswbuttonpressed = true;
+                                        });
+                                        try {
+                                          await FirebaseAuth.instance
+                                              .signInWithEmailAndPassword(
+                                                  email: widget.curruser.email,
+                                                  password: psw.text.trim());
+                                          if (newpsw.text.trim().isEmpty) {
+                                            throw Exception(
+                                                "Please enter new password");
+                                          }
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .updatePassword(
+                                                  newpsw.text.trim());
+                                          emailaddress.clear();
+                                          psw.clear();
+                                          newpsw.clear();
+                                          goauthwrapper();
+                                        } catch (e) {
+                                          displayErrorSnackBar(
+                                              "Invalid Action, try again");
+                                        } finally {
+                                          setState(() {
+                                            updatepswbuttonpressed = false;
+                                          });
+                                        }
+                                      },
+                                child: PrimaryButton(
+                                    screenwidth: screenwidth,
+                                    buttonpressed: updatepswbuttonpressed,
+                                    text: "Update",
+                                    buttonwidth: screenwidth * 0.7,
+                                    bold: false)),
+                          ]),
+                        ),
+                      );
+                    });
                   });
             },
             child: Row(
@@ -613,105 +592,101 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                               showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
-                                    return Dialog(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      backgroundColor: Colors.white,
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            10, 20, 10, 10),
-                                        height: screenheight * 0.35,
-                                        decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10))),
-                                        child: Column(children: [
-                                          const Text("Delete Account",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25)),
-                                          SizedBox(
-                                            height: screenheight * 0.02,
-                                          ),
-                                          const Text(
-                                            "We hate to see you go...\nEnter Password to permamently delete your account",
-                                            style: TextStyle(fontSize: 15),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          SizedBox(
-                                            height: screenheight * 0.02,
-                                          ),
-                                          textdatafield(screenwidth * 0.4,
-                                              "Enter Password", psw),
-                                          SizedBox(
-                                            height: screenheight * 0.04,
-                                          ),
-                                          GestureDetector(
-                                            onTap: deletebuttonpressed
-                                                ? null
-                                                : () async {
-                                                    setState(() {
-                                                      deletebuttonpressed =
-                                                          true;
-                                                    });
-                                                    try {
-                                                      await FirebaseAuth
-                                                          .instance
-                                                          .signInWithEmailAndPassword(
-                                                              email: widget
-                                                                  .curruser
-                                                                  .email,
-                                                              password: psw.text
-                                                                  .trim());
-                                                      await db.deleteuser(
-                                                          widget.curruser);
-                                                      await FirebaseAuth
-                                                          .instance.currentUser!
-                                                          .delete();
-                                                      emailaddress.clear();
-                                                      psw.clear();
-                                                      newpsw.clear();
-                                                      emailaddress.dispose();
-                                                      psw.dispose();
-                                                      newpsw.dispose();
-                                                      goauthwrapper();
-                                                    } catch (e) {
-                                                      displayErrorSnackBar(
-                                                          "Invalid Action, try again");
-                                                    } finally {
-                                                      setState(() {
-                                                        deletebuttonpressed =
-                                                            false;
-                                                      });
-                                                    }
-                                                  },
-                                            child: SizedBox(
-                                                height: 50,
-                                                width: screenwidth * 0.7,
-                                                child: Container(
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                          color: Color
-                                                              .fromARGB(255,
-                                                                  255, 48, 117),
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          20))),
-                                                  child: const Center(
-                                                      child: Text(
-                                                    "Delete Account :(",
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        color: Colors.white),
+                                    return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return Dialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          backgroundColor: Colors.white,
+                                          child: Container(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                10, 20, 10, 10),
+                                            height: screenheight * 0.35,
+                                            decoration: const BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10))),
+                                            child: Column(children: [
+                                              const Text("Delete Account",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 25)),
+                                              SizedBox(
+                                                height: screenheight * 0.02,
+                                              ),
+                                              const Text(
+                                                "We hate to see you go...\nEnter Password to permamently delete your account",
+                                                style: TextStyle(fontSize: 15),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              SizedBox(
+                                                height: screenheight * 0.02,
+                                              ),
+                                              textdatafield(screenwidth * 0.4,
+                                                  "Enter Password", psw),
+                                              SizedBox(
+                                                height: screenheight * 0.04,
+                                              ),
+                                              GestureDetector(
+                                                  onTap: deletebuttonpressed
+                                                      ? null
+                                                      : () async {
+                                                          setState(() {
+                                                            deletebuttonpressed =
+                                                                true;
+                                                          });
+                                                          try {
+                                                            await FirebaseAuth
+                                                                .instance
+                                                                .signInWithEmailAndPassword(
+                                                                    email: widget
+                                                                        .curruser
+                                                                        .email,
+                                                                    password: psw
+                                                                        .text
+                                                                        .trim());
+                                                            await db.deleteuser(
+                                                                widget
+                                                                    .curruser);
+                                                            await FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .delete();
+                                                            emailaddress
+                                                                .clear();
+                                                            psw.clear();
+                                                            newpsw.clear();
+                                                            emailaddress
+                                                                .dispose();
+                                                            psw.dispose();
+                                                            newpsw.dispose();
+                                                            goauthwrapper();
+                                                          } catch (e) {
+                                                            displayErrorSnackBar(
+                                                                "Invalid Action, try again");
+                                                          } finally {
+                                                            setState(() {
+                                                              deletebuttonpressed =
+                                                                  false;
+                                                            });
+                                                          }
+                                                        },
+                                                  child: PrimaryButton(
+                                                    bold: false,
+                                                    screenwidth: screenwidth,
+                                                    buttonpressed:
+                                                        deletebuttonpressed,
+                                                    text: "Delete Account :(",
+                                                    buttonwidth:
+                                                        screenwidth * 0.7,
                                                   )),
-                                                )),
+                                            ]),
                                           ),
-                                        ]),
-                                      ),
+                                        );
+                                      },
                                     );
                                   });
                             },

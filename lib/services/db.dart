@@ -925,6 +925,60 @@ class db_conn {
     }
   }
 
+  Future<List<Event>> getProfileScreenJoinedEvents(
+      AppUser user, bool showinviteonly) async {
+    try {
+      List<Event> joinedEvents = [];
+      late QuerySnapshot querySnapshot;
+      if (showinviteonly) {
+        querySnapshot = await events
+            .where('participants', arrayContains: user.uid)
+            .orderBy('time')
+            .get();
+      } else {
+        querySnapshot = await events
+            .where('participants', arrayContains: user.uid)
+            .where('isinviteonly', isEqualTo: showinviteonly)
+            .orderBy('time')
+            .get();
+      }
+      querySnapshot.docs.forEach((element) {
+        joinedEvents.add(Event.fromJson(element.data(), element.id));
+      });
+      return joinedEvents;
+    } catch (e) {
+      print(e);
+      throw Exception(e);
+    }
+  }
+
+  Future<List<Event>> getProfileScreenHostedEvents(
+      AppUser user, bool showinviteonly) async {
+    try {
+      List<Event> hostedEvents = [];
+      late QuerySnapshot querySnapshot;
+      if (showinviteonly) {
+        querySnapshot = await events
+            .where('hostdocid', isEqualTo: user.uid)
+            .orderBy('time')
+            .get();
+      } else {
+        querySnapshot = await events
+            .where('hostdocid', isEqualTo: user.uid)
+            .where('isinviteonly', isEqualTo: showinviteonly)
+            .orderBy('time')
+            .get();
+      }
+      querySnapshot.docs.forEach((element) {
+        hostedEvents.add(Event.fromJson(element.data(), element.id));
+      });
+      return hostedEvents;
+    } catch (e) {
+      print(e);
+      throw Exception(e);
+    }
+  }
+
   Future<List<Event>> getLngLatEventsByInterest(double lng, double lat,
       String interest, String country, AppUser curruser) async {
     try {
