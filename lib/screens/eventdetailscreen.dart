@@ -49,6 +49,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   QRViewController? qrcontroller;
   String qrmessage = "";
   bool showqrmessage = false;
+  bool deletebuttonpressed = false;
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
@@ -369,440 +370,461 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   backgroundColor: Colors.white,
                   context: context,
                   builder: (BuildContext context) {
-                    return SizedBox(
-                        height: screenheight * 0.3,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                              20, screenheight * 0.01, 20, 20),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.transparent),
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: const Color.fromARGB(60, 0, 0, 0),
-                                ),
-                              ),
-                              SizedBox(
-                                height: screenheight * 0.015,
-                              ),
-                              Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        String link = await createShareLink();
-                                        //print(link);
-                                        String text =
-                                            "Join ${widget.event.title} on Clout!\n\n$link";
-                                        shareevent(text);
-                                      },
-                                      child: Container(
-                                        height: screenheight * 0.1,
-                                        width: screenwidth * 0.4,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).primaryColor,
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(20)),
+                    return StatefulBuilder(
+                      builder: (BuildContext context, setState) {
+                        return SizedBox(
+                            height: screenheight * 0.3,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                  20, screenheight * 0.01, 20, 20),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      border:
+                                          Border.all(color: Colors.transparent),
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: const Color.fromARGB(60, 0, 0, 0),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: screenheight * 0.015,
+                                  ),
+                                  Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            String link =
+                                                await createShareLink();
+                                            //print(link);
+                                            String text =
+                                                "Join ${widget.event.title} on Clout!\n\n$link";
+                                            shareevent(text);
+                                          },
+                                          child: Container(
+                                            height: screenheight * 0.1,
+                                            width: screenwidth * 0.4,
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(20)),
+                                            ),
+                                            child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  const Icon(Icons.ios_share,
+                                                      color: Colors.white,
+                                                      size: 30),
+                                                  SizedBox(
+                                                    height: screenheight * 0.01,
+                                                  ),
+                                                  const Text(
+                                                    "Share Event",
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        color: Colors.white),
+                                                    textScaleFactor: 1.0,
+                                                  )
+                                                ]),
+                                          ),
                                         ),
-                                        child: Column(
+                                        GestureDetector(
+                                          onTap: gotochatbuttonpressed
+                                              ? null
+                                              : () async {
+                                                  setState(() {
+                                                    gotochatbuttonpressed =
+                                                        true;
+                                                  });
+                                                  try {
+                                                    if (widget
+                                                        .event.participants
+                                                        .contains(widget
+                                                            .curruser.uid)) {
+                                                      Chat chat = await db
+                                                          .getChatfromDocId(
+                                                              widget.event
+                                                                  .chatid);
+                                                      chatnavigate(chat);
+                                                    } else {
+                                                      displayErrorSnackBar(
+                                                          "Please join event first");
+                                                    }
+                                                  } catch (e) {
+                                                    displayErrorSnackBar(
+                                                        "Could not display chat");
+                                                  }
+                                                  setState(() {
+                                                    gotochatbuttonpressed =
+                                                        false;
+                                                  });
+                                                },
+                                          child: Container(
+                                            height: screenheight * 0.1,
+                                            width: screenwidth * 0.4,
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(20))),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                const Icon(
+                                                  Icons
+                                                      .chat_bubble_outline_rounded,
+                                                  color: Colors.white,
+                                                  size: 30,
+                                                ),
+                                                SizedBox(
+                                                  height: screenheight * 0.01,
+                                                ),
+                                                const Text(
+                                                  "Go to Chat",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.white),
+                                                  textScaleFactor: 1.0,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ]),
+                                  SizedBox(
+                                    height: screenheight * 0.02,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: widget.curruser.uid ==
+                                                widget.event.hostdocid
+                                            ? joinedval == "Finished"
+                                                ? deletebuttonpressed
+                                                    ? null
+                                                    : () async {
+                                                        setState(() {
+                                                          deletebuttonpressed =
+                                                              true;
+                                                        });
+                                                        await db.deleteevent(
+                                                            widget.event,
+                                                            widget.curruser);
+                                                        setState(() {
+                                                          deletebuttonpressed =
+                                                              false;
+                                                        });
+                                                        Navigator.of(context)
+                                                            .push(
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  LoadingScreen(
+                                                                    uid: widget
+                                                                        .curruser
+                                                                        .uid,
+                                                                  ),
+                                                              fullscreenDialog:
+                                                                  true),
+                                                        );
+                                                      }
+                                                : () async {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (BuildContext
+                                                                context) =>
+                                                            EditEventScreen(
+                                                                curruser: widget
+                                                                    .curruser,
+                                                                allowbackarrow:
+                                                                    true,
+                                                                event: widget
+                                                                    .event),
+                                                      ),
+                                                    );
+                                                  }
+                                            : () {
+                                                reportevent(widget.event);
+                                              },
+                                        child: Container(
+                                          height: screenheight * 0.1,
+                                          width: screenwidth * 0.4,
+                                          decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(20))),
+                                          child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              const Icon(Icons.ios_share,
-                                                  color: Colors.white,
-                                                  size: 30),
+                                              Icon(
+                                                widget.curruser.uid ==
+                                                        widget.event.hostdocid
+                                                    ? joinedval != "Finished"
+                                                        ? Icons.edit
+                                                        : Icons.delete
+                                                    : Icons.flag_outlined,
+                                                color: Colors.white,
+                                                size: 30,
+                                              ),
                                               SizedBox(
                                                 height: screenheight * 0.01,
                                               ),
-                                              const Text(
-                                                "Share Event",
-                                                style: TextStyle(
+                                              Text(
+                                                widget.curruser.uid ==
+                                                        widget.event.hostdocid
+                                                    ? joinedval != "Finished"
+                                                        ? "Edit Event"
+                                                        : "Delete Event"
+                                                    : "Report Event",
+                                                style: const TextStyle(
                                                     fontSize: 20,
                                                     color: Colors.white),
                                                 textScaleFactor: 1.0,
                                               )
-                                            ]),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: gotochatbuttonpressed
-                                          ? null
-                                          : () async {
-                                              setState(() {
-                                                gotochatbuttonpressed = true;
-                                              });
-                                              try {
-                                                if (widget.event.participants
-                                                    .contains(
-                                                        widget.curruser.uid)) {
-                                                  Chat chat =
-                                                      await db.getChatfromDocId(
-                                                          widget.event.chatid);
-                                                  chatnavigate(chat);
-                                                } else {
-                                                  displayErrorSnackBar(
-                                                      "Please join event first");
-                                                }
-                                              } catch (e) {
-                                                displayErrorSnackBar(
-                                                    "Could not display chat");
-                                              }
-                                              setState(() {
-                                                gotochatbuttonpressed = false;
-                                              });
-                                            },
-                                      child: Container(
-                                        height: screenheight * 0.1,
-                                        width: screenwidth * 0.4,
-                                        decoration: BoxDecoration(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(20))),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            const Icon(
-                                              Icons.chat_bubble_outline_rounded,
-                                              color: Colors.white,
-                                              size: 30,
-                                            ),
-                                            SizedBox(
-                                              height: screenheight * 0.01,
-                                            ),
-                                            const Text(
-                                              "Go to Chat",
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  color: Colors.white),
-                                              textScaleFactor: 1.0,
-                                            )
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ]),
-                              SizedBox(
-                                height: screenheight * 0.02,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: widget.curruser.uid ==
-                                            widget.event.hostdocid
-                                        ? joinedval == "Finished"
-                                            ? null
-                                            : () async {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (BuildContext
-                                                            context) =>
-                                                        EditEventScreen(
-                                                            curruser:
-                                                                widget.curruser,
-                                                            allowbackarrow:
-                                                                true,
-                                                            event:
-                                                                widget.event),
-                                                  ),
-                                                );
-                                              }
-                                        : () {
-                                            reportevent(widget.event);
-                                          },
-                                    child: Container(
-                                      height: screenheight * 0.1,
-                                      width: screenwidth * 0.4,
-                                      decoration: BoxDecoration(
-                                          color: joinedval == "Finished" &&
-                                                  widget.curruser.uid ==
-                                                      widget.event.hostdocid
-                                              ? Color.fromARGB(
-                                                  180, 255, 48, 117)
-                                              : Theme.of(context).primaryColor,
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(20))),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
+                                      GestureDetector(
+                                        onTap:
                                             widget.curruser.uid ==
                                                     widget.event.hostdocid
-                                                ? Icons.edit
-                                                : Icons.flag_outlined,
-                                            color: Colors.white,
-                                            size: 30,
-                                          ),
-                                          SizedBox(
-                                            height: screenheight * 0.01,
-                                          ),
-                                          Text(
-                                            widget.curruser.uid ==
-                                                    widget.event.hostdocid
-                                                ? "Edit Event"
-                                                : "Report Event",
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
-                                            textScaleFactor: 1.0,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap:
-                                        widget.curruser.uid ==
-                                                widget.event.hostdocid
-                                            ? joinedval == "Finished"
-                                                ? () {
-                                                    Navigator.pop(context);
-                                                    showModalBottomSheet(
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return StatefulBuilder(
-                                                              builder: (context,
-                                                                  setState) {
-                                                            return SizedBox(
-                                                              height:
-                                                                  screenheight *
-                                                                      0.8,
-                                                              child: Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  showqrmessage !=
-                                                                          false
-                                                                      ? result !=
-                                                                              null
-                                                                          ? Container(
-                                                                              height: screenheight * 0.06,
-                                                                              width: screenwidth,
-                                                                              color: Theme.of(context).primaryColor,
-                                                                              child: Center(
-                                                                                child: Text(
-                                                                                  qrmessage,
-                                                                                  textScaleFactor: 1.0,
-                                                                                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
-                                                                                ),
-                                                                              ),
-                                                                            )
+                                                ? joinedval == "Finished"
+                                                    ? () {
+                                                        Navigator.pop(context);
+                                                        showModalBottomSheet(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return StatefulBuilder(
+                                                                  builder: (context,
+                                                                      setState) {
+                                                                return SizedBox(
+                                                                  height:
+                                                                      screenheight *
+                                                                          0.8,
+                                                                  child: Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      showqrmessage !=
+                                                                              false
+                                                                          ? result != null
+                                                                              ? Container(
+                                                                                  height: screenheight * 0.06,
+                                                                                  width: screenwidth,
+                                                                                  color: Theme.of(context).primaryColor,
+                                                                                  child: Center(
+                                                                                    child: Text(
+                                                                                      qrmessage,
+                                                                                      textScaleFactor: 1.0,
+                                                                                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                                                                                    ),
+                                                                                  ),
+                                                                                )
+                                                                              : Container(
+                                                                                  height: screenheight * 0.06,
+                                                                                  width: screenwidth,
+                                                                                )
                                                                           : Container(
                                                                               height: screenheight * 0.06,
                                                                               width: screenwidth,
-                                                                            )
-                                                                      : Container(
-                                                                          height:
-                                                                              screenheight * 0.06,
-                                                                          width:
-                                                                              screenwidth,
-                                                                        ),
-                                                                  SizedBox(
-                                                                    height:
-                                                                        screenheight *
+                                                                            ),
+                                                                      SizedBox(
+                                                                        height: screenheight *
                                                                             0.4,
-                                                                    child:
-                                                                        QRView(
-                                                                      key:
-                                                                          qrKey,
-                                                                      overlay: QrScannerOverlayShape(
-                                                                          cutOutSize:
-                                                                              screenheight * 0.35),
-                                                                      onPermissionSet:
-                                                                          (p0,
-                                                                              permission) {
-                                                                        if (!permission) {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                          displayErrorSnackBar(
-                                                                              "Could not open camera, please ensure Clout has access to camera");
-                                                                        }
-                                                                      },
-                                                                      onQRViewCreated:
-                                                                          (QRViewController
-                                                                              controller) async {
-                                                                        setState(
-                                                                            () {
-                                                                          this.qrcontroller =
-                                                                              controller;
-                                                                          showqrmessage =
-                                                                              false;
-                                                                          result =
-                                                                              null;
-                                                                        });
-                                                                        controller
-                                                                            .scannedDataStream
-                                                                            .listen((scanData) async {
-                                                                          setState(
-                                                                              () {
-                                                                            result =
-                                                                                scanData;
-                                                                          });
-                                                                        });
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Container(
-                                                                    height:
-                                                                        screenheight *
-                                                                            0.1,
-                                                                    width:
-                                                                        screenwidth,
-                                                                    color: Colors
-                                                                        .white,
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          GestureDetector(
-                                                                        onTap: result ==
-                                                                                null
-                                                                            ? null
-                                                                            : () async {
-                                                                                try {
-                                                                                  await validateqr(result!.code);
-                                                                                  setState(() {
-                                                                                    result = null;
-                                                                                    showqrmessage = true;
-                                                                                  });
-                                                                                } catch (e) {}
-                                                                              },
-                                                                        child: SizedBox(
-                                                                            height: 50 > screenheight * 0.1 ? screenheight * 0.1 : 50,
-                                                                            width: screenwidth * 0.5,
-                                                                            child: Container(
-                                                                              decoration: BoxDecoration(color: result == null ? const Color.fromARGB(180, 255, 48, 117) : Theme.of(context).primaryColor, borderRadius: const BorderRadius.all(Radius.circular(20))),
-                                                                              child: const Center(
-                                                                                  child: Text(
-                                                                                "Validate",
-                                                                                style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w800),
-                                                                              )),
-                                                                            )),
+                                                                        child:
+                                                                            QRView(
+                                                                          key:
+                                                                              qrKey,
+                                                                          overlay:
+                                                                              QrScannerOverlayShape(cutOutSize: screenheight * 0.35),
+                                                                          onPermissionSet:
+                                                                              (p0, permission) {
+                                                                            if (!permission) {
+                                                                              Navigator.pop(context);
+                                                                              displayErrorSnackBar("Could not open camera, please ensure Clout has access to camera");
+                                                                            }
+                                                                          },
+                                                                          onQRViewCreated:
+                                                                              (QRViewController controller) async {
+                                                                            setState(() {
+                                                                              this.qrcontroller = controller;
+                                                                              showqrmessage = false;
+                                                                              result = null;
+                                                                            });
+                                                                            controller.scannedDataStream.listen((scanData) async {
+                                                                              setState(() {
+                                                                                result = scanData;
+                                                                              });
+                                                                            });
+                                                                          },
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            );
-                                                          });
-                                                        });
-                                                  }
-                                                : null
-                                            : joinedval == "Leave"
-                                                ? () {
-                                                    Navigator.pop(context);
-                                                    showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return Dialog(
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
+                                                                      Container(
+                                                                        height: screenheight *
+                                                                            0.1,
+                                                                        width:
+                                                                            screenwidth,
+                                                                        color: Colors
+                                                                            .white,
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap: result == null
+                                                                                ? null
+                                                                                : () async {
+                                                                                    try {
+                                                                                      await validateqr(result!.code);
+                                                                                      setState(() {
+                                                                                        result = null;
+                                                                                        showqrmessage = true;
+                                                                                      });
+                                                                                    } catch (e) {}
+                                                                                  },
+                                                                            child: SizedBox(
+                                                                                height: 50 > screenheight * 0.1 ? screenheight * 0.1 : 50,
+                                                                                width: screenwidth * 0.5,
+                                                                                child: Container(
+                                                                                  decoration: BoxDecoration(color: result == null ? const Color.fromARGB(180, 255, 48, 117) : Theme.of(context).primaryColor, borderRadius: const BorderRadius.all(Radius.circular(20))),
+                                                                                  child: const Center(
+                                                                                      child: Text(
+                                                                                    "Validate",
+                                                                                    style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w800),
+                                                                                  )),
+                                                                                )),
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              });
+                                                            });
+                                                      }
+                                                    : null
+                                                : joinedval == "Leave"
+                                                    ? () {
+                                                        Navigator.pop(context);
+                                                        showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return Dialog(
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
                                                                             10)),
-                                                            backgroundColor:
-                                                                Colors.white,
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .fromLTRB(
-                                                                      10,
-                                                                      10,
-                                                                      10,
-                                                                      10),
-                                                              height:
-                                                                  screenheight *
-                                                                      0.35,
-                                                              decoration: const BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              10))),
-                                                              child: Center(
-                                                                child: CustomPaint(
-                                                                    size: Size.square(
-                                                                        screenwidth *
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                child:
+                                                                    Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .fromLTRB(
+                                                                          10,
+                                                                          10,
+                                                                          10,
+                                                                          10),
+                                                                  height:
+                                                                      screenheight *
+                                                                          0.35,
+                                                                  decoration: const BoxDecoration(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      borderRadius:
+                                                                          BorderRadius.all(
+                                                                              Radius.circular(10))),
+                                                                  child: Center(
+                                                                    child: CustomPaint(
+                                                                        size: Size.square(screenwidth *
                                                                             0.6),
-                                                                    painter: QrPainter(
-                                                                        data:
-                                                                            "${widget.event.docid}/${widget.curruser.uid}",
-                                                                        version:
-                                                                            QrVersions
-                                                                                .auto,
-                                                                        eyeStyle: QrEyeStyle(
-                                                                            color: Colors
-                                                                                .black,
-                                                                            eyeShape: QrEyeShape
-                                                                                .square),
-                                                                        embeddedImageStyle:
-                                                                            QrEmbeddedImageStyle(color: Theme.of(context).primaryColor))),
-                                                              ),
-                                                            ),
-                                                          );
-                                                        });
-                                                  }
-                                                : null,
-                                    child: Container(
-                                      //if finished works, if joined works,
-                                      height: screenheight * 0.1,
-                                      width: screenwidth * 0.4,
-                                      decoration: BoxDecoration(
-                                          color: joinedval == "Finished" ||
-                                                  joinedval == "Leave"
-                                              ? Theme.of(context).primaryColor
-                                              : const Color.fromARGB(
-                                                  180, 255, 48, 117),
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(20))),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.qr_code,
-                                            color: Colors.white,
-                                            size: 30,
+                                                                        painter: QrPainter(
+                                                                            data:
+                                                                                "${widget.event.docid}/${widget.curruser.uid}",
+                                                                            version:
+                                                                                QrVersions.auto,
+                                                                            eyeStyle: QrEyeStyle(color: Colors.black, eyeShape: QrEyeShape.square),
+                                                                            embeddedImageStyle: QrEmbeddedImageStyle(color: Theme.of(context).primaryColor))),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            });
+                                                      }
+                                                    : null,
+                                        child: Container(
+                                          //if finished works, if joined works,
+                                          height: screenheight * 0.1,
+                                          width: screenwidth * 0.4,
+                                          decoration: BoxDecoration(
+                                              color: joinedval == "Finished" ||
+                                                      joinedval == "Leave"
+                                                  ? Theme.of(context)
+                                                      .primaryColor
+                                                  : const Color.fromARGB(
+                                                      180, 255, 48, 117),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(20))),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.qr_code,
+                                                color: Colors.white,
+                                                size: 30,
+                                              ),
+                                              SizedBox(
+                                                height: screenheight * 0.01,
+                                              ),
+                                              Text(
+                                                widget.curruser.uid ==
+                                                        widget.event.hostdocid
+                                                    ? "Scan QR"
+                                                    : "Show QR",
+                                                style: const TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.white),
+                                                textScaleFactor: 1.0,
+                                              )
+                                            ],
                                           ),
-                                          SizedBox(
-                                            height: screenheight * 0.01,
-                                          ),
-                                          Text(
-                                            widget.curruser.uid ==
-                                                    widget.event.hostdocid
-                                                ? "Scan QR"
-                                                : "Show QR",
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
-                                            textScaleFactor: 1.0,
-                                          )
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    ],
+                                  )
                                 ],
-                              )
-                            ],
-                          ),
-                        ));
+                              ),
+                            ));
+                      },
+                    );
                   });
             },
             child: const Padding(
