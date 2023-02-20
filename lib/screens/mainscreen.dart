@@ -167,9 +167,7 @@ class _MainScreenState extends State<MainScreen> {
         for (String x in chosenEvent.participants) await db.getUserFromUID(x)
       ];
       godeeplinkeventdetailscreen(chosenEvent, participants);
-    } catch (e) {
-      displayErrorSnackBar("Invalid Event Link");
-    }
+    } catch (e) {}
   }
 
   Future<void> setupInteractedMessage() async {
