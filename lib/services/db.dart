@@ -511,7 +511,6 @@ class db_conn {
       await uploadUserPFP(filePath, uid);
       String photoUrl = await downloadUserPFPURL(uid);
       DocumentSnapshot documentSnapshot = await users.doc(uid).get();
-      print("here");
       await users.doc(uid).update({'pfp_url': photoUrl});
       List chatlist = documentSnapshot['chats'];
       for (int i = 0; i < chatlist.length; i++) {

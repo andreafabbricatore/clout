@@ -581,6 +581,8 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                                           (p0,
                                                                               permission) {
                                                                         if (!permission) {
+                                                                          Navigator.pop(
+                                                                              context);
                                                                           displayErrorSnackBar(
                                                                               "Could not open camera, please ensure Clout has access to camera");
                                                                         }
@@ -654,75 +656,72 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                         });
                                                   }
                                                 : null
-                                            : () {
-                                                Navigator.pop(context);
-                                                showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Dialog(
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10)),
-                                                        backgroundColor:
-                                                            Colors.white,
-                                                        child: Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  10,
-                                                                  10,
-                                                                  10,
-                                                                  10),
-                                                          height: screenheight *
-                                                              0.35,
-                                                          decoration: const BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius: BorderRadius
-                                                                  .all(Radius
-                                                                      .circular(
-                                                                          10))),
-                                                          child: Center(
-                                                            child: CustomPaint(
-                                                                size: Size.square(
-                                                                    screenwidth *
-                                                                        0.6),
-                                                                painter: QrPainter(
-                                                                    data:
-                                                                        "${widget.event.docid}/${widget.curruser.uid}",
-                                                                    version:
-                                                                        QrVersions
-                                                                            .auto,
-                                                                    eyeStyle: QrEyeStyle(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        eyeShape:
-                                                                            QrEyeShape
+                                            : joinedval == "Leave"
+                                                ? () {
+                                                    Navigator.pop(context);
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Dialog(
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            child: Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      10,
+                                                                      10,
+                                                                      10,
+                                                                      10),
+                                                              height:
+                                                                  screenheight *
+                                                                      0.35,
+                                                              decoration: const BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              10))),
+                                                              child: Center(
+                                                                child: CustomPaint(
+                                                                    size: Size.square(
+                                                                        screenwidth *
+                                                                            0.6),
+                                                                    painter: QrPainter(
+                                                                        data:
+                                                                            "${widget.event.docid}/${widget.curruser.uid}",
+                                                                        version:
+                                                                            QrVersions
+                                                                                .auto,
+                                                                        eyeStyle: QrEyeStyle(
+                                                                            color: Colors
+                                                                                .black,
+                                                                            eyeShape: QrEyeShape
                                                                                 .square),
-                                                                    embeddedImageStyle:
-                                                                        QrEmbeddedImageStyle(
-                                                                            color:
-                                                                                Theme.of(context).primaryColor))),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    });
-                                              },
+                                                                        embeddedImageStyle:
+                                                                            QrEmbeddedImageStyle(color: Theme.of(context).primaryColor))),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        });
+                                                  }
+                                                : null,
                                     child: Container(
                                       height: screenheight * 0.1,
                                       width: screenwidth * 0.4,
                                       decoration: BoxDecoration(
-                                          color: joinedval == "Finished"
+                                          color: joinedval == "Finished" ||
+                                                  joinedval == "Leave"
                                               ? Theme.of(context).primaryColor
-                                              : widget.curruser.uid ==
-                                                      widget.event.hostdocid
-                                                  ? const Color.fromARGB(
-                                                      180, 255, 48, 117)
-                                                  : Theme.of(context)
-                                                      .primaryColor,
+                                              : const Color.fromARGB(
+                                                  180, 255, 48, 117),
                                           borderRadius: const BorderRadius.all(
                                               Radius.circular(20))),
                                       child: Column(

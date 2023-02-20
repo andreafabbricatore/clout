@@ -491,7 +491,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               height: screenwidth * 0.13,
               width: screenwidth * 0.6,
               decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.black)),
+                  border: Border.all(width: 1, color: Colors.black),
+                  borderRadius: BorderRadius.circular(20)),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [

@@ -1278,10 +1278,11 @@ class _MiscScreenState extends State<MiscScreen> {
             SizedBox(
               width: screenwidth * 0.6,
               child: DropdownButtonFormField(
+                borderRadius: BorderRadius.circular(20),
                 decoration: InputDecoration(
                     focusedBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor))),
+                  borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                )),
                 value: nationality,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -1339,7 +1340,8 @@ class _MiscScreenState extends State<MiscScreen> {
                 height: screenwidth * 0.13,
                 width: screenwidth * 0.6,
                 decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: Colors.black)),
+                    border: Border.all(width: 1, color: Colors.black),
+                    borderRadius: BorderRadius.circular(20)),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Text(
