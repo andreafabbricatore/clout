@@ -522,9 +522,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                           deletebuttonpressed =
                                                               true;
                                                         });
-                                                        await db.deleteevent(
-                                                            widget.event,
-                                                            widget.curruser);
+                                                        await db
+                                                            .deletefutureevent(
+                                                                widget.event,
+                                                                widget
+                                                                    .curruser);
                                                         setState(() {
                                                           deletebuttonpressed =
                                                               false;

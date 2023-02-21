@@ -482,6 +482,52 @@ class db_conn {
     }
   }
 
+  Future deletefutureevent(Event event, AppUser host) async {
+    try {
+      DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
+      List participants = eventSnapshot['participants'];
+      for (String x in participants) {
+        if (x == host.uid) {
+          int decrease = 5 * (event.presentparticipants.length - 1) + 20;
+          users.doc(x).set({
+            'hosted_events': FieldValue.arrayRemove([event.docid]),
+            'chats': FieldValue.arrayRemove([event.chatid]),
+            'visiblechats': FieldValue.arrayRemove([event.chatid]),
+            'clout': FieldValue.increment(-decrease),
+          }, SetOptions(merge: true));
+        } else {
+          if (event.presentparticipants.contains(x)) {
+            users.doc(x).set(
+                {'clout': FieldValue.increment(-10)}, SetOptions(merge: true));
+          }
+        }
+        users.doc(x).set({
+          'joined_events': FieldValue.arrayRemove(
+            [event.docid],
+          )
+        }, SetOptions(merge: true));
+      }
+      if (eventSnapshot['custom_image']) {
+        await FirebaseStorage.instance
+            .ref('/event_thumbnails/${event.docid}.jpg')
+            .delete();
+      } else {}
+      final instance = FirebaseFirestore.instance;
+      final batch = instance.batch();
+      var collection =
+          instance.collection('chats').doc(event.chatid).collection('messages');
+      var snapshots = await collection.get();
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      await deletechat(event.chatid);
+      await events.doc(event.docid).delete();
+    } catch (e) {
+      throw Exception("Could not delete event");
+    }
+  }
+
   Future<void> deletechat(String chatid) async {
     try {
       DocumentSnapshot chat = await chats.doc(chatid).get();
@@ -1175,8 +1221,10 @@ class db_conn {
 
   Future<List<AppUser>> getAllUsersRankedByCloutScore() async {
     try {
-      QuerySnapshot querySnapshot =
-          await users.orderBy('clout', descending: true).get();
+      QuerySnapshot querySnapshot = await users
+          .orderBy('clout', descending: true)
+          .where("setinterests", isNotEqualTo: false)
+          .get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
         print(element.id);

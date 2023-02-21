@@ -473,9 +473,11 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                           deletebuttonpressed =
                                                               true;
                                                         });
-                                                        await db.deleteevent(
-                                                            widget.event,
-                                                            widget.curruser);
+                                                        await db
+                                                            .deletefutureevent(
+                                                                widget.event,
+                                                                widget
+                                                                    .curruser);
                                                         setState(() {
                                                           deletebuttonpressed =
                                                               false;

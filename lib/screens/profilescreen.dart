@@ -206,6 +206,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> followunfollow() async {
+    await updatecurruser();
+    widget.curruser.following.contains(widget.user.uid) ? unfollow : follow;
+  }
+
   Future interactfav(Event event) async {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
@@ -380,9 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 followerscreen: followerscreen,
                 followingscreen: followingscreen,
                 cloutscreen: cloutscreen,
-                follow: widget.curruser.following.contains(widget.user.uid)
-                    ? unfollow
-                    : follow,
+                follow: followunfollow,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
