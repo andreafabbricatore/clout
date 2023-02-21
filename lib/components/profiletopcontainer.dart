@@ -16,7 +16,7 @@ class ProfileTopContainer extends StatefulWidget {
   AppUser user;
   AppUser curruser;
   bool iscurruser;
-  final VoidCallback follow;
+  final Function() follow;
   final VoidCallback editprofile;
   final VoidCallback followerscreen;
   final VoidCallback followingscreen;
@@ -164,11 +164,11 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                       : GestureDetector(
                           onTap: buttonpressed
                               ? null
-                              : () {
+                              : () async {
                                   setState(() {
                                     buttonpressed = true;
                                   });
-                                  widget.follow();
+                                  await widget.follow();
                                   setState(() {
                                     buttonpressed = false;
                                   });

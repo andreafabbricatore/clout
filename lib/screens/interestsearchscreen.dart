@@ -1,5 +1,6 @@
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
+import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
@@ -155,79 +156,30 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
         onRefresh: refresh,
         color: Theme.of(context).primaryColor,
         child: Padding(
-          padding: EdgeInsets.all(screenheight * 0.02),
-          child: widget.events.isNotEmpty
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EventListView(
-                      isHorizontal: false,
-                      eventList: widget.events,
-                      onTap: navigate,
-                      scrollable: true,
-                      leftpadding: false,
-                      curruser: widget.curruser,
-                      interactfav: interactfav,
-                      screenheight: screenheight,
-                      screenwidth: screenwidth,
-                    )
-                  ],
-                )
-              : SizedBox(
-                  width: screenwidth,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+            padding: EdgeInsets.all(screenheight * 0.02),
+            child: widget.events.isNotEmpty
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: screenheight * 0.1,
-                      ),
-                      const Text(
-                        "No Events Yet :(",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 20,
-                        ),
-                        textScaleFactor: 1.0,
-                      ),
-                      SizedBox(
-                        height: screenheight * 0.03,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  CreateEventScreen(
-                                curruser: widget.curruser,
-                                allowbackarrow: true,
-                                startinterest: widget.interest,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          height: screenwidth * 0.13,
-                          width: screenwidth * 0.6,
-                          decoration: BoxDecoration(
-                              border:
-                                  Border.all(width: 1, color: Colors.black)),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  "Create Event",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ]),
-                        ),
-                      ),
+                      EventListView(
+                        isHorizontal: false,
+                        eventList: widget.events,
+                        onTap: navigate,
+                        scrollable: true,
+                        leftpadding: false,
+                        curruser: widget.curruser,
+                        interactfav: interactfav,
+                        screenheight: screenheight,
+                        screenwidth: screenwidth,
+                      )
                     ],
-                  ),
-                ),
-        ),
+                  )
+                : Center(
+                    child: noEventsBox(
+                        screenheight: screenheight,
+                        curruser: widget.curruser,
+                        screenwidth: screenwidth),
+                  )),
       ),
     );
   }

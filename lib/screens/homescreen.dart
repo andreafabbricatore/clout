@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
+import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
@@ -307,24 +308,23 @@ class _HomeScreenState extends State<HomeScreen> {
         onRefresh: refresh,
         color: Theme.of(context).primaryColor,
         child: Padding(
-          padding: EdgeInsets.all(screenheight * 0.02),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              EventListView(
-                isHorizontal: false,
-                eventList: totaleventlist,
-                onTap: navigate,
-                scrollable: true,
-                leftpadding: false,
-                curruser: widget.curruser,
-                interactfav: interactfav,
-                screenheight: screenheight,
-                screenwidth: screenwidth,
-              )
-            ],
-          ),
-        ),
+            padding: EdgeInsets.all(screenheight * 0.02),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EventListView(
+                  isHorizontal: false,
+                  eventList: totaleventlist,
+                  onTap: navigate,
+                  scrollable: true,
+                  leftpadding: false,
+                  curruser: widget.curruser,
+                  interactfav: interactfav,
+                  screenheight: screenheight,
+                  screenwidth: screenwidth,
+                )
+              ],
+            )),
       ),
     );
   }

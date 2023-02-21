@@ -1222,18 +1222,17 @@ class db_conn {
   Future<List<AppUser>> getAllUsersRankedByCloutScore() async {
     try {
       QuerySnapshot querySnapshot = await users
-          .orderBy('clout', descending: true)
           .where("setinterests", isNotEqualTo: false)
+          .orderBy("setinterests")
+          .orderBy('clout', descending: true)
           .get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
-        print(element.id);
         usersearches.add(AppUser.fromJson(element.data(), element.id));
       });
 
       return usersearches;
     } catch (e) {
-      print(e);
       throw Exception("Could not search for users");
     }
   }

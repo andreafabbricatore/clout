@@ -188,27 +188,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 )));
   }
 
-  Future<void> follow() async {
-    try {
-      await db.follow(widget.curruser.uid, widget.user.uid);
-      refresh();
-    } catch (e) {
-      displayErrorSnackBar("Could not follow @${widget.user.username}");
-    }
-  }
-
-  Future<void> unfollow() async {
-    try {
-      await db.unFollow(widget.curruser.uid, widget.user.uid);
-      refresh();
-    } catch (e) {
-      displayErrorSnackBar("Could not unfollow @${widget.user.username}");
-    }
-  }
-
   Future<void> followunfollow() async {
-    await updatecurruser();
-    widget.curruser.following.contains(widget.user.uid) ? unfollow : follow;
+    try {
+      //await updatecurruser();
+      if (widget.curruser.following.contains(widget.user.uid)) {
+        await db.unFollow(widget.curruser.uid, widget.user.uid);
+      } else {
+        await db.follow(widget.curruser.uid, widget.user.uid);
+      }
+    } catch (e) {
+      displayErrorSnackBar("Could not complete action");
+    } finally {
+      refresh();
+    }
   }
 
   Future interactfav(Event event) async {
