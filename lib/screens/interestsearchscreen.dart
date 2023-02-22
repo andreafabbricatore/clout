@@ -15,12 +15,12 @@ class InterestSearchScreen extends StatefulWidget {
       required this.interest,
       required this.events,
       required this.curruser,
-      required this.userlocation})
+      required this.curruserlocation})
       : super(key: key);
   String interest;
   List<Event> events;
   AppUser curruser;
-  AppLocation userlocation;
+  AppLocation curruserlocation;
   @override
   State<InterestSearchScreen> createState() => _InterestSearchScreenState();
 }
@@ -75,10 +75,10 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
     try {
       List<Event> interesteventlist = [];
       interesteventlist = await db.getLngLatEventsByInterest(
-          widget.userlocation.center[0],
-          widget.userlocation.center[1],
+          widget.curruserlocation.center[0],
+          widget.curruserlocation.center[1],
           widget.interest,
-          widget.userlocation.country,
+          widget.curruserlocation.country,
           widget.curruser);
 
       setState(() {
@@ -116,6 +116,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,
+                      curruserlocation: widget.curruserlocation,
                     )));
       } catch (e) {
         displayErrorSnackBar("Could not display event");

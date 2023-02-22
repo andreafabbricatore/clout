@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/chatroomscreen.dart';
 import 'package:clout/screens/editeventscreen.dart';
+import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
@@ -20,15 +22,16 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class DeepLinkEventDetailScreen extends StatefulWidget {
-  DeepLinkEventDetailScreen({
-    super.key,
-    required this.event,
-    required this.curruser,
-    required this.participants,
-  });
+  DeepLinkEventDetailScreen(
+      {super.key,
+      required this.event,
+      required this.curruser,
+      required this.participants,
+      required this.curruserlocation});
   Event event;
   AppUser curruser;
   List<AppUser> participants;
+  AppLocation curruserlocation;
   @override
   State<DeepLinkEventDetailScreen> createState() =>
       _DeepLinkEventDetailScreenState();
@@ -238,6 +241,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
             builder: (_) => ChatRoomScreen(
                   chatinfo: chat,
                   curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
                 )));
     updatescreen(widget.event.docid);
   }
@@ -272,6 +276,18 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     }
   }
 
+  void gotointerestsearchscreen(
+      String interest, List<Event> interesteventlist) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => InterestSearchScreen(
+                interest: interest,
+                events: interesteventlist,
+                curruser: widget.curruser,
+                curruserlocation: widget.curruserlocation)));
+  }
+
   @override
   void initState() {
     checkifjoined();
@@ -304,6 +320,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
+                    curruserlocation: widget.curruserlocation,
                   )));
     }
 
@@ -820,12 +837,29 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.event.interest,
-                style: TextStyle(
-                    fontSize: 25,
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold),
+              GestureDetector(
+                onTap: () async {
+                  try {
+                    List<Event> interesteventlist = [];
+                    interesteventlist = await db.getLngLatEventsByInterest(
+                        widget.curruserlocation.center[0],
+                        widget.curruserlocation.center[1],
+                        widget.event.interest,
+                        widget.curruserlocation.country,
+                        widget.curruser);
+                    gotointerestsearchscreen(
+                        widget.event.interest, interesteventlist);
+                  } catch (e) {
+                    displayErrorSnackBar("Could not go to interest screen");
+                  }
+                },
+                child: Text(
+                  widget.event.interest,
+                  style: TextStyle(
+                      fontSize: 25,
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
               InkWell(
                 onTap: () async {

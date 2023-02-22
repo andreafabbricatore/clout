@@ -1,4 +1,5 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/notificationslistview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/notification.dart';
@@ -9,8 +10,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatefulWidget {
-  NotificationScreen({Key? key, required this.curruser}) : super(key: key);
+  NotificationScreen(
+      {Key? key, required this.curruser, required this.curruserlocation})
+      : super(key: key);
   AppUser curruser;
+  AppLocation curruserlocation;
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
 }
@@ -63,6 +67,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   user: user,
                   curruser: widget.curruser,
                   visit: true,
+                  curruserlocation: widget.curruserlocation,
                 )));
   }
 
@@ -121,6 +126,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,
+                      curruserlocation: widget.curruserlocation,
                     )));
       } catch (e) {
         displayErrorSnackBar("Could not display event");

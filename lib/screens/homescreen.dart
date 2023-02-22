@@ -16,12 +16,12 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatefulWidget {
   bool justloaded;
   AppUser curruser;
-  AppLocation userlocation;
+  AppLocation curruserlocation;
   HomeScreen(
       {Key? key,
       required this.justloaded,
       required this.curruser,
-      required this.userlocation})
+      required this.curruserlocation})
       : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -74,9 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
       generaleventlist = [];
       List<Event> currloceventlist = [];
       currloceventlist = await db.getLngLatEvents(
-          widget.userlocation.center[0],
-          widget.userlocation.center[1],
-          widget.userlocation.country,
+          widget.curruserlocation.center[0],
+          widget.curruserlocation.center[1],
+          widget.curruserlocation.country,
           widget.curruser);
       for (int i = 0; i < currloceventlist.length; i++) {
         if (widget.curruser.interests.contains(currloceventlist[i].interest)) {
@@ -181,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,
+                      curruserlocation: widget.curruserlocation,
                     )));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
@@ -211,8 +212,10 @@ class _HomeScreenState extends State<HomeScreen> {
               await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) =>
-                          NotificationScreen(curruser: widget.curruser)));
+                      builder: (_) => NotificationScreen(
+                            curruser: widget.curruser,
+                            curruserlocation: widget.curruserlocation,
+                          )));
               refresh();
             },
             child: Padding(
@@ -259,8 +262,10 @@ class _HomeScreenState extends State<HomeScreen> {
               await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) =>
-                          ChatListScreen(curruser: widget.curruser)));
+                      builder: (_) => ChatListScreen(
+                            curruser: widget.curruser,
+                            curruserlocation: widget.curruserlocation,
+                          )));
               refresh();
             },
             child: Padding(

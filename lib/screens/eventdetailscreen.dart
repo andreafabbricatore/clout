@@ -3,11 +3,13 @@ import 'dart:io';
 
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/chatroomscreen.dart';
 import 'package:clout/screens/editeventscreen.dart';
+import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
 
@@ -29,11 +31,13 @@ class EventDetailScreen extends StatefulWidget {
       required this.event,
       required this.curruser,
       required this.participants,
-      required this.interactfav});
+      required this.interactfav,
+      required this.curruserlocation});
   Event event;
   AppUser curruser;
   List<AppUser> participants;
   final Function(Event event) interactfav;
+  AppLocation curruserlocation;
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
 }
@@ -116,6 +120,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             builder: (_) => ChatRoomScreen(
                   chatinfo: chat,
                   curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
                 )));
     updatescreen(widget.event.docid);
   }
@@ -263,6 +268,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  void gotointerestsearchscreen(
+      String interest, List<Event> interesteventlist) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => InterestSearchScreen(
+                interest: interest,
+                events: interesteventlist,
+                curruser: widget.curruser,
+                curruserlocation: widget.curruserlocation)));
+  }
+
   Future<String> createShareLink() async {
     final dynamicLinkParams = DynamicLinkParameters(
       link: Uri.parse("https://outwithclout.com/${widget.event.docid}"),
@@ -305,6 +322,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
+                    curruserlocation: widget.curruserlocation,
                   )));
     }
 
@@ -870,12 +888,29 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.event.interest,
-                style: TextStyle(
-                    fontSize: 25,
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold),
+              GestureDetector(
+                onTap: () async {
+                  try {
+                    List<Event> interesteventlist = [];
+                    interesteventlist = await db.getLngLatEventsByInterest(
+                        widget.curruserlocation.center[0],
+                        widget.curruserlocation.center[1],
+                        widget.event.interest,
+                        widget.curruserlocation.country,
+                        widget.curruser);
+                    gotointerestsearchscreen(
+                        widget.event.interest, interesteventlist);
+                  } catch (e) {
+                    displayErrorSnackBar("Could not go to interest screen");
+                  }
+                },
+                child: Text(
+                  widget.event.interest,
+                  style: TextStyle(
+                      fontSize: 25,
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
               InkWell(
                 onTap: () async {

@@ -1,4 +1,5 @@
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/profiletopcontainer.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/cloutscorescreen.dart';
@@ -18,11 +19,13 @@ class ProfileScreen extends StatefulWidget {
   AppUser curruser;
   bool visit;
   bool iscurruser = false;
+  AppLocation curruserlocation;
   ProfileScreen({
     super.key,
     required this.user,
     required this.curruser,
     required this.visit,
+    required this.curruserlocation,
     iscurruser,
   });
 
@@ -162,6 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   curruser: widget.curruser,
                   iscurruser: widget.iscurruser,
                   onfollowers: true,
+                  curruserlocation: widget.curruserlocation,
                 )));
     refresh();
   }
@@ -175,6 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   curruser: widget.curruser,
                   iscurruser: widget.iscurruser,
                   onfollowers: false,
+                  curruserlocation: widget.curruserlocation,
                 )));
     refresh();
   }
@@ -185,6 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         CupertinoPageRoute(
             builder: (_) => CloutScoreScreen(
                   curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
                 )));
   }
 
@@ -248,6 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,
+                      curruserlocation: widget.curruserlocation,
                     )));
       } catch (e) {
         displayErrorSnackBar("Could not display event");

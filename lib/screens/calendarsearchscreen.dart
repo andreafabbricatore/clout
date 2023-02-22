@@ -11,10 +11,10 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class CalendarSearchScreen extends StatefulWidget {
-  AppLocation userlocation;
+  AppLocation curruserlocation;
   AppUser curruser;
   CalendarSearchScreen(
-      {Key? key, required this.userlocation, required this.curruser})
+      {Key? key, required this.curruserlocation, required this.curruser})
       : super(key: key);
 
   @override
@@ -85,10 +85,10 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
     List<Event> res = [];
     filteredEventList = [];
     res = await db.getLngLatEventsFilteredByDate(
-        widget.userlocation.center[0],
-        widget.userlocation.center[1],
+        widget.curruserlocation.center[0],
+        widget.curruserlocation.center[1],
         selectedDate,
-        widget.userlocation.country,
+        widget.curruserlocation.country,
         widget.curruser);
     for (int i = 0; i < res.length; i++) {
       if (widget.curruser.following.contains(res[i].hostdocid)) {
@@ -134,6 +134,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,
+                      curruserlocation: widget.curruserlocation,
                     )));
       } catch (e) {
         displayErrorSnackBar("Could not display event");

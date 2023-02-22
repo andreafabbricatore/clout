@@ -1,5 +1,6 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,9 @@ import 'eventdetailscreen.dart';
 
 class FavScreen extends StatefulWidget {
   AppUser curruser;
-  FavScreen({Key? key, required this.curruser}) : super(key: key);
+  AppLocation curruserlocation;
+  FavScreen({Key? key, required this.curruser, required this.curruserlocation})
+      : super(key: key);
 
   @override
   State<FavScreen> createState() => _FavScreenState();
@@ -101,6 +104,7 @@ class _FavScreenState extends State<FavScreen> {
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,
+                      curruserlocation: widget.curruserlocation,
                     )));
       } catch (e) {
         displayErrorSnackBar("Could not display event");

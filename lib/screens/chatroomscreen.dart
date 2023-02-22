@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/chatbubble.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/profilescreen.dart';
@@ -11,10 +12,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ChatRoomScreen extends StatefulWidget {
-  ChatRoomScreen({Key? key, required this.chatinfo, required this.curruser})
+  ChatRoomScreen(
+      {Key? key,
+      required this.chatinfo,
+      required this.curruser,
+      required this.curruserlocation})
       : super(key: key);
   Chat chatinfo;
   AppUser curruser;
+  AppLocation curruserlocation;
   @override
   State<ChatRoomScreen> createState() => _ChatRoomScreenState();
 }
@@ -93,6 +99,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   user: otheruser,
                   curruser: widget.curruser,
                   visit: true,
+                  curruserlocation: widget.curruserlocation,
                 )));
   }
 
@@ -127,6 +134,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                             curruser: widget.curruser,
                             participants: participants,
                             interactfav: interactfav,
+                            curruserlocation: widget.curruserlocation,
                           )));
             }
           },

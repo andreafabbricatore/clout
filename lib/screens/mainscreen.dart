@@ -22,12 +22,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class MainScreen extends StatefulWidget {
   AppUser curruser;
-  AppLocation userlocation;
+  AppLocation curruserlocation;
   bool justloaded;
   MainScreen(
       {Key? key,
       required this.curruser,
-      required this.userlocation,
+      required this.curruserlocation,
       required this.justloaded})
       : super(key: key);
   @override
@@ -64,11 +64,11 @@ class _MainScreenState extends State<MainScreen> {
     page = [
       HomeScreen(
         curruser: widget.curruser,
-        userlocation: widget.userlocation,
+        curruserlocation: widget.curruserlocation,
         justloaded: widget.justloaded,
       ),
       SearchScreen(
-          curruser: widget.curruser, userlocation: widget.userlocation),
+          curruser: widget.curruser, curruserlocation: widget.curruserlocation),
       CreateEventScreen(
         curruser: widget.curruser,
         allowbackarrow: false,
@@ -76,11 +76,13 @@ class _MainScreenState extends State<MainScreen> {
       ),
       FavScreen(
         curruser: widget.curruser,
+        curruserlocation: widget.curruserlocation,
       ),
       ProfileScreen(
         user: widget.curruser,
         curruser: widget.curruser,
         visit: false,
+        curruserlocation: widget.curruserlocation,
       )
     ];
   }
@@ -132,6 +134,7 @@ class _MainScreenState extends State<MainScreen> {
                   event: chosenEvent,
                   curruser: widget.curruser,
                   participants: participants,
+                  curruserlocation: widget.curruserlocation,
                 )));
   }
 
@@ -139,8 +142,11 @@ class _MainScreenState extends State<MainScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (_) =>
-                ChatRoomScreen(chatinfo: chat, curruser: widget.curruser)));
+            builder: (_) => ChatRoomScreen(
+                  chatinfo: chat,
+                  curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
+                )));
   }
 
   void gotoprofilescreen(AppUser user) {
@@ -151,6 +157,7 @@ class _MainScreenState extends State<MainScreen> {
                   user: user,
                   curruser: widget.curruser,
                   visit: true,
+                  curruserlocation: widget.curruserlocation,
                 )));
   }
 

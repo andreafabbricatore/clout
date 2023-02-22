@@ -1,5 +1,6 @@
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/chatlistview.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/chatroomscreen.dart';
@@ -8,8 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatListScreen extends StatefulWidget {
-  ChatListScreen({super.key, required this.curruser});
+  ChatListScreen(
+      {super.key, required this.curruser, required this.curruserlocation});
   AppUser curruser;
+  AppLocation curruserlocation;
   @override
   State<ChatListScreen> createState() => _ChatListScreenState();
 }
@@ -81,6 +84,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               builder: (_) => ChatRoomScreen(
                     chatinfo: chat,
                     curruser: widget.curruser,
+                    curruserlocation: widget.curruserlocation,
                   )));
       refresh();
     }
@@ -100,6 +104,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               builder: (_) => ChatRoomScreen(
                     chatinfo: userchat,
                     curruser: widget.curruser,
+                    curruserlocation: widget.curruserlocation,
                   )));
       setState(() {
         searching = false;

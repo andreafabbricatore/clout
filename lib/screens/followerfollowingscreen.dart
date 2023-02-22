@@ -1,3 +1,4 @@
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/profilescreen.dart';
@@ -11,12 +12,14 @@ class FollowerFollowingScreen extends StatefulWidget {
       required this.user,
       required this.iscurruser,
       required this.curruser,
-      required this.onfollowers})
+      required this.onfollowers,
+      required this.curruserlocation})
       : super(key: key);
   AppUser user;
   AppUser curruser;
   bool iscurruser;
   bool onfollowers;
+  AppLocation curruserlocation;
 
   @override
   State<FollowerFollowingScreen> createState() =>
@@ -93,6 +96,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
+                    curruserlocation: widget.curruserlocation,
                   )));
     }
 

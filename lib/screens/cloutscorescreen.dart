@@ -1,3 +1,4 @@
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/profilescreen.dart';
@@ -6,8 +7,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CloutScoreScreen extends StatefulWidget {
-  CloutScoreScreen({Key? key, required this.curruser}) : super(key: key);
+  CloutScoreScreen(
+      {Key? key, required this.curruser, required this.curruserlocation})
+      : super(key: key);
   AppUser curruser;
+  AppLocation curruserlocation;
 
   @override
   State<CloutScoreScreen> createState() => _CloutScoreScreenState();
@@ -65,6 +69,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                     user: user,
                     curruser: widget.curruser,
                     visit: true,
+                    curruserlocation: widget.curruserlocation,
                   )));
     }
 

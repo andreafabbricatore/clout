@@ -1,5 +1,6 @@
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
@@ -15,12 +16,14 @@ class SearchBarListView extends StatefulWidget {
       required this.eventres,
       required this.userres,
       required this.curruser,
-      required this.query});
+      required this.query,
+      required this.curruserlocation});
   bool searchevents;
   List<Event> eventres;
   List<AppUser> userres;
   AppUser curruser;
   String query;
+  AppLocation curruserlocation;
   @override
   State<SearchBarListView> createState() => _SearchBarListViewState();
 }
@@ -119,6 +122,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
                       curruser: widget.curruser,
                       participants: participants,
                       interactfav: interactfav,
+                      curruserlocation: widget.curruserlocation,
                     )));
       } catch (e) {
         displayErrorSnackBar("Could not refresh");
@@ -131,10 +135,10 @@ class _SearchBarListViewState extends State<SearchBarListView> {
           context,
           CupertinoPageRoute(
               builder: (_) => ProfileScreen(
-                    user: user,
-                    curruser: widget.curruser,
-                    visit: true,
-                  )));
+                  user: user,
+                  curruser: widget.curruser,
+                  visit: true,
+                  curruserlocation: widget.curruserlocation)));
     }
 
     return widget.searchevents

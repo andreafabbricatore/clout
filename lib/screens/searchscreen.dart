@@ -9,9 +9,10 @@ import 'package:flutter/material.dart';
 import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({super.key, required this.curruser, required this.userlocation});
+  SearchScreen(
+      {super.key, required this.curruser, required this.curruserlocation});
   AppUser curruser;
-  AppLocation userlocation;
+  AppLocation curruserlocation;
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
@@ -79,7 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 interest: interest,
                 events: interesteventlist,
                 curruser: widget.curruser,
-                userlocation: widget.userlocation)));
+                curruserlocation: widget.curruserlocation)));
   }
 
   @override
@@ -99,10 +100,10 @@ class _SearchScreenState extends State<SearchScreen> {
       try {
         List<Event> interesteventlist = [];
         interesteventlist = await db.getLngLatEventsByInterest(
-            widget.userlocation.center[0],
-            widget.userlocation.center[1],
+            widget.curruserlocation.center[0],
+            widget.curruserlocation.center[1],
             interest,
-            widget.userlocation.country,
+            widget.curruserlocation.country,
             widget.curruser);
         gotointerestsearchscreen(interest, interesteventlist);
         //print(interesteventlist);
@@ -199,7 +200,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (_) => CalendarSearchScreen(
-                                        userlocation: widget.userlocation,
+                                        curruserlocation:
+                                            widget.curruserlocation,
                                         curruser: widget.curruser,
                                       )));
                         },
@@ -298,6 +300,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   userres: searchedusers,
                   curruser: widget.curruser,
                   query: searchcontroller.text,
+                  curruserlocation: widget.curruserlocation,
                 )
               : SearchGridView(
                   interests: interests,
