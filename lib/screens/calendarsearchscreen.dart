@@ -224,7 +224,9 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                   : noEventsBox(
                       screenheight: screenheight,
                       curruser: widget.curruser,
-                      screenwidth: screenwidth)
+                      screenwidth: screenwidth,
+                      interest: "Sports",
+                    )
         ]),
       ),
     );

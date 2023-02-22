@@ -3,12 +3,13 @@ import 'package:clout/screens/createeventscreen.dart';
 import 'package:flutter/material.dart';
 
 class noEventsBox extends StatelessWidget {
-  noEventsBox({
-    super.key,
-    required this.screenheight,
-    required this.curruser,
-    required this.screenwidth,
-  });
+  noEventsBox(
+      {super.key,
+      required this.screenheight,
+      required this.curruser,
+      required this.screenwidth,
+      required this.interest});
+  String interest;
   AppUser curruser;
   final double screenheight;
   final double screenwidth;
@@ -39,7 +40,7 @@ class noEventsBox extends StatelessWidget {
                 builder: (BuildContext context) => CreateEventScreen(
                   curruser: curruser,
                   allowbackarrow: true,
-                  startinterest: "Sports",
+                  startinterest: interest,
                 ),
               ),
             );

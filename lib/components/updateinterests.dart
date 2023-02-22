@@ -22,7 +22,13 @@ class _UpdateInterestsState extends State<UpdateInterests> {
     "Singing",
     "Drinking",
     "Food",
-    "Art"
+    "Art",
+    "Animals",
+    "Fashion",
+    "Cooking",
+    "Culture",
+    "Travel",
+    "Games"
   ];
   Widget _listviewitem(String interest) {
     Widget thiswidget = Container(

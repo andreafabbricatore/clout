@@ -28,7 +28,13 @@ class _SearchScreenState extends State<SearchScreen> {
     "Singing",
     "Drinking",
     "Food",
-    "Art"
+    "Art",
+    "Animals",
+    "Fashion",
+    "Cooking",
+    "Culture",
+    "Travel",
+    "Games"
   ];
 
   Future<void> updatecurruser() async {

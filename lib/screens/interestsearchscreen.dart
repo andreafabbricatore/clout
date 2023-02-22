@@ -176,9 +176,11 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                   )
                 : Center(
                     child: noEventsBox(
-                        screenheight: screenheight,
-                        curruser: widget.curruser,
-                        screenwidth: screenwidth),
+                      screenheight: screenheight,
+                      curruser: widget.curruser,
+                      screenwidth: screenwidth,
+                      interest: widget.interest,
+                    ),
                   )),
       ),
     );

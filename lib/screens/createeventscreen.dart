@@ -63,7 +63,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     "Singing",
     "Drinking",
     "Food",
-    "Art"
+    "Art",
+    "Animals",
+    "Fashion",
+    "Cooking",
+    "Culture",
+    "Travel",
+    "Games"
   ];
 
   db_conn db = db_conn();
@@ -294,10 +300,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
+              borderRadius: BorderRadius.circular(20),
               decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor))),
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              )),
               value: selectedinterest,
               onChanged: (String? newValue) {
                 setState(() {
