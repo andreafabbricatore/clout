@@ -659,10 +659,6 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                                                                 .clear();
                                                             psw.clear();
                                                             newpsw.clear();
-                                                            emailaddress
-                                                                .dispose();
-                                                            psw.dispose();
-                                                            newpsw.dispose();
                                                             goauthwrapper();
                                                           } catch (e) {
                                                             displayErrorSnackBar(
