@@ -24,6 +24,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? timer;
   TextEditingController psw = TextEditingController();
   db_conn db = db_conn();
+  String sendagain = "Press below to send";
+  String sendbuttontext = "Send Email";
 
   Future<void> sendverificationemail() async {
     await FirebaseAuth.instance.currentUser!.sendEmailVerification();
@@ -59,9 +61,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   }
 
   void checker() {
-    if (!isemailverified) {
-      sendverificationemail();
-    }
     timer =
         Timer.periodic(const Duration(seconds: 3), (_) => checkemailverified());
   }
@@ -106,7 +105,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     ),
                     Center(
                         child: Text(
-                      "Sent verification email for:\n${FirebaseAuth.instance.currentUser!.email}",
+                      "Verification for:\n${FirebaseAuth.instance.currentUser!.email}",
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20),
                       textAlign: TextAlign.center,
@@ -117,7 +116,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     ),
                     Center(
                         child: Text(
-                      "Press below to resend",
+                      sendagain,
                       style: const TextStyle(fontSize: 15),
                       textScaleFactor: 1.0,
                     )),
@@ -128,19 +127,21 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         child: InkWell(
                             onTap: sendbuttonpressed
                                 ? null
-                                : () async {
+                                : () {
                                     setState(() {
                                       sendbuttonpressed = true;
                                     });
-                                    await sendverificationemail();
+                                    sendverificationemail();
                                     setState(() {
+                                      sendagain = "Press below to send again";
+                                      sendbuttontext = "Resend email";
                                       sendbuttonpressed = false;
                                     });
                                   },
                             child: PrimaryButton(
                               screenwidth: screenwidth,
                               buttonpressed: sendbuttonpressed,
-                              text: "Resend Email",
+                              text: sendbuttontext,
                               buttonwidth: screenwidth * 0.6,
                               bold: false,
                             ))),
@@ -248,6 +249,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                                                             .currentUser!
                                                                             .delete();
                                                                         psw.clear();
+                                                                        psw.dispose();
                                                                       } catch (e) {
                                                                         displayErrorSnackBar(
                                                                             "Could not cancel signup, please try again and makes sure password is correct");
