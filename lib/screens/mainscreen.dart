@@ -162,18 +162,18 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void openAppLink(Uri uri) async {
-    //print(uri.toString().split("/").last);
-    //print(uri.queryParameters['link']);
-    //String docid =
-    //uri.toString().replaceAll("https://outwithclout.com/?link=", "");
-    //docid.replaceAll("&amv=0&efr=0", "");
     try {
-      Event chosenEvent =
-          await db.getEventfromDocId(uri.toString().split("/").last);
-      List<AppUser> participants = [
-        for (String x in chosenEvent.participants) await db.getUserFromUID(x)
-      ];
-      godeeplinkeventdetailscreen(chosenEvent, participants);
+      List<String> splitlink = uri.toString().split("/");
+      String id = splitlink.last;
+      if (splitlink[splitlink.length - 2] == "event") {
+        Event chosenEvent = await db.getEventfromDocId(id);
+        List<AppUser> participants =
+            await db.geteventparticipantslist(chosenEvent);
+        godeeplinkeventdetailscreen(chosenEvent, participants);
+      } else if (splitlink[splitlink.length - 2] == "user") {
+        AppUser user = await db.getUserFromUID(id);
+        gotoprofilescreen(user);
+      }
     } catch (e) {}
   }
 

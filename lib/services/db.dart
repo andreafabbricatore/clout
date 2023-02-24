@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get/utils.dart';
 
 extension FirestoreDocumentExtension on DocumentReference {
   Future<DocumentSnapshot> getSavy() async {

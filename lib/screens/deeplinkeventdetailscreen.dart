@@ -424,8 +424,9 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                                   .chatid);
                                                       chatnavigate(chat);
                                                     } else {
+                                                      Navigator.pop(context);
                                                       displayErrorSnackBar(
-                                                          "Please join event first");
+                                                          "Please join the event first");
                                                     }
                                                   } catch (e) {
                                                     displayErrorSnackBar(

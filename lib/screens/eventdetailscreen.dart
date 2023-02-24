@@ -282,12 +282,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<String> createShareLink() async {
     final dynamicLinkParams = DynamicLinkParameters(
-      link: Uri.parse("https://outwithclout.com/${widget.event.docid}"),
+      link: Uri.parse("https://outwithclout.com/event/${widget.event.docid}"),
       uriPrefix: "https://outwithclout.page.link",
     );
     final dynamicLink =
-        await FirebaseDynamicLinks.instance.buildLink(dynamicLinkParams);
-    return dynamicLink.toString();
+        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+    //print(dynamicLink.previewLink);
+    return dynamicLink.shortUrl.toString();
   }
 
   @override
@@ -339,7 +340,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       final box = context.findRenderObject() as RenderBox?;
       await Share.share(
         text,
-        subject: "Join this event on Clout!",
+        subject: "Join ${widget.event.title} on Clout!",
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
     }
@@ -474,8 +475,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                                   .chatid);
                                                       chatnavigate(chat);
                                                     } else {
+                                                      Navigator.pop(context);
                                                       displayErrorSnackBar(
-                                                          "Please join event first");
+                                                          "Please join the event first");
                                                     }
                                                   } catch (e) {
                                                     displayErrorSnackBar(

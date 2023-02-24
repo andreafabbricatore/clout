@@ -8,9 +8,11 @@ import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/followerfollowingscreen.dart';
 import 'package:clout/screens/settings.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../components/event.dart';
 
@@ -223,6 +225,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<String> createShareLink() async {
+    final dynamicLinkParams = DynamicLinkParameters(
+      link: Uri.parse("https://outwithclout.com/user/${widget.user.uid}"),
+      uriPrefix: "https://outwithclout.page.link",
+    );
+    final dynamicLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+    return dynamicLink.shortUrl.toString();
+  }
+
+  void shareuser(String text) async {
+    final box = context.findRenderObject() as RenderBox?;
+    await Share.share(
+      text,
+      subject: "Follow @${widget.user.username} on Clout",
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
   @override
   void initState() {
     refresh();
@@ -297,6 +318,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: widget.visit ? true : false,
         actions: widget.iscurruser
             ? [
+                GestureDetector(
+                    onTap: () async {
+                      String link = await createShareLink();
+                      shareuser(link);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                      child: const Icon(Icons.ios_share, color: Colors.black),
+                    )),
                 InkWell(
                   onTap: () {
                     settings();
@@ -311,6 +341,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ]
             : [
+                GestureDetector(
+                    onTap: () async {
+                      String link = await createShareLink();
+                      shareuser(link);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                      child: const Icon(Icons.ios_share, color: Colors.black),
+                    )),
                 InkWell(
                   onTap: () async {
                     showModalBottomSheet(
