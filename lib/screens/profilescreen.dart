@@ -229,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (widget.curruser.favorites.contains(event.docid)) {
         await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });
@@ -237,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         await widget.analytics.logEvent(name: "add_to_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });
@@ -264,8 +264,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final box = context.findRenderObject() as RenderBox?;
     await widget.analytics.logEvent(name: "shared_user", parameters: {
       "iscurruser": widget.iscurruser,
-      "isfollowinguser": widget.curruser.following.contains(widget.user.uid),
-      "isuserfollower": widget.curruser.followers.contains(widget.user.uid),
+      "isfollowinguser":
+          widget.curruser.following.contains(widget.user.uid).toString(),
+      "isuserfollower":
+          widget.curruser.followers.contains(widget.user.uid).toString(),
       "shared_user_gender": widget.user.gender,
       "sharer_user_gender": widget.curruser.gender
     });

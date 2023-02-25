@@ -116,7 +116,8 @@ class _SearchScreenState extends State<SearchScreen> {
         await widget.analytics
             .logEvent(name: "go_to_interest_search_screen", parameters: {
           "interest": interest,
-          "inuserinterests": widget.curruser.interests.contains(interest),
+          "inuserinterests":
+              (widget.curruser.interests.contains(interest)).toString(),
           "userclout": widget.curruser.clout
         });
         gotointerestsearchscreen(interest, interesteventlist);

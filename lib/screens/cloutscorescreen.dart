@@ -151,7 +151,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 height: screenheight * 0.01,
               ),
               const Text(
-                "Clout Scores are assigned as following:\n• 20 points for creating an event.\n• 10 points for joining an event.\n• 5 points everytime a user joins an event you created.",
+                "Clout Scores are assigned as following:\n• 20 points for creating an event.\n• 10 points for participating in an event.\n• 5 points everytime a user participates in an event you host.",
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w200,

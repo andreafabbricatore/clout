@@ -101,7 +101,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       await db.reportEvent(event);
       await widget.analytics.logEvent(name: "reported_event", parameters: {
         "interest": widget.event.interest,
-        "inviteonly": widget.event.isinviteonly,
+        "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
         "participants": widget.event.participants.length,
         "title": widget.event.title
@@ -127,10 +127,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     await widget.analytics
         .logEvent(name: "opened_chat_from_event_screen", parameters: {
       "interest": widget.event.interest,
-      "inviteonly": widget.event.isinviteonly,
+      "inviteonly": widget.event.isinviteonly.toString(),
       "maxparticipants": widget.event.maxparticipants,
       "participants": widget.event.participants.length,
-      "ishost": widget.curruser.uid == widget.event.hostdocid
+      "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
     });
     await Navigator.push(
         context,
@@ -213,7 +213,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await db.joinevent(widget.event, widget.curruser, widget.event.docid);
         await widget.analytics.logEvent(name: "joined_event", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "currentparticipants": widget.event.participants.length
         });
@@ -235,7 +235,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await db.deleteevent(widget.event, widget.curruser);
         await widget.analytics.logEvent(name: "deleted_event", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "currentparticipants": widget.event.participants.length,
           "predeletionstatus": joinedval
@@ -262,12 +262,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           buttonpressed = true;
         });
         await db.leaveevent(widget.curruser, widget.event);
+        print("here");
         await widget.analytics.logEvent(name: "left_event", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "currentparticipants": widget.event.participants.length,
         });
+        print("there");
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {
@@ -290,7 +292,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               widget.event.docid, useruid, widget.curruser.uid);
           await widget.analytics.logEvent(name: "validated_qr", parameters: {
             "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly,
+            "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
             "participants": widget.event.participants.length,
             "presentparticipants": widget.event.presentparticipants.length,
@@ -303,7 +305,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           await widget.analytics
               .logEvent(name: "already_validated_qr", parameters: {
             "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly,
+            "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
             "participants": widget.event.participants.length,
             "presentparticipants": widget.event.presentparticipants.length,
@@ -316,7 +318,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await widget.analytics
             .logEvent(name: "non_participant_qr", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "participants": widget.event.participants.length,
           "presentparticipants": widget.event.presentparticipants.length,
@@ -328,7 +330,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     } else {
       await widget.analytics.logEvent(name: "invalid_event_qr", parameters: {
         "interest": widget.event.interest,
-        "inviteonly": widget.event.isinviteonly,
+        "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
         "participants": widget.event.participants.length,
         "presentparticipants": widget.event.presentparticipants.length,
@@ -344,10 +346,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     await widget.analytics
         .logEvent(name: "visit_interest_screen_from_event", parameters: {
       "interest": widget.event.interest,
-      "inviteonly": widget.event.isinviteonly,
+      "inviteonly": widget.event.isinviteonly.toString(),
       "maxparticipants": widget.event.maxparticipants,
       "participants": widget.event.participants.length,
-      "ishost": widget.curruser.uid == widget.event.hostdocid
+      "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
     });
     Navigator.push(
         context,
@@ -402,11 +404,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           name: "visited_profile_screen_from_event_screen",
           parameters: {
             "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly,
+            "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
             "participants": widget.event.participants.length,
-            "ishost": widget.event.hostdocid == widget.curruser.uid,
-            "visitinghost": widget.event.hostdocid == user.uid
+            "ishost":
+                (widget.event.hostdocid == widget.curruser.uid).toString(),
+            "visitinghost": (widget.event.hostdocid == user.uid).toString()
           });
       Navigator.push(
           context,
@@ -426,7 +429,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await db.removeparticipant(user, widget.event);
         await widget.analytics.logEvent(name: "rem_participant", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "participants": widget.event.participants.length,
           "userbirthday": user.birthday,
@@ -437,7 +440,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "userfollowers": user.followers.length,
           "userfollowing": user.following.length,
           "userfollowersgtfollowing":
-              user.followers.length >= user.following.length
+              (user.followers.length >= user.following.length).toString()
         });
         updatescreen(widget.event.docid);
       } catch (e) {
@@ -449,12 +452,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       final box = context.findRenderObject() as RenderBox?;
       await widget.analytics.logEvent(name: "shared_event", parameters: {
         "interest": widget.event.interest,
-        "inviteonly": widget.event.isinviteonly,
+        "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
         "participants": widget.event.participants.length,
-        "ishost": widget.curruser.uid == widget.event.hostdocid,
-        "isfollowinghost":
-            widget.curruser.following.contains(widget.event.hostdocid)
+        "ishost": (widget.curruser.uid == widget.event.hostdocid).toString(),
+        "isfollowinghost": widget.curruser.following
+            .contains(widget.event.hostdocid)
+            .toString()
       });
       await Share.share(
         text,
@@ -679,7 +683,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                                   .interest,
                                                               "inviteonly": widget
                                                                   .event
-                                                                  .isinviteonly,
+                                                                  .isinviteonly
+                                                                  .toString(),
                                                               "maxparticipants":
                                                                   widget.event
                                                                       .maxparticipants,
@@ -901,7 +906,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                             });
                                                       }
                                                     : null
-                                                : joinedval == "Leave"
+                                                : joinedval == "Leave" ||
+                                                        joinedval == "Finished"
                                                     ? () {
                                                         Navigator.pop(context);
                                                         showDialog(

@@ -535,7 +535,8 @@ class db_conn {
       List participants = chat['participants'];
       for (int i = 0; i < participants.length; i++) {
         await users.doc(participants[i]).set({
-          'chats': FieldValue.arrayRemove([chatid])
+          'chats': FieldValue.arrayRemove([chatid]),
+          'visiblechats': FieldValue.arrayRemove([chatid]),
         }, SetOptions(merge: true));
       }
       final instance = FirebaseFirestore.instance;

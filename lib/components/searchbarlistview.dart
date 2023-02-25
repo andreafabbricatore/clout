@@ -100,19 +100,17 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
         await db.remFromFav(widget.curruser.uid, event.docid);
-        await widget.analytics
-            .logEvent(name: "rem_from_fav_search_screen", parameters: {
+        await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
-        await widget.analytics
-            .logEvent(name: "add_to_fav_search_screen", parameters: {
+        await widget.analytics.logEvent(name: "add_to_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });
@@ -146,8 +144,9 @@ class _SearchBarListViewState extends State<SearchBarListView> {
               : widget.userres.length,
           "eventinterest": event.interest,
           "hostinfollowing":
-              widget.curruser.following.contains(event.hostdocid),
-          "hostinfollowers": widget.curruser.followers.contains(event.hostdocid)
+              widget.curruser.following.contains(event.hostdocid).toString(),
+          "hostinfollowers":
+              widget.curruser.followers.contains(event.hostdocid).toString()
         });
         await Navigator.push(
             context,
@@ -174,8 +173,10 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         "searchreslength": widget.searchevents
             ? widget.eventres.length
             : widget.userres.length,
-        "userinfollowing": widget.curruser.following.contains(user.uid),
-        "userinfollowers": widget.curruser.followers.contains(user.uid)
+        "userinfollowing":
+            widget.curruser.following.contains(user.uid).toString(),
+        "userinfollowers":
+            widget.curruser.followers.contains(user.uid).toString()
       });
       Navigator.push(
           context,

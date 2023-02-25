@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await db.remFromFav(widget.curruser.uid, event.docid);
         await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });
@@ -145,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await db.addToFav(widget.curruser.uid, event.docid);
         await widget.analytics.logEvent(name: "add_to_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });

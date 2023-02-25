@@ -95,7 +95,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
       await db.reportEvent(event);
       await widget.analytics.logEvent(name: "reported_event", parameters: {
         "interest": widget.event.interest,
-        "inviteonly": widget.event.isinviteonly,
+        "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
         "participants": widget.event.participants.length,
         "title": widget.event.title
@@ -185,7 +185,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         await db.joinevent(widget.event, widget.curruser, widget.event.docid);
         await widget.analytics.logEvent(name: "joined_event", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "currentparticipants": widget.event.participants.length
         });
@@ -207,7 +207,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         await db.deleteevent(widget.event, widget.curruser);
         await widget.analytics.logEvent(name: "deleted_event", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "currentparticipants": widget.event.participants.length,
           "predeletionstatus": joinedval
@@ -236,7 +236,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         await db.leaveevent(widget.curruser, widget.event);
         await widget.analytics.logEvent(name: "left_event", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "currentparticipants": widget.event.participants.length,
         });
@@ -257,7 +257,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         await db.remFromFav(widget.curruser.uid, event.docid);
         await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });
@@ -265,7 +265,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         await db.addToFav(widget.curruser.uid, event.docid);
         await widget.analytics.logEvent(name: "add_to_fav", parameters: {
           "interest": event.interest,
-          "inviteonly": event.isinviteonly,
+          "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
           "currentparticipants": event.participants.length
         });
@@ -281,10 +281,10 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     await widget.analytics
         .logEvent(name: "opened_chat_from_event_screen", parameters: {
       "interest": widget.event.interest,
-      "inviteonly": widget.event.isinviteonly,
+      "inviteonly": widget.event.isinviteonly.toString(),
       "maxparticipants": widget.event.maxparticipants,
       "participants": widget.event.participants.length,
-      "ishost": widget.curruser.uid == widget.event.hostdocid
+      "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
     });
     await Navigator.push(
         context,
@@ -310,7 +310,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
               widget.event.docid, useruid, widget.curruser.uid);
           await widget.analytics.logEvent(name: "validated_qr", parameters: {
             "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly,
+            "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
             "participants": widget.event.participants.length,
             "presentparticipants": widget.event.presentparticipants.length,
@@ -323,7 +323,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           await widget.analytics
               .logEvent(name: "already_validated_qr", parameters: {
             "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly,
+            "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
             "participants": widget.event.participants.length,
             "presentparticipants": widget.event.presentparticipants.length,
@@ -336,7 +336,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         await widget.analytics
             .logEvent(name: "non_participant_qr", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "participants": widget.event.participants.length,
           "presentparticipants": widget.event.presentparticipants.length,
@@ -348,7 +348,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     } else {
       await widget.analytics.logEvent(name: "invalid_event_qr", parameters: {
         "interest": widget.event.interest,
-        "inviteonly": widget.event.isinviteonly,
+        "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
         "participants": widget.event.participants.length,
         "presentparticipants": widget.event.presentparticipants.length,
@@ -364,10 +364,10 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     await widget.analytics
         .logEvent(name: "visit_interest_screen_from_event", parameters: {
       "interest": widget.event.interest,
-      "inviteonly": widget.event.isinviteonly,
+      "inviteonly": widget.event.isinviteonly.toString(),
       "maxparticipants": widget.event.maxparticipants,
       "participants": widget.event.participants.length,
-      "ishost": widget.curruser.uid == widget.event.hostdocid
+      "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
     });
     Navigator.push(
         context,
@@ -411,11 +411,12 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           name: "visited_profile_screen_from_event_screen",
           parameters: {
             "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly,
+            "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
             "participants": widget.event.participants.length,
-            "ishost": widget.event.hostdocid == widget.curruser.uid,
-            "visitinghost": widget.event.hostdocid == user.uid
+            "ishost":
+                (widget.event.hostdocid == widget.curruser.uid).toString(),
+            "visitinghost": (widget.event.hostdocid == user.uid).toString()
           });
       Navigator.push(
           context,
@@ -435,7 +436,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         await db.removeparticipant(user, widget.event);
         await widget.analytics.logEvent(name: "rem_participant", parameters: {
           "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly,
+          "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "participants": widget.event.participants.length,
           "userbirthday": user.birthday,
@@ -446,7 +447,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           "userfollowers": user.followers.length,
           "userfollowing": user.following.length,
           "userfollowersgtfollowing":
-              user.followers.length >= user.following.length
+              (user.followers.length >= user.following.length).toString()
         });
         updatescreen(widget.event.docid);
       } catch (e) {
@@ -631,7 +632,8 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                                   .interest,
                                                               "inviteonly": widget
                                                                   .event
-                                                                  .isinviteonly,
+                                                                  .isinviteonly
+                                                                  .toString(),
                                                               "maxparticipants":
                                                                   widget.event
                                                                       .maxparticipants,
@@ -853,7 +855,8 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                             });
                                                       }
                                                     : null
-                                                : joinedval == "Leave"
+                                                : joinedval == "Leave" ||
+                                                        joinedval == "Finished"
                                                     ? () {
                                                         Navigator.pop(context);
                                                         showDialog(
