@@ -114,7 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
       //  generaleventlist = events;
       //  interesteventlist = interestevents;
       //});
-      await widget.analytics.logEvent(name: "please");
       getSortedCurrLocEventsList();
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");
