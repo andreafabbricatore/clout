@@ -93,6 +93,13 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   Future<void> reportevent(Event event) async {
     try {
       await db.reportEvent(event);
+      await widget.analytics.logEvent(name: "reported_event", parameters: {
+        "interest": widget.event.interest,
+        "inviteonly": widget.event.isinviteonly,
+        "maxparticipants": widget.event.maxparticipants,
+        "participants": widget.event.participants.length,
+        "title": widget.event.title
+      });
       displayErrorSnackBar("Reported ${event.title}");
     } catch (e) {
       displayErrorSnackBar("Could not report, please try again");
@@ -176,6 +183,12 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           buttonpressed = true;
         });
         await db.joinevent(widget.event, widget.curruser, widget.event.docid);
+        await widget.analytics.logEvent(name: "joined_event", parameters: {
+          "interest": widget.event.interest,
+          "inviteonly": widget.event.isinviteonly,
+          "maxparticipants": widget.event.maxparticipants,
+          "currentparticipants": widget.event.participants.length
+        });
       } catch (e) {
         displayErrorSnackBar("Could not join event");
       } finally {
@@ -192,6 +205,13 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           buttonpressed = true;
         });
         await db.deleteevent(widget.event, widget.curruser);
+        await widget.analytics.logEvent(name: "deleted_event", parameters: {
+          "interest": widget.event.interest,
+          "inviteonly": widget.event.isinviteonly,
+          "maxparticipants": widget.event.maxparticipants,
+          "currentparticipants": widget.event.participants.length,
+          "predeletionstatus": joinedval
+        });
         Navigator.of(context).push(
           MaterialPageRoute(
               builder: (context) => LoadingScreen(
@@ -214,6 +234,12 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           buttonpressed = true;
         });
         await db.leaveevent(widget.curruser, widget.event);
+        await widget.analytics.logEvent(name: "left_event", parameters: {
+          "interest": widget.event.interest,
+          "inviteonly": widget.event.isinviteonly,
+          "maxparticipants": widget.event.maxparticipants,
+          "currentparticipants": widget.event.participants.length,
+        });
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {
@@ -229,8 +255,20 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
         await db.remFromFav(widget.curruser.uid, event.docid);
+        await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
+        await widget.analytics.logEvent(name: "add_to_fav", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
       }
     } catch (e) {
       displayErrorSnackBar("Could not update favorites");
@@ -240,6 +278,14 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   }
 
   Future<void> chatnavigate(Chat chat) async {
+    await widget.analytics
+        .logEvent(name: "opened_chat_from_event_screen", parameters: {
+      "interest": widget.event.interest,
+      "inviteonly": widget.event.isinviteonly,
+      "maxparticipants": widget.event.maxparticipants,
+      "participants": widget.event.participants.length,
+      "ishost": widget.curruser.uid == widget.event.hostdocid
+    });
     await Navigator.push(
         context,
         CupertinoPageRoute(
@@ -262,21 +308,51 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         if (!widget.event.presentparticipants.contains(useruid)) {
           await db.setpresence(
               widget.event.docid, useruid, widget.curruser.uid);
+          await widget.analytics.logEvent(name: "validated_qr", parameters: {
+            "interest": widget.event.interest,
+            "inviteonly": widget.event.isinviteonly,
+            "maxparticipants": widget.event.maxparticipants,
+            "participants": widget.event.participants.length,
+            "presentparticipants": widget.event.presentparticipants.length,
+          });
           setState(() {
             qrmessage = "QR code Validated!";
           });
           updatescreen(widget.event.docid);
         } else {
+          await widget.analytics
+              .logEvent(name: "already_validated_qr", parameters: {
+            "interest": widget.event.interest,
+            "inviteonly": widget.event.isinviteonly,
+            "maxparticipants": widget.event.maxparticipants,
+            "participants": widget.event.participants.length,
+            "presentparticipants": widget.event.presentparticipants.length,
+          });
           setState(() {
             qrmessage = "QR code has already been validated";
           });
         }
       } else {
+        await widget.analytics
+            .logEvent(name: "non_participant_qr", parameters: {
+          "interest": widget.event.interest,
+          "inviteonly": widget.event.isinviteonly,
+          "maxparticipants": widget.event.maxparticipants,
+          "participants": widget.event.participants.length,
+          "presentparticipants": widget.event.presentparticipants.length,
+        });
         setState(() {
           qrmessage = "User is not a participant to this event";
         });
       }
     } else {
+      await widget.analytics.logEvent(name: "invalid_event_qr", parameters: {
+        "interest": widget.event.interest,
+        "inviteonly": widget.event.isinviteonly,
+        "maxparticipants": widget.event.maxparticipants,
+        "participants": widget.event.participants.length,
+        "presentparticipants": widget.event.presentparticipants.length,
+      });
       setState(() {
         qrmessage = "Invalid: QR code is not for this event";
       });
@@ -284,7 +360,15 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   }
 
   void gotointerestsearchscreen(
-      String interest, List<Event> interesteventlist) {
+      String interest, List<Event> interesteventlist) async {
+    await widget.analytics
+        .logEvent(name: "visit_interest_screen_from_event", parameters: {
+      "interest": widget.event.interest,
+      "inviteonly": widget.event.isinviteonly,
+      "maxparticipants": widget.event.maxparticipants,
+      "participants": widget.event.participants.length,
+      "ishost": widget.curruser.uid == widget.event.hostdocid
+    });
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -323,6 +407,16 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     Future<void> usernavigate(AppUser user, int index) async {
+      await widget.analytics.logEvent(
+          name: "visited_profile_screen_from_event_screen",
+          parameters: {
+            "interest": widget.event.interest,
+            "inviteonly": widget.event.isinviteonly,
+            "maxparticipants": widget.event.maxparticipants,
+            "participants": widget.event.participants.length,
+            "ishost": widget.event.hostdocid == widget.curruser.uid,
+            "visitinghost": widget.event.hostdocid == user.uid
+          });
       Navigator.push(
           context,
           CupertinoPageRoute(
@@ -339,6 +433,21 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     Future<void> remuser(AppUser user, int index) async {
       try {
         await db.removeparticipant(user, widget.event);
+        await widget.analytics.logEvent(name: "rem_participant", parameters: {
+          "interest": widget.event.interest,
+          "inviteonly": widget.event.isinviteonly,
+          "maxparticipants": widget.event.maxparticipants,
+          "participants": widget.event.participants.length,
+          "userbirthday": user.birthday,
+          "usernationality": user.nationality,
+          "userbio": user.bio,
+          "username": user.username,
+          "userclout": user.clout,
+          "userfollowers": user.followers.length,
+          "userfollowing": user.following.length,
+          "userfollowersgtfollowing":
+              user.followers.length >= user.following.length
+        });
         updatescreen(widget.event.docid);
       } catch (e) {
         displayErrorSnackBar("Could not remove participant, please try again");
@@ -512,6 +621,28 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                           deletebuttonpressed =
                                                               false;
                                                         });
+                                                        await widget.analytics
+                                                            .logEvent(
+                                                                name:
+                                                                    "deleted_event",
+                                                                parameters: {
+                                                              "interest": widget
+                                                                  .event
+                                                                  .interest,
+                                                              "inviteonly": widget
+                                                                  .event
+                                                                  .isinviteonly,
+                                                              "maxparticipants":
+                                                                  widget.event
+                                                                      .maxparticipants,
+                                                              "currentparticipants":
+                                                                  widget
+                                                                      .event
+                                                                      .participants
+                                                                      .length,
+                                                              "predeletionstatus":
+                                                                  joinedval
+                                                            });
                                                         Navigator.of(context)
                                                             .push(
                                                           MaterialPageRoute(

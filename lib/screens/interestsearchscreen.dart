@@ -64,8 +64,20 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
         await db.remFromFav(widget.curruser.uid, event.docid);
+        await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
+        await widget.analytics.logEvent(name: "add_to_fav", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
       }
     } catch (e) {
       displayErrorSnackBar("Could not update favorites");

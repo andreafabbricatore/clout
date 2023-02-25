@@ -154,6 +154,9 @@ class _SignInScreenState extends State<SignInScreen> {
                               .signInWithEmailAndPassword(
                                   email: emailController.text.trim(),
                                   password: pswController.text.trim());
+                          await widget.analytics.setUserId(
+                              id: FirebaseAuth.instance.currentUser!.uid);
+                          await widget.analytics.logLogin(loginMethod: "email");
                           donesignin();
                         } catch (e) {
                           displayErrorSnackBar("Could not Sign in");

@@ -147,6 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         MaterialPageRoute(
             builder: (_) => EditProfileScreen(
                   curruser: widget.curruser,
+                  analytics: widget.analytics,
                 ),
             settings: RouteSettings(name: "EditProfileScreen")));
     refresh();
@@ -226,8 +227,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future interactfav(Event event) async {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
+        await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
         await db.remFromFav(widget.curruser.uid, event.docid);
       } else {
+        await widget.analytics.logEvent(name: "add_to_fav", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
         await db.addToFav(widget.curruser.uid, event.docid);
       }
     } catch (e) {
@@ -249,6 +262,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void shareuser(String text) async {
     final box = context.findRenderObject() as RenderBox?;
+    await widget.analytics.logEvent(name: "shared_user", parameters: {
+      "iscurruser": widget.iscurruser,
+      "isfollowinguser": widget.curruser.following.contains(widget.user.uid),
+      "isuserfollower": widget.curruser.followers.contains(widget.user.uid),
+      "shared_user_gender": widget.user.gender,
+      "sharer_user_gender": widget.curruser.gender
+    });
     await Share.share(
       text,
       subject: "Follow @${widget.user.username} on Clout",

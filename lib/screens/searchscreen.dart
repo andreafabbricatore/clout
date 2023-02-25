@@ -113,6 +113,12 @@ class _SearchScreenState extends State<SearchScreen> {
             interest,
             widget.curruserlocation.country,
             widget.curruser);
+        await widget.analytics
+            .logEvent(name: "go_to_interest_search_screen", parameters: {
+          "interest": interest,
+          "inuserinterests": widget.curruser.interests.contains(interest),
+          "userclout": widget.curruser.clout
+        });
         gotointerestsearchscreen(interest, interesteventlist);
         //print(interesteventlist);
       } catch (e) {

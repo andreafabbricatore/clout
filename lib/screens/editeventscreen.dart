@@ -639,6 +639,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
                                 await CompressAndGetFile(imagepath);
                           }
                           await db.updateEvent(widget.event, compressedimgpath);
+                          await widget.analytics
+                              .logEvent(name: "edited_event", parameters: {});
                           goloadingscreen();
                         } catch (e) {
                           displayErrorSnackBar("Could not update event");

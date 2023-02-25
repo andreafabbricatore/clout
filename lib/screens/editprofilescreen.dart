@@ -5,14 +5,17 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  EditProfileScreen({super.key, required this.curruser});
+  EditProfileScreen(
+      {super.key, required this.curruser, required this.analytics});
   AppUser curruser;
+  FirebaseAnalytics analytics;
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
@@ -553,6 +556,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             'interests', newinterests, widget.curruser.uid);
                         await db.changeattribute('bio',
                             biocontroller.text.trim(), widget.curruser.uid);
+                        await widget.analytics
+                            .logEvent(name: "edited_profile", parameters: {});
                       } catch (e) {
                         displayErrorSnackBar("Could not update profile");
                       } finally {

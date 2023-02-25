@@ -83,6 +83,14 @@ class _SearchBarListViewState extends State<SearchBarListView> {
           widget.userres = temp;
         });
       }
+      await widget.analytics.logEvent(name: "search", parameters: {
+        "searchevent": widget.searchevents,
+        "searchuser": !widget.searchevents,
+        "searchterm": widget.query,
+        "searchreslength": widget.searchevents
+            ? widget.eventres.length
+            : widget.userres.length,
+      });
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");
     }
@@ -92,8 +100,22 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     try {
       if (widget.curruser.favorites.contains(event.docid)) {
         await db.remFromFav(widget.curruser.uid, event.docid);
+        await widget.analytics
+            .logEvent(name: "rem_from_fav_search_screen", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
+        await widget.analytics
+            .logEvent(name: "add_to_fav_search_screen", parameters: {
+          "interest": event.interest,
+          "inviteonly": event.isinviteonly,
+          "maxparticipants": event.maxparticipants,
+          "currentparticipants": event.participants.length
+        });
       }
     } catch (e) {
       displayErrorSnackBar("Could not update favorites");
@@ -116,7 +138,17 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
         List<AppUser> participants =
             await db.geteventparticipantslist(chosenEvent);
-
+        await widget.analytics
+            .logEvent(name: "event_navigate_from_search", parameters: {
+          "searchterm": widget.query,
+          "searchreslength": widget.searchevents
+              ? widget.eventres.length
+              : widget.userres.length,
+          "eventinterest": event.interest,
+          "hostinfollowing":
+              widget.curruser.following.contains(event.hostdocid),
+          "hostinfollowers": widget.curruser.followers.contains(event.hostdocid)
+        });
         await Navigator.push(
             context,
             MaterialPageRoute(
@@ -136,6 +168,15 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     }
 
     Future<void> usernavigate(AppUser user, int index) async {
+      await widget.analytics
+          .logEvent(name: "user_navigate_from_search", parameters: {
+        "searchterm": widget.query,
+        "searchreslength": widget.searchevents
+            ? widget.eventres.length
+            : widget.userres.length,
+        "userinfollowing": widget.curruser.following.contains(user.uid),
+        "userinfollowers": widget.curruser.followers.contains(user.uid)
+      });
       Navigator.push(
           context,
           CupertinoPageRoute(

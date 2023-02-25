@@ -1717,6 +1717,9 @@ class _InterestScreenState extends State<InterestScreen> {
                           FirebaseAuth.instance.currentUser!.uid);
                       await db.changeattributebool('setinterests', true,
                           FirebaseAuth.instance.currentUser!.uid);
+                      await widget.analytics.setUserId(
+                          id: FirebaseAuth.instance.currentUser!.uid);
+                      await widget.analytics.logSignUp(signUpMethod: "email");
                       donesignup();
                     } else {
                       displayErrorSnackBar("Choose at least 3 interests");

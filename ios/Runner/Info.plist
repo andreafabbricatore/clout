@@ -39,7 +39,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
-		<string>https://outwithclout.com/</string>
+		<string>https://outwithclout.com/event/</string>
+		<string>https://outwithclout.com/user/</string>
 	</array>
 	<key>FirebaseAutomaticScreenReportingEnabled</key>
 	<true/>
