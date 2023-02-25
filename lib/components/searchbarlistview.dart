@@ -6,6 +6,7 @@ import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,13 +18,15 @@ class SearchBarListView extends StatefulWidget {
       required this.userres,
       required this.curruser,
       required this.query,
-      required this.curruserlocation});
+      required this.curruserlocation,
+      required this.analytics});
   bool searchevents;
   List<Event> eventres;
   List<AppUser> userres;
   AppUser curruser;
   String query;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   @override
   State<SearchBarListView> createState() => _SearchBarListViewState();
 }
@@ -123,7 +126,9 @@ class _SearchBarListViewState extends State<SearchBarListView> {
                       participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
-                    )));
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not refresh");
       }
@@ -135,10 +140,13 @@ class _SearchBarListViewState extends State<SearchBarListView> {
           context,
           CupertinoPageRoute(
               builder: (_) => ProfileScreen(
-                  user: user,
-                  curruser: widget.curruser,
-                  visit: true,
-                  curruserlocation: widget.curruserlocation)));
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
     }
 
     return widget.searchevents

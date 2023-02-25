@@ -5,6 +5,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LoadingScreen extends StatefulWidget {
-  LoadingScreen({Key? key, required this.uid}) : super(key: key);
+  LoadingScreen({Key? key, required this.uid, required this.analytics})
+      : super(key: key);
   final String uid;
+  FirebaseAnalytics analytics;
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
 }
@@ -115,6 +118,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       });
       Stopwatch stopwatch = Stopwatch()..start();
       //await newgetUserAppLocation();
+      await widget.analytics.setUserId(id: widget.uid);
       await getUserAppLocation();
       await db.updatelastuserloc(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
@@ -155,12 +159,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => MainScreen(
-                curruser: curruser,
-                curruserlocation: curruserlocation,
-                justloaded: true,
-              ),
-          fullscreenDialog: true),
+        builder: (BuildContext context) => MainScreen(
+            curruser: curruser,
+            curruserlocation: curruserlocation,
+            justloaded: true,
+            analytics: widget.analytics),
+        fullscreenDialog: true,
+      ),
     );
   }
 

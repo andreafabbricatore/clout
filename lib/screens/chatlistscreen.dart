@@ -5,14 +5,19 @@ import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/chatroomscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatListScreen extends StatefulWidget {
   ChatListScreen(
-      {super.key, required this.curruser, required this.curruserlocation});
+      {super.key,
+      required this.curruser,
+      required this.curruserlocation,
+      required this.analytics});
   AppUser curruser;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   @override
   State<ChatListScreen> createState() => _ChatListScreenState();
 }
@@ -85,7 +90,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     chatinfo: chat,
                     curruser: widget.curruser,
                     curruserlocation: widget.curruserlocation,
-                  )));
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ChatRoomScreen")));
       refresh();
     }
 
@@ -105,7 +112,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     chatinfo: userchat,
                     curruser: widget.curruser,
                     curruserlocation: widget.curruserlocation,
-                  )));
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ChatRoomScreen")));
       setState(() {
         searching = false;
         suffixiconcolor = Colors.white;

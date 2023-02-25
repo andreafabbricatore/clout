@@ -1,5 +1,6 @@
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/createeventscreen.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 class noEventsBox extends StatelessWidget {
@@ -8,9 +9,11 @@ class noEventsBox extends StatelessWidget {
       required this.screenheight,
       required this.curruser,
       required this.screenwidth,
-      required this.interest});
+      required this.interest,
+      required this.analytics});
   String interest;
   AppUser curruser;
+  FirebaseAnalytics analytics;
   final double screenheight;
   final double screenwidth;
 
@@ -37,12 +40,13 @@ class noEventsBox extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => CreateEventScreen(
-                  curruser: curruser,
-                  allowbackarrow: true,
-                  startinterest: interest,
-                ),
-              ),
+                  builder: (BuildContext context) => CreateEventScreen(
+                        curruser: curruser,
+                        allowbackarrow: true,
+                        startinterest: interest,
+                        analytics: analytics,
+                      ),
+                  settings: RouteSettings(name: "CreateEventScreen")),
             );
           },
           child: Container(

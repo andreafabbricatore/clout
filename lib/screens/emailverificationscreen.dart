@@ -4,13 +4,16 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:clout/components/datatextfield.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
-  const EmailVerificationScreen({Key? key}) : super(key: key);
+  EmailVerificationScreen({Key? key, required this.analytics})
+      : super(key: key);
+  FirebaseAnalytics analytics;
 
   @override
   State<EmailVerificationScreen> createState() =>
@@ -69,8 +72,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthScreen")),
     );
   }
 
@@ -92,7 +98,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     final screenheight = MediaQuery.of(context).size.height;
 
     return isemailverified
-        ? AuthenticationWrapper()
+        ? AuthenticationWrapper(
+            analytics: widget.analytics,
+          )
         : Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(

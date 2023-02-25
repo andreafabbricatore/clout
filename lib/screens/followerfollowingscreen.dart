@@ -3,6 +3,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,14 +14,15 @@ class FollowerFollowingScreen extends StatefulWidget {
       required this.iscurruser,
       required this.curruser,
       required this.onfollowers,
-      required this.curruserlocation})
+      required this.curruserlocation,
+      required this.analytics})
       : super(key: key);
   AppUser user;
   AppUser curruser;
   bool iscurruser;
   bool onfollowers;
   AppLocation curruserlocation;
-
+  FirebaseAnalytics analytics;
   @override
   State<FollowerFollowingScreen> createState() =>
       _FollowerFollowingScreenState();
@@ -97,7 +99,9 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
                     curruser: widget.curruser,
                     visit: true,
                     curruserlocation: widget.curruserlocation,
-                  )));
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
     }
 
     return Scaffold(

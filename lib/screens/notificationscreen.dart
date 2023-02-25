@@ -6,15 +6,20 @@ import 'package:clout/components/notification.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatefulWidget {
   NotificationScreen(
-      {Key? key, required this.curruser, required this.curruserlocation})
+      {Key? key,
+      required this.curruser,
+      required this.curruserlocation,
+      required this.analytics})
       : super(key: key);
   AppUser curruser;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
 }
@@ -68,7 +73,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   curruser: widget.curruser,
                   visit: true,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ProfileScreen")));
   }
 
   Future<void> updatecurruser() async {
@@ -127,7 +134,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
-                    )));
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }

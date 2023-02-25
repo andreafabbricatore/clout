@@ -481,7 +481,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   MaterialPageRoute(
                       builder: (_) => UpdateInterests(
                             curruser: widget.curruser,
-                          )));
+                          ),
+                      settings: RouteSettings(name: "UpdateInterests")));
               setState(() {
                 newinterests = updatedinterests;
               });

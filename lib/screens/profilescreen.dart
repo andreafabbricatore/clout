@@ -8,6 +8,7 @@ import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/followerfollowingscreen.dart';
 import 'package:clout/screens/settings.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,12 +23,14 @@ class ProfileScreen extends StatefulWidget {
   bool visit;
   bool iscurruser = false;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   ProfileScreen({
     super.key,
     required this.user,
     required this.curruser,
     required this.visit,
     required this.curruserlocation,
+    required this.analytics,
     iscurruser,
   });
 
@@ -144,7 +147,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         MaterialPageRoute(
             builder: (_) => EditProfileScreen(
                   curruser: widget.curruser,
-                )));
+                ),
+            settings: RouteSettings(name: "EditProfileScreen")));
     refresh();
   }
 
@@ -152,9 +156,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (_) => SetttingsScreen(
+            builder: (_) => SettingsScreen(
                   curruser: widget.curruser,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "SettingsScreen")));
     refresh();
   }
 
@@ -168,7 +174,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   iscurruser: widget.iscurruser,
                   onfollowers: true,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "FollowerFollowingScreen")));
     refresh();
   }
 
@@ -182,7 +190,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   iscurruser: widget.iscurruser,
                   onfollowers: false,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "FollowerFollowingScreen")));
     refresh();
   }
 
@@ -193,7 +203,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             builder: (_) => CloutScoreScreen(
                   curruser: widget.curruser,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "CloutScoreScreen")));
   }
 
   Future<void> followunfollow() async {
@@ -276,7 +288,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
-                    )));
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }

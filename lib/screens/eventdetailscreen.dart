@@ -14,6 +14,7 @@ import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
 
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,10 +33,12 @@ class EventDetailScreen extends StatefulWidget {
       required this.curruser,
       required this.participants,
       required this.interactfav,
-      required this.curruserlocation});
+      required this.curruserlocation,
+      required this.analytics});
   Event event;
   AppUser curruser;
   List<AppUser> participants;
+  FirebaseAnalytics analytics;
   final Function(Event event) interactfav;
   AppLocation curruserlocation;
   @override
@@ -121,7 +124,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   chatinfo: chat,
                   curruser: widget.curruser,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ChatRoomScreen")));
     updatescreen(widget.event.docid);
   }
 
@@ -211,7 +216,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           MaterialPageRoute(
               builder: (context) => LoadingScreen(
                     uid: widget.curruser.uid,
+                    analytics: widget.analytics,
                   ),
+              settings: RouteSettings(name: "LoadingScreen"),
               fullscreenDialog: true),
         );
       } catch (e) {
@@ -274,10 +281,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         context,
         MaterialPageRoute(
             builder: (_) => InterestSearchScreen(
-                interest: interest,
-                events: interesteventlist,
-                curruser: widget.curruser,
-                curruserlocation: widget.curruserlocation)));
+                  interest: interest,
+                  events: interesteventlist,
+                  curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "InterestSearchScreen")));
   }
 
   Future<String> createShareLink() async {
@@ -324,7 +334,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     curruser: widget.curruser,
                     visit: true,
                     curruserlocation: widget.curruserlocation,
-                  )));
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
     }
 
     Future<void> remuser(AppUser user, int index) async {
@@ -559,7 +571,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                                     uid: widget
                                                                         .curruser
                                                                         .uid,
+                                                                    analytics:
+                                                                        widget
+                                                                            .analytics,
                                                                   ),
+                                                              settings:
+                                                                  RouteSettings(
+                                                                      name:
+                                                                          "LoadingScreen"),
                                                               fullscreenDialog:
                                                                   true),
                                                         );
@@ -568,16 +587,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            EditEventScreen(
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              EditEventScreen(
                                                                 curruser: widget
                                                                     .curruser,
                                                                 allowbackarrow:
                                                                     true,
                                                                 event: widget
-                                                                    .event),
-                                                      ),
+                                                                    .event,
+                                                                analytics: widget
+                                                                    .analytics,
+                                                              ),
+                                                          settings: RouteSettings(
+                                                              name:
+                                                                  "EditEventScreen")),
                                                     );
                                                   }
                                             : () {

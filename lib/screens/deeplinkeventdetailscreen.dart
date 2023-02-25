@@ -12,6 +12,7 @@ import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -27,11 +28,13 @@ class DeepLinkEventDetailScreen extends StatefulWidget {
       required this.event,
       required this.curruser,
       required this.participants,
-      required this.curruserlocation});
+      required this.curruserlocation,
+      required this.analytics});
   Event event;
   AppUser curruser;
   List<AppUser> participants;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   @override
   State<DeepLinkEventDetailScreen> createState() =>
       _DeepLinkEventDetailScreenState();
@@ -193,7 +196,9 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           MaterialPageRoute(
               builder: (context) => LoadingScreen(
                     uid: widget.curruser.uid,
+                    analytics: widget.analytics,
                   ),
+              settings: RouteSettings(name: "LoadingScreen"),
               fullscreenDialog: true),
         );
       } catch (e) {
@@ -242,7 +247,9 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                   chatinfo: chat,
                   curruser: widget.curruser,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ChatRoomScreen")));
     updatescreen(widget.event.docid);
   }
 
@@ -282,10 +289,13 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         context,
         MaterialPageRoute(
             builder: (_) => InterestSearchScreen(
-                interest: interest,
-                events: interesteventlist,
-                curruser: widget.curruser,
-                curruserlocation: widget.curruserlocation)));
+                  interest: interest,
+                  events: interesteventlist,
+                  curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "InterestSearchScreen")));
   }
 
   @override
@@ -321,7 +331,9 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                     curruser: widget.curruser,
                     visit: true,
                     curruserlocation: widget.curruserlocation,
-                  )));
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
     }
 
     Future<void> remuser(AppUser user, int index) async {
@@ -508,7 +520,14 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                                     uid: widget
                                                                         .curruser
                                                                         .uid,
+                                                                    analytics:
+                                                                        widget
+                                                                            .analytics,
                                                                   ),
+                                                              settings:
+                                                                  RouteSettings(
+                                                                      name:
+                                                                          "LoadingScreen"),
                                                               fullscreenDialog:
                                                                   true),
                                                         );
@@ -517,16 +536,21 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            EditEventScreen(
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              EditEventScreen(
                                                                 curruser: widget
                                                                     .curruser,
                                                                 allowbackarrow:
                                                                     true,
                                                                 event: widget
-                                                                    .event),
-                                                      ),
+                                                                    .event,
+                                                                analytics: widget
+                                                                    .analytics,
+                                                              ),
+                                                          settings: RouteSettings(
+                                                              name:
+                                                                  "EditEventScreen")),
                                                     );
                                                   }
                                             : () {

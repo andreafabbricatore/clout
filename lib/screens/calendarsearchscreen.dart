@@ -6,6 +6,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -13,8 +14,12 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 class CalendarSearchScreen extends StatefulWidget {
   AppLocation curruserlocation;
   AppUser curruser;
+  FirebaseAnalytics analytics;
   CalendarSearchScreen(
-      {Key? key, required this.curruserlocation, required this.curruser})
+      {Key? key,
+      required this.curruserlocation,
+      required this.curruser,
+      required this.analytics})
       : super(key: key);
 
   @override
@@ -135,7 +140,9 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                       participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
-                    )));
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
@@ -226,6 +233,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                       screenheight: screenheight,
                       curruser: widget.curruser,
                       screenwidth: screenwidth,
+                      analytics: widget.analytics,
                       interest: "Sports",
                     )
         ]),

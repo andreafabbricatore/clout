@@ -5,19 +5,21 @@ import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/screens/blockedusersscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SetttingsScreen extends StatefulWidget {
-  SetttingsScreen({Key? key, required this.curruser}) : super(key: key);
+class SettingsScreen extends StatefulWidget {
+  SettingsScreen({Key? key, required this.curruser, required this.analytics})
+      : super(key: key);
   AppUser curruser;
-
+  FirebaseAnalytics analytics;
   @override
-  State<SetttingsScreen> createState() => _SetttingsScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SetttingsScreenState extends State<SetttingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   db_conn db = db_conn();
 
   TextEditingController psw = TextEditingController();
@@ -55,8 +57,11 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthScreen")),
     );
   }
 
@@ -64,8 +69,11 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthenticationWrapper(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthenticationWrapper(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthenticationWrapper")),
     );
   }
 
@@ -516,7 +524,8 @@ class _SetttingsScreenState extends State<SetttingsScreen> {
                 MaterialPageRoute(
                     builder: (BuildContext context) => BlockedUsersScreen(
                           curruser: widget.curruser,
-                        )),
+                        ),
+                    settings: RouteSettings(name: "BlockedUsersScreen")),
               );
             },
             child: Row(

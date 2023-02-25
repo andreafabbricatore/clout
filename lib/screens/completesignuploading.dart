@@ -6,12 +6,15 @@ import 'package:clout/screens/emailverificationscreen.dart';
 import 'package:clout/screens/preauthscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CompleteSignUpLoading extends StatefulWidget {
-  CompleteSignUpLoading({Key? key, required this.uid}) : super(key: key);
+  CompleteSignUpLoading({Key? key, required this.uid, required this.analytics})
+      : super(key: key);
   String uid;
+  FirebaseAnalytics analytics;
   @override
   State<CompleteSignUpLoading> createState() => _CompleteSignUpLoadingState();
 }
@@ -82,35 +85,50 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => PicandNameScreen(),
+            builder: (BuildContext context) => PicandNameScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "PicandNameScreen"),
             fullscreenDialog: true),
       );
     } else if (curruser.setusername == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => UsernameScreen(),
+            builder: (BuildContext context) => UsernameScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "UsernameScreen"),
             fullscreenDialog: true),
       );
     } else if (curruser.setmisc == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => MiscScreen(),
+            builder: (BuildContext context) => MiscScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "MiscScreen"),
             fullscreenDialog: true),
       );
     } else if (curruser.setinterests == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => InterestScreen(),
+            builder: (BuildContext context) => InterestScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "InterestScreen"),
             fullscreenDialog: true),
       );
     } else {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => const EmailVerificationScreen(),
+            builder: (BuildContext context) => EmailVerificationScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "EmailVerificationScreen"),
             fullscreenDialog: true),
       );
     }
@@ -129,7 +147,10 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => PreAuthScreen(),
+            builder: (BuildContext context) => PreAuthScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "PreAuthScreen"),
             fullscreenDialog: true),
       );
     }

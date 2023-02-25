@@ -5,6 +5,7 @@ import 'package:clout/components/searchlocation.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +23,11 @@ class EditEventScreen extends StatefulWidget {
       {super.key,
       required this.curruser,
       required this.allowbackarrow,
-      required this.event});
+      required this.event,
+      required this.analytics});
   AppUser curruser;
   bool allowbackarrow;
+  FirebaseAnalytics analytics;
 
   Event event;
 
@@ -166,9 +169,11 @@ class _EditEventScreenState extends State<EditEventScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) =>
-            LoadingScreen(uid: widget.curruser.uid),
-      ),
+          builder: (BuildContext context) => LoadingScreen(
+                uid: widget.curruser.uid,
+                analytics: widget.analytics,
+              ),
+          settings: RouteSettings(name: "LoadingScreen")),
     );
   }
 
@@ -438,16 +443,16 @@ class _EditEventScreenState extends State<EditEventScreen> {
               AppLocation chosen = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SearchLocation(
-                      locationchosen: true,
-                      startlocation: AppLocation(
-                          address: widget.event.address,
-                          city: widget.event.city[0],
-                          country: widget.event.country,
-                          center: [widget.event.lat, widget.event.lng]),
-                      curruserLatLng: LatLngs,
-                    ),
-                  ));
+                      builder: (context) => SearchLocation(
+                            locationchosen: true,
+                            startlocation: AppLocation(
+                                address: widget.event.address,
+                                city: widget.event.city[0],
+                                country: widget.event.country,
+                                center: [widget.event.lat, widget.event.lng]),
+                            curruserLatLng: LatLngs,
+                          ),
+                      settings: RouteSettings(name: "SearchLocation")));
               setState(() {
                 chosenLocation = chosen;
               });

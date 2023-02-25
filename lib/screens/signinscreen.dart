@@ -2,12 +2,13 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/pswresetscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignInScreen extends StatefulWidget {
-  SignInScreen({Key? key}) : super(key: key);
-
+  SignInScreen({Key? key, required this.analytics}) : super(key: key);
+  FirebaseAnalytics analytics;
   @override
   State<SignInScreen> createState() => _SignInScreenState();
 }
@@ -39,8 +40,11 @@ class _SignInScreenState extends State<SignInScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthenticationWrapper(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthenticationWrapper(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthenticationWrapper")),
     );
   }
 
@@ -172,7 +176,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => PswResetScreen()),
+                      builder: (BuildContext context) => PswResetScreen(),
+                      settings: RouteSettings(name: "PswResetScreen")),
                 );
               },
               child: const Center(

@@ -3,6 +3,7 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 import 'eventdetailscreen.dart';
@@ -10,7 +11,12 @@ import 'eventdetailscreen.dart';
 class FavScreen extends StatefulWidget {
   AppUser curruser;
   AppLocation curruserlocation;
-  FavScreen({Key? key, required this.curruser, required this.curruserlocation})
+  FirebaseAnalytics analytics;
+  FavScreen(
+      {Key? key,
+      required this.curruser,
+      required this.curruserlocation,
+      required this.analytics})
       : super(key: key);
 
   @override
@@ -105,7 +111,9 @@ class _FavScreenState extends State<FavScreen> {
                       participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
-                    )));
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }

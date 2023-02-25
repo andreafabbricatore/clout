@@ -7,6 +7,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -16,11 +17,13 @@ class ChatRoomScreen extends StatefulWidget {
       {Key? key,
       required this.chatinfo,
       required this.curruser,
-      required this.curruserlocation})
+      required this.curruserlocation,
+      required this.analytics})
       : super(key: key);
   Chat chatinfo;
   AppUser curruser;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   @override
   State<ChatRoomScreen> createState() => _ChatRoomScreenState();
 }
@@ -100,7 +103,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   curruser: widget.curruser,
                   visit: true,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ProfileScreen")));
   }
 
   @override
@@ -135,7 +140,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                             participants: participants,
                             interactfav: interactfav,
                             curruserlocation: widget.curruserlocation,
-                          )));
+                            analytics: widget.analytics,
+                          ),
+                      settings: RouteSettings(name: "EventDetailScreen")));
             }
           },
           child: Text(

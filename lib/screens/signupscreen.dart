@@ -4,6 +4,7 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -16,8 +17,8 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SignUpScreen extends StatefulWidget {
-  SignUpScreen({Key? key}) : super(key: key);
-
+  SignUpScreen({Key? key, required this.analytics}) : super(key: key);
+  FirebaseAnalytics analytics;
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
@@ -50,8 +51,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => PicandNameScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => PicandNameScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "PicandNameScreen")),
     );
   }
 
@@ -245,7 +249,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class PicandNameScreen extends StatefulWidget {
-  PicandNameScreen({super.key});
+  PicandNameScreen({super.key, required this.analytics});
+  FirebaseAnalytics analytics;
   @override
   State<PicandNameScreen> createState() => _PicandNameScreenState();
 }
@@ -303,8 +308,11 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthScreen")),
     );
   }
 
@@ -312,8 +320,11 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => UsernameScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => UsernameScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "UsernameScreen")),
     );
   }
 
@@ -570,7 +581,9 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
 class UsernameScreen extends StatefulWidget {
   UsernameScreen({
     Key? key,
+    required this.analytics,
   }) : super(key: key);
+  FirebaseAnalytics analytics;
   @override
   State<UsernameScreen> createState() => _UsernameScreenState();
 }
@@ -604,7 +617,9 @@ class _UsernameScreenState extends State<UsernameScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthScreen(),
+          builder: (BuildContext context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
           fullscreenDialog: true),
     );
   }
@@ -613,8 +628,10 @@ class _UsernameScreenState extends State<UsernameScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => MiscScreen(),
-      ),
+          builder: (BuildContext context) => MiscScreen(
+                analytics: widget.analytics,
+              ),
+          settings: RouteSettings(name: "MiscScreen")),
     );
   }
 
@@ -805,8 +822,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
 }
 
 class MiscScreen extends StatefulWidget {
-  MiscScreen({super.key});
-
+  MiscScreen({super.key, required this.analytics});
+  FirebaseAnalytics analytics;
   @override
   State<MiscScreen> createState() => _MiscScreenState();
 }
@@ -1095,8 +1112,11 @@ class _MiscScreenState extends State<MiscScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthScreen")),
     );
   }
 
@@ -1104,8 +1124,11 @@ class _MiscScreenState extends State<MiscScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => InterestScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => InterestScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "InterestScreen")),
     );
   }
 
@@ -1411,9 +1434,8 @@ class _MiscScreenState extends State<MiscScreen> {
 }
 
 class InterestScreen extends StatefulWidget {
-  InterestScreen({
-    Key? key,
-  }) : super(key: key);
+  InterestScreen({Key? key, required this.analytics}) : super(key: key);
+  FirebaseAnalytics analytics;
   @override
   State<InterestScreen> createState() => _InterestScreenState();
 }
@@ -1468,8 +1490,11 @@ class _InterestScreenState extends State<InterestScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthScreen(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthScreen")),
     );
   }
 
@@ -1477,8 +1502,11 @@ class _InterestScreenState extends State<InterestScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthenticationWrapper(),
-          fullscreenDialog: true),
+          builder: (BuildContext context) => AuthenticationWrapper(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthenticationWrapper")),
     );
   }
 

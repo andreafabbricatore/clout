@@ -5,14 +5,19 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/calendarsearchscreen.dart';
 import 'package:clout/screens/interestsearchscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import '../components/event.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreen(
-      {super.key, required this.curruser, required this.curruserlocation});
+      {super.key,
+      required this.curruser,
+      required this.curruserlocation,
+      required this.analytics});
   AppUser curruser;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
@@ -77,10 +82,13 @@ class _SearchScreenState extends State<SearchScreen> {
         context,
         MaterialPageRoute(
             builder: (_) => InterestSearchScreen(
-                interest: interest,
-                events: interesteventlist,
-                curruser: widget.curruser,
-                curruserlocation: widget.curruserlocation)));
+                  interest: interest,
+                  events: interesteventlist,
+                  curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "InterestSearchScreen")));
   }
 
   @override
@@ -203,7 +211,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                         curruserlocation:
                                             widget.curruserlocation,
                                         curruser: widget.curruser,
-                                      )));
+                                        analytics: widget.analytics,
+                                      ),
+                                  settings: RouteSettings(
+                                      name: "CalendarSearchScreen")));
                         },
                         child: SizedBox(
                           width: screenwidth * 0.05,
@@ -301,6 +312,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   curruser: widget.curruser,
                   query: searchcontroller.text,
                   curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
                 )
               : SearchGridView(
                   interests: interests,

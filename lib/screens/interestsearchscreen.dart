@@ -5,6 +5,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/createeventscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 import '../components/event.dart';
@@ -15,12 +16,14 @@ class InterestSearchScreen extends StatefulWidget {
       required this.interest,
       required this.events,
       required this.curruser,
-      required this.curruserlocation})
+      required this.curruserlocation,
+      required this.analytics})
       : super(key: key);
   String interest;
   List<Event> events;
   AppUser curruser;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   @override
   State<InterestSearchScreen> createState() => _InterestSearchScreenState();
 }
@@ -117,7 +120,9 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                       participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
-                    )));
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
@@ -181,6 +186,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                       curruser: widget.curruser,
                       screenwidth: screenwidth,
                       interest: widget.interest,
+                      analytics: widget.analytics,
                     ),
                   )),
       ),

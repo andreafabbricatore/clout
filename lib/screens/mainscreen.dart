@@ -13,6 +13,7 @@ import 'package:clout/screens/homescreen.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/screens/searchscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +25,13 @@ class MainScreen extends StatefulWidget {
   AppUser curruser;
   AppLocation curruserlocation;
   bool justloaded;
+  FirebaseAnalytics analytics;
   MainScreen(
       {Key? key,
       required this.curruser,
       required this.curruserlocation,
-      required this.justloaded})
+      required this.justloaded,
+      required this.analytics})
       : super(key: key);
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -66,23 +69,30 @@ class _MainScreenState extends State<MainScreen> {
         curruser: widget.curruser,
         curruserlocation: widget.curruserlocation,
         justloaded: widget.justloaded,
+        analytics: widget.analytics,
       ),
       SearchScreen(
-          curruser: widget.curruser, curruserlocation: widget.curruserlocation),
+        curruser: widget.curruser,
+        curruserlocation: widget.curruserlocation,
+        analytics: widget.analytics,
+      ),
       CreateEventScreen(
         curruser: widget.curruser,
         allowbackarrow: false,
         startinterest: "Sports",
+        analytics: widget.analytics,
       ),
       FavScreen(
         curruser: widget.curruser,
         curruserlocation: widget.curruserlocation,
+        analytics: widget.analytics,
       ),
       ProfileScreen(
         user: widget.curruser,
         curruser: widget.curruser,
         visit: false,
         curruserlocation: widget.curruserlocation,
+        analytics: widget.analytics,
       )
     ];
   }
@@ -135,7 +145,9 @@ class _MainScreenState extends State<MainScreen> {
                   curruser: widget.curruser,
                   participants: participants,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "DeepLinkEventDetailScreen")));
   }
 
   void gochatroomscreen(Chat chat) {
@@ -146,7 +158,9 @@ class _MainScreenState extends State<MainScreen> {
                   chatinfo: chat,
                   curruser: widget.curruser,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ChatRoomScreen")));
   }
 
   void gotoprofilescreen(AppUser user) {
@@ -158,7 +172,9 @@ class _MainScreenState extends State<MainScreen> {
                   curruser: widget.curruser,
                   visit: true,
                   curruserlocation: widget.curruserlocation,
-                )));
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ProfileScreen")));
   }
 
   void openAppLink(Uri uri) async {

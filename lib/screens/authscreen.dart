@@ -1,14 +1,14 @@
 import 'package:clout/screens/signinscreen.dart';
 import 'package:clout/screens/signupscreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
 import 'package:rive/rive.dart';
 
 class AuthScreen extends StatefulWidget {
-  AuthScreen({Key? key}) : super(key: key);
-
+  AuthScreen({Key? key, required this.analytics}) : super(key: key);
+  FirebaseAnalytics analytics;
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
@@ -76,7 +76,10 @@ class _AuthScreenState extends State<AuthScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SignUpScreen()),
+                                builder: (context) => SignUpScreen(
+                                      analytics: widget.analytics,
+                                    ),
+                                settings: RouteSettings(name: "SignUpScreen")),
                           );
                         },
                         child: SizedBox(
@@ -108,7 +111,11 @@ class _AuthScreenState extends State<AuthScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SignInScreen()),
+                                  builder: (context) => SignInScreen(
+                                        analytics: widget.analytics,
+                                      ),
+                                  settings:
+                                      RouteSettings(name: "SignInScreen")),
                             );
                           },
                           child: Text(

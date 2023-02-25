@@ -5,6 +5,7 @@ import 'package:clout/components/searchlocation.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/loading.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +24,12 @@ class CreateEventScreen extends StatefulWidget {
       {super.key,
       required this.curruser,
       required this.allowbackarrow,
-      required this.startinterest});
+      required this.startinterest,
+      required this.analytics});
   AppUser curruser;
   bool allowbackarrow;
   String startinterest;
+  FirebaseAnalytics analytics;
 
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -168,9 +171,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) =>
-            LoadingScreen(uid: widget.curruser.uid),
-      ),
+          builder: (BuildContext context) => LoadingScreen(
+                uid: widget.curruser.uid,
+                analytics: widget.analytics,
+              ),
+          settings: RouteSettings(name: "LoadingScreen")),
     );
   }
 
@@ -445,30 +450,30 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   ? await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SearchLocation(
-                          locationchosen: false,
-                          startlocation: AppLocation(
-                              address: "",
-                              center: [0.0, 0.0],
-                              city: "",
-                              country: ""),
-                          curruserLatLng: LatLngs,
-                        ),
-                      ))
+                          builder: (context) => SearchLocation(
+                                locationchosen: false,
+                                startlocation: AppLocation(
+                                    address: "",
+                                    center: [0.0, 0.0],
+                                    city: "",
+                                    country: ""),
+                                curruserLatLng: LatLngs,
+                              ),
+                          settings: RouteSettings(name: "SearchLocation")))
                   : await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SearchLocation(
-                          locationchosen: true,
-                          startlocation: AppLocation(
-                            address: chosenLocation.address,
-                            center: chosenLocation.center,
-                            city: chosenLocation.city,
-                            country: chosenLocation.country,
-                          ),
-                          curruserLatLng: LatLngs,
-                        ),
-                      ));
+                          builder: (context) => SearchLocation(
+                                locationchosen: true,
+                                startlocation: AppLocation(
+                                  address: chosenLocation.address,
+                                  center: chosenLocation.center,
+                                  city: chosenLocation.city,
+                                  country: chosenLocation.country,
+                                ),
+                                curruserLatLng: LatLngs,
+                              ),
+                          settings: RouteSettings(name: "SearchLocation")));
               setState(() {
                 chosenLocation = chosen;
               });

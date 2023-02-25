@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -41,13 +42,20 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   PendingDynamicLinkData? initialLink;
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   MyApp({super.key, initialLink});
   @override
   Widget build(BuildContext context) {
+    analytics.setAnalyticsCollectionEnabled(true);
     return MaterialApp(
       title: 'clout',
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
       debugShowCheckedModeBanner: false,
-      home: AuthenticationWrapper(),
+      home: AuthenticationWrapper(
+        analytics: analytics,
+      ),
       theme: ThemeData(
           primaryColor: const Color.fromARGB(255, 255, 48, 117),
           fontFamily: "Archivo",
@@ -60,6 +68,8 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthenticationWrapper extends StatefulWidget {
+  AuthenticationWrapper({super.key, required this.analytics});
+  FirebaseAnalytics analytics;
   @override
   State<AuthenticationWrapper> createState() => _AuthenticationWrapperState();
 }
@@ -74,13 +84,16 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
           if (snapshot.hasData) {
             //print(FirebaseAuth.instance.currentUser!);
             if (FirebaseAuth.instance.currentUser!.emailVerified) {
-              return LoadingScreen(uid: FirebaseAuth.instance.currentUser!.uid);
+              return LoadingScreen(
+                  uid: FirebaseAuth.instance.currentUser!.uid,
+                  analytics: widget.analytics);
             } else {
               return CompleteSignUpLoading(
-                  uid: FirebaseAuth.instance.currentUser!.uid);
+                  uid: FirebaseAuth.instance.currentUser!.uid,
+                  analytics: widget.analytics);
             }
           } else {
-            return PreAuthScreen();
+            return PreAuthScreen(analytics: widget.analytics);
           }
         }),
       ),

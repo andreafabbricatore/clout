@@ -10,6 +10,7 @@ import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/notificationscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,11 +18,13 @@ class HomeScreen extends StatefulWidget {
   bool justloaded;
   AppUser curruser;
   AppLocation curruserlocation;
+  FirebaseAnalytics analytics;
   HomeScreen(
       {Key? key,
       required this.justloaded,
       required this.curruser,
-      required this.curruserlocation})
+      required this.curruserlocation,
+      required this.analytics})
       : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -111,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //  generaleventlist = events;
       //  interesteventlist = interestevents;
       //});
+      await widget.analytics.logEvent(name: "please");
       getSortedCurrLocEventsList();
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");
@@ -182,7 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
-                    )));
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
@@ -215,7 +221,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (_) => NotificationScreen(
                             curruser: widget.curruser,
                             curruserlocation: widget.curruserlocation,
-                          )));
+                            analytics: widget.analytics,
+                          ),
+                      settings: RouteSettings(name: "NotificationScreen")));
               refresh();
             },
             child: Padding(
@@ -265,7 +273,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (_) => ChatListScreen(
                             curruser: widget.curruser,
                             curruserlocation: widget.curruserlocation,
-                          )));
+                            analytics: widget.analytics,
+                          ),
+                      settings: RouteSettings(name: "ChatListScreen")));
               refresh();
             },
             child: Padding(

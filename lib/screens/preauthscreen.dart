@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/screens/authscreen.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PreAuthScreen extends StatefulWidget {
+  PreAuthScreen({super.key, required this.analytics});
+  FirebaseAnalytics analytics;
   @override
   State<PreAuthScreen> createState() => _PreAuthScreenState();
 }
@@ -20,7 +23,11 @@ class _PreAuthScreenState extends State<PreAuthScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => AuthScreen(), fullscreenDialog: true),
+          builder: (context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
+          settings: RouteSettings(name: "AuthScreen"),
+          fullscreenDialog: true),
     );
   }
 
