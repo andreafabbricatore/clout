@@ -234,6 +234,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                                           fontSize: 15),
                                       textScaleFactor: 1.0,
                                       maxLines: 2,
+                                      textAlign: TextAlign.center,
                                     ),
                                   )),
                                 ],
