@@ -604,9 +604,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
                             "Please enter a name for your event");
                       } else if (desccontroller.text.trim().isEmpty) {
                         displayErrorSnackBar("Please enter a description");
-                      } else if (int.parse(maxpartcontroller.text) <= 1) {
+                      } else if (maxpartcontroller.text.isEmpty) {
                         displayErrorSnackBar(
-                            "Please enter a valid max number of participants");
+                            "Please enter a max number of participants");
+                      } else if (int.parse(maxpartcontroller.text.trim()) < 2) {
+                        displayErrorSnackBar(
+                            "Max number of participants has to be at least 2");
                       } else if (eventdate
                           .isAtSameMomentAs(DateTime(0, 0, 0))) {
                         displayErrorSnackBar(

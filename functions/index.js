@@ -124,3 +124,4 @@ exports.eventNotifyFollowers = functions.firestore.document("events/{id}").onCre
         return;
     }
 });
+

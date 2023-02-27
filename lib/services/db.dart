@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
@@ -7,6 +9,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 extension FirestoreDocumentExtension on DocumentReference {
   Future<DocumentSnapshot> getSavy() async {
@@ -53,9 +56,14 @@ class db_conn {
   CollectionReference report = FirebaseFirestore.instance.collection('report');
   CollectionReference chats = FirebaseFirestore.instance.collection('chats');
   CollectionReference bugs = FirebaseFirestore.instance.collection('bugs');
+  CollectionReference maintenance =
+      FirebaseFirestore.instance.collection('maintenance');
+  CollectionReference appupdate =
+      FirebaseFirestore.instance.collection('appupdate');
 
   Future createuserinstance(String email, String uid) async {
     try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
       await users.doc(uid).set({
         'fullname': '',
         'email': email,
@@ -88,7 +96,8 @@ class db_conn {
         'lastknownlat': 0.0,
         'lastknownlng': 0.0,
         'notificationcounter': 0,
-        'chatnotificationcounter': 0
+        'chatnotificationcounter': 0,
+        'appversion': packageInfo.version
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -1465,15 +1474,16 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await chats.get().then(
+    await events.get().then(
           (value) => value.docs.forEach(
             (element) async {
               var docRef = FirebaseFirestore.instance
-                  .collection('chats')
+                  .collection('events')
                   .doc(element.id);
 
-              chats.doc(element.id).set(
-                  {'lastmessagetime': DateTime.now()}, SetOptions(merge: true));
+              events.doc(element.id).set({
+                'presentparticipants': [element['hostdocid']]
+              }, SetOptions(merge: true));
             },
           ),
         );
@@ -1738,6 +1748,38 @@ class db_conn {
           .set({"clout": FieldValue.increment(5)}, SetOptions(merge: true));
     } catch (e) {
       throw Exception("Could not validate, please try again");
+    }
+  }
+
+  Future<bool> undermaintenance() async {
+    try {
+      QuerySnapshot querySnapshot = await maintenance.get();
+      bool maintenancestatus = false;
+      querySnapshot.docs.forEach((element) {
+        maintenancestatus = element['maintenance_status'];
+      });
+      return maintenancestatus;
+    } catch (e) {
+      throw Exception("Could not pull maintenance status");
+    }
+  }
+
+  Future<bool> checkversionandneedupdate(String uid) async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      await users
+          .doc(uid)
+          .set({"appversion": packageInfo.version}, SetOptions(merge: true));
+      QuerySnapshot querySnapshot = await appupdate.get();
+      bool needupdatestatus = false;
+      String requiredversion = "";
+      querySnapshot.docs.forEach((element) {
+        needupdatestatus = element['need_update_status'];
+        requiredversion = element['app_version'];
+      });
+      return (needupdatestatus && requiredversion != packageInfo.version);
+    } catch (e) {
+      throw Exception("Could not pull update status");
     }
   }
 }

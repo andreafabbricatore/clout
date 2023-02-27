@@ -261,6 +261,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               margin: const EdgeInsets.fromLTRB(15, 0, 15, 25),
               child: TextField(
                 controller: _textmessage,
+                textInputAction: TextInputAction.newline,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 14, horizontal: 10),

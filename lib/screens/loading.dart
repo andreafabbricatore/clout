@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/main.dart';
 import 'package:clout/screens/mainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
@@ -11,6 +13,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:launch_review/launch_review.dart';
 
 class LoadingScreen extends StatefulWidget {
   LoadingScreen({Key? key, required this.uid, required this.analytics})
@@ -24,6 +28,8 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> {
   late bool _serviceEnabled;
   late LocationPermission permission;
+  bool maintenance = false;
+  bool update = false;
   Position? _userLocation;
   bool error = false;
   AppLocation curruserlocation =
@@ -179,10 +185,38 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
+  Future<void> undermaintenance() async {
+    try {
+      bool maint = await db.undermaintenance();
+      setState(() {
+        maintenance = maint;
+      });
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> needupdate() async {
+    try {
+      bool upd = await db.checkversionandneedupdate(widget.uid);
+      setState(() {
+        update = upd;
+      });
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   void loadinglogic() async {
     try {
       await ensurelocation();
-      await appinit();
+      await undermaintenance();
+      if (!maintenance) {
+        await needupdate();
+        if (!update) {
+          await appinit();
+        }
+      }
     } catch (e) {
       setState(() {
         error = true;
@@ -205,47 +239,141 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Widget build(BuildContext context) {
     final screenheight = MediaQuery.of(context).size.height;
     final screenwidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      body: SafeArea(
-        child: error
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Please make sure Location Services are enabled\nor\nCheck your internet connection",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    SizedBox(
-                      height: screenheight * 0.02,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        loadinglogic();
-                      },
-                      child: SizedBox(
-                          height: 50,
-                          width: screenwidth * 0.6,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(20))),
-                            child: const Center(
-                                child: Text(
-                              "Refresh",
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
-                            )),
-                          )),
-                    ),
-                  ],
+    if (maintenance) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Server under maintenance\n\nWe'll be back soon!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                  textScaleFactor: 1.2,
                 ),
-              )
-            : Center(child: Image.asset("assets/images/logos/cloutlogo.gif")),
-      ),
-    );
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                InkWell(
+                  onTap: () {
+                    loadinglogic();
+                  },
+                  child: SizedBox(
+                      height: 50,
+                      width: screenwidth * 0.6,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20))),
+                        child: const Center(
+                            child: Text(
+                          "Refresh",
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                          textScaleFactor: 1.2,
+                        )),
+                      )),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else if (update) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                    "Update available!\n\nUpdate Clout to keep Going Out!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    textScaleFactor: 1.2),
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                InkWell(
+                  onTap: () {
+                    LaunchReview.launch(
+                        iOSAppId: "1642153685",
+                        androidAppId: "com.outwithclout.clout",
+                        writeReview: false);
+                  },
+                  child: SizedBox(
+                      height: 50,
+                      width: screenwidth * 0.6,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20))),
+                        child: const Center(
+                            child: Text(
+                          "Update",
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                          textScaleFactor: 1.2,
+                        )),
+                      )),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else if (error) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                    "Please make sure Location Services are enabled\nor\nCheck your internet connection",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    textScaleFactor: 1.2),
+                SizedBox(
+                  height: screenheight * 0.02,
+                ),
+                InkWell(
+                  onTap: () {
+                    loadinglogic();
+                  },
+                  child: SizedBox(
+                      height: 50,
+                      width: screenwidth * 0.6,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20))),
+                        child: const Center(
+                            child: Text(
+                          "Refresh",
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                          textScaleFactor: 1.2,
+                        )),
+                      )),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child:
+              Center(child: Image.asset("assets/images/logos/cloutlogo.gif")),
+        ),
+      );
+    }
   }
 }

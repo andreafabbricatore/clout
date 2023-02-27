@@ -166,8 +166,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void screenview() async {
+    await widget.analytics.logScreenView(screenName: "HomeScreen");
+  }
+
   @override
   void initState() {
+    screenview();
     if (widget.justloaded) {
       refreshevents();
     } else {
