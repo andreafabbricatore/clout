@@ -240,7 +240,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "currentparticipants": widget.event.participants.length,
           "predeletionstatus": joinedval
         });
-        Navigator.of(context).push(
+        Navigator.push(
+          context,
           MaterialPageRoute(
               builder: (context) => LoadingScreen(
                     uid: widget.curruser.uid,

@@ -620,7 +620,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
           builder: (BuildContext context) => AuthScreen(
                 analytics: widget.analytics,
               ),
-          fullscreenDialog: true),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthScreen")),
     );
   }
 

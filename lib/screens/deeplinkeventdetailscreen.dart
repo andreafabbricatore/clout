@@ -212,7 +212,8 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
           "currentparticipants": widget.event.participants.length,
           "predeletionstatus": joinedval
         });
-        Navigator.of(context).push(
+        Navigator.push(
+          context,
           MaterialPageRoute(
               builder: (context) => LoadingScreen(
                     uid: widget.curruser.uid,
