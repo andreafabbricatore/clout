@@ -41,6 +41,7 @@
 	<array>
 		<string>https://outwithclout.com/event/</string>
 		<string>https://outwithclout.com/user/</string>
+		<string>https://outwithclout.com/referral/</string>
 	</array>
 	<key>FirebaseAutomaticScreenReportingEnabled</key>
 	<true/>
