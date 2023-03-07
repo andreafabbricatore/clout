@@ -1085,10 +1085,21 @@ class db_conn {
   Future<List<AppUser>> geteventparticipantslist(Event event) async {
     try {
       List<AppUser> participants = [];
-      QuerySnapshot querySnapshot =
-          await users.where("uid", whereIn: event.participants).getSavy();
-      querySnapshot.docs.forEach((element) {
-        participants.add(AppUser.fromJson(element.data(), element.id));
+      List<List<dynamic>> subList = [];
+      for (var i = 0; i < event.participants.length; i += 10) {
+        subList.add(event.participants.sublist(
+            i,
+            i + 10 > event.participants.length
+                ? event.participants.length
+                : i + 10));
+      }
+
+      subList.forEach((element) {
+        users.where("uid", whereIn: element).getSavy().then((value) => {
+              value.docs.forEach((element) {
+                participants.add(AppUser.fromJson(element.data(), element.id));
+              })
+            });
       });
       return participants;
     } catch (e) {
