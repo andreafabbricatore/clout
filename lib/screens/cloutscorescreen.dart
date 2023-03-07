@@ -4,8 +4,10 @@ import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/profilescreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CloutScoreScreen extends StatefulWidget {
   CloutScoreScreen(
@@ -54,6 +56,27 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
     } catch (e) {
       displayErrorSnackBar("Could not get user rankings");
     }
+  }
+
+  Future<String> createShareLink() async {
+    final dynamicLinkParams = DynamicLinkParameters(
+      link:
+          Uri.parse("https://outwithclout.com/referral/${widget.curruser.uid}"),
+      uriPrefix: "https://outwithclout.page.link",
+    );
+    final dynamicLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+    return dynamicLink.shortUrl.toString();
+  }
+
+  void refer(String text) async {
+    final box = context.findRenderObject() as RenderBox?;
+    await widget.analytics.logEvent(name: "referred_user", parameters: {});
+    await Share.share(
+      text,
+      subject: "${widget.curruser.fullname} wants you to join them on Clout",
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
   }
 
   @override
@@ -110,7 +133,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: SizedBox(
-            height: screenheight * 0.4 + globalrankedusers.length * 80,
+            height: screenheight * 0.8 + globalrankedusers.length * 60,
             width: screenwidth,
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -151,12 +174,40 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 height: screenheight * 0.01,
               ),
               const Text(
-                "Clout Scores are assigned as following:\n• 20 points for creating an event.\n• 10 points for participating in an event.\n• 5 points everytime a user participates in an event you host.",
+                "Clout Scores are assigned as following:\n• 20 points for creating an event.\n• 10 points for participating in an event.\n• 5 points everytime a user participates in an event you host. \n• 30 points every time you invite a new person on Clout\n• 20 points when you're invited on Clout",
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w200,
                     fontSize: 20),
                 textScaleFactor: 1.0,
+              ),
+              SizedBox(
+                height: screenheight * 0.02,
+              ),
+              GestureDetector(
+                onTap: widget.curruser.referred.length <= 10
+                    ? () async {
+                        String link = await createShareLink();
+                        String text =
+                            "${widget.curruser.fullname} wants you to join them on Clout\n\n$link";
+                        refer(text);
+                      }
+                    : null,
+                child: Container(
+                  height: screenheight * 0.05,
+                  width: screenwidth,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                      child: Text(
+                    "Invite a Friend - ${widget.curruser.referred.length}/10",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  )),
+                ),
               ),
               SizedBox(
                 height: screenheight * 0.02,

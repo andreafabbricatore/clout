@@ -380,7 +380,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 GestureDetector(
                     onTap: () async {
                       String link = await createShareLink();
-                      shareuser(link);
+                      String text =
+                          "Follow @${widget.user.username} on Clout\n\n$link";
+                      shareuser(text);
                     },
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),

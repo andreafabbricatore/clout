@@ -88,6 +88,8 @@ class db_conn {
         'visiblechats': [],
         'tokens': [],
         'notifications': [],
+        'referred': [],
+        'referredby': [],
         'plan': 'free',
         'setnameandpfp': false,
         'setusername': false,
@@ -1038,10 +1040,18 @@ class db_conn {
   Future<List<AppUser>> getfollowinglist(AppUser user) async {
     try {
       List<AppUser> following = [];
-      QuerySnapshot querySnapshot =
-          await users.where("uid", whereIn: user.following).getSavy();
-      querySnapshot.docs.forEach((element) {
-        following.add(AppUser.fromJson(element.data(), element.id));
+      List<List<dynamic>> subList = [];
+      for (var i = 0; i < user.following.length; i += 10) {
+        subList.add(user.following.sublist(i,
+            i + 10 > user.following.length ? user.following.length : i + 10));
+      }
+
+      subList.forEach((element) {
+        users.where("uid", whereIn: element).getSavy().then((value) => {
+              value.docs.forEach((element) {
+                following.add(AppUser.fromJson(element.data(), element.id));
+              })
+            });
       });
       return following;
     } catch (e) {
@@ -1052,13 +1062,22 @@ class db_conn {
   Future<List<AppUser>> getfollowerslist(AppUser user) async {
     try {
       List<AppUser> followers = [];
-      QuerySnapshot querySnapshot =
-          await users.where("uid", whereIn: user.followers).getSavy();
-      querySnapshot.docs.forEach((element) {
-        followers.add(AppUser.fromJson(element.data(), element.id));
+      List<List<dynamic>> subList = [];
+      for (var i = 0; i < user.followers.length; i += 10) {
+        subList.add(user.followers.sublist(i,
+            i + 10 > user.followers.length ? user.followers.length : i + 10));
+      }
+
+      subList.forEach((element) {
+        users.where("uid", whereIn: element).getSavy().then((value) => {
+              value.docs.forEach((element) {
+                followers.add(AppUser.fromJson(element.data(), element.id));
+              })
+            });
       });
       return followers;
     } catch (e) {
+      print(e);
       throw Exception(e);
     }
   }
@@ -1474,16 +1493,11 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await events.get().then(
+    await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              var docRef = FirebaseFirestore.instance
-                  .collection('events')
-                  .doc(element.id);
-
-              events.doc(element.id).set({
-                'presentparticipants': [element['hostdocid']]
-              }, SetOptions(merge: true));
+              users.doc(element.id).set(
+                  {'referred': [], 'referredby': []}, SetOptions(merge: true));
             },
           ),
         );
@@ -1780,6 +1794,29 @@ class db_conn {
       return (needupdatestatus && requiredversion != packageInfo.version);
     } catch (e) {
       throw Exception("Could not pull update status");
+    }
+  }
+
+  Future<void> referralcloutinc(String referreduid, String shareruid) async {
+    try {
+      DocumentSnapshot referredsnapshot = await users.doc(referreduid).get();
+      DocumentSnapshot sharersnapshot = await users.doc(shareruid).get();
+      int referredlength = referredsnapshot['referredby'].length;
+      int sharerlength = referredsnapshot['referred'].length;
+      if (referredlength < 1 && sharerlength <= 10) {
+        await users.doc(referreduid).set({
+          "clout": FieldValue.increment(20),
+          "referredby": FieldValue.arrayUnion([shareruid])
+        }, SetOptions(merge: true));
+        await users.doc(shareruid).set({
+          "clout": FieldValue.increment(30),
+          "referred": FieldValue.arrayUnion([referreduid])
+        }, SetOptions(merge: true));
+      } else {
+        throw Exception();
+      }
+    } catch (e) {
+      throw Exception();
     }
   }
 }

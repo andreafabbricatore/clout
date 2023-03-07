@@ -88,6 +88,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                     "${widget.user.clout}\nClout",
                     textAlign: TextAlign.center,
                     textScaleFactor: 1.0,
+                    style: TextStyle(color: Theme.of(context).primaryColor),
                   ),
                 ),
                 SizedBox(

@@ -28,6 +28,7 @@ class AppUser {
   double lastknownlng;
   int notificationcounter;
   int chatnotificationcounter;
+  List referred;
 
   AppUser(
       {required this.username,
@@ -58,7 +59,8 @@ class AppUser {
       required this.lastknownlat,
       required this.lastknownlng,
       required this.notificationcounter,
-      required this.chatnotificationcounter});
+      required this.chatnotificationcounter,
+      required this.referred});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -90,6 +92,7 @@ class AppUser {
         lastknownlat: json['lastknownlat'],
         lastknownlng: json['lastknownlng'],
         notificationcounter: json['notificationcounter'],
-        chatnotificationcounter: json['chatnotificationcounter']);
+        chatnotificationcounter: json['chatnotificationcounter'],
+        referred: json['referred'] as List);
   }
 }

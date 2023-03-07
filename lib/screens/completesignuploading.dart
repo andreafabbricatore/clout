@@ -49,7 +49,8 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       lastknownlat: 0.0,
       lastknownlng: 0.0,
       notificationcounter: 0,
-      chatnotificationcounter: 0);
+      chatnotificationcounter: 0,
+      referred: []);
 
   db_conn db = db_conn();
 

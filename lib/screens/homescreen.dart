@@ -214,14 +214,19 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          "Clout.",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.w900,
-            fontSize: 50,
+        title: GestureDetector(
+          onTap: () async {
+            await db.addAttributetoAllDocuments();
+          },
+          child: Text(
+            "Clout.",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w900,
+              fontSize: 50,
+            ),
+            textScaleFactor: 1.0,
           ),
-          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,

@@ -189,6 +189,14 @@ class _MainScreenState extends State<MainScreen> {
       } else if (splitlink[splitlink.length - 2] == "user") {
         AppUser user = await db.getUserFromUID(id);
         gotoprofilescreen(user);
+      } else if (splitlink[splitlink.length - 2] == "referral") {
+        try {
+          await db.referralcloutinc(widget.curruser.uid, id).catchError((e) {
+            throw Exception();
+          });
+          displayErrorSnackBar(
+              "Succesfully referred! Clout score has been increased!");
+        } catch (e) {}
       }
     } catch (e) {}
   }
