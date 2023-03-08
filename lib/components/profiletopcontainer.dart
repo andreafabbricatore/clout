@@ -67,7 +67,8 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: screenheight * 0.035,
+            height:
+                widget.iscurruser ? screenheight * 0.02 : screenheight * 0.035,
           ),
           widget.iscurruser
               ? GestureDetector(
@@ -75,13 +76,13 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   child: Center(
                     child: Container(
                       height: screenheight * 0.05,
-                      width: screenwidth * 0.6,
+                      width: screenwidth * 0.8,
                       decoration: BoxDecoration(
                           color: Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(10)),
                       child: const Center(
                         child: Text(
-                          "Invite Friends to Clout!",
+                          "Invite your friends to Clout!",
                           textScaleFactor: 1.0,
                           style: TextStyle(
                               fontSize: 18,

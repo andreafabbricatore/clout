@@ -32,12 +32,14 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
   List<Event> filteredEventList = [];
   bool displaycalendar = true;
   DateTime initialDate = DateTime.now();
+  Color loadedcolor = Colors.black;
 
-  void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+  void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) async {
     setState(() {
       selectedDate = args.value;
     });
     getEventList();
+    await Future.delayed(Duration(milliseconds: 200));
     setState(() {
       displaycalendar = false;
     });
@@ -247,6 +249,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                       screenwidth: screenwidth,
                       analytics: widget.analytics,
                       interest: "Sports",
+                      allcolor: loadedcolor,
                     )
         ]),
       ),

@@ -15,7 +15,9 @@ class FollowerFollowingScreen extends StatefulWidget {
       required this.curruser,
       required this.onfollowers,
       required this.curruserlocation,
-      required this.analytics})
+      required this.analytics,
+      required this.followers,
+      required this.following})
       : super(key: key);
   AppUser user;
   AppUser curruser;
@@ -23,14 +25,14 @@ class FollowerFollowingScreen extends StatefulWidget {
   bool onfollowers;
   AppLocation curruserlocation;
   FirebaseAnalytics analytics;
+  List<AppUser> followers;
+  List<AppUser> following;
   @override
   State<FollowerFollowingScreen> createState() =>
       _FollowerFollowingScreenState();
 }
 
 class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
-  List<AppUser> followers = [];
-  List<AppUser> following = [];
   db_conn db = db_conn();
 
   void displayErrorSnackBar(
@@ -51,38 +53,8 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Future<void> getfollowerslist() async {
-    followers = [];
-    try {
-      List<AppUser> temp = await db.getfollowerslist(widget.user);
-      setState(() {
-        followers = temp;
-      });
-    } catch (e) {
-      displayErrorSnackBar("Could not retrieve followers");
-    }
-  }
-
-  Future<void> getfollowinglist() async {
-    following = [];
-    try {
-      List<AppUser> temp = await db.getfollowinglist(widget.user);
-      setState(() {
-        following = temp;
-      });
-    } catch (e) {
-      displayErrorSnackBar("Could not retrieve following");
-    }
-  }
-
-  Future<void> refresh() async {
-    await getfollowerslist();
-    await getfollowinglist();
-  }
-
   @override
   void initState() {
-    refresh();
     super.initState();
   }
 
@@ -185,7 +157,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
           ],
         ),
         UserListView(
-          userres: widget.onfollowers ? followers : following,
+          userres: widget.onfollowers ? widget.followers : widget.following,
           onTap: usernavigate,
           curruser: widget.curruser,
           screenwidth: screenwidth,

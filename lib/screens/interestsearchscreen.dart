@@ -199,6 +199,7 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                       screenwidth: screenwidth,
                       interest: widget.interest,
                       analytics: widget.analytics,
+                      allcolor: Colors.black,
                     ),
                   )),
       ),

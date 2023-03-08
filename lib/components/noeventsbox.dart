@@ -10,12 +10,14 @@ class noEventsBox extends StatelessWidget {
       required this.curruser,
       required this.screenwidth,
       required this.interest,
-      required this.analytics});
+      required this.analytics,
+      required this.allcolor});
   String interest;
   AppUser curruser;
   FirebaseAnalytics analytics;
   final double screenheight;
   final double screenwidth;
+  Color allcolor;
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +26,10 @@ class noEventsBox extends StatelessWidget {
         SizedBox(
           height: screenheight * 0.1,
         ),
-        const Text(
+        Text(
           "No Events Nearby :(",
           style: TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 20,
-          ),
+              fontWeight: FontWeight.w800, fontSize: 20, color: allcolor),
           textScaleFactor: 1.0,
         ),
         SizedBox(
@@ -53,16 +53,15 @@ class noEventsBox extends StatelessWidget {
             height: screenwidth * 0.13,
             width: screenwidth * 0.6,
             decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black),
+                border: Border.all(width: 1, color: allcolor),
                 borderRadius: BorderRadius.circular(20)),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    "Create Event",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                ]),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                "Create Event",
+                style: TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.bold, color: allcolor),
+              ),
+            ]),
           ),
         ),
       ],

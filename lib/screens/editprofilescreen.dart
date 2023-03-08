@@ -421,6 +421,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
+              borderRadius: BorderRadius.circular(20),
               decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                       borderSide:
@@ -450,6 +451,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             width: screenwidth * 0.6,
             child: DropdownButtonFormField(
+              borderRadius: BorderRadius.circular(20),
               decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                       borderSide:
