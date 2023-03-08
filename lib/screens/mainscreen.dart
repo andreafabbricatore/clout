@@ -191,11 +191,15 @@ class _MainScreenState extends State<MainScreen> {
         gotoprofilescreen(user);
       } else if (splitlink[splitlink.length - 2] == "referral") {
         try {
-          await db.referralcloutinc(widget.curruser.uid, id).catchError((e) {
-            throw Exception();
-          });
-          displayErrorSnackBar(
-              "Succesfully referred! Clout score has been increased!");
+          Duration signupdiff =
+              DateTime.now().difference(widget.curruser.donesignuptime);
+          if (signupdiff.inMinutes <= 15) {
+            await db.referralcloutinc(widget.curruser.uid, id).catchError((e) {
+              throw Exception();
+            });
+            displayErrorSnackBar(
+                "Succesfully referred! Clout score has been increased!");
+          }
         } catch (e) {}
       }
     } catch (e) {}
@@ -238,6 +242,7 @@ class _MainScreenState extends State<MainScreen> {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
         List<AppUser> participants = await db.geteventparticipantslist(event);
+        await Future.delayed(const Duration(milliseconds: 50));
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
         displayErrorSnackBar("Could not display event");

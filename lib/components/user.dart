@@ -10,6 +10,7 @@ class AppUser {
   String fullname;
   String email;
   DateTime birthday;
+  DateTime donesignuptime;
   List followers;
   List following;
   List favorites;
@@ -60,7 +61,8 @@ class AppUser {
       required this.lastknownlng,
       required this.notificationcounter,
       required this.chatnotificationcounter,
-      required this.referred});
+      required this.referred,
+      required this.donesignuptime});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -75,6 +77,7 @@ class AppUser {
         fullname: json['fullname'],
         email: json['email'],
         birthday: json['birthday'].toDate(),
+        donesignuptime: json['donesignuptime'].toDate(),
         followers: json['followers'] as List,
         following: json['following'] as List,
         clout: json['clout'] as int,

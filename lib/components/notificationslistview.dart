@@ -99,11 +99,11 @@ class NotificationsListView extends StatelessWidget {
 
     Duration diff = DateTime.now().difference(notification.time);
     String timediff = "";
-    if (diff.inDays > 1) {
+    if (diff.inDays >= 1) {
       timediff = "${diff.inDays}d";
-    } else if (diff.inHours > 1) {
+    } else if (diff.inHours >= 1) {
       timediff = "${diff.inHours}h";
-    } else if (diff.inMinutes > 1) {
+    } else if (diff.inMinutes >= 1) {
       timediff = "${diff.inMinutes}m";
     } else {
       timediff = "1s";

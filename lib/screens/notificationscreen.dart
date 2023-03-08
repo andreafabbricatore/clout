@@ -137,6 +137,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       try {
         Event event = await db.getEventfromDocId(eventid);
         List<AppUser> participants = await db.geteventparticipantslist(event);
+        await Future.delayed(const Duration(milliseconds: 50));
         await Navigator.push(
             context,
             MaterialPageRoute(

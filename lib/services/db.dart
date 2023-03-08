@@ -99,10 +99,21 @@ class db_conn {
         'lastknownlng': 0.0,
         'notificationcounter': 0,
         'chatnotificationcounter': 0,
-        'appversion': packageInfo.version
+        'appversion': packageInfo.version,
+        'donesignuptime': DateTime(1900, 1, 1, 0, 0)
       });
     } catch (e) {
       throw Exception("Could not create user");
+    }
+  }
+
+  Future<void> setdonesignuptime(String curruseruid) async {
+    try {
+      await users.doc(curruseruid).set(
+          {"donesignuptime": FieldValue.serverTimestamp()},
+          SetOptions(merge: true));
+    } catch (e) {
+      throw Exception();
     }
   }
 
@@ -1507,8 +1518,9 @@ class db_conn {
     await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              users.doc(element.id).set(
-                  {'referred': [], 'referredby': []}, SetOptions(merge: true));
+              await users.doc(element.id).set(
+                  {"donesignuptime": FieldValue.serverTimestamp()},
+                  SetOptions(merge: true));
             },
           ),
         );

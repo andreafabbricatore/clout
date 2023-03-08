@@ -312,6 +312,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 )
               : Container(),
           searching
+              ? SizedBox(
+                  height: screenheight * 0.01,
+                )
+              : Container(),
+          searching
               ? SearchBarListView(
                   searchevents: searchevents,
                   eventres: searchedevents,

@@ -1499,7 +1499,8 @@ class _InterestScreenState extends State<InterestScreen> {
     );
   }
 
-  void donesignup() {
+  void donesignup() async {
+    await db.setdonesignuptime(FirebaseAuth.instance.currentUser!.uid);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(

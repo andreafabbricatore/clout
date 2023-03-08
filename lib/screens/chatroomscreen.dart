@@ -120,6 +120,21 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             settings: RouteSettings(name: "ProfileScreen")));
   }
 
+  void gotoeventscreen(Event chosenEvent, List<AppUser> participants) async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => EventDetailScreen(
+                  event: chosenEvent,
+                  curruser: widget.curruser,
+                  participants: participants,
+                  interactfav: interactfav,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: const RouteSettings(name: "EventDetailScreen")));
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -138,23 +153,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             } else {
               Event chosenEvent =
                   await db.getEventfromDocId(widget.chatinfo.connectedid[0]);
-              List<AppUser> participants = [
-                for (String x in chosenEvent.participants)
-                  await db.getUserFromUID(x)
-              ];
-
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => EventDetailScreen(
-                            event: chosenEvent,
-                            curruser: widget.curruser,
-                            participants: participants,
-                            interactfav: interactfav,
-                            curruserlocation: widget.curruserlocation,
-                            analytics: widget.analytics,
-                          ),
-                      settings: RouteSettings(name: "EventDetailScreen")));
+              List<AppUser> participants =
+                  await db.geteventparticipantslist(chosenEvent);
+              await Future.delayed(const Duration(milliseconds: 50));
+              gotoeventscreen(chosenEvent, participants);
             }
           },
           child: Text(

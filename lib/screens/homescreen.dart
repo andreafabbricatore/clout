@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
         List<AppUser> participants =
             await db.geteventparticipantslist(chosenEvent);
-
+        await Future.delayed(const Duration(milliseconds: 50));
         await Navigator.push(
             context,
             MaterialPageRoute(

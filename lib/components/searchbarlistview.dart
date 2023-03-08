@@ -84,8 +84,8 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         });
       }
       await widget.analytics.logEvent(name: "search", parameters: {
-        "searchevent": widget.searchevents,
-        "searchuser": !widget.searchevents,
+        "searchevent": widget.searchevents.toString(),
+        "searchuser": (!widget.searchevents).toString(),
         "searchterm": widget.query,
         "searchreslength": widget.searchevents
             ? widget.eventres.length
@@ -136,6 +136,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
         List<AppUser> participants =
             await db.geteventparticipantslist(chosenEvent);
+        await Future.delayed(const Duration(milliseconds: 50));
         await widget.analytics
             .logEvent(name: "event_navigate_from_search", parameters: {
           "searchterm": widget.query,

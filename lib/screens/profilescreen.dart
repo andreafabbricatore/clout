@@ -320,7 +320,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
         List<AppUser> participants =
             await db.geteventparticipantslist(chosenEvent);
-
+        print(participants);
+        await Future.delayed(Duration(milliseconds: 50));
+        print(participants);
         await Navigator.push(
             context,
             MaterialPageRoute(
