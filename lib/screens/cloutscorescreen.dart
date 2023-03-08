@@ -185,14 +185,12 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 height: screenheight * 0.02,
               ),
               GestureDetector(
-                onTap: widget.curruser.referred.length <= 10
-                    ? () async {
-                        String link = await createShareLink();
-                        String text =
-                            "${widget.curruser.fullname} wants you to join them on Clout\n\n$link";
-                        refer(text);
-                      }
-                    : null,
+                onTap: () async {
+                  String link = await createShareLink();
+                  String text =
+                      "${widget.curruser.fullname} wants you to join them on Clout\n\n$link";
+                  refer(text);
+                },
                 child: Container(
                   height: screenheight * 0.05,
                   width: screenwidth,
@@ -200,13 +198,15 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                       color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.circular(10)),
                   child: Center(
-                      child: Text(
-                    "Invite a Friend - ${widget.curruser.referred.length}/10",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  )),
+                    child: Text(
+                      "Friends invited: ${widget.curruser.referred.length}",
+                      textScaleFactor: 1.0,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  ),
                 ),
               ),
               SizedBox(

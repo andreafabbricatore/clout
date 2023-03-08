@@ -263,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void shareuser(String text) async {
     final box = context.findRenderObject() as RenderBox?;
     await widget.analytics.logEvent(name: "shared_user", parameters: {
-      "iscurruser": widget.iscurruser,
+      "iscurruser": widget.iscurruser.toString(),
       "isfollowinguser":
           widget.curruser.following.contains(widget.user.uid).toString(),
       "isuserfollower":
@@ -274,6 +274,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await Share.share(
       text,
       subject: "Follow @${widget.user.username} on Clout",
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
+  void refer() async {
+    final dynamicLinkParams = DynamicLinkParameters(
+      link:
+          Uri.parse("https://outwithclout.com/referral/${widget.curruser.uid}"),
+      uriPrefix: "https://outwithclout.page.link",
+    );
+    final dynamicLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+    String link = dynamicLink.shortUrl.toString();
+    String text =
+        "${widget.curruser.fullname} wants you to join them on Clout\n\n$link";
+    final box = context.findRenderObject() as RenderBox?;
+    await widget.analytics.logEvent(name: "referred_user", parameters: {});
+    await Share.share(
+      text,
+      subject: "${widget.curruser.fullname} wants you to join them on Clout",
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
   }
@@ -449,8 +469,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: SingleChildScrollView(
           child: SizedBox(
             height: joinedevents
-                ? screenheight * 0.3 + (joinedEvents.length * 180)
-                : screenheight * 0.3 + (hostedEvents.length * 180),
+                ? screenheight * 0.4 + (joinedEvents.length * 180)
+                : screenheight * 0.4 + (hostedEvents.length * 180),
             width: screenwidth,
             child: Column(children: [
               ProfileTopContainer(
@@ -462,6 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 followingscreen: followingscreen,
                 cloutscreen: cloutscreen,
                 follow: followunfollow,
+                refer: refer,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

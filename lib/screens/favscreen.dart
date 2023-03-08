@@ -26,6 +26,7 @@ class FavScreen extends StatefulWidget {
 class _FavScreenState extends State<FavScreen> {
   List<Event> favorites = [];
   db_conn db = db_conn();
+  Color loadedcolor = Colors.white;
 
   void displayErrorSnackBar(
     String error,
@@ -98,10 +99,18 @@ class _FavScreenState extends State<FavScreen> {
     }
   }
 
+  Future<void> setcolour() async {
+    await Future.delayed(const Duration(milliseconds: 250));
+    setState(() {
+      loadedcolor = Colors.black;
+    });
+  }
+
   @override
   void initState() {
     refresh();
     super.initState();
+    setcolour();
   }
 
   @override
@@ -149,17 +158,54 @@ class _FavScreenState extends State<FavScreen> {
         automaticallyImplyLeading: false,
       ),
       body: Column(children: [
-        EventListView(
-          isHorizontal: false,
-          scrollable: true,
-          eventList: favorites,
-          leftpadding: true,
-          curruser: widget.curruser,
-          interactfav: interactfav,
-          onTap: navigate,
-          screenheight: screenheight,
-          screenwidth: screenwidth,
-        )
+        favorites.isEmpty
+            ? SizedBox(
+                height: screenheight * 0.4,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Add events you don't want to miss!",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: loadedcolor),
+                        textAlign: TextAlign.center,
+                        textScaleFactor: 1.0,
+                      ),
+                      SizedBox(
+                        height: screenheight * 0.01,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Click on the favorites icon.",
+                            style: TextStyle(fontSize: 20, color: loadedcolor),
+                            textScaleFactor: 1.0,
+                          ),
+                          Icon(
+                            Icons.bookmark,
+                            color: loadedcolor,
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              )
+            : EventListView(
+                isHorizontal: false,
+                scrollable: true,
+                eventList: favorites,
+                leftpadding: true,
+                curruser: widget.curruser,
+                interactfav: interactfav,
+                onTap: navigate,
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+              )
       ]),
     );
   }

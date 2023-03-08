@@ -11,7 +11,8 @@ class ProfileTopContainer extends StatefulWidget {
       required this.editprofile,
       required this.followerscreen,
       required this.followingscreen,
-      required this.cloutscreen})
+      required this.cloutscreen,
+      required this.refer})
       : super(key: key);
   AppUser user;
   AppUser curruser;
@@ -21,6 +22,7 @@ class ProfileTopContainer extends StatefulWidget {
   final VoidCallback followerscreen;
   final VoidCallback followingscreen;
   final VoidCallback cloutscreen;
+  final VoidCallback refer;
 
   @override
   State<ProfileTopContainer> createState() => _ProfileTopContainerState();
@@ -51,7 +53,13 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
     return Container(
-      height: widget.user.bio == "" ? screenheight * 0.2 : screenheight * 0.24,
+      height: widget.iscurruser
+          ? widget.user.bio == ""
+              ? screenheight * 0.27
+              : screenheight * 0.31
+          : widget.user.bio == ""
+              ? screenheight * 0.2
+              : screenheight * 0.24,
       decoration: const BoxDecoration(
           border: Border(
               bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158)))),
@@ -61,6 +69,35 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
           SizedBox(
             height: screenheight * 0.035,
           ),
+          widget.iscurruser
+              ? GestureDetector(
+                  onTap: widget.refer,
+                  child: Center(
+                    child: Container(
+                      height: screenheight * 0.05,
+                      width: screenwidth * 0.6,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: const Center(
+                        child: Text(
+                          "Invite Friends to Clout!",
+                          textScaleFactor: 1.0,
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
+          widget.iscurruser
+              ? SizedBox(
+                  height: screenheight * 0.02,
+                )
+              : Container(),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
             child: Row(
@@ -216,7 +253,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   )
-                ])
+                ]),
         ],
       ),
     );

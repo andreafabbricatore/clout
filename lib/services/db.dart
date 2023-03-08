@@ -1811,10 +1811,8 @@ class db_conn {
   Future<void> referralcloutinc(String referreduid, String shareruid) async {
     try {
       DocumentSnapshot referredsnapshot = await users.doc(referreduid).get();
-      DocumentSnapshot sharersnapshot = await users.doc(shareruid).get();
       int referredlength = referredsnapshot['referredby'].length;
-      int sharerlength = referredsnapshot['referred'].length;
-      if (referredlength < 1 && sharerlength <= 10) {
+      if (referredlength < 1) {
         await users.doc(referreduid).set({
           "clout": FieldValue.increment(20),
           "referredby": FieldValue.arrayUnion([shareruid])
