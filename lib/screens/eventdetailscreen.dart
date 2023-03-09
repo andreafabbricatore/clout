@@ -194,10 +194,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         widget.event = updatedevent;
       });
       List<AppUser> temp = await db.geteventparticipantslist(widget.event);
-      setState(() {
-        widget.participants = temp;
-      });
-
+      await Future.delayed(Duration(milliseconds: 50)).then((value) => {
+            setState(() {
+              widget.participants = temp;
+            })
+          });
       checkifjoined();
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
@@ -263,14 +264,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           buttonpressed = true;
         });
         await db.leaveevent(widget.curruser, widget.event);
-        print("here");
         await widget.analytics.logEvent(name: "left_event", parameters: {
           "interest": widget.event.interest,
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "currentparticipants": widget.event.participants.length,
         });
-        print("there");
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {

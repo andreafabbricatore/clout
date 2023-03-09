@@ -306,12 +306,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
     String link = dynamicLink.shortUrl.toString();
     String text =
-        "${widget.curruser.fullname} wants you to join them on Clout\n\n$link";
+        "${widget.curruser.fullname} wants you to join them on Clout.\nPress the link after signing up to boost your Clout score.\n\n$link";
     final box = context.findRenderObject() as RenderBox?;
     await widget.analytics.logEvent(name: "referred_user", parameters: {});
     await Share.share(
       text,
-      subject: "${widget.curruser.fullname} wants you to join them on Clout",
+      subject: "${widget.curruser.fullname} wants you to join them on Clout.",
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
   }
@@ -395,7 +395,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 GestureDetector(
                     onTap: () async {
                       String link = await createShareLink();
-                      shareuser(link);
+                      String text =
+                          "Follow @${widget.user.username} on Clout\n\n$link";
+                      shareuser(text);
                     },
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
