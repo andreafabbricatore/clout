@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -22,7 +23,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await dotenv.load(fileName: "assets/.env");
-
+  Stripe.publishableKey = dotenv.get("stripePublishableKey");
+  Stripe.merchantIdentifier = "merchant.com.outwithclout.clout";
+  Stripe.instance.applySettings();
   if (FirebaseAuth.instance.currentUser != null) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 

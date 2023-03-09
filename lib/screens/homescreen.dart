@@ -9,6 +9,8 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/notificationscreen.dart';
+import 'package:clout/screens/paymenttest.dart';
+import 'package:clout/screens/paymenttest.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -214,14 +216,24 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          "Clout.",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.w900,
-            fontSize: 50,
+        title: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => PaymentTestScreen(
+                          curruser: widget.curruser,
+                        )));
+          },
+          child: Text(
+            "Clout.",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w900,
+              fontSize: 50,
+            ),
+            textScaleFactor: 1.0,
           ),
-          textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
