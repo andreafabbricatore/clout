@@ -10,7 +10,6 @@ import 'package:clout/screens/chatlistscreen.dart';
 import 'package:clout/screens/eventdetailscreen.dart';
 import 'package:clout/screens/notificationscreen.dart';
 import 'package:clout/screens/paymenttest.dart';
-import 'package:clout/screens/paymenttest.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
