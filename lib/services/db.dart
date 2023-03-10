@@ -1016,7 +1016,6 @@ class db_conn {
       });
       return joinedEvents;
     } catch (e) {
-      print(e);
       throw Exception(e);
     }
   }
@@ -1043,7 +1042,6 @@ class db_conn {
       });
       return hostedEvents;
     } catch (e) {
-      print(e);
       throw Exception(e);
     }
   }
@@ -1064,6 +1062,7 @@ class db_conn {
               })
             });
       });
+      await Future.delayed(const Duration(milliseconds: 50));
       return following;
     } catch (e) {
       throw Exception(e);
@@ -1086,9 +1085,9 @@ class db_conn {
               })
             });
       });
+      await Future.delayed(const Duration(milliseconds: 50));
       return followers;
     } catch (e) {
-      print(e);
       throw Exception(e);
     }
   }
@@ -1112,6 +1111,7 @@ class db_conn {
               })
             });
       });
+      await Future.delayed(const Duration(milliseconds: 50));
       return participants;
     } catch (e) {
       throw Exception(e);
