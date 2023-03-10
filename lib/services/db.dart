@@ -1057,13 +1057,14 @@ class db_conn {
             i + 10 > user.following.length ? user.following.length : i + 10));
       }
 
-      subList.forEach((element) {
-        users.where("uid", whereIn: element).getSavy().then((value) => {
-              value.docs.forEach((element) {
-                following.add(AppUser.fromJson(element.data(), element.id));
-              })
-            });
-      });
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("uid", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          following.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+      await Future.delayed(Duration(milliseconds: 50));
       return following;
     } catch (e) {
       throw Exception(e);
@@ -1079,22 +1080,24 @@ class db_conn {
             i + 10 > user.followers.length ? user.followers.length : i + 10));
       }
 
-      subList.forEach((element) {
-        users.where("uid", whereIn: element).getSavy().then((value) => {
-              value.docs.forEach((element) {
-                followers.add(AppUser.fromJson(element.data(), element.id));
-              })
-            });
-      });
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("uid", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          followers.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+
+      await Future.delayed(Duration(milliseconds: 50));
       return followers;
     } catch (e) {
-      print(e);
       throw Exception(e);
     }
   }
 
   Future<List<AppUser>> geteventparticipantslist(Event event) async {
     try {
+      List<AppUser> temp = [];
       List<AppUser> participants = [];
       List<List<dynamic>> subList = [];
       for (var i = 0; i < event.participants.length; i += 10) {
@@ -1104,14 +1107,15 @@ class db_conn {
                 ? event.participants.length
                 : i + 10));
       }
-
-      subList.forEach((element) {
-        users.where("uid", whereIn: element).getSavy().then((value) => {
-              value.docs.forEach((element) {
-                participants.add(AppUser.fromJson(element.data(), element.id));
-              })
-            });
-      });
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("uid", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          participants
+              .add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+      await Future.delayed(Duration(milliseconds: 50));
       return participants;
     } catch (e) {
       throw Exception(e);
