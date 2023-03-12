@@ -174,3 +174,43 @@ exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) 
         res.status(404).send({ success: false, error: error.message })
     }
 });
+
+exports.stripeAccount = functions.https.onRequest(async (req, res) => {
+    const { method } = req
+    if (method === "GET") {
+      // CREATE CONNECTED ACCOUNT
+      const { mobile } = req.query
+      const account = await stripe.accounts.create({
+        country: 'IT',
+        type: 'express',
+        capabilities: {card_payments: {requested: true}, transfers: {requested: true}},
+        business_type: 'individual',
+      })
+      const accountLinks = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `https://outwithclout.com`,
+        return_url: `https://outwithclout.page.link/NcxQ`,
+        type: "account_onboarding",
+      })
+      if (mobile) {
+        // In case of request generated from the flutter app, return a json response
+        res.status(200).json({ success: true, url: accountLinks.url })
+      } else {
+        // In case of request generated from the web app, redirect
+        res.redirect(accountLinks.url)
+      }
+    } else if (method === "DELETE") {
+      // Delete the Connected Account having provided ID
+      const {
+        query: { id },
+      } = req
+      console.log(id)
+      const deleted = await stripe.accounts.del(id)
+      res.status(200).json({ message: "account deleted successfully", deleted })
+    } else if (method === "POST") {
+      // Retrieve the Connected Account for the provided ID
+      // I know it shouldn't be a POST call. Don't judge :D I had a lot on my plate
+      const account = await stripe.accounts.retrieve(req.query.id)
+      res.status(200).json({ account })
+    }
+  });
