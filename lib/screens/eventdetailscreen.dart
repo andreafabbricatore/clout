@@ -178,9 +178,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           joinedval = "Full";
         });
       } else {
-        setState(() {
-          joinedval = "Join";
-        });
+        if (widget.event.price == 0) {
+          setState(() {
+            joinedval = "Join";
+          });
+        } else {
+          setState(() {
+            joinedval = "Pay to Join - ${widget.event.price}€";
+          });
+        }
       }
     }
 

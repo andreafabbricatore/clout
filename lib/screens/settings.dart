@@ -37,7 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool updatepswbuttonpressed = false;
   bool updateemailbuttonpressed = false;
   bool bugbuttonpressed = false;
-
+  bool businessbuttonpressed = false;
   void displayErrorSnackBar(
     String error,
   ) {
@@ -82,6 +82,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void StripeSellerOnboarding() async {
     try {
+      setState(() {
+        businessbuttonpressed = true;
+      });
       var response = await http.get(Uri.parse(
           'https://us-central1-clout-1108.cloudfunctions.net/stripeAccount/stripe/account?mobile=true'));
       Map<String, dynamic> body = jsonDecode(response.body);
@@ -89,6 +92,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       displayErrorSnackBar("Could not initialise registration as seller");
     }
+    setState(() {
+      businessbuttonpressed = false;
+    });
   }
 
   @override
@@ -532,6 +538,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             height: screenheight * 0.02,
           ),
           GestureDetector(
+              onTap: StripeSellerOnboarding,
+              child: PrimaryButton(
+                  screenwidth: screenwidth,
+                  buttonpressed: businessbuttonpressed,
+                  text: "Register as a business",
+                  buttonwidth: screenwidth * 0.8,
+                  bold: true)),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
+          GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
@@ -558,15 +575,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SizedBox(
             height: screenheight * 0.05,
           ),
-          GestureDetector(
-              onTap: () async {
-                StripeSellerOnboarding();
-              },
-              child: Center(
-                  child: Text(
-                "Register as Seller",
-                style: TextStyle(fontSize: 30),
-              ))),
           SizedBox(
             height: screenheight * 0.05,
           ),
