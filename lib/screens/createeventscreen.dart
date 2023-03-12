@@ -54,7 +54,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       lng: 0,
       chatid: "",
       isinviteonly: false,
-      presentparticipants: []);
+      presentparticipants: [],
+      price: 0);
 
   List<String> allinterests = [
     "Sports",
@@ -83,6 +84,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
+  TextEditingController pricecontroller = TextEditingController();
   DateTime eventdate = DateTime(0, 0, 0);
   AppLocation chosenLocation =
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
@@ -611,6 +613,46 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             textScaleFactor: 1.0,
           ),
           SizedBox(
+            height: screenheight * 0.01,
+          ),
+          widget.curruser.plan != "Free"
+              ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
+                  child: TextFormField(
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w300,
+                      fontSize: 15,
+                    ),
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor)),
+                      hintText: "Price in Euros (Optional)",
+                      hintStyle: const TextStyle(
+                        color: Color.fromARGB(39, 0, 0, 0),
+                        fontSize: 15,
+                      ),
+                    ),
+                    textAlign: TextAlign.start,
+                    enableSuggestions: true,
+                    autocorrect: true,
+                    controller: pricecontroller,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                )
+              : Container(),
+          SizedBox(
+            height: screenheight * 0.01,
+          ),
+          widget.curruser.plan != "Free"
+              ? const Text(
+                  "Paid events can't be edited or deleted",
+                  style: TextStyle(color: Color.fromARGB(53, 0, 0, 0)),
+                  textScaleFactor: 1.0,
+                )
+              : Container(),
+          SizedBox(
             height: screenheight * 0.03,
           ),
           GestureDetector(
@@ -643,7 +685,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.title = titlecontroller.text.trim();
                           event.description = desccontroller.text.trim();
                           event.maxparticipants =
-                              int.parse(maxpartcontroller.text);
+                              int.parse(maxpartcontroller.text.trim());
                           event.interest = selectedinterest;
                           event.datetime = eventdate;
                           event.address = chosenLocation.address;
@@ -656,6 +698,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.lng = chosenLocation.center[1];
                           event.isinviteonly = isinviteonly;
                           event.presentparticipants = [widget.curruser.uid];
+                          if (pricecontroller.text.trim().isNotEmpty) {
+                            event.price =
+                                int.parse(pricecontroller.text.trim());
+                          }
                         });
                         try {
                           if (imagepath == null) {

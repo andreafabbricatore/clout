@@ -60,6 +60,8 @@ class db_conn {
       FirebaseFirestore.instance.collection('maintenance');
   CollectionReference appupdate =
       FirebaseFirestore.instance.collection('appupdate');
+  CollectionReference transactions =
+      FirebaseFirestore.instance.collection('transactions');
 
   Future createuserinstance(String email, String uid) async {
     try {
@@ -241,7 +243,8 @@ class db_conn {
           'searchfield': searchfield,
           'chatid': '',
           'isinviteonly': newevent.isinviteonly,
-          'presentparticipants': newevent.presentparticipants
+          'presentparticipants': newevent.presentparticipants,
+          'price': newevent.price
         }).then((value) {
           eventid = value.id;
         });
@@ -1016,6 +1019,7 @@ class db_conn {
       });
       return joinedEvents;
     } catch (e) {
+      print(e);
       throw Exception(e);
     }
   }
@@ -1042,6 +1046,7 @@ class db_conn {
       });
       return hostedEvents;
     } catch (e) {
+      print(e);
       throw Exception(e);
     }
   }
@@ -1055,14 +1060,14 @@ class db_conn {
             i + 10 > user.following.length ? user.following.length : i + 10));
       }
 
-      subList.forEach((element) {
-        users.where("uid", whereIn: element).getSavy().then((value) => {
-              value.docs.forEach((element) {
-                following.add(AppUser.fromJson(element.data(), element.id));
-              })
-            });
-      });
-      await Future.delayed(const Duration(milliseconds: 50));
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("uid", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          following.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+      await Future.delayed(Duration(milliseconds: 50));
       return following;
     } catch (e) {
       throw Exception(e);
@@ -1078,14 +1083,15 @@ class db_conn {
             i + 10 > user.followers.length ? user.followers.length : i + 10));
       }
 
-      subList.forEach((element) {
-        users.where("uid", whereIn: element).getSavy().then((value) => {
-              value.docs.forEach((element) {
-                followers.add(AppUser.fromJson(element.data(), element.id));
-              })
-            });
-      });
-      await Future.delayed(const Duration(milliseconds: 50));
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("uid", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          followers.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+
+      await Future.delayed(Duration(milliseconds: 50));
       return followers;
     } catch (e) {
       throw Exception(e);
@@ -1094,6 +1100,7 @@ class db_conn {
 
   Future<List<AppUser>> geteventparticipantslist(Event event) async {
     try {
+      List<AppUser> temp = [];
       List<AppUser> participants = [];
       List<List<dynamic>> subList = [];
       for (var i = 0; i < event.participants.length; i += 10) {
@@ -1103,15 +1110,15 @@ class db_conn {
                 ? event.participants.length
                 : i + 10));
       }
-
-      subList.forEach((element) {
-        users.where("uid", whereIn: element).getSavy().then((value) => {
-              value.docs.forEach((element) {
-                participants.add(AppUser.fromJson(element.data(), element.id));
-              })
-            });
-      });
-      await Future.delayed(const Duration(milliseconds: 50));
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("uid", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          participants
+              .add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+      await Future.delayed(Duration(milliseconds: 50));
       return participants;
     } catch (e) {
       throw Exception(e);
@@ -1515,12 +1522,12 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await users.get().then(
+    await events.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users.doc(element.id).set(
-                  {"donesignuptime": FieldValue.serverTimestamp()},
-                  SetOptions(merge: true));
+              await events
+                  .doc(element.id)
+                  .set({"price": 0}, SetOptions(merge: true));
             },
           ),
         );
@@ -1839,5 +1846,25 @@ class db_conn {
     } catch (e) {
       throw Exception();
     }
+  }
+
+  Future<void> recordtransaction(String payeruid, String stripepayeruid,
+      String receiveruid, int amount) async {
+    try {
+      String transactionid = "";
+      await transactions.add({
+        "payer_uid": payeruid,
+        "stripe_payer_uid": stripepayeruid,
+        "receiver_uid": receiveruid,
+        "amount": amount,
+        "timestamp": FieldValue.serverTimestamp()
+      }).then((value) => transactionid = value.id);
+      await users.doc(payeruid).set({
+        "paid_transactions": FieldValue.arrayUnion([transactionid])
+      }, SetOptions(merge: true));
+      await users.doc(receiveruid).set({
+        "received_transactions": FieldValue.arrayUnion([transactionid])
+      }, SetOptions(merge: true));
+    } catch (e) {}
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:clout/components/chat.dart';
@@ -19,12 +20,14 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as Maps;
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 
 class EventDetailScreen extends StatefulWidget {
   EventDetailScreen(
@@ -57,6 +60,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   String qrmessage = "";
   bool showqrmessage = false;
   bool deletebuttonpressed = false;
+  bool paymentbeingprocessed = false;
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
@@ -205,12 +209,41 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
-  void interactevent(context) async {
-    if (!joined && joinedval == "Join") {
+  Future<void> initPaymentandJoin({
+    required double amount,
+  }) async {
+    try {
+      // 1. Create a payment intent on the server
+      final response = await http.post(
+          Uri.parse(
+              'https://us-central1-clout-1108.cloudfunctions.net/stripePaymentIntentRequest'),
+          body: {
+            'email': widget.curruser.email,
+            'amount': (amount * 100).toString(),
+            'name': widget.curruser.fullname,
+            'uid': widget.curruser.uid
+          });
+
+      final jsonResponse = jsonDecode(response.body);
+      // 2. Initialize the payment sheet
+      await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+              paymentIntentClientSecret: jsonResponse['paymentIntent'],
+              merchantDisplayName: 'Clout',
+              customerId: jsonResponse['customer'],
+              customerEphemeralKeySecret: jsonResponse['ephemeralKey'],
+              applePay: const PaymentSheetApplePay(
+                merchantCountryCode: 'IT',
+              ),
+              googlePay: const PaymentSheetGooglePay(merchantCountryCode: "IT"),
+              style: ThemeMode.light));
+      setState(() {
+        paymentbeingprocessed = true;
+      });
+      await Stripe.instance.presentPaymentSheet();
+
+      // need to do this in cloud function!!!
       try {
-        setState(() {
-          buttonpressed = true;
-        });
         await db.joinevent(widget.event, widget.curruser, widget.event.docid);
         await widget.analytics.logEvent(name: "joined_event", parameters: {
           "interest": widget.event.interest,
@@ -220,64 +253,161 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         });
       } catch (e) {
         displayErrorSnackBar("Could not join event");
-      } finally {
-        setState(() {
-          buttonpressed = false;
-        });
-        updatescreen(widget.event.docid);
+      }
+      await db.recordtransaction(widget.curruser.uid, jsonResponse['customer'],
+          widget.event.hostdocid, amount.toInt());
+      updatescreen(widget.event.docid);
+      displayErrorSnackBar("Payment is successful");
+      setState(() {
+        paymentbeingprocessed = false;
+      });
+    } catch (error) {
+      if (error is StripeException) {
+        displayErrorSnackBar(
+            'Stripe error occurred - contact Clout. if it persists');
+      } else {
+        displayErrorSnackBar(error.toString());
+      }
+    }
+  }
+
+  void interactevent(context) async {
+    if (!joined && joinedval == "Join") {
+      if (widget.event.price == 0) {
+        try {
+          setState(() {
+            buttonpressed = true;
+          });
+          await db.joinevent(widget.event, widget.curruser, widget.event.docid);
+          await widget.analytics.logEvent(name: "joined_event", parameters: {
+            "interest": widget.event.interest,
+            "inviteonly": widget.event.isinviteonly.toString(),
+            "maxparticipants": widget.event.maxparticipants,
+            "currentparticipants": widget.event.participants.length
+          });
+        } catch (e) {
+          displayErrorSnackBar("Could not join event");
+        } finally {
+          setState(() {
+            buttonpressed = false;
+          });
+          updatescreen(widget.event.docid);
+        }
+      } else {
+        initPaymentandJoin(amount: widget.event.price.toDouble());
       }
     } else if ((!joined && joinedval == "Full") || joinedval == "Finished") {
       //print(joinedval);
     } else if (joined && joinedval == "Delete Event") {
-      try {
-        setState(() {
-          buttonpressed = true;
-        });
-        await db.deleteevent(widget.event, widget.curruser);
-        await widget.analytics.logEvent(name: "deleted_event", parameters: {
-          "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly.toString(),
-          "maxparticipants": widget.event.maxparticipants,
-          "currentparticipants": widget.event.participants.length,
-          "predeletionstatus": joinedval
-        });
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => LoadingScreen(
-                    uid: widget.curruser.uid,
-                    analytics: widget.analytics,
-                  ),
-              settings: RouteSettings(name: "LoadingScreen"),
-              fullscreenDialog: true),
-        );
-      } catch (e) {
-        displayErrorSnackBar("Could not delete event");
-        updatescreen(widget.event.docid);
-        setState(() {
-          buttonpressed = false;
-        });
+      if (widget.event.price == 0) {
+        try {
+          setState(() {
+            buttonpressed = true;
+          });
+          await db.deleteevent(widget.event, widget.curruser);
+          await widget.analytics.logEvent(name: "deleted_event", parameters: {
+            "interest": widget.event.interest,
+            "inviteonly": widget.event.isinviteonly.toString(),
+            "maxparticipants": widget.event.maxparticipants,
+            "currentparticipants": widget.event.participants.length,
+            "predeletionstatus": joinedval
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => LoadingScreen(
+                      uid: widget.curruser.uid,
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "LoadingScreen"),
+                fullscreenDialog: true),
+          );
+        } catch (e) {
+          displayErrorSnackBar("Could not delete event");
+          updatescreen(widget.event.docid);
+          setState(() {
+            buttonpressed = false;
+          });
+        }
       }
     } else {
-      try {
-        setState(() {
-          buttonpressed = true;
-        });
-        await db.leaveevent(widget.curruser, widget.event);
-        await widget.analytics.logEvent(name: "left_event", parameters: {
-          "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly.toString(),
-          "maxparticipants": widget.event.maxparticipants,
-          "currentparticipants": widget.event.participants.length,
-        });
-      } catch (e) {
-        displayErrorSnackBar("Could not leave event");
-      } finally {
-        updatescreen(widget.event.docid);
-        setState(() {
-          buttonpressed = false;
-        });
+      if (widget.event.price == 0) {
+        try {
+          setState(() {
+            buttonpressed = true;
+          });
+          await db.leaveevent(widget.curruser, widget.event);
+          await widget.analytics.logEvent(name: "left_event", parameters: {
+            "interest": widget.event.interest,
+            "inviteonly": widget.event.isinviteonly.toString(),
+            "maxparticipants": widget.event.maxparticipants,
+            "currentparticipants": widget.event.participants.length,
+          });
+        } catch (e) {
+          displayErrorSnackBar("Could not leave event");
+        } finally {
+          updatescreen(widget.event.docid);
+          setState(() {
+            buttonpressed = false;
+          });
+        }
+      } else {
+        //leaving event when price != 0?
       }
+    }
+  }
+
+  void editdeletereport() {
+    if (widget.curruser.uid == widget.event.hostdocid) {
+      if (widget.event.price != 0) {
+      } else {
+        if (joinedval == "Finished") {
+          deletebuttonpressed
+              ? null
+              : () async {
+                  setState(() {
+                    deletebuttonpressed = true;
+                  });
+                  await db.deletefutureevent(widget.event, widget.curruser);
+                  setState(() {
+                    deletebuttonpressed = false;
+                  });
+                  await widget.analytics
+                      .logEvent(name: "deleted_event", parameters: {
+                    "interest": widget.event.interest,
+                    "inviteonly": widget.event.isinviteonly.toString(),
+                    "maxparticipants": widget.event.maxparticipants,
+                    "currentparticipants": widget.event.participants.length,
+                    "predeletionstatus": joinedval
+                  });
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => LoadingScreen(
+                              uid: widget.curruser.uid,
+                              analytics: widget.analytics,
+                            ),
+                        settings: RouteSettings(name: "LoadingScreen"),
+                        fullscreenDialog: true),
+                  );
+                };
+        } else {
+          {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => EditEventScreen(
+                        curruser: widget.curruser,
+                        allowbackarrow: true,
+                        event: widget.event,
+                        analytics: widget.analytics,
+                      ),
+                  settings: RouteSettings(name: "EditEventScreen")),
+            );
+          }
+        }
+      }
+    } else {
+      reportevent(widget.event);
     }
   }
 
@@ -654,98 +784,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       GestureDetector(
-                                        onTap: widget.curruser.uid ==
-                                                widget.event.hostdocid
-                                            ? joinedval == "Finished"
-                                                ? deletebuttonpressed
-                                                    ? null
-                                                    : () async {
-                                                        setState(() {
-                                                          deletebuttonpressed =
-                                                              true;
-                                                        });
-                                                        await db
-                                                            .deletefutureevent(
-                                                                widget.event,
-                                                                widget
-                                                                    .curruser);
-                                                        setState(() {
-                                                          deletebuttonpressed =
-                                                              false;
-                                                        });
-                                                        await widget.analytics
-                                                            .logEvent(
-                                                                name:
-                                                                    "deleted_event",
-                                                                parameters: {
-                                                              "interest": widget
-                                                                  .event
-                                                                  .interest,
-                                                              "inviteonly": widget
-                                                                  .event
-                                                                  .isinviteonly
-                                                                  .toString(),
-                                                              "maxparticipants":
-                                                                  widget.event
-                                                                      .maxparticipants,
-                                                              "currentparticipants":
-                                                                  widget
-                                                                      .event
-                                                                      .participants
-                                                                      .length,
-                                                              "predeletionstatus":
-                                                                  joinedval
-                                                            });
-                                                        Navigator.of(context)
-                                                            .push(
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  LoadingScreen(
-                                                                    uid: widget
-                                                                        .curruser
-                                                                        .uid,
-                                                                    analytics:
-                                                                        widget
-                                                                            .analytics,
-                                                                  ),
-                                                              settings:
-                                                                  RouteSettings(
-                                                                      name:
-                                                                          "LoadingScreen"),
-                                                              fullscreenDialog:
-                                                                  true),
-                                                        );
-                                                      }
-                                                : () async {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (BuildContext
-                                                                  context) =>
-                                                              EditEventScreen(
-                                                                curruser: widget
-                                                                    .curruser,
-                                                                allowbackarrow:
-                                                                    true,
-                                                                event: widget
-                                                                    .event,
-                                                                analytics: widget
-                                                                    .analytics,
-                                                              ),
-                                                          settings: RouteSettings(
-                                                              name:
-                                                                  "EditEventScreen")),
-                                                    );
-                                                  }
-                                            : () {
-                                                reportevent(widget.event);
-                                              },
+                                        onTap: editdeletereport,
                                         child: Container(
                                           height: screenheight * 0.1,
                                           width: screenwidth * 0.4,
                                           decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
+                                              color: widget.event.price != 0 &&
+                                                      widget.curruser.uid ==
+                                                          widget.event.hostdocid
+                                                  ? const Color.fromARGB(
+                                                      180, 255, 48, 117)
+                                                  : Theme.of(context)
+                                                      .primaryColor,
                                               borderRadius:
                                                   const BorderRadius.all(
                                                       Radius.circular(20))),
@@ -1253,27 +1303,32 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               onTap: () async {
                 buttonpressed ? null : interactevent(context);
               },
-              child: joinedval == "Finished"
-                  ? Container(
-                      height: 50,
-                      width: screenwidth,
-                      color: Colors.white,
-                      child: Text(
-                        joinedval,
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Theme.of(context).primaryColor),
-                        textScaleFactor: 1.1,
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  : PrimaryButton(
-                      screenwidth: screenwidth,
-                      buttonpressed: buttonpressed,
-                      text: joinedval,
-                      buttonwidth: screenwidth * 0.5,
-                      bold: false,
-                    ))
+              child: paymentbeingprocessed
+                  ? Container()
+                  : joinedval == "Finished"
+                      ? Container(
+                          height: 50,
+                          width: screenwidth,
+                          color: Colors.white,
+                          child: Text(
+                            joinedval,
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Theme.of(context).primaryColor),
+                            textScaleFactor: 1.1,
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : widget.curruser.uid == widget.event.hostdocid &&
+                              widget.event.price != 0
+                          ? Container()
+                          : PrimaryButton(
+                              screenwidth: screenwidth,
+                              buttonpressed: buttonpressed,
+                              text: joinedval,
+                              buttonwidth: screenwidth * 0.5,
+                              bold: false,
+                            ))
         ]),
       ),
     );
