@@ -3,7 +3,8 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/searchlocation.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/loading.dart';
+import 'package:clout/screens/authentication/authscreen.dart';
+import 'package:clout/screens/authscreens/loading.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,23 +20,23 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-class CreateEventScreen extends StatefulWidget {
-  CreateEventScreen(
+class UnAuthCreateEventScreen extends StatefulWidget {
+  UnAuthCreateEventScreen(
       {super.key,
-      required this.curruser,
       required this.allowbackarrow,
       required this.startinterest,
       required this.analytics});
-  AppUser curruser;
+
   bool allowbackarrow;
   String startinterest;
   FirebaseAnalytics analytics;
 
   @override
-  State<CreateEventScreen> createState() => _CreateEventScreenState();
+  State<UnAuthCreateEventScreen> createState() =>
+      _UnAuthCreateEventScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> {
+class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
   Event event = Event(
       title: "",
       description: "",
@@ -167,15 +168,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  void goloadingscreen() {
-    Navigator.pushReplacement(
+  void goauthscreen() {
+    Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => LoadingScreen(
-                uid: widget.curruser.uid,
+          builder: (context) => AuthScreen(
                 analytics: widget.analytics,
               ),
-          settings: RouteSettings(name: "LoadingScreen")),
+          fullscreenDialog: true),
     );
   }
 
@@ -614,73 +614,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             height: screenheight * 0.03,
           ),
           GestureDetector(
-              onTap: buttonpressed
-                  ? null
-                  : () async {
-                      setState(() {
-                        buttonpressed = true;
-                      });
-                      if (titlecontroller.text.trim().isEmpty) {
-                        displayErrorSnackBar(
-                            "Please enter a name for your event");
-                      } else if (desccontroller.text.trim().isEmpty) {
-                        displayErrorSnackBar("Please enter a description");
-                      } else if (maxpartcontroller.text.isEmpty) {
-                        displayErrorSnackBar(
-                            "Please enter a max number of participants");
-                      } else if (int.parse(maxpartcontroller.text.trim()) < 2) {
-                        displayErrorSnackBar(
-                            "Max number of participants has to be at least 2");
-                      } else if (eventdate
-                          .isAtSameMomentAs(DateTime(0, 0, 0))) {
-                        displayErrorSnackBar(
-                            "Please choose a date for your event");
-                      } else if (emptylocation) {
-                        displayErrorSnackBar(
-                            "Please choose a location for your event");
-                      } else {
-                        setState(() {
-                          event.title = titlecontroller.text.trim();
-                          event.description = desccontroller.text.trim();
-                          event.maxparticipants =
-                              int.parse(maxpartcontroller.text);
-                          event.interest = selectedinterest;
-                          event.datetime = eventdate;
-                          event.address = chosenLocation.address;
-                          event.country = chosenLocation.country.toLowerCase();
-                          event.city =
-                              chosenLocation.city.toLowerCase().split(" ");
-                          event.host = widget.curruser.username;
-                          event.hostdocid = widget.curruser.uid;
-                          event.lat = chosenLocation.center[0];
-                          event.lng = chosenLocation.center[1];
-                          event.isinviteonly = isinviteonly;
-                          event.presentparticipants = [widget.curruser.uid];
-                        });
-                        try {
-                          if (imagepath == null) {
-                            compressedimgpath = null;
-                          } else {
-                            compressedimgpath =
-                                await CompressAndGetFile(imagepath);
-                          }
-                          await db.createevent(
-                              event, widget.curruser, compressedimgpath);
-
-                          goloadingscreen();
-                        } catch (e) {
-                          displayErrorSnackBar("Could not create event");
-                        }
-                      }
-                      setState(() {
-                        buttonpressed = false;
-                      });
-                    },
+              onTap: goauthscreen,
               child: PrimaryButton(
                 screenwidth: screenwidth,
                 buttonpressed: buttonpressed,
-                text: "Create Event",
-                buttonwidth: screenwidth * 0.6,
+                text: "Authenticate to Create",
+                buttonwidth: screenwidth * 0.8,
                 bold: false,
               )),
           SizedBox(

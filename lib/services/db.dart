@@ -994,6 +994,36 @@ class db_conn {
     }
   }
 
+  Future<List<Event>> UnAuthgetLngLatEvents(
+      double lng, double lat, String country) async {
+    try {
+      //print(country);
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
+          .where('country', isEqualTo: country.toLowerCase())
+          .where('isinviteonly', isEqualTo: false)
+          .get();
+      List<Event> tempeventlist = [];
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        tempeventlist.add(Event.fromJson(element.data(), element.id));
+      });
+
+      for (int i = 0; i < tempeventlist.length; i++) {
+        if ((tempeventlist[i].lat < lat + 0.06 &&
+            tempeventlist[i].lat > lat - 0.06 &&
+            tempeventlist[i].lng < lng + 0.06 &&
+            tempeventlist[i].lng > lng - 0.06)) {
+          eventlist.add(tempeventlist[i]);
+        }
+      }
+      return eventlist;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<Event>> getProfileScreenJoinedEvents(
       AppUser user, bool showinviteonly) async {
     try {
@@ -1155,6 +1185,36 @@ class db_conn {
     }
   }
 
+  Future<List<Event>> UnAuthgetLngLatEventsByInterest(
+      double lng, double lat, String interest, String country) async {
+    try {
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
+          .where('country', isEqualTo: country.toLowerCase())
+          .where('interest', isEqualTo: interest)
+          .where('isinviteonly', isEqualTo: false)
+          .get();
+      List<Event> tempeventlist = [];
+      List<Event> eventlist = [];
+      querySnapshot.docs.forEach((element) {
+        tempeventlist.add(Event.fromJson(element.data(), element.id));
+      });
+
+      for (int i = 0; i < tempeventlist.length; i++) {
+        if ((tempeventlist[i].lat < lat + 0.06 &&
+            tempeventlist[i].lat > lat - 0.06 &&
+            tempeventlist[i].lng < lng + 0.06 &&
+            tempeventlist[i].lng > lng - 0.06)) {
+          eventlist.add(tempeventlist[i]);
+        }
+      }
+      return eventlist;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<Event>> getFavEvents(AppUser user) async {
     try {
       List<Event> favEvents = [
@@ -1223,6 +1283,25 @@ class db_conn {
     }
   }
 
+  Future<List<Event>> UnAuthsearchEvents(String searchquery) async {
+    try {
+      QuerySnapshot querySnapshot = await events
+          .orderBy('time')
+          .startAfter([DateTime.now()])
+          .where('searchfield', arrayContains: searchquery.toLowerCase())
+          .where('isinviteonly', isEqualTo: false)
+          .get();
+      List<Event> eventsearchres = [];
+      querySnapshot.docs.forEach((element) {
+        Event event = Event.fromJson(element.data(), element.id);
+        eventsearchres.add(event);
+      });
+      return eventsearchres;
+    } catch (e) {
+      throw Exception("Could not search for events");
+    }
+  }
+
   Future<List<Event>> getLngLatEventsFilteredByDate(double lng, double lat,
       DateTime date, String country, AppUser curruser) async {
     try {
@@ -1267,6 +1346,22 @@ class db_conn {
         if (!curruser.blockedusers.contains(element.id)) {
           usersearches.add(AppUser.fromJson(element.data(), element.id));
         }
+      });
+
+      return usersearches;
+    } catch (e) {
+      throw Exception("Could not search for users");
+    }
+  }
+
+  Future<List<AppUser>> UnAuthsearchUsers(String searchquery) async {
+    try {
+      QuerySnapshot querySnapshot = await users
+          .where('searchfield', arrayContains: searchquery.toLowerCase())
+          .getSavy();
+      List<AppUser> usersearches = [];
+      querySnapshot.docs.forEach((element) {
+        usersearches.add(AppUser.fromJson(element.data(), element.id));
       });
 
       return usersearches;

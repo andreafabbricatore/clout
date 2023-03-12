@@ -1,7 +1,7 @@
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
-import 'package:clout/screens/profilescreen.dart';
+import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';

@@ -1,5 +1,5 @@
 import 'package:clout/screens/completesignuploading.dart';
-import 'package:clout/screens/loading.dart';
+import 'package:clout/screens/authscreens/loading.dart';
 import 'package:clout/screens/preauthscreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';

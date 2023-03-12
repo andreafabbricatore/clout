@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreen.dart';
-import 'package:clout/screens/emailverificationscreen.dart';
+import 'package:clout/screens/authentication/authscreen.dart';
+import 'package:clout/screens/authentication/emailverificationscreen.dart';
 import 'package:clout/screens/preauthscreen.dart';
-import 'package:clout/screens/signupscreen.dart';
+import 'package:clout/screens/authentication/signupscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';

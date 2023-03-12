@@ -3,7 +3,7 @@ import 'package:clout/components/chatlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
-import 'package:clout/screens/chatroomscreen.dart';
+import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';

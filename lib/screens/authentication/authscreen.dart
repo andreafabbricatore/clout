@@ -1,5 +1,6 @@
-import 'package:clout/screens/signinscreen.dart';
-import 'package:clout/screens/signupscreen.dart';
+import 'package:clout/screens/authentication/signinscreen.dart';
+import 'package:clout/screens/authentication/signupscreen.dart';
+import 'package:clout/screens/unauthscreens/unauthloadingscreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -71,7 +72,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      InkWell(
+                      GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
@@ -106,7 +107,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: screenheight * 0.02,
                   ),
                   Center(
-                      child: InkWell(
+                      child: GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
@@ -124,7 +125,30 @@ class _AuthScreenState extends State<AuthScreen> {
                               color: Theme.of(context).primaryColor,
                               decoration: TextDecoration.underline,
                             ),
-                          )))
+                          ))),
+                  SizedBox(
+                    height: screenheight * 0.06,
+                  ),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UnAuthLoadingScreen(
+                                    analytics: widget.analytics,
+                                  ),
+                              fullscreenDialog: true),
+                        );
+                      },
+                      child: const Text(
+                        "Continue as Guest",
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ])),

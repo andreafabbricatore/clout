@@ -2,12 +2,12 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/searchbarlistview.dart';
 import 'package:clout/components/searchgridview.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/calendarsearchscreen.dart';
-import 'package:clout/screens/interestsearchscreen.dart';
+import 'package:clout/screens/authscreens/calendarsearchscreen.dart';
+import 'package:clout/screens/authscreens/interestsearchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import '../components/event.dart';
+import 'package:clout/components/event.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreen(

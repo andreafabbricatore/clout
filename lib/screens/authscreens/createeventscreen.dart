@@ -3,7 +3,7 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/searchlocation.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/loading.dart';
+import 'package:clout/screens/authscreens/loading.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,27 +15,47 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-class EditEventScreen extends StatefulWidget {
-  EditEventScreen(
+class CreateEventScreen extends StatefulWidget {
+  CreateEventScreen(
       {super.key,
       required this.curruser,
       required this.allowbackarrow,
-      required this.event,
+      required this.startinterest,
       required this.analytics});
   AppUser curruser;
   bool allowbackarrow;
+  String startinterest;
   FirebaseAnalytics analytics;
 
-  Event event;
-
   @override
-  State<EditEventScreen> createState() => _EditEventScreenState();
+  State<CreateEventScreen> createState() => _CreateEventScreenState();
 }
 
-class _EditEventScreenState extends State<EditEventScreen> {
+class _CreateEventScreenState extends State<CreateEventScreen> {
+  Event event = Event(
+      title: "",
+      description: "",
+      interest: "",
+      image: "",
+      address: "",
+      country: "",
+      city: [],
+      host: "",
+      hostdocid: "",
+      maxparticipants: 0,
+      participants: [],
+      datetime: DateTime(0, 0, 0),
+      docid: "",
+      lat: 0,
+      lng: 0,
+      chatid: "",
+      isinviteonly: false,
+      presentparticipants: []);
+
   List<String> allinterests = [
     "Sports",
     "Nature",
@@ -63,36 +83,19 @@ class _EditEventScreenState extends State<EditEventScreen> {
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
-  DateTime eventdate = DateTime(0, 0, 0, 0);
+  DateTime eventdate = DateTime(0, 0, 0);
   AppLocation chosenLocation =
-      AppLocation(address: "", city: "", country: "", center: [0, 0]);
-  bool emptylocation = false;
+      AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
+  bool emptylocation = true;
   bool buttonpressed = false;
   bool isinviteonly = false;
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   List LatLngs = [];
 
-  void setup() {
-    setState(() {
-      selectedinterest = widget.event.interest;
-      titlecontroller.text = widget.event.title;
-      desccontroller.text = widget.event.description;
-      maxpartcontroller.text = widget.event.maxparticipants.toString();
-      eventdate = widget.event.datetime;
-      chosenLocation = AppLocation(
-          address: widget.event.address,
-          city: widget.event.city.join(" "),
-          country: widget.event.country,
-          center: [widget.event.lat, widget.event.lng]);
-      isinviteonly = widget.event.isinviteonly;
-    });
-    _addMarker(LatLng(chosenLocation.center[0], chosenLocation.center[1]));
-  }
-
   Future _addMarker(LatLng latlang) async {
     setState(() {
-      const MarkerId markerId = MarkerId("chosenlocation");
+      final MarkerId markerId = MarkerId("chosenlocation");
       Marker marker = Marker(
         markerId: markerId,
         draggable: true,
@@ -108,7 +111,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
     });
 
     //This is optional, it will zoom when the marker has been created
-    mapController?.animateCamera(CameraUpdate.newLatLngZoom(latlang, 17.0));
   }
 
   Future<File> CompressAndGetFile(File file) async {
@@ -179,7 +181,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
   @override
   void initState() {
-    setup();
+    selectedinterest = widget.startinterest;
     super.initState();
   }
 
@@ -211,16 +213,16 @@ class _EditEventScreenState extends State<EditEventScreen> {
               )
             : Container(),
         title: Text(
-          "Edit Event",
+          "Create Event",
           style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 30),
         ),
-        centerTitle: true,
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
+        centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -246,11 +248,15 @@ class _EditEventScreenState extends State<EditEventScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: imagepath == null
-                  ? Image.network(
-                      widget.event.image,
+                  ? Container(
+                      color: Theme.of(context).primaryColor,
                       height: screenheight * 0.2,
                       width: screenheight * 0.2,
-                      fit: BoxFit.cover,
+                      child: Icon(
+                        Icons.upload_rounded,
+                        color: Colors.white,
+                        size: screenheight * 0.18,
+                      ),
                     )
                   : Image.file(
                       imagepath,
@@ -396,7 +402,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                               child: CupertinoDatePicker(
                                   mode: CupertinoDatePickerMode.dateAndTime,
                                   minimumDate: DateTime.now(),
-                                  initialDateTime: eventdate,
+                                  initialDateTime: DateTime.now(),
                                   onDateTimeChanged: (val) {
                                     setState(() {
                                       eventdate = val;
@@ -440,19 +446,34 @@ class _EditEventScreenState extends State<EditEventScreen> {
               setState(() {
                 LatLngs = [_locationData.latitude, _locationData.longitude];
               });
-              AppLocation chosen = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SearchLocation(
-                            locationchosen: true,
-                            startlocation: AppLocation(
-                                address: widget.event.address,
-                                city: widget.event.city[0],
-                                country: widget.event.country,
-                                center: [widget.event.lat, widget.event.lng]),
-                            curruserLatLng: LatLngs,
-                          ),
-                      settings: RouteSettings(name: "SearchLocation")));
+              AppLocation chosen = emptylocation
+                  ? await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchLocation(
+                                locationchosen: false,
+                                startlocation: AppLocation(
+                                    address: "",
+                                    center: [0.0, 0.0],
+                                    city: "",
+                                    country: ""),
+                                curruserLatLng: LatLngs,
+                              ),
+                          settings: RouteSettings(name: "SearchLocation")))
+                  : await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchLocation(
+                                locationchosen: true,
+                                startlocation: AppLocation(
+                                  address: chosenLocation.address,
+                                  center: chosenLocation.center,
+                                  city: chosenLocation.city,
+                                  country: chosenLocation.country,
+                                ),
+                                curruserLatLng: LatLngs,
+                              ),
+                          settings: RouteSettings(name: "SearchLocation")));
               setState(() {
                 chosenLocation = chosen;
               });
@@ -503,7 +524,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       //innital position in map
                       target: LatLng(chosenLocation.center[0],
                           chosenLocation.center[1]), //initial position
-                      zoom: 17.0, //initial zoom level
+                      zoom: 14.0, //initial zoom level
                     ),
                     mapType: MapType.normal, //map type
                     markers: Set<Marker>.of(markers.values),
@@ -516,7 +537,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                   ),
                 ),
           SizedBox(
-            height: screenheight * 0.03,
+            height: emptylocation ? 0 : screenheight * 0.03,
           ),
           Container(
             height: screenwidth * 0.13,
@@ -619,20 +640,22 @@ class _EditEventScreenState extends State<EditEventScreen> {
                             "Please choose a location for your event");
                       } else {
                         setState(() {
-                          widget.event.title = titlecontroller.text.trim();
-                          widget.event.description = desccontroller.text.trim();
-                          widget.event.maxparticipants =
+                          event.title = titlecontroller.text.trim();
+                          event.description = desccontroller.text.trim();
+                          event.maxparticipants =
                               int.parse(maxpartcontroller.text);
-                          widget.event.interest = selectedinterest;
-                          widget.event.datetime = eventdate;
-                          widget.event.country =
-                              chosenLocation.country.toLowerCase();
-                          widget.event.address = chosenLocation.address;
-                          widget.event.city =
+                          event.interest = selectedinterest;
+                          event.datetime = eventdate;
+                          event.address = chosenLocation.address;
+                          event.country = chosenLocation.country.toLowerCase();
+                          event.city =
                               chosenLocation.city.toLowerCase().split(" ");
-                          widget.event.lat = chosenLocation.center[0];
-                          widget.event.lng = chosenLocation.center[1];
-                          widget.event.isinviteonly = isinviteonly;
+                          event.host = widget.curruser.username;
+                          event.hostdocid = widget.curruser.uid;
+                          event.lat = chosenLocation.center[0];
+                          event.lng = chosenLocation.center[1];
+                          event.isinviteonly = isinviteonly;
+                          event.presentparticipants = [widget.curruser.uid];
                         });
                         try {
                           if (imagepath == null) {
@@ -641,15 +664,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
                             compressedimgpath =
                                 await CompressAndGetFile(imagepath);
                           }
-                          await db.updateEvent(widget.event, compressedimgpath);
-                          await widget.analytics
-                              .logEvent(name: "edited_event", parameters: {});
+                          await db.createevent(
+                              event, widget.curruser, compressedimgpath);
+
                           goloadingscreen();
                         } catch (e) {
-                          displayErrorSnackBar("Could not update event");
-                          setState(() {
-                            buttonpressed = false;
-                          });
+                          displayErrorSnackBar("Could not create event");
                         }
                       }
                       setState(() {
@@ -659,7 +679,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
               child: PrimaryButton(
                 screenwidth: screenwidth,
                 buttonpressed: buttonpressed,
-                text: "Update Event",
+                text: "Create Event",
                 buttonwidth: screenwidth * 0.6,
                 bold: false,
               )),

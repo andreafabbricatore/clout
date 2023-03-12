@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
-import 'package:clout/screens/mainscreen.dart';
+import 'package:clout/screens/authscreens/mainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';

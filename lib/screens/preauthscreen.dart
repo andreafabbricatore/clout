@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:clout/components/primarybutton.dart';
-import 'package:clout/screens/authscreen.dart';
+import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';

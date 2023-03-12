@@ -1,23 +1,22 @@
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/createeventscreen.dart';
+import 'package:clout/screens/unauthscreens/unauthcreateeventscreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
-class noEventsBox extends StatelessWidget {
-  noEventsBox(
+class UnAuthnoEventsBox extends StatelessWidget {
+  UnAuthnoEventsBox(
       {super.key,
       required this.screenheight,
-      required this.curruser,
       required this.screenwidth,
       required this.interest,
-      required this.analytics,
-      required this.allcolor});
+      required this.allcolor,
+      required this.analytics});
   String interest;
-  AppUser curruser;
-  FirebaseAnalytics analytics;
   final double screenheight;
   final double screenwidth;
   Color allcolor;
+  FirebaseAnalytics analytics;
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +39,7 @@ class noEventsBox extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => CreateEventScreen(
-                        curruser: curruser,
+                  builder: (BuildContext context) => UnAuthCreateEventScreen(
                         allowbackarrow: true,
                         startinterest: interest,
                         analytics: analytics,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:clout/components/chat.dart';
@@ -6,46 +7,49 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
-import 'package:clout/screens/chatroomscreen.dart';
-import 'package:clout/screens/editeventscreen.dart';
-import 'package:clout/screens/interestsearchscreen.dart';
-import 'package:clout/screens/loading.dart';
-import 'package:clout/screens/profilescreen.dart';
+import 'package:clout/screens/authscreens/chatroomscreen.dart';
+import 'package:clout/screens/authscreens/editeventscreen.dart';
+import 'package:clout/screens/authscreens/interestsearchscreen.dart';
+import 'package:clout/screens/authscreens/loading.dart';
+import 'package:clout/screens/authscreens/profilescreen.dart';
+
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:map_launcher/map_launcher.dart' as Maps;
 import 'package:intl/intl.dart';
+import 'package:map_launcher/map_launcher.dart' as Maps;
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
-class DeepLinkEventDetailScreen extends StatefulWidget {
-  DeepLinkEventDetailScreen(
+class EventDetailScreen extends StatefulWidget {
+  EventDetailScreen(
       {super.key,
       required this.event,
       required this.curruser,
       required this.participants,
+      required this.interactfav,
       required this.curruserlocation,
       required this.analytics});
   Event event;
   AppUser curruser;
   List<AppUser> participants;
-  AppLocation curruserlocation;
   FirebaseAnalytics analytics;
+  final Function(Event event) interactfav;
+  AppLocation curruserlocation;
   @override
-  State<DeepLinkEventDetailScreen> createState() =>
-      _DeepLinkEventDetailScreenState();
+  State<EventDetailScreen> createState() => _EventDetailScreenState();
 }
 
-class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
+class _EventDetailScreenState extends State<EventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
   String joinedval = "Join";
   bool buttonpressed = false;
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   bool gotochatbuttonpressed = false;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
@@ -54,23 +58,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
   bool showqrmessage = false;
   bool deletebuttonpressed = false;
 
-  Future _addMarker(LatLng latlang) async {
-    setState(() {
-      const MarkerId markerId = MarkerId("chosenlocation");
-      Marker marker = Marker(
-        markerId: markerId,
-        draggable: true,
-        position:
-            latlang, //With this parameter you automatically obtain latitude and longitude
-        infoWindow: const InfoWindow(
-          title: "Chosen Location",
-        ),
-        icon: BitmapDescriptor.defaultMarker,
-      );
-
-      markers[markerId] = marker;
-    });
-  }
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   void displayErrorSnackBar(
     String error,
@@ -88,6 +76,24 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future _addMarker(LatLng latlang) async {
+    setState(() {
+      const MarkerId markerId = MarkerId("chosenlocation");
+      Marker marker = Marker(
+        markerId: markerId,
+        draggable: true,
+        position:
+            latlang, //With this parameter you automatically obtain latitude and longitude
+        infoWindow: const InfoWindow(
+          title: "Chosen Location",
+        ),
+        icon: BitmapDescriptor.defaultMarker,
+      );
+
+      markers[markerId] = marker;
+    });
   }
 
   Future<void> reportevent(Event event) async {
@@ -115,6 +121,28 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
     } catch (e) {
       displayErrorSnackBar("Could not update user");
     }
+  }
+
+  Future<void> chatnavigate(Chat chat) async {
+    await widget.analytics
+        .logEvent(name: "opened_chat_from_event_screen", parameters: {
+      "interest": widget.event.interest,
+      "inviteonly": widget.event.isinviteonly.toString(),
+      "maxparticipants": widget.event.maxparticipants,
+      "participants": widget.event.participants.length,
+      "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
+    });
+    await Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ChatRoomScreen(
+                  chatinfo: chat,
+                  curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ChatRoomScreen")));
+    updatescreen(widget.event.docid);
   }
 
   void checkifjoined() async {
@@ -171,7 +199,6 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
               widget.participants = temp;
             })
           });
-
       checkifjoined();
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
@@ -252,54 +279,6 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         });
       }
     }
-  }
-
-  Future interactfav(Event event) async {
-    try {
-      if (widget.curruser.favorites.contains(event.docid)) {
-        await db.remFromFav(widget.curruser.uid, event.docid);
-        await widget.analytics.logEvent(name: "rem_from_fav", parameters: {
-          "interest": event.interest,
-          "inviteonly": event.isinviteonly.toString(),
-          "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
-        });
-      } else {
-        await db.addToFav(widget.curruser.uid, event.docid);
-        await widget.analytics.logEvent(name: "add_to_fav", parameters: {
-          "interest": event.interest,
-          "inviteonly": event.isinviteonly.toString(),
-          "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
-        });
-      }
-    } catch (e) {
-      displayErrorSnackBar("Could not update favorites");
-    } finally {
-      updatecurruser();
-    }
-  }
-
-  Future<void> chatnavigate(Chat chat) async {
-    await widget.analytics
-        .logEvent(name: "opened_chat_from_event_screen", parameters: {
-      "interest": widget.event.interest,
-      "inviteonly": widget.event.isinviteonly.toString(),
-      "maxparticipants": widget.event.maxparticipants,
-      "participants": widget.event.participants.length,
-      "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
-    });
-    await Navigator.push(
-        context,
-        CupertinoPageRoute(
-            builder: (_) => ChatRoomScreen(
-                  chatinfo: chat,
-                  curruser: widget.curruser,
-                  curruserlocation: widget.curruserlocation,
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "ChatRoomScreen")));
-    updatescreen(widget.event.docid);
   }
 
   Future<void> validateqr(String? qrcontent) async {
@@ -385,6 +364,17 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
             settings: RouteSettings(name: "InterestSearchScreen")));
   }
 
+  Future<String> createShareLink() async {
+    final dynamicLinkParams = DynamicLinkParameters(
+      link: Uri.parse("https://outwithclout.com/event/${widget.event.docid}"),
+      uriPrefix: "https://outwithclout.page.link",
+    );
+    final dynamicLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
+    //print(dynamicLink.previewLink);
+    return dynamicLink.shortUrl.toString();
+  }
+
   @override
   void initState() {
     checkifjoined();
@@ -458,6 +448,25 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
       }
     }
 
+    void shareevent(String text) async {
+      final box = context.findRenderObject() as RenderBox?;
+      await widget.analytics.logEvent(name: "shared_event", parameters: {
+        "interest": widget.event.interest,
+        "inviteonly": widget.event.isinviteonly.toString(),
+        "maxparticipants": widget.event.maxparticipants,
+        "participants": widget.event.participants.length,
+        "ishost": (widget.curruser.uid == widget.event.hostdocid).toString(),
+        "isfollowinghost": widget.curruser.following
+            .contains(widget.event.hostdocid)
+            .toString()
+      });
+      await Share.share(
+        text,
+        subject: "Join ${widget.event.title} on Clout!",
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -483,7 +492,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         actions: [
           GestureDetector(
             onTap: () async {
-              await interactfav(widget.event);
+              await widget.interactfav(widget.event);
               updatecurruser();
             },
             child: Padding(
@@ -526,10 +535,49 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                   ),
                                   Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                          MainAxisAlignment.spaceAround,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            String link =
+                                                await createShareLink();
+                                            //print(link);
+                                            String text =
+                                                "Join ${widget.event.title} on Clout!\n\n$link";
+                                            shareevent(text);
+                                          },
+                                          child: Container(
+                                            height: screenheight * 0.1,
+                                            width: screenwidth * 0.4,
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(20)),
+                                            ),
+                                            child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  const Icon(Icons.ios_share,
+                                                      color: Colors.white,
+                                                      size: 30),
+                                                  SizedBox(
+                                                    height: screenheight * 0.01,
+                                                  ),
+                                                  const Text(
+                                                    "Share Event",
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        color: Colors.white),
+                                                    textScaleFactor: 1.0,
+                                                  )
+                                                ]),
+                                          ),
+                                        ),
                                         GestureDetector(
                                           onTap: gotochatbuttonpressed
                                               ? null
@@ -564,7 +612,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                 },
                                           child: Container(
                                             height: screenheight * 0.1,
-                                            width: screenwidth * 0.85,
+                                            width: screenwidth * 0.4,
                                             decoration: BoxDecoration(
                                                 color: Theme.of(context)
                                                     .primaryColor,
@@ -911,6 +959,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                                                       }
                                                     : null,
                                         child: Container(
+                                          //if finished works, if joined works,
                                           height: screenheight * 0.1,
                                           width: screenwidth * 0.4,
                                           decoration: BoxDecoration(
@@ -1201,30 +1250,30 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
             height: screenheight * 0.02,
           ),
           InkWell(
-            onTap: () async {
-              buttonpressed ? null : interactevent(context);
-            },
-            child: joinedval == "Finished"
-                ? Container(
-                    height: 50,
-                    width: screenwidth,
-                    color: Colors.white,
-                    child: Text(
-                      joinedval,
-                      style: TextStyle(
-                          fontSize: 20, color: Theme.of(context).primaryColor),
-                      textScaleFactor: 1.1,
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : PrimaryButton(
-                    screenwidth: screenwidth,
-                    buttonpressed: buttonpressed,
-                    text: joinedval,
-                    buttonwidth: screenwidth * 0.5,
-                    bold: false,
-                  ),
-          )
+              onTap: () async {
+                buttonpressed ? null : interactevent(context);
+              },
+              child: joinedval == "Finished"
+                  ? Container(
+                      height: 50,
+                      width: screenwidth,
+                      color: Colors.white,
+                      child: Text(
+                        joinedval,
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Theme.of(context).primaryColor),
+                        textScaleFactor: 1.1,
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : PrimaryButton(
+                      screenwidth: screenwidth,
+                      buttonpressed: buttonpressed,
+                      text: joinedval,
+                      buttonwidth: screenwidth * 0.5,
+                      bold: false,
+                    ))
         ]),
       ),
     );

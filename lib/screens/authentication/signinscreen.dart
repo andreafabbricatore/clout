@@ -1,6 +1,6 @@
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
-import 'package:clout/screens/pswresetscreen.dart';
+import 'package:clout/screens/authentication/pswresetscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
