@@ -1,32 +1,20 @@
 import 'dart:async';
-import 'dart:io';
-
-import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/unauthuserlistview.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/authentication/authscreen.dart';
-import 'package:clout/screens/authscreens/chatroomscreen.dart';
-import 'package:clout/screens/authscreens/editeventscreen.dart';
-import 'package:clout/screens/authscreens/interestsearchscreen.dart';
-import 'package:clout/screens/authscreens/loading.dart';
-import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/screens/unauthscreens/unauthprofilescreen.dart';
 
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as Maps;
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 class UnAuthEventDetailScreen extends StatefulWidget {
@@ -48,7 +36,7 @@ class UnAuthEventDetailScreen extends StatefulWidget {
 class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
   db_conn db = db_conn();
   bool joined = false;
-  String joinedval = "Authenticate to Join";
+  String joinedval = "Join";
   bool buttonpressed = false;
   bool gotochatbuttonpressed = false;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -56,7 +44,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
   QRViewController? qrcontroller;
   String qrmessage = "";
   bool showqrmessage = false;
-
+  bool authbuttonpressed = false;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   void displayErrorSnackBar(
@@ -112,7 +100,58 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
     }
   }
 
-  void interactevent() async {
+  void showauthdialog(screenheight, screenwidth) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                  height: screenheight * 0.2,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(children: [
+                    const Text(
+                      "Login or Signup\nto join an event",
+                      style: TextStyle(color: Colors.black, fontSize: 25),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.02,
+                    ),
+                    GestureDetector(
+                        onTap: authbuttonpressed
+                            ? null
+                            : () async {
+                                setState(() {
+                                  authbuttonpressed = true;
+                                });
+                                goauthscreen();
+                                setState(() {
+                                  authbuttonpressed = false;
+                                });
+                              },
+                        child: PrimaryButton(
+                            screenwidth: screenwidth,
+                            buttonpressed: authbuttonpressed,
+                            text: "Continue",
+                            buttonwidth: screenwidth * 0.6,
+                            bold: false)),
+                  ]),
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  void goauthscreen() async {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -422,7 +461,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
           ),
           InkWell(
               onTap: () async {
-                interactevent();
+                showauthdialog(screenheight, screenwidth);
               },
               child: joinedval == "Finished"
                   ? Container(

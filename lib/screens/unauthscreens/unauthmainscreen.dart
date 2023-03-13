@@ -1,17 +1,7 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
-import 'package:clout/components/chat.dart';
-import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreens/chatroomscreen.dart';
-import 'package:clout/screens/authscreens/createeventscreen.dart';
-import 'package:clout/screens/authscreens/deeplinkeventdetailscreen.dart';
-import 'package:clout/screens/authscreens/favscreen.dart';
-import 'package:clout/screens/authscreens/homescreen.dart';
-import 'package:clout/screens/authscreens/profilescreen.dart';
-import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthcreateeventscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthfavscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthhomescreen.dart';
@@ -22,9 +12,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class UnAuthMainScreen extends StatefulWidget {
   AppLocation curruserlocation;

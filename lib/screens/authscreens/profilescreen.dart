@@ -12,7 +12,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:clout/components/event.dart';
@@ -489,8 +488,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: SingleChildScrollView(
           child: SizedBox(
             height: joinedevents
-                ? screenheight * 0.4 + (joinedEvents.length * 180)
-                : screenheight * 0.4 + (hostedEvents.length * 180),
+                ? screenheight * 0.4 +
+                    (joinedEvents.length * screenheight * 0.37)
+                : screenheight * 0.4 +
+                    (hostedEvents.length * screenheight * 0.37),
             width: screenwidth,
             child: Column(children: [
               ProfileTopContainer(
@@ -565,10 +566,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               EventListView(
                 eventList: joinedevents ? joinedEvents : hostedEvents,
-                isHorizontal: false,
                 onTap: navigate,
                 scrollable: false,
-                leftpadding: true,
+                leftpadding: 18.0,
                 curruser: widget.curruser,
                 interactfav: interactfav,
                 screenheight: screenheight,

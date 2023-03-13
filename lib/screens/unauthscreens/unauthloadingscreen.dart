@@ -1,22 +1,14 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
-import 'package:clout/main.dart';
-import 'package:clout/screens/authscreens/mainscreen.dart';
-import 'package:clout/screens/unauthscreens/unauthhomescreen.dart';
 import 'package:clout/screens/unauthscreens/unauthmainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:launch_review/launch_review.dart';
 
 class UnAuthLoadingScreen extends StatefulWidget {
   FirebaseAnalytics analytics;

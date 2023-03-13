@@ -1,5 +1,3 @@
-import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreens/createeventscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthcreateeventscreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';

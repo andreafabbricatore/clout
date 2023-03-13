@@ -3,8 +3,6 @@ import 'package:clout/screens/authentication/signupscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthloadingscreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
-
 import 'package:rive/rive.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -127,7 +125,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           ))),
                   SizedBox(
-                    height: screenheight * 0.06,
+                    height: screenheight * 0.05,
                   ),
                   Center(
                     child: GestureDetector(
@@ -142,7 +140,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         );
                       },
                       child: const Text(
-                        "Continue as Guest",
+                        "Continue as a Guest",
                         style: TextStyle(
                           color: Colors.grey,
                         ),

@@ -3,7 +3,6 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreens/createeventscreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -234,10 +233,9 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
               : filteredEventList.isNotEmpty
                   ? EventListView(
                       onTap: navigate,
-                      isHorizontal: false,
                       eventList: filteredEventList,
                       scrollable: true,
-                      leftpadding: false,
+                      leftpadding: 12.0,
                       curruser: widget.curruser,
                       interactfav: interactfav,
                       screenwidth: screenwidth,

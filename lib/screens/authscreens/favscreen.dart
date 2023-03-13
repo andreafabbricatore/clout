@@ -196,10 +196,9 @@ class _FavScreenState extends State<FavScreen> {
                 ),
               )
             : EventListView(
-                isHorizontal: false,
                 scrollable: true,
                 eventList: favorites,
-                leftpadding: true,
+                leftpadding: 20.0,
                 curruser: widget.curruser,
                 interactfav: interactfav,
                 onTap: navigate,

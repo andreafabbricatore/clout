@@ -2,7 +2,6 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreens/createeventscreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -180,11 +179,10 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       EventListView(
-                        isHorizontal: false,
                         eventList: widget.events,
                         onTap: navigate,
                         scrollable: true,
-                        leftpadding: false,
+                        leftpadding: 2.0,
                         curruser: widget.curruser,
                         interactfav: interactfav,
                         screenheight: screenheight,

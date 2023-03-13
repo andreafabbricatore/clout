@@ -1,4 +1,3 @@
-import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 

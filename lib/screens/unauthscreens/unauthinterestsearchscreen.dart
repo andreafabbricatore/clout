@@ -1,16 +1,11 @@
-import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
-import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/unautheventlistview.dart';
 import 'package:clout/components/unauthnoeventsbox.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreens/createeventscreen.dart';
-import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-
 import 'package:clout/components/event.dart';
 
 class UnAuthInterestSearchScreen extends StatefulWidget {
@@ -144,11 +139,10 @@ class _UnAuthInterestSearchScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       UnAuthEventListView(
-                        isHorizontal: false,
                         eventList: widget.events,
                         onTap: navigate,
                         scrollable: true,
-                        leftpadding: false,
+                        leftpadding: 2.0,
                         screenheight: screenheight,
                         screenwidth: screenwidth,
                       )

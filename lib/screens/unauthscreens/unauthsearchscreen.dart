@@ -1,10 +1,7 @@
 import 'package:clout/components/location.dart';
-import 'package:clout/components/searchbarlistview.dart';
 import 'package:clout/components/searchgridview.dart';
 import 'package:clout/components/unauthsearchbarlistview.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreens/calendarsearchscreen.dart';
-import 'package:clout/screens/authscreens/interestsearchscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthinterestsearchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';

@@ -93,6 +93,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   List LatLngs = [];
+  bool authbuttonpressed = false;
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -166,6 +167,57 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
         emptylocation = false;
       });
     }
+  }
+
+  void showauthdialog(screenheight, screenwidth) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                  height: screenheight * 0.2,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(children: [
+                    const Text(
+                      "Login or Signup\nto create an event",
+                      style: TextStyle(color: Colors.black, fontSize: 25),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.02,
+                    ),
+                    GestureDetector(
+                        onTap: authbuttonpressed
+                            ? null
+                            : () async {
+                                setState(() {
+                                  authbuttonpressed = true;
+                                });
+                                goauthscreen();
+                                setState(() {
+                                  authbuttonpressed = false;
+                                });
+                              },
+                        child: PrimaryButton(
+                            screenwidth: screenwidth,
+                            buttonpressed: authbuttonpressed,
+                            text: "Continue",
+                            buttonwidth: screenwidth * 0.6,
+                            bold: false)),
+                  ]),
+                ),
+              );
+            },
+          );
+        });
   }
 
   void goauthscreen() {
@@ -614,12 +666,14 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
             height: screenheight * 0.03,
           ),
           GestureDetector(
-              onTap: goauthscreen,
+              onTap: () {
+                showauthdialog(screenheight, screenwidth);
+              },
               child: PrimaryButton(
                 screenwidth: screenwidth,
                 buttonpressed: buttonpressed,
-                text: "Authenticate to Create",
-                buttonwidth: screenwidth * 0.8,
+                text: "Create Event",
+                buttonwidth: screenwidth * 0.6,
                 bold: false,
               )),
           SizedBox(

@@ -196,9 +196,8 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         ? EventListView(
             eventList: widget.eventres,
             onTap: eventnavigate,
-            isHorizontal: false,
             scrollable: true,
-            leftpadding: false,
+            leftpadding: 8.0,
             curruser: widget.curruser,
             interactfav: interactfav,
             screenheight: screenheight,

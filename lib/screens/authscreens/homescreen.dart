@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
-import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/chatlistscreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
@@ -344,11 +341,10 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 EventListView(
-                  isHorizontal: false,
                   eventList: totaleventlist,
                   onTap: navigate,
                   scrollable: true,
-                  leftpadding: false,
+                  leftpadding: 2.0,
                   curruser: widget.curruser,
                   interactfav: interactfav,
                   screenheight: screenheight,

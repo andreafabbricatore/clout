@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/screens/authentication/emailverificationscreen.dart';
 import 'package:clout/screens/preauthscreen.dart';
 import 'package:clout/screens/authentication/signupscreen.dart';
