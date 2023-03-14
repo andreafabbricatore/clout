@@ -36,7 +36,9 @@ class UnAuthFavScreen extends StatelessWidget {
           height: screenheight * 0.04,
         ),
         GestureDetector(
-          onTap: () {
+          onTap: () async {
+            await analytics
+                .logEvent(name: "auth_from_guest_screen", parameters: {});
             Navigator.push(
               context,
               MaterialPageRoute(

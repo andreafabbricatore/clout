@@ -190,6 +190,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                       "Login or Signup\nto create an event",
                       style: TextStyle(color: Colors.black, fontSize: 25),
                       textAlign: TextAlign.center,
+                      textScaleFactor: 1.0,
                     ),
                     SizedBox(
                       height: screenheight * 0.02,
@@ -220,7 +221,9 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
         });
   }
 
-  void goauthscreen() {
+  void goauthscreen() async {
+    await widget.analytics
+        .logEvent(name: "auth_from_guest_screen", parameters: {});
     Navigator.push(
       context,
       MaterialPageRoute(

@@ -75,7 +75,7 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
                   curruserlocation: widget.curruserlocation,
                   analytics: widget.analytics,
                 ),
-            settings: RouteSettings(name: "InterestSearchScreen")));
+            settings: RouteSettings(name: "UnAuthInterestSearchScreen")));
   }
 
   @override

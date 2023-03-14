@@ -62,6 +62,7 @@ class UnAuthEventListView extends StatelessWidget {
                         color: Colors.black),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    textScaleFactor: 1.0,
                   ),
                 ),
               ),
@@ -150,7 +151,7 @@ class UnAuthEventListView extends StatelessWidget {
         itemBuilder: (_, index) {
           Event event = eventList.reversed.toList()[index];
           return Padding(
-            padding: EdgeInsets.only(bottom: 10, top: 10, left: leftpadding),
+            padding: EdgeInsets.only(bottom: 0, top: 10, left: leftpadding),
             child: _listViewItem(event, index),
           );
         },

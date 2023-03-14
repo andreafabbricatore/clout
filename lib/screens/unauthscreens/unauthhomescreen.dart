@@ -116,13 +116,13 @@ class _UnAuthHomeScreenState extends State<UnAuthHomeScreen> {
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => UnAuthEventDetailScreen(
-                event: chosenEvent,
-                participants: participants,
-                curruserlocation: widget.curruserlocation,
-                analytics: widget.analytics,
-              ),
-            ));
+                builder: (_) => UnAuthEventDetailScreen(
+                      event: chosenEvent,
+                      participants: participants,
+                      curruserlocation: widget.curruserlocation,
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "UnAuthEventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }

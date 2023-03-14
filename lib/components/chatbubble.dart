@@ -46,7 +46,8 @@ Widget chatbubble(String sender, String content, bool curruser) {
                       ),
                     ],
                   )
-            : dart_emoji.EmojiUtil.hasOnlyEmojis(content)
+            : dart_emoji.EmojiUtil.hasOnlyEmojis(content) &&
+                    parser.count(content) <= 2
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -58,7 +59,7 @@ Widget chatbubble(String sender, String content, bool curruser) {
                           content,
                           style: const TextStyle(
                             color: Colors.black,
-                            fontSize: 25,
+                            fontSize: 60,
                           ),
                           textAlign: TextAlign.left,
                         ),

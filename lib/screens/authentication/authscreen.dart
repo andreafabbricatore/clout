@@ -125,11 +125,13 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           ))),
                   SizedBox(
-                    height: screenheight * 0.05,
+                    height: screenheight * 0.04,
                   ),
                   Center(
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        await widget.analytics.logEvent(
+                            name: "continue_as_guest", parameters: {});
                         Navigator.push(
                           context,
                           MaterialPageRoute(

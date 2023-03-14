@@ -197,11 +197,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           child: Column(children: [
-                            const Text("Report a Bug",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25)),
+                            const Text(
+                              "Report a Bug",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25),
+                              textScaleFactor: 1.0,
+                            ),
                             SizedBox(
                               height: screenheight * 0.02,
                             ),
@@ -321,11 +324,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           child: Column(children: [
-                            const Text("Change Email",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25)),
+                            const Text(
+                              "Change Email",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25),
+                              textScaleFactor: 1.0,
+                            ),
                             SizedBox(
                               height: screenheight * 0.02,
                             ),
@@ -334,6 +340,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               style: TextStyle(
                                 fontSize: 15,
                               ),
+                              textScaleFactor: 1.1,
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(
@@ -434,17 +441,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           child: Column(children: [
-                            const Text("Change Password",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25)),
+                            const Text(
+                              "Change Password",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                              ),
+                              textScaleFactor: 1.0,
+                            ),
                             SizedBox(
                               height: screenheight * 0.02,
                             ),
                             const Text(
                               "In order to change password,\nenter old and new password",
                               style: TextStyle(fontSize: 15),
+                              textScaleFactor: 1.1,
                             ),
                             SizedBox(
                               height: screenheight * 0.02,

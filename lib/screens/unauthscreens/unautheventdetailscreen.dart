@@ -121,6 +121,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                       "Login or Signup\nto join an event",
                       style: TextStyle(color: Colors.black, fontSize: 25),
                       textAlign: TextAlign.center,
+                      textScaleFactor: 1.0,
                     ),
                     SizedBox(
                       height: screenheight * 0.02,
@@ -152,6 +153,8 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
   }
 
   void goauthscreen() async {
+    await widget.analytics
+        .logEvent(name: "auth_from_guest_screen", parameters: {});
     Navigator.push(
       context,
       MaterialPageRoute(

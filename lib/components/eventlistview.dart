@@ -79,6 +79,7 @@ class EventListView extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Colors.black),
+                    textScaleFactor: 1.0,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -169,7 +170,7 @@ class EventListView extends StatelessWidget {
         itemBuilder: (_, index) {
           Event event = eventList.reversed.toList()[index];
           return Padding(
-            padding: EdgeInsets.only(bottom: 10, top: 10, left: leftpadding),
+            padding: EdgeInsets.only(bottom: 0, top: 10, left: leftpadding),
             child: _listViewItem(event, index),
           );
         },

@@ -93,7 +93,7 @@ class _UnAuthInterestSearchScreenState
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),
-                settings: RouteSettings(name: "EventDetailScreen")));
+                settings: RouteSettings(name: "UnAuthEventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }

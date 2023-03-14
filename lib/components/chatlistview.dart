@@ -41,7 +41,7 @@ class _ChatListViewState extends State<ChatListView> {
     }
     widget = SizedBox(
       width: screenwidth,
-      height: 50,
+      height: 55,
       child: Stack(children: [
         Row(
           children: [
@@ -126,7 +126,7 @@ class _ChatListViewState extends State<ChatListView> {
   Widget build(BuildContext context) {
     return Expanded(
       child: ListView.builder(
-          padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
+          padding: const EdgeInsets.fromLTRB(8, 16, 0, 16),
           shrinkWrap: true,
           itemCount: widget.chatlist.length,
           itemBuilder: (_, index) {
