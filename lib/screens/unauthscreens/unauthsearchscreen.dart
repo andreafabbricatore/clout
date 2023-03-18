@@ -35,7 +35,9 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
     "Cooking",
     "Culture",
     "Travel",
-    "Games"
+    "Games",
+    "Studying",
+    "Chilling"
   ];
 
   List<Event> searchedevents = [];

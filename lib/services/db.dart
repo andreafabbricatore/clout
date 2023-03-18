@@ -289,13 +289,13 @@ class db_conn {
       DocumentSnapshot oldEventSnapshot = await events.doc(event.docid).get();
       String bannerUrl = "";
       if (imagepath == null) {
-        bannerUrl = event.image;
+        if (!event.customimage) {
+          bannerUrl = await downloadBannerUrl(event.interest);
+        } else {
+          bannerUrl = oldEventSnapshot['image'];
+        }
       } else {
         bannerUrl = await uploadEventThumbnail(imagepath, event.docid);
-      }
-      bool custompic = oldEventSnapshot['custom_image'];
-      if (!custompic && imagepath != null) {
-        custompic = true;
       }
       List searchfield = [];
       String temp = "";
@@ -316,7 +316,7 @@ class db_conn {
         'city': event.city,
         'time': event.datetime,
         'maxparticipants': event.maxparticipants,
-        'custom_image': custompic,
+        'custom_image': event.customimage,
         'image': bannerUrl,
         'lat': event.lat,
         'lng': event.lng,
@@ -333,6 +333,7 @@ class db_conn {
         'type': 'modified'
       });
     } catch (e) {
+      print(e);
       throw Exception();
     }
   }

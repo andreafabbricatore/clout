@@ -113,7 +113,7 @@ class EventListView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: screenheight * 0.28,
+                  width: screenwidth * 0.6,
                   child: Text(
                     event.title,
                     style: const TextStyle(
@@ -157,8 +157,6 @@ class EventListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenheight = MediaQuery.of(context).size.height;
-
     return Expanded(
       child: ListView.builder(
         physics: scrollable

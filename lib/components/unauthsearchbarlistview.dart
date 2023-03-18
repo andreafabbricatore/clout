@@ -96,13 +96,13 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => UnAuthEventDetailScreen(
-                event: chosenEvent,
-                participants: participants,
-                curruserlocation: widget.curruserlocation,
-                analytics: widget.analytics,
-              ),
-            ));
+                builder: (_) => UnAuthEventDetailScreen(
+                      event: chosenEvent,
+                      participants: participants,
+                      curruserlocation: widget.curruserlocation,
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "UnAuthEventDetailScreen")));
       } catch (e) {
         displayErrorSnackBar("Could not refresh");
       }
@@ -117,7 +117,8 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
                   analytics: widget.analytics,
                   visit: true,
                 ),
-            fullscreenDialog: true),
+            fullscreenDialog: true,
+            settings: RouteSettings(name: "UnAuthProfileScreen")),
       );
     }
 

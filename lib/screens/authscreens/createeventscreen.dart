@@ -52,7 +52,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       lng: 0,
       chatid: "",
       isinviteonly: false,
-      presentparticipants: []);
+      presentparticipants: [],
+      customimage: false);
 
   List<String> allinterests = [
     "Sports",
@@ -70,7 +71,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     "Cooking",
     "Culture",
     "Travel",
-    "Games"
+    "Games",
+    "Studying",
+    "Chilling"
   ];
 
   db_conn db = db_conn();

@@ -51,7 +51,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
     "Cooking",
     "Culture",
     "Travel",
-    "Games"
+    "Games",
+    "Studying",
+    "Chilling"
   ];
 
   db_conn db = db_conn();
@@ -639,6 +641,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
                           } else {
                             compressedimgpath =
                                 await CompressAndGetFile(imagepath);
+                            setState(() {
+                              widget.event.customimage = true;
+                            });
                           }
                           await db.updateEvent(widget.event, compressedimgpath);
                           await widget.analytics

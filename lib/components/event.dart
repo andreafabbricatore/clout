@@ -17,6 +17,7 @@ class Event {
   String chatid;
   bool isinviteonly;
   List presentparticipants;
+  bool customimage;
 
   Event(
       {required this.title,
@@ -36,7 +37,8 @@ class Event {
       required this.lng,
       required this.chatid,
       required this.isinviteonly,
-      required this.presentparticipants});
+      required this.presentparticipants,
+      required this.customimage});
 
   factory Event.fromJson(dynamic json, String docid) {
     return Event(
@@ -57,6 +59,7 @@ class Event {
         lng: json['lng'],
         chatid: json['chatid'],
         isinviteonly: json['isinviteonly'] as bool,
-        presentparticipants: json['presentparticipants'] as List);
+        presentparticipants: json['presentparticipants'] as List,
+        customimage: json['custom_image'] as bool);
   }
 }

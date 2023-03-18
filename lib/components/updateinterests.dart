@@ -28,7 +28,9 @@ class _UpdateInterestsState extends State<UpdateInterests> {
     "Cooking",
     "Culture",
     "Travel",
-    "Games"
+    "Games",
+    "Studying",
+    "Chilling"
   ];
   Widget _listviewitem(String interest) {
     Widget thiswidget = Container(

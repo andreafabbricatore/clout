@@ -200,7 +200,8 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                   analytics: widget.analytics,
                   visit: true,
                 ),
-            fullscreenDialog: true),
+            fullscreenDialog: true,
+            settings: RouteSettings(name: "UnAuthProfileScreen")),
       );
     }
 
