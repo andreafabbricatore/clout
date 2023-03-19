@@ -1919,6 +1919,22 @@ class db_conn {
     }
   }
 
+  Future<bool> unauthcheckversionandneedupdate() async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      QuerySnapshot querySnapshot = await appupdate.get();
+      bool needupdatestatus = false;
+      String requiredversion = "";
+      querySnapshot.docs.forEach((element) {
+        needupdatestatus = element['need_update_status'];
+        requiredversion = element['app_version'];
+      });
+      return (needupdatestatus && requiredversion != packageInfo.version);
+    } catch (e) {
+      throw Exception("Could not pull update status");
+    }
+  }
+
   Future<void> referralcloutinc(String referreduid, String shareruid) async {
     try {
       DocumentSnapshot referredsnapshot = await users.doc(referreduid).get();

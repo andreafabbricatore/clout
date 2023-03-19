@@ -1458,7 +1458,9 @@ class _InterestScreenState extends State<InterestScreen> {
     "Cooking",
     "Culture",
     "Travel",
-    "Games"
+    "Games",
+    "Studying",
+    "Chilling"
   ];
   List<Color> textcolors =
       List.filled(10, const Color.fromARGB(255, 255, 48, 117));
