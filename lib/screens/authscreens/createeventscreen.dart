@@ -251,8 +251,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               child: imagepath == null
                   ? Container(
                       color: Theme.of(context).primaryColor,
-                      height: screenheight * 0.2,
-                      width: screenheight * 0.2,
+                      height: 200,
+                      width: screenwidth * 0.9,
                       child: Icon(
                         Icons.upload_rounded,
                         color: Colors.white,
@@ -261,8 +261,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     )
                   : Image.file(
                       imagepath,
-                      height: screenheight * 0.2,
-                      width: screenheight * 0.2,
+                      height: 200,
+                      width: screenwidth * 0.9,
                       fit: BoxFit.cover,
                     ),
             ),

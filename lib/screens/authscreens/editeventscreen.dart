@@ -249,14 +249,14 @@ class _EditEventScreenState extends State<EditEventScreen> {
               child: imagepath == null
                   ? Image.network(
                       widget.event.image,
-                      height: screenheight * 0.2,
-                      width: screenheight * 0.2,
+                      height: 200,
+                      width: screenwidth * 0.9,
                       fit: BoxFit.cover,
                     )
                   : Image.file(
                       imagepath,
-                      height: screenheight * 0.2,
-                      width: screenheight * 0.2,
+                      height: 200,
+                      width: screenwidth * 0.9,
                       fit: BoxFit.cover,
                     ),
             ),
