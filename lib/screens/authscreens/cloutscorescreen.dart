@@ -60,8 +60,8 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
 
   Future<String> createShareLink() async {
     final dynamicLinkParams = DynamicLinkParameters(
-      link:
-          Uri.parse("https://outwithclout.com/referral/${widget.curruser.uid}"),
+      link: Uri.parse(
+          "https://outwithclout.com/#/referral/${widget.curruser.uid}"),
       uriPrefix: "https://outwithclout.page.link",
     );
     final dynamicLink =

@@ -269,7 +269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<String> createShareLink() async {
     final dynamicLinkParams = DynamicLinkParameters(
-      link: Uri.parse("https://outwithclout.com/user/${widget.user.uid}"),
+      link: Uri.parse("https://outwithclout.com/#/user/${widget.user.uid}"),
       uriPrefix: "https://outwithclout.page.link",
     );
     final dynamicLink =
@@ -297,8 +297,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void refer() async {
     final dynamicLinkParams = DynamicLinkParameters(
-      link:
-          Uri.parse("https://outwithclout.com/referral/${widget.curruser.uid}"),
+      link: Uri.parse(
+          "https://outwithclout.com/#/referral/${widget.curruser.uid}"),
       uriPrefix: "https://outwithclout.page.link",
     );
     final dynamicLink =

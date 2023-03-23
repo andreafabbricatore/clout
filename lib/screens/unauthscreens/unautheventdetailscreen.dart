@@ -90,11 +90,10 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
         widget.event = updatedevent;
       });
       List<AppUser> temp = await db.geteventparticipantslist(widget.event);
-      await Future.delayed(Duration(milliseconds: 50)).then((value) => {
-            setState(() {
-              widget.participants = temp;
-            })
-          });
+      await Future.delayed(Duration(milliseconds: 50));
+      setState(() {
+        widget.participants = temp;
+      });
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
     }
@@ -167,7 +166,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
 
   Future<String> createShareLink() async {
     final dynamicLinkParams = DynamicLinkParameters(
-      link: Uri.parse("https://outwithclout.com/event/${widget.event.docid}"),
+      link: Uri.parse("https://outwithclout.com/#/event/${widget.event.docid}"),
       uriPrefix: "https://outwithclout.page.link",
     );
     final dynamicLink =

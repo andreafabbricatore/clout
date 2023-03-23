@@ -164,11 +164,10 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
         widget.event = updatedevent;
       });
       List<AppUser> temp = await db.geteventparticipantslist(widget.event);
-      await Future.delayed(Duration(milliseconds: 50)).then((value) => {
-            setState(() {
-              widget.participants = temp;
-            })
-          });
+      await Future.delayed(Duration(milliseconds: 50));
+      setState(() {
+        widget.participants = temp;
+      });
 
       checkifjoined();
     } catch (e) {
