@@ -239,6 +239,8 @@ class db_conn {
           'searchfield': searchfield,
           'chatid': '',
           'isinviteonly': newevent.isinviteonly,
+          'participants': [curruser.uid],
+          'presentparticipants': [curruser.uid]
         }).then((value) {
           eventid = value.id;
         });
@@ -251,16 +253,8 @@ class db_conn {
           "uid": curruser.uid,
           "pfp_url": curruser.pfpurl,
           "username": curruser.username,
-        });
-
-        await events
-            .doc(eventid)
-            .collection("presentparticipants")
-            .doc(curruser.uid)
-            .set({
-          "uid": curruser.uid,
-          "pfp_url": curruser.pfpurl,
-          "username": curruser.username,
+          "fullname": curruser.fullname,
+          "present": true
         });
 
         if (imagepath == null) {
@@ -377,6 +371,8 @@ class db_conn {
           "uid": curruser.uid,
           "pfp_url": curruser.pfpurl,
           "username": curruser.username,
+          "fullname": curruser.fullname,
+          "present": false
         });
       }
     } catch (e) {
@@ -513,6 +509,7 @@ class db_conn {
           'joined_events': FieldValue.arrayRemove([event.docid]),
         }, SetOptions(merge: true));
       }
+
       if (eventSnapshot['custom_image']) {
         await FirebaseStorage.instance
             .ref('/event_thumbnails/${event.docid}.jpg')
@@ -525,15 +522,13 @@ class db_conn {
       for (var doc in chatsnapshots.docs) {
         batch.delete(doc.reference);
       }
-      await batch.commit();
-      var eventcollection = events.doc(event.chatid).collection('participants');
+      var eventcollection = events.doc(event.docid).collection('participants');
       var eventsnapshots = await eventcollection.get();
       for (var doc in eventsnapshots.docs) {
         batch.delete(doc.reference);
       }
-      await batch.commit();
       var preseventcollection =
-          events.doc(event.chatid).collection('presentparticipants');
+          events.doc(event.docid).collection('presentparticipants');
       var preseventsnapshots = await preseventcollection.get();
       for (var doc in preseventsnapshots.docs) {
         batch.delete(doc.reference);
@@ -542,6 +537,7 @@ class db_conn {
       await deletechat(event.chatid);
       await events.doc(event.docid).delete();
     } catch (e) {
+      print(e);
       throw Exception("Could not delete event");
     }
   }
@@ -553,7 +549,8 @@ class db_conn {
           await events.doc(event.docid).collection("participants").get();
       final presentparticipantslength = await events
           .doc(event.docid)
-          .collection("presentparticipants")
+          .collection("participants")
+          .where("present", isEqualTo: true)
           .snapshots()
           .length;
       for (QueryDocumentSnapshot<Map<String, dynamic>> x in participants.docs) {
@@ -566,16 +563,10 @@ class db_conn {
             'clout': FieldValue.increment(-decrease),
           }, SetOptions(merge: true));
         } else {
-          events
-              .doc(event.docid)
-              .collection("presentparticipants")
-              .doc(x.data()['uid'])
-              .get()
-              .then((value) => value.exists
-                  ? users.doc(x.data()['uid']).set(
-                      {'clout': FieldValue.increment(-10)},
-                      SetOptions(merge: true))
-                  : null);
+          if (x.data()['present'] == true) {
+            users.doc(x.data()['uid']).set(
+                {'clout': FieldValue.increment(-10)}, SetOptions(merge: true));
+          }
         }
         users.doc(x.data()['uid']).set({
           'joined_events': FieldValue.arrayRemove(
@@ -596,15 +587,15 @@ class db_conn {
       for (var doc in chatsnapshots.docs) {
         batch.delete(doc.reference);
       }
-      await batch.commit();
-      var eventcollection = events.doc(event.chatid).collection('participants');
+
+      var eventcollection = events.doc(event.docid).collection('participants');
       var eventsnapshots = await eventcollection.get();
       for (var doc in eventsnapshots.docs) {
         batch.delete(doc.reference);
       }
-      await batch.commit();
+
       var preseventcollection =
-          events.doc(event.chatid).collection('presentparticipants');
+          events.doc(event.docid).collection('presentparticipants');
       var preseventsnapshots = await preseventcollection.get();
       for (var doc in preseventsnapshots.docs) {
         batch.delete(doc.reference);
@@ -1778,6 +1769,10 @@ class db_conn {
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots();
+  }
+
+  Stream<QuerySnapshot> retrieveparticipants(String docid) {
+    return events.doc(docid).collection('participants').snapshots();
   }
 
   Future<void> setReadReceipt(String chatid, String readerid) {

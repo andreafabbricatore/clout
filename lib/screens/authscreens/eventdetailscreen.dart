@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/eventuserlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/user.dart';
@@ -18,6 +20,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as Maps;
@@ -422,8 +425,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               settings: RouteSettings(name: "ProfileScreen")));
     }
 
-    Future<void> remuser(AppUser user, int index) async {
+    Future<void> remuser(String uid) async {
       try {
+        AppUser user = await db.getUserFromUID(uid);
         await db.removeparticipant(user, widget.event);
         await widget.analytics.logEvent(name: "rem_participant", parameters: {
           "interest": widget.event.interest,
@@ -1224,25 +1228,46 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             height: screenheight * 0.005,
           ),
           SizedBox(
-            height: screenheight * 0.09 * widget.participants.length,
-            width: screenwidth,
-            child: Column(
-              children: [
-                UserListView(
-                  userres: widget.participants,
-                  curruser: widget.curruser,
-                  onTap: usernavigate,
-                  screenwidth: screenwidth,
-                  showcloutscore: false,
-                  showrembutton:
-                      (widget.curruser.uid == widget.event.hostdocid) &&
-                          (joinedval != "Finished"),
-                  removeUser: remuser,
-                  presentparticipants: widget.event.presentparticipants,
-                ),
-              ],
-            ),
-          ),
+              height: screenheight * 0.09 * widget.participants.length,
+              width: screenwidth,
+              child: StreamBuilder<QuerySnapshot>(
+                  stream: db.retrieveparticipants(widget.event.docid),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text(
+                        "Error Loading Chat",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30),
+                        textScaleFactor: 1.0,
+                      );
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return SpinKitFadingFour(
+                        color: Theme.of(context).primaryColor,
+                      );
+                    }
+                    return ListView(
+                      reverse: true,
+                      children:
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                            document.data()! as Map<String, dynamic>;
+                        return EventUserListViewItem(
+                            pfp_url: data['pfp_url'],
+                            screenwidth: screenwidth,
+                            screenheight: screenheight,
+                            username: data['username'],
+                            fullname: data['fullname'],
+                            curruser: widget.curruser,
+                            present: data['present'] as bool,
+                            uid: data['uid']);
+                      }).toList(),
+                    );
+                  })),
           SizedBox(
             height: screenheight * 0.02,
           ),
