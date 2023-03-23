@@ -71,7 +71,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
         });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
@@ -79,7 +78,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
         });
       }
     } catch (e) {
@@ -120,14 +118,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             settings: RouteSettings(name: "ProfileScreen")));
   }
 
-  void gotoeventscreen(Event chosenEvent, List<AppUser> participants) async {
+  void gotoeventscreen(Event chosenEvent) async {
     await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (_) => EventDetailScreen(
                   event: chosenEvent,
                   curruser: widget.curruser,
-                  participants: participants,
                   interactfav: interactfav,
                   curruserlocation: widget.curruserlocation,
                   analytics: widget.analytics,
@@ -153,10 +150,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             } else {
               Event chosenEvent =
                   await db.getEventfromDocId(widget.chatinfo.connectedid[0]);
-              List<AppUser> participants =
-                  await db.geteventparticipantslist(chosenEvent);
               await Future.delayed(const Duration(milliseconds: 50));
-              gotoeventscreen(chosenEvent, participants);
+              gotoeventscreen(chosenEvent);
             }
           },
           child: Text(

@@ -89,8 +89,6 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
     Future<void> eventnavigate(Event event, int index) async {
       try {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
-        List<AppUser> participants =
-            await db.geteventparticipantslist(chosenEvent);
         await Future.delayed(const Duration(milliseconds: 50));
 
         await Navigator.push(
@@ -98,7 +96,6 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
             MaterialPageRoute(
                 builder: (_) => UnAuthEventDetailScreen(
                       event: chosenEvent,
-                      participants: participants,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),

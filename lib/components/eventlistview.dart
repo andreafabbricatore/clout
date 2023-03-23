@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventListView extends StatelessWidget {
-  final Function(Event event, int index)? onTap;
+  final Function(Event event)? onTap;
   final List<Event> eventList;
   bool scrollable;
   double leftpadding;
@@ -57,44 +58,46 @@ class EventListView extends StatelessWidget {
         Align(
           alignment: Alignment.bottomLeft,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-              ),
-              height: screenheight * 0.02,
-              width: event.participants.length != event.maxparticipants
-                  ? screenwidth * 0.27
-                  : screenwidth * 0.42,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    event.participants.length != event.maxparticipants
-                        ? "${event.participants.length}/${event.maxparticipants} participants"
-                        : "Participant number reached",
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black),
-                    textScaleFactor: 1.0,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ),
+            padding: const EdgeInsets.all(10.0),
+            child: StreamBuilder<QuerySnapshot>(
+                stream: db.retrieveparticipants(event.docid),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {}
+                  if (snapshot.connectionState == ConnectionState.waiting) {}
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                    ),
+                    height: screenheight * 0.02,
+                    width: snapshot.data!.docs.length != event.maxparticipants
+                        ? screenwidth * 0.27
+                        : screenwidth * 0.42,
+                    child: Center(
+                      child: Text(
+                        snapshot.data!.docs.length != event.maxparticipants
+                            ? "${snapshot.data!.docs.length}/${event.maxparticipants} participants"
+                            : "Participant number reached",
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
+                        textScaleFactor: 1.0,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  );
+                }),
           ),
-        )
+        ),
       ]),
     );
   }
 
   Widget _listViewItem(
     Event event,
-    int index,
   ) {
     Widget widget;
     widget = Container(
@@ -150,7 +153,7 @@ class EventListView extends StatelessWidget {
     );
 
     return GestureDetector(
-      onTap: () => onTap?.call(event, index),
+      onTap: () => onTap?.call(event),
       child: widget,
     );
   }
@@ -169,7 +172,7 @@ class EventListView extends StatelessWidget {
           Event event = eventList.reversed.toList()[index];
           return Padding(
             padding: EdgeInsets.only(bottom: 0, top: 10, left: leftpadding),
-            child: _listViewItem(event, index),
+            child: _listViewItem(event),
           );
         },
       ),

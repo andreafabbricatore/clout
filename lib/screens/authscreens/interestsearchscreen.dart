@@ -67,7 +67,6 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
         });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
@@ -75,7 +74,6 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
         });
       }
     } catch (e) {
@@ -116,11 +114,10 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> navigate(Event event, int index) async {
+    Future<void> navigate(Event event) async {
       try {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
-        List<AppUser> participants =
-            await db.geteventparticipantslist(chosenEvent);
+
         await Future.delayed(const Duration(milliseconds: 50));
         await Navigator.push(
             context,
@@ -128,7 +125,6 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                 builder: (_) => EventDetailScreen(
                       event: chosenEvent,
                       curruser: widget.curruser,
-                      participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,

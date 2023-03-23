@@ -106,3 +106,99 @@ class _UnAuthUserListViewState extends State<UnAuthUserListView> {
     );
   }
 }
+
+class UnAuthEventUserListViewItem extends StatefulWidget {
+  UnAuthEventUserListViewItem(
+      {super.key,
+      required this.uid,
+      required this.pfp_url,
+      required this.screenwidth,
+      required this.screenheight,
+      required this.username,
+      required this.fullname,
+      required this.present,
+      this.onTap});
+  String pfp_url;
+  double screenwidth;
+  double screenheight;
+  String username;
+  String fullname;
+  String uid;
+  bool present;
+
+  final Function(String uid)? onTap;
+
+  @override
+  State<UnAuthEventUserListViewItem> createState() =>
+      _UnAuthEventUserListViewItemState();
+}
+
+class _UnAuthEventUserListViewItemState
+    extends State<UnAuthEventUserListViewItem> {
+  bool removeuserpressed = false;
+  bool ontappressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: ontappressed
+          ? null
+          : () async {
+              setState(() {
+                ontappressed = true;
+              });
+              await widget.onTap?.call(widget.uid);
+              setState(() {
+                ontappressed = false;
+              });
+            },
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+            child: SizedBox(
+              height: 50,
+              width: 50,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100.0),
+                child: Image.network(
+                  widget.pfp_url,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: widget.screenwidth * 0.7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "@${widget.username}",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  widget.fullname,
+                  style: const TextStyle(fontSize: 15, color: Colors.black),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          widget.present
+              ? const Icon(
+                  Icons.check,
+                  color: Color.fromARGB(255, 255, 48, 117),
+                )
+              : Container(),
+        ],
+      ),
+    );
+  }
+}

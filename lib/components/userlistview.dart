@@ -2,30 +2,22 @@ import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
 class UserListView extends StatefulWidget {
-  UserListView(
-      {Key? key,
-      required this.userres,
-      required this.onTap,
-      required this.curruser,
-      required this.screenwidth,
-      required this.showcloutscore,
-      required this.showrembutton,
-      this.removeUser,
-      this.removebuttonblack = false,
-      this.physics = const AlwaysScrollableScrollPhysics(),
-      this.presentparticipants = const []})
-      : super(key: key);
+  UserListView({
+    Key? key,
+    required this.userres,
+    required this.onTap,
+    required this.curruser,
+    required this.screenwidth,
+    required this.showcloutscore,
+    this.physics = const AlwaysScrollableScrollPhysics(),
+  }) : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
   double screenwidth;
   bool showcloutscore;
-  bool showrembutton;
-  bool removebuttonblack;
-  List presentparticipants;
   var physics;
 
-  final Function(AppUser user, int index)? onTap;
-  final Function(AppUser user, int index)? removeUser;
+  final Function(AppUser user)? onTap;
 
   @override
   State<UserListView> createState() => _UserListViewState();
@@ -36,16 +28,13 @@ class _UserListViewState extends State<UserListView> {
   bool removeuserpressed = false;
 
   Widget _listviewitem(
-      AppUser user,
-      int index,
-      double screenwidth,
-      AppUser curruser,
-      bool showcloutscore,
-      bool showrembutton,
-      bool removebuttonblack,
-      Function(AppUser user, int index)? removeUser,
-      Function(AppUser user, int index)? onTap,
-      List presentparticipants) {
+    AppUser user,
+    int index,
+    double screenwidth,
+    AppUser curruser,
+    bool showcloutscore,
+    Function(AppUser user)? onTap,
+  ) {
     Widget widget;
     widget = Row(
       children: [
@@ -96,32 +85,6 @@ class _UserListViewState extends State<UserListView> {
                 textScaleFactor: 1.0,
               )
             : Container(),
-        showrembutton && user.uid != curruser.uid
-            ? GestureDetector(
-                onTap: removeuserpressed
-                    ? null
-                    : () {
-                        setState(() {
-                          removeuserpressed = true;
-                        });
-                        removeUser?.call(user, index);
-                        setState(() {
-                          removeuserpressed = false;
-                        });
-                      },
-                child: Icon(
-                  Icons.remove_circle_outline,
-                  color: removebuttonblack
-                      ? Colors.black
-                      : const Color.fromARGB(255, 255, 48, 117),
-                ),
-              )
-            : presentparticipants.contains(user.uid)
-                ? const Icon(
-                    Icons.check,
-                    color: Color.fromARGB(255, 255, 48, 117),
-                  )
-                : Container(),
       ],
     );
 
@@ -132,7 +95,7 @@ class _UserListViewState extends State<UserListView> {
               setState(() {
                 ontappressed = true;
               });
-              await onTap?.call(user, index);
+              await onTap?.call(user);
               setState(() {
                 ontappressed = false;
               });
@@ -153,16 +116,13 @@ class _UserListViewState extends State<UserListView> {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
                 child: _listviewitem(
-                    widget.userres[index],
-                    index,
-                    widget.screenwidth,
-                    widget.curruser,
-                    widget.showcloutscore,
-                    widget.showrembutton,
-                    widget.removebuttonblack,
-                    widget.removeUser,
-                    widget.onTap,
-                    widget.presentparticipants));
+                  widget.userres[index],
+                  index,
+                  widget.screenwidth,
+                  widget.curruser,
+                  widget.showcloutscore,
+                  widget.onTap,
+                ));
           }),
     );
   }

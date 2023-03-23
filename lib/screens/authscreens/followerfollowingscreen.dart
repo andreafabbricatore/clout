@@ -62,7 +62,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user) async {
       Navigator.push(
           context,
           CupertinoPageRoute(
@@ -162,7 +162,6 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
           curruser: widget.curruser,
           screenwidth: screenwidth,
           showcloutscore: false,
-          showrembutton: false,
         )
       ]),
     );

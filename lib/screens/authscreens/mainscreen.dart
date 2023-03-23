@@ -135,15 +135,13 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void godeeplinkeventdetailscreen(
-      Event chosenEvent, List<AppUser> participants) {
+  void godeeplinkeventdetailscreen(Event chosenEvent) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (_) => DeepLinkEventDetailScreen(
                   event: chosenEvent,
                   curruser: widget.curruser,
-                  participants: participants,
                   curruserlocation: widget.curruserlocation,
                   analytics: widget.analytics,
                 ),
@@ -183,9 +181,8 @@ class _MainScreenState extends State<MainScreen> {
       String id = splitlink.last;
       if (splitlink[splitlink.length - 2] == "event") {
         Event chosenEvent = await db.getEventfromDocId(id);
-        List<AppUser> participants =
-            await db.geteventparticipantslist(chosenEvent);
-        godeeplinkeventdetailscreen(chosenEvent, participants);
+
+        godeeplinkeventdetailscreen(chosenEvent);
       } else if (splitlink[splitlink.length - 2] == "user") {
         AppUser user = await db.getUserFromUID(id);
         gotoprofilescreen(user);
@@ -233,25 +230,22 @@ class _MainScreenState extends State<MainScreen> {
     } else if (message.data["type"] == "eventcreated") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = await db.geteventparticipantslist(event);
-        godeeplinkeventdetailscreen(event, participants);
+        godeeplinkeventdetailscreen(event);
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
     } else if (message.data["type"] == "joined") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = await db.geteventparticipantslist(event);
         await Future.delayed(const Duration(milliseconds: 50));
-        godeeplinkeventdetailscreen(event, participants);
+        godeeplinkeventdetailscreen(event);
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
     } else if (message.data["type"] == "modified") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = await db.geteventparticipantslist(event);
-        godeeplinkeventdetailscreen(event, participants);
+        godeeplinkeventdetailscreen(event);
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
@@ -265,8 +259,7 @@ class _MainScreenState extends State<MainScreen> {
     } else if (message.data["type"] == "kicked") {
       try {
         Event event = await db.getEventfromDocId(message.data["eventid"]);
-        List<AppUser> participants = await db.geteventparticipantslist(event);
-        godeeplinkeventdetailscreen(event, participants);
+        godeeplinkeventdetailscreen(event);
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }

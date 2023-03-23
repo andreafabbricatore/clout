@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
@@ -11,6 +12,7 @@ import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as Maps;
@@ -21,11 +23,9 @@ class UnAuthEventDetailScreen extends StatefulWidget {
   UnAuthEventDetailScreen(
       {super.key,
       required this.event,
-      required this.participants,
       required this.curruserlocation,
       required this.analytics});
   Event event;
-  List<AppUser> participants;
   AppLocation curruserlocation;
   FirebaseAnalytics analytics;
   @override
@@ -88,11 +88,6 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
       Event updatedevent = await db.getEventfromDocId(eventid);
       setState(() {
         widget.event = updatedevent;
-      });
-      List<AppUser> temp = await db.geteventparticipantslist(widget.event);
-      await Future.delayed(Duration(milliseconds: 50));
-      setState(() {
-        widget.participants = temp;
       });
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
@@ -191,7 +186,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(String uid) async {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -294,10 +289,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
               InkWell(
                 onTap: () async {
                   try {
-                    String hostdocid =
-                        await db.getUserUIDfromUsername(widget.event.host);
-                    AppUser eventhost = await db.getUserFromUID(hostdocid);
-                    usernavigate(eventhost, 0);
+                    usernavigate("");
                   } catch (e) {
                     displayErrorSnackBar("Could not retrieve host information");
                   }
@@ -435,30 +427,58 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Text(
-            widget.event.participants.length != widget.event.maxparticipants
-                ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
-                : "Participant number reached",
-            style: const TextStyle(
-                fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: screenheight * 0.005,
-          ),
-          SizedBox(
-            height: screenheight * 0.09 * widget.participants.length,
-            width: screenwidth,
-            child: Column(
-              children: [
-                UnAuthUserListView(
-                  userres: widget.participants,
-                  screenwidth: screenwidth,
-                  presentparticipants: widget.event.presentparticipants,
-                  onTap: usernavigate,
-                ),
-              ],
-            ),
-          ),
+          StreamBuilder<QuerySnapshot>(
+              stream: db.retrieveparticipants(widget.event.docid),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {}
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SpinKitFadingFour(
+                    color: Theme.of(context).primaryColor,
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      snapshot.data!.docs.length != widget.event.maxparticipants
+                          ? "${snapshot.data!.docs.length}/${widget.event.maxparticipants} participants"
+                          : "Participant number reached",
+                      style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.005,
+                    ),
+                    SizedBox(
+                      width: screenwidth,
+                      height: screenheight * 0.09 * snapshot.data!.docs.length,
+                      child: ListView(
+                        reverse: true,
+                        children: snapshot.data!.docs
+                            .map((DocumentSnapshot document) {
+                          Map<String, dynamic> data =
+                              document.data()! as Map<String, dynamic>;
+                          return UnAuthEventUserListViewItem(
+                            pfp_url: data['pfp_url'],
+                            screenwidth: screenwidth,
+                            screenheight: screenheight,
+                            username: data['username'],
+                            fullname: data['fullname'],
+                            present: data['present'] as bool,
+                            uid: data['uid'],
+                            onTap: usernavigate,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                );
+              }),
           SizedBox(
             height: screenheight * 0.02,
           ),

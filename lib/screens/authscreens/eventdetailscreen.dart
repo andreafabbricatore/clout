@@ -33,13 +33,11 @@ class EventDetailScreen extends StatefulWidget {
       {super.key,
       required this.event,
       required this.curruser,
-      required this.participants,
       required this.interactfav,
       required this.curruserlocation,
       required this.analytics});
   Event event;
   AppUser curruser;
-  List<AppUser> participants;
   FirebaseAnalytics analytics;
   final Function(Event event) interactfav;
   AppLocation curruserlocation;
@@ -105,7 +103,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         "interest": widget.event.interest,
         "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
-        "participants": widget.event.participants.length,
         "title": widget.event.title
       });
       displayErrorSnackBar("Reported ${event.title}");
@@ -131,7 +128,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       "interest": widget.event.interest,
       "inviteonly": widget.event.isinviteonly.toString(),
       "maxparticipants": widget.event.maxparticipants,
-      "participants": widget.event.participants.length,
       "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
     });
     await Navigator.push(
@@ -147,18 +143,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     updatescreen(widget.event.docid);
   }
 
-  void checkifjoined() async {
-    bool found = false;
-    for (int i = 0; i < widget.participants.length; i++) {
-      if (widget.participants[i].username == widget.curruser.username) {
-        setState(() {
-          found = true;
-          joined = true;
-        });
-      }
-    }
-    if (found) {
-      if (widget.curruser.username == widget.event.host) {
+  Future checkifjoined() async {
+    bool contained = await db.participantscontainsuser(
+        widget.event.docid, widget.curruser.uid);
+    List<int> partlength = await db.retrieveparticipantlength([widget.event]);
+    print("hi");
+    print(contained);
+    if (contained) {
+      setState(() {
+        joined = true;
+      });
+      if (widget.curruser.uid == widget.event.hostdocid) {
         setState(() {
           joinedval = "Delete Event";
         });
@@ -171,7 +166,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       setState(() {
         joined = false;
       });
-      if (widget.event.maxparticipants == widget.participants.length) {
+      if (widget.event.maxparticipants == partlength[0]) {
         setState(() {
           joinedval = "Full";
         });
@@ -195,11 +190,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       setState(() {
         widget.event = updatedevent;
       });
-      List<AppUser> temp = await db.geteventparticipantslist(widget.event);
-      await Future.delayed(Duration(milliseconds: 50));
-      setState(() {
-        widget.participants = temp;
-      });
       checkifjoined();
     } catch (e) {
       displayErrorSnackBar("Could not refresh");
@@ -217,7 +207,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "interest": widget.event.interest,
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
-          "currentparticipants": widget.event.participants.length
         });
       } catch (e) {
         displayErrorSnackBar("Could not join event");
@@ -239,7 +228,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "interest": widget.event.interest,
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
-          "currentparticipants": widget.event.participants.length,
           "predeletionstatus": joinedval
         });
         Navigator.push(
@@ -269,7 +257,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "interest": widget.event.interest,
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
-          "currentparticipants": widget.event.participants.length,
         });
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
@@ -287,16 +274,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     String eventid = contents[0];
     String useruid = contents[1];
     if (eventid == widget.event.docid) {
-      if (widget.event.participants.contains(useruid)) {
-        if (!widget.event.presentparticipants.contains(useruid)) {
+      bool contained =
+          await db.participantscontainsuser(widget.event.docid, useruid);
+      if (contained) {
+        bool presentcontained =
+            await db.participantscontainsuser(widget.event.docid, useruid);
+        if (!presentcontained) {
           await db.setpresence(
               widget.event.docid, useruid, widget.curruser.uid);
           await widget.analytics.logEvent(name: "validated_qr", parameters: {
             "interest": widget.event.interest,
             "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
-            "participants": widget.event.participants.length,
-            "presentparticipants": widget.event.presentparticipants.length,
           });
           setState(() {
             qrmessage = "QR code Validated!";
@@ -308,8 +297,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             "interest": widget.event.interest,
             "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
-            "participants": widget.event.participants.length,
-            "presentparticipants": widget.event.presentparticipants.length,
           });
           setState(() {
             qrmessage = "QR code has already been validated";
@@ -321,8 +308,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "interest": widget.event.interest,
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
-          "participants": widget.event.participants.length,
-          "presentparticipants": widget.event.presentparticipants.length,
         });
         setState(() {
           qrmessage = "User is not a participant to this event";
@@ -333,8 +318,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         "interest": widget.event.interest,
         "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
-        "participants": widget.event.participants.length,
-        "presentparticipants": widget.event.presentparticipants.length,
       });
       setState(() {
         qrmessage = "Invalid: QR code is not for this event";
@@ -349,7 +332,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       "interest": widget.event.interest,
       "inviteonly": widget.event.isinviteonly.toString(),
       "maxparticipants": widget.event.maxparticipants,
-      "participants": widget.event.participants.length,
       "ishost": (widget.curruser.uid == widget.event.hostdocid).toString()
     });
     Navigator.push(
@@ -400,14 +382,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(String uid) async {
+      AppUser user = await db.getUserFromUID(uid);
       await widget.analytics.logEvent(
           name: "visited_profile_screen_from_event_screen",
           parameters: {
             "interest": widget.event.interest,
             "inviteonly": widget.event.isinviteonly.toString(),
             "maxparticipants": widget.event.maxparticipants,
-            "participants": widget.event.participants.length,
             "ishost":
                 (widget.event.hostdocid == widget.curruser.uid).toString(),
             "visitinghost": (widget.event.hostdocid == user.uid).toString()
@@ -433,7 +415,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "interest": widget.event.interest,
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
-          "participants": widget.event.participants.length,
           "usernationality": user.nationality,
           "userbio": user.bio,
           "username": user.username,
@@ -455,7 +436,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         "interest": widget.event.interest,
         "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
-        "participants": widget.event.participants.length,
         "ishost": (widget.curruser.uid == widget.event.hostdocid).toString(),
         "isfollowinghost": widget.curruser.following
             .contains(widget.event.hostdocid)
@@ -588,10 +568,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                         true;
                                                   });
                                                   try {
-                                                    if (widget
-                                                        .event.participants
-                                                        .contains(widget
-                                                            .curruser.uid)) {
+                                                    bool contained = await db
+                                                        .participantscontainsuser(
+                                                            widget.event.docid,
+                                                            widget
+                                                                .curruser.uid);
+                                                    if (contained) {
                                                       Chat chat = await db
                                                           .getChatfromDocId(
                                                               widget.event
@@ -689,11 +671,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                                               "maxparticipants":
                                                                   widget.event
                                                                       .maxparticipants,
-                                                              "currentparticipants":
-                                                                  widget
-                                                                      .event
-                                                                      .participants
-                                                                      .length,
                                                               "predeletionstatus":
                                                                   joinedval
                                                             });
@@ -1076,10 +1053,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               InkWell(
                 onTap: () async {
                   try {
-                    String hostdocid =
-                        await db.getUserUIDfromUsername(widget.event.host);
-                    AppUser eventhost = await db.getUserFromUID(hostdocid);
-                    usernavigate(eventhost, 0);
+                    usernavigate(widget.event.hostdocid);
                   } catch (e) {
                     displayErrorSnackBar("Could not retrieve host information");
                   }
@@ -1217,46 +1191,47 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Text(
-            widget.event.participants.length != widget.event.maxparticipants
-                ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
-                : "Participant number reached",
-            style: const TextStyle(
-                fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: screenheight * 0.005,
-          ),
-          SizedBox(
-              height: screenheight * 0.09 * widget.participants.length,
-              width: screenwidth,
-              child: StreamBuilder<QuerySnapshot>(
-                  stream: db.retrieveparticipants(widget.event.docid),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return const Text(
-                        "Error Loading Chat",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30),
-                        textScaleFactor: 1.0,
-                      );
-                    }
+          StreamBuilder<QuerySnapshot>(
+              stream: db.retrieveparticipants(widget.event.docid),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {}
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return SpinKitFadingFour(
-                        color: Theme.of(context).primaryColor,
-                      );
-                    }
-                    return ListView(
-                      reverse: true,
-                      children:
-                          snapshot.data!.docs.map((DocumentSnapshot document) {
-                        Map<String, dynamic> data =
-                            document.data()! as Map<String, dynamic>;
-                        return EventUserListViewItem(
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SpinKitFadingFour(
+                    color: Theme.of(context).primaryColor,
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        snapshot.data!.docs.length !=
+                                widget.event.maxparticipants
+                            ? "${snapshot.data!.docs.length}/${widget.event.maxparticipants} participants"
+                            : "Participant number reached",
+                        style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.005,
+                    ),
+                    SizedBox(
+                      width: screenwidth,
+                      height: screenheight * 0.09 * snapshot.data!.docs.length,
+                      child: ListView(
+                        reverse: true,
+                        children: snapshot.data!.docs
+                            .map((DocumentSnapshot document) {
+                          Map<String, dynamic> data =
+                              document.data()! as Map<String, dynamic>;
+                          return EventUserListViewItem(
                             pfp_url: data['pfp_url'],
                             screenwidth: screenwidth,
                             screenheight: screenheight,
@@ -1264,14 +1239,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             fullname: data['fullname'],
                             curruser: widget.curruser,
                             present: data['present'] as bool,
-                            uid: data['uid']);
-                      }).toList(),
-                    );
-                  })),
+                            uid: data['uid'],
+                            removeUser: remuser,
+                            onTap: usernavigate,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                );
+              }),
           SizedBox(
             height: screenheight * 0.02,
           ),
-          InkWell(
+          GestureDetector(
               onTap: () async {
                 buttonpressed ? null : interactevent(context);
               },
@@ -1293,7 +1274,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       screenwidth: screenwidth,
                       buttonpressed: buttonpressed,
                       text: joinedval,
-                      buttonwidth: screenwidth * 0.5,
+                      buttonwidth: screenwidth * 0.7,
                       bold: false,
                     ))
         ]),

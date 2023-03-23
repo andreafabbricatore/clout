@@ -315,8 +315,10 @@ class db_conn {
         temp = temp + event.title[i];
         searchfield.add(temp.toLowerCase());
       }
-      List participants = oldEventSnapshot['participants'];
-      if (event.maxparticipants < participants.length) {
+      QuerySnapshot<Map<String, dynamic>> participants =
+          await events.doc(event.docid).collection("participants").get();
+
+      if (event.maxparticipants < participants.docs.length) {
         throw Exception();
       }
       events.doc(event.docid).update({
@@ -335,9 +337,12 @@ class db_conn {
         'searchfield': searchfield,
         'isinviteonly': event.isinviteonly
       });
-      event.participants.removeWhere((element) => element == event.hostdocid);
+      List<String> targetids = [];
+      for (int i = 0; i < participants.docs.length; i++) {
+        targetids.add(participants.docs[i].id);
+      }
       updates.add({
-        'target': event.participants,
+        'target': targetids,
         'description': '${event.title} was modified. Check out the changes!',
         'notification': '${event.title} was modified. Check out the changes!',
         'eventid': event.docid,
@@ -537,7 +542,6 @@ class db_conn {
       await deletechat(event.chatid);
       await events.doc(event.docid).delete();
     } catch (e) {
-      print(e);
       throw Exception("Could not delete event");
     }
   }
@@ -606,6 +610,26 @@ class db_conn {
     } catch (e) {
       throw Exception("Could not delete event");
     }
+  }
+
+  Future<bool> participantscontainsuser(String eventid, String uid) async {
+    bool res = false;
+    events
+        .doc(eventid)
+        .collection("participants")
+        .doc(uid)
+        .get()
+        .then((value) => res = value.exists);
+    return res;
+  }
+
+  Future<bool> presentparticipantscontainsuser(
+      String eventid, String uid) async {
+    bool res = false;
+    DocumentSnapshot user =
+        await events.doc(eventid).collection("participants").doc(uid).get();
+    res = user['present'] as bool;
+    return res;
   }
 
   Future<void> deletechat(String chatid) async {
@@ -797,34 +821,6 @@ class db_conn {
       }
     } else {
       return false;
-    }
-  }
-
-  Future<String> getEventDocID(Event event) async {
-    String docID = "";
-    try {
-      await events.get().then((QuerySnapshot querySnapshot) => {
-            querySnapshot.docs.forEach((doc) {
-              if (doc["title"] == event.title &&
-                  doc['description'] == event.description &&
-                  doc['interest'] == event.interest &&
-                  doc['address'] == event.address &&
-                  doc['city'] == event.city &&
-                  doc['host'] == event.host &&
-                  doc['maxparticipants'] == event.maxparticipants &&
-                  listEquals(doc['participants'], event.participants) &&
-                  doc['time'].toDate() == event.datetime) {
-                docID = doc.id;
-              }
-            })
-          });
-    } catch (e) {
-      throw Exception("Error with eventdocid");
-    }
-    if (docID != "") {
-      return docID;
-    } else {
-      throw Exception("Error with eventdocid");
     }
   }
 
@@ -1176,33 +1172,6 @@ class db_conn {
 
       await Future.delayed(Duration(milliseconds: 50));
       return followers;
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
-
-  Future<List<AppUser>> geteventparticipantslist(Event event) async {
-    try {
-      List<AppUser> temp = [];
-      List<AppUser> participants = [];
-      List<List<dynamic>> subList = [];
-      for (var i = 0; i < event.participants.length; i += 10) {
-        subList.add(event.participants.sublist(
-            i,
-            i + 10 > event.participants.length
-                ? event.participants.length
-                : i + 10));
-      }
-      for (int i = 0; i < subList.length; i++) {
-        QuerySnapshot temp =
-            await users.where("uid", whereIn: subList[i]).get();
-        for (int j = 0; j < temp.docs.length; j++) {
-          participants
-              .add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
-        }
-      }
-      await Future.delayed(Duration(milliseconds: 50));
-      return participants;
     } catch (e) {
       throw Exception(e);
     }
@@ -1773,6 +1742,19 @@ class db_conn {
 
   Stream<QuerySnapshot> retrieveparticipants(String docid) {
     return events.doc(docid).collection('participants').snapshots();
+  }
+
+  Future<List<int>> retrieveparticipantlength(List<Event> eventlist) async {
+    List<int> res = [];
+    for (int i = 0; i < eventlist.length; i++) {
+      int length = await events
+          .doc(eventlist[i].docid)
+          .collection('participants')
+          .snapshots()
+          .length;
+      res.add(length);
+    }
+    return res;
   }
 
   Future<void> setReadReceipt(String chatid, String readerid) {

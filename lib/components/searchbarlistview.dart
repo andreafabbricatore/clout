@@ -104,7 +104,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
+          //"currentparticipants": event.participants.length
         });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
@@ -112,7 +112,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
+          //"currentparticipants": event.participants.length
         });
       }
     } catch (e) {
@@ -131,11 +131,9 @@ class _SearchBarListViewState extends State<SearchBarListView> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> eventnavigate(Event event, int index) async {
+    Future<void> eventnavigate(Event event) async {
       try {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
-        List<AppUser> participants =
-            await db.geteventparticipantslist(chosenEvent);
         await Future.delayed(const Duration(milliseconds: 50));
         await widget.analytics
             .logEvent(name: "event_navigate_from_search", parameters: {
@@ -155,7 +153,6 @@ class _SearchBarListViewState extends State<SearchBarListView> {
                 builder: (_) => EventDetailScreen(
                       event: chosenEvent,
                       curruser: widget.curruser,
-                      participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
@@ -167,7 +164,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
       refresh();
     }
 
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user) async {
       await widget.analytics
           .logEvent(name: "user_navigate_from_search", parameters: {
         "searchterm": widget.query,
@@ -209,7 +206,6 @@ class _SearchBarListViewState extends State<SearchBarListView> {
             curruser: widget.curruser,
             screenwidth: screenwidth,
             showcloutscore: false,
-            showrembutton: false,
           );
   }
 }

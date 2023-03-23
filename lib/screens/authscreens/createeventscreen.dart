@@ -45,14 +45,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       host: "",
       hostdocid: "",
       maxparticipants: 0,
-      participants: [],
       datetime: DateTime(0, 0, 0),
       docid: "",
       lat: 0,
       lng: 0,
       chatid: "",
       isinviteonly: false,
-      presentparticipants: [],
       customimage: false);
 
   List<String> allinterests = [
@@ -656,7 +654,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.lat = chosenLocation.center[0];
                           event.lng = chosenLocation.center[1];
                           event.isinviteonly = isinviteonly;
-                          event.presentparticipants = [widget.curruser.uid];
                         });
                         try {
                           if (imagepath == null) {

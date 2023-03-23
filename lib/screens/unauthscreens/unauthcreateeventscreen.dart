@@ -48,14 +48,12 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
       host: "",
       hostdocid: "",
       maxparticipants: 0,
-      participants: [],
       datetime: DateTime(0, 0, 0),
       docid: "",
       lat: 0,
       lng: 0,
       chatid: "",
       isinviteonly: false,
-      presentparticipants: [],
       customimage: false);
 
   List<String> allinterests = [

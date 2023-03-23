@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
@@ -38,37 +39,40 @@ class UnAuthEventListView extends StatelessWidget {
         Align(
           alignment: Alignment.bottomLeft,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-              ),
-              height: screenheight * 0.02,
-              width: event.participants.length != event.maxparticipants
-                  ? screenwidth * 0.27
-                  : screenwidth * 0.42,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    event.participants.length != event.maxparticipants
-                        ? "${event.participants.length}/${event.maxparticipants} participants"
-                        : "Participant number reached",
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textScaleFactor: 1.0,
-                  ),
-                ),
-              ),
-            ),
+            padding: const EdgeInsets.all(10.0),
+            child: StreamBuilder<QuerySnapshot>(
+                stream: db.retrieveparticipants(event.docid),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {}
+                  if (snapshot.connectionState == ConnectionState.waiting) {}
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                    ),
+                    height: screenheight * 0.02,
+                    width: snapshot.data!.docs.length != event.maxparticipants
+                        ? screenwidth * 0.27
+                        : screenwidth * 0.42,
+                    child: Center(
+                      child: Text(
+                        snapshot.data!.docs.length != event.maxparticipants
+                            ? "${snapshot.data!.docs.length}/${event.maxparticipants} participants"
+                            : "Participant number reached",
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
+                        textScaleFactor: 1.0,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  );
+                }),
           ),
-        )
+        ),
       ]),
     );
   }

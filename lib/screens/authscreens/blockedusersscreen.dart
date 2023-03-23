@@ -122,9 +122,6 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                 curruser: widget.curruser,
                 screenwidth: screenwidth,
                 showcloutscore: false,
-                showrembutton: true,
-                removeUser: unblockUser,
-                removebuttonblack: true,
               ),
               SizedBox(
                 height: screenheight * 0.02,

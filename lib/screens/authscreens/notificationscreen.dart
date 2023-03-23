@@ -97,7 +97,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
         });
       } else {
         await db.addToFav(widget.curruser.uid, event.docid);
@@ -105,7 +104,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           "interest": event.interest,
           "inviteonly": event.isinviteonly.toString(),
           "maxparticipants": event.maxparticipants,
-          "currentparticipants": event.participants.length
         });
       }
     } catch (e) {
@@ -136,7 +134,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     Future<void> eventnavigate(String eventid, int index) async {
       try {
         Event event = await db.getEventfromDocId(eventid);
-        List<AppUser> participants = await db.geteventparticipantslist(event);
         await Future.delayed(const Duration(milliseconds: 50));
         await Navigator.push(
             context,
@@ -144,7 +141,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 builder: (_) => EventDetailScreen(
                       event: event,
                       curruser: widget.curruser,
-                      participants: participants,
                       interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
