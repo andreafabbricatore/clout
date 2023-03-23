@@ -48,17 +48,17 @@ extension FirestoreQueryExtension on Query {
 
 class db_conn {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
-  CollectionReference events = FirebaseFirestore.instance.collection('events');
+  CollectionReference users = FirebaseFirestore.instance.collection('users2');
+  CollectionReference events = FirebaseFirestore.instance.collection('events2');
   CollectionReference updates =
-      FirebaseFirestore.instance.collection('updates');
-  CollectionReference report = FirebaseFirestore.instance.collection('report');
-  CollectionReference chats = FirebaseFirestore.instance.collection('chats');
-  CollectionReference bugs = FirebaseFirestore.instance.collection('bugs');
+      FirebaseFirestore.instance.collection('updates2');
+  CollectionReference report = FirebaseFirestore.instance.collection('report2');
+  CollectionReference chats = FirebaseFirestore.instance.collection('chats2');
+  CollectionReference bugs = FirebaseFirestore.instance.collection('bugs2');
   CollectionReference maintenance =
-      FirebaseFirestore.instance.collection('maintenance');
+      FirebaseFirestore.instance.collection('maintenance2');
   CollectionReference appupdate =
-      FirebaseFirestore.instance.collection('appupdate');
+      FirebaseFirestore.instance.collection('appupdate2');
 
   Future createuserinstance(String email, String uid) async {
     try {
@@ -232,7 +232,6 @@ class db_conn {
           'hostdocid': newevent.hostdocid,
           'time': newevent.datetime,
           'maxparticipants': newevent.maxparticipants,
-          'participants': [curruser.uid],
           'image': "",
           'custom_image': false,
           'lat': newevent.lat,
@@ -240,9 +239,28 @@ class db_conn {
           'searchfield': searchfield,
           'chatid': '',
           'isinviteonly': newevent.isinviteonly,
-          'presentparticipants': newevent.presentparticipants
         }).then((value) {
           eventid = value.id;
+        });
+
+        await events
+            .doc(eventid)
+            .collection("participants")
+            .doc(curruser.uid)
+            .set({
+          "uid": curruser.uid,
+          "pfp_url": curruser.pfpurl,
+          "username": curruser.username,
+        });
+
+        await events
+            .doc(eventid)
+            .collection("presentparticipants")
+            .doc(curruser.uid)
+            .set({
+          "uid": curruser.uid,
+          "pfp_url": curruser.pfpurl,
+          "username": curruser.username,
         });
 
         if (imagepath == null) {
@@ -339,56 +357,58 @@ class db_conn {
 
   Future joinevent(Event event, AppUser curruser, String? eventid) async {
     try {
-      DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
-      List participants = eventSnapshot['participants'];
+      final int participantlength = await events
+          .doc(event.docid)
+          .collection("participants")
+          .snapshots()
+          .length;
 
-      if (participants.length + 1 > event.maxparticipants) {
+      if (participantlength + 1 > event.maxparticipants) {
         throw Exception("Too many participants");
       } else {
         users.doc(curruser.uid).set({
           'joined_events': FieldValue.arrayUnion([eventid]),
         }, SetOptions(merge: true));
-        events.doc(eventid).set({
-          'participants': FieldValue.arrayUnion([curruser.uid])
-        }, SetOptions(merge: true));
+        await events
+            .doc(eventid)
+            .collection("participants")
+            .doc(curruser.uid)
+            .set({
+          "uid": curruser.uid,
+          "pfp_url": curruser.pfpurl,
+          "username": curruser.username,
+        });
       }
     } catch (e) {
       throw Exception("Could not join event");
     } finally {
       try {
-        DocumentSnapshot eventSnapshot = await events.doc(eventid).get();
-        List participants = eventSnapshot['participants'];
-
-        if (participants.length > event.maxparticipants) {
-          await leaveevent(curruser, event);
-        } else {
-          updates.add({
-            'target': [event.hostdocid],
-            'description':
-                '${curruser.fullname} joined your your event: ${event.title}',
-            'notification':
-                '@${curruser.username} joined your your event: ${event.title}',
-            'eventid': event.docid,
-            'userid': curruser.uid,
-            'type': 'joined'
-          });
-          users.doc(curruser.uid).set({
-            'chats': FieldValue.arrayUnion([event.chatid]),
-            'visiblechats': FieldValue.arrayUnion([event.chatid])
-          }, SetOptions(merge: true));
-          chats.doc(event.chatid).set({
-            'participants': FieldValue.arrayUnion([curruser.uid])
-          }, SetOptions(merge: true));
-          chats.doc(event.chatid).collection('messages').add({
-            'content': "${curruser.username} joined the event",
-            'sender': 'server',
-            'timestamp': DateTime.now()
-          });
-          chats.doc(event.chatid).update({
-            'mostrecentmessage': "${curruser.username} joined the event",
-            "lastmessagetime": DateTime.now()
-          });
-        }
+        updates.add({
+          'target': [event.hostdocid],
+          'description':
+              '${curruser.fullname} joined your your event: ${event.title}',
+          'notification':
+              '@${curruser.username} joined your your event: ${event.title}',
+          'eventid': event.docid,
+          'userid': curruser.uid,
+          'type': 'joined'
+        });
+        users.doc(curruser.uid).set({
+          'chats': FieldValue.arrayUnion([event.chatid]),
+          'visiblechats': FieldValue.arrayUnion([event.chatid])
+        }, SetOptions(merge: true));
+        chats.doc(event.chatid).set({
+          'participants': FieldValue.arrayUnion([curruser.uid])
+        }, SetOptions(merge: true));
+        chats.doc(event.chatid).collection('messages').add({
+          'content': "${curruser.username} joined the event",
+          'sender': 'server',
+          'timestamp': DateTime.now()
+        });
+        chats.doc(event.chatid).update({
+          'mostrecentmessage': "${curruser.username} joined the event",
+          "lastmessagetime": DateTime.now()
+        });
       } catch (e) {
         throw Exception("Could not notify host that you joined");
       }
@@ -397,11 +417,14 @@ class db_conn {
 
   Future leaveevent(AppUser curruser, Event event) async {
     try {
-      DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
       DocumentSnapshot chatSnapshot = await chats.doc(event.chatid).get();
-      List participants = eventSnapshot['participants'];
+      final int participantlength = await events
+          .doc(event.docid)
+          .collection("participants")
+          .snapshots()
+          .length;
       List chatparticipants = chatSnapshot['participants'];
-      if (participants.length == 1) {
+      if (participantlength == 1) {
         throw Exception("Cannot leave event");
       } else {
         chatparticipants.removeWhere((element) => element == curruser.uid);
@@ -410,9 +433,11 @@ class db_conn {
           'chats': FieldValue.arrayRemove([event.chatid]),
           'visiblechats': FieldValue.arrayRemove([event.chatid])
         }, SetOptions(merge: true));
-        events.doc(event.docid).set({
-          'participants': FieldValue.arrayRemove([curruser.uid])
-        }, SetOptions(merge: true));
+        await events
+            .doc(event.docid)
+            .collection("participants")
+            .doc(curruser.uid)
+            .delete();
         chats.doc(event.chatid).set({
           'participants': FieldValue.arrayRemove([curruser.uid])
         }, SetOptions(merge: true));
@@ -438,9 +463,11 @@ class db_conn {
         'chats': FieldValue.arrayRemove([event.chatid]),
         'visiblechats': FieldValue.arrayRemove([event.chatid]),
       }, SetOptions(merge: true));
-      events.doc(event.docid).set({
-        'participants': FieldValue.arrayRemove([user.uid])
-      }, SetOptions(merge: true));
+      await events
+          .doc(event.docid)
+          .collection("participants")
+          .doc(user.uid)
+          .delete();
       chats.doc(event.chatid).set({
         'participants': FieldValue.arrayRemove([user.uid])
       }, SetOptions(merge: true));
@@ -466,21 +493,24 @@ class db_conn {
     }
   }
 
+  //NOT SURE
   Future deleteevent(Event event, AppUser host) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
-      List participants = eventSnapshot['participants'];
-      for (String x in participants) {
-        if (x == host.uid) {
-          users.doc(x).set({
+      QuerySnapshot<Map<String, dynamic>> participants =
+          await events.doc(event.docid).collection("participants").get();
+      //List participants = eventSnapshot['participants'];
+      for (QueryDocumentSnapshot<Map<String, dynamic>> x in participants.docs) {
+        if (x.data()['uid'] == host.uid) {
+          users.doc(host.uid).set({
             'hosted_events': FieldValue.arrayRemove([event.docid]),
             'chats': FieldValue.arrayRemove([event.chatid]),
             'visiblechats': FieldValue.arrayRemove([event.chatid]),
             'clout': FieldValue.increment(-20),
           }, SetOptions(merge: true));
         }
-        users.doc(x).set({
-          'joined_events': FieldValue.arrayRemove([event.docid])
+        users.doc(x.data()['uid']).set({
+          'joined_events': FieldValue.arrayRemove([event.docid]),
         }, SetOptions(merge: true));
       }
       if (eventSnapshot['custom_image']) {
@@ -490,10 +520,22 @@ class db_conn {
       } else {}
       final instance = FirebaseFirestore.instance;
       final batch = instance.batch();
-      var collection =
-          instance.collection('chats').doc(event.chatid).collection('messages');
-      var snapshots = await collection.get();
-      for (var doc in snapshots.docs) {
+      var chatcollection = chats.doc(event.chatid).collection('messages');
+      var chatsnapshots = await chatcollection.get();
+      for (var doc in chatsnapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      var eventcollection = events.doc(event.chatid).collection('participants');
+      var eventsnapshots = await eventcollection.get();
+      for (var doc in eventsnapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      var preseventcollection =
+          events.doc(event.chatid).collection('presentparticipants');
+      var preseventsnapshots = await preseventcollection.get();
+      for (var doc in preseventsnapshots.docs) {
         batch.delete(doc.reference);
       }
       await batch.commit();
@@ -507,28 +549,41 @@ class db_conn {
   Future deletefutureevent(Event event, AppUser host) async {
     try {
       DocumentSnapshot eventSnapshot = await events.doc(event.docid).get();
-      List participants = eventSnapshot['participants'];
-      for (String x in participants) {
-        if (x == host.uid) {
-          int decrease = 5 * (event.presentparticipants.length - 1) + 20;
-          users.doc(x).set({
+      QuerySnapshot<Map<String, dynamic>> participants =
+          await events.doc(event.docid).collection("participants").get();
+      final presentparticipantslength = await events
+          .doc(event.docid)
+          .collection("presentparticipants")
+          .snapshots()
+          .length;
+      for (QueryDocumentSnapshot<Map<String, dynamic>> x in participants.docs) {
+        if (x.data()['uid'] == host.uid) {
+          int decrease = 5 * (presentparticipantslength - 1) + 20;
+          users.doc(x.data()['uid']).set({
             'hosted_events': FieldValue.arrayRemove([event.docid]),
             'chats': FieldValue.arrayRemove([event.chatid]),
             'visiblechats': FieldValue.arrayRemove([event.chatid]),
             'clout': FieldValue.increment(-decrease),
           }, SetOptions(merge: true));
         } else {
-          if (event.presentparticipants.contains(x)) {
-            users.doc(x).set(
-                {'clout': FieldValue.increment(-10)}, SetOptions(merge: true));
-          }
+          events
+              .doc(event.docid)
+              .collection("presentparticipants")
+              .doc(x.data()['uid'])
+              .get()
+              .then((value) => value.exists
+                  ? users.doc(x.data()['uid']).set(
+                      {'clout': FieldValue.increment(-10)},
+                      SetOptions(merge: true))
+                  : null);
         }
-        users.doc(x).set({
+        users.doc(x.data()['uid']).set({
           'joined_events': FieldValue.arrayRemove(
             [event.docid],
           )
         }, SetOptions(merge: true));
       }
+
       if (eventSnapshot['custom_image']) {
         await FirebaseStorage.instance
             .ref('/event_thumbnails/${event.docid}.jpg')
@@ -536,10 +591,22 @@ class db_conn {
       } else {}
       final instance = FirebaseFirestore.instance;
       final batch = instance.batch();
-      var collection =
-          instance.collection('chats').doc(event.chatid).collection('messages');
-      var snapshots = await collection.get();
-      for (var doc in snapshots.docs) {
+      var chatcollection = chats.doc(event.chatid).collection('messages');
+      var chatsnapshots = await chatcollection.get();
+      for (var doc in chatsnapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      var eventcollection = events.doc(event.chatid).collection('participants');
+      var eventsnapshots = await eventcollection.get();
+      for (var doc in eventsnapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      var preseventcollection =
+          events.doc(event.chatid).collection('presentparticipants');
+      var preseventsnapshots = await preseventcollection.get();
+      for (var doc in preseventsnapshots.docs) {
         batch.delete(doc.reference);
       }
       await batch.commit();
