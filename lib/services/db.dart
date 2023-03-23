@@ -333,7 +333,6 @@ class db_conn {
         'type': 'modified'
       });
     } catch (e) {
-      print(e);
       throw Exception();
     }
   }
@@ -1046,7 +1045,6 @@ class db_conn {
       });
       return joinedEvents;
     } catch (e) {
-      print(e);
       throw Exception(e);
     }
   }

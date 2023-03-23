@@ -430,7 +430,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "participants": widget.event.participants.length,
-          "userbirthday": user.birthday,
           "usernationality": user.nationality,
           "userbio": user.bio,
           "username": user.username,
