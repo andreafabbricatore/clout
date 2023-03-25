@@ -1219,6 +1219,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 : "Participant number reached",
             style: const TextStyle(
                 fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+            textScaleFactor: 1.0,
           ),
           SizedBox(
             height: screenheight * 0.005,
@@ -1239,6 +1240,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           (joinedval != "Finished"),
                   removeUser: remuser,
                   presentparticipants: widget.event.presentparticipants,
+                  physics: NeverScrollableScrollPhysics(),
                 ),
               ],
             ),

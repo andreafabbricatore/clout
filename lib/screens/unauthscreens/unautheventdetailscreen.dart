@@ -441,6 +441,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                 : "Participant number reached",
             style: const TextStyle(
                 fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+            textScaleFactor: 1.0,
           ),
           SizedBox(
             height: screenheight * 0.005,
@@ -455,6 +456,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                   screenwidth: screenwidth,
                   presentparticipants: widget.event.presentparticipants,
                   onTap: usernavigate,
+                  physics: NeverScrollableScrollPhysics(),
                 ),
               ],
             ),

@@ -1169,6 +1169,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                 : "Participant number reached",
             style: const TextStyle(
                 fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+            textScaleFactor: 1.0,
           ),
           SizedBox(
             height: screenheight * 0.005,
@@ -1189,6 +1190,7 @@ class _DeepLinkEventDetailScreenState extends State<DeepLinkEventDetailScreen> {
                           (joinedval != "Finished"),
                   removeUser: remuser,
                   presentparticipants: widget.event.presentparticipants,
+                  physics: NeverScrollableScrollPhysics(),
                 ),
               ],
             ),
