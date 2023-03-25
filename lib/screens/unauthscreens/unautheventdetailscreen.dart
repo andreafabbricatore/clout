@@ -446,7 +446,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
             height: screenheight * 0.005,
           ),
           SizedBox(
-            height: screenheight * 0.09 * widget.participants.length,
+            height: 16.0 + 60.0 * widget.participants.length,
             width: screenwidth,
             child: Column(
               children: [

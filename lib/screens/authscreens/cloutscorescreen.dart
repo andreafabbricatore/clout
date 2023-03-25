@@ -133,7 +133,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: SizedBox(
-            height: screenheight * 0.8 + globalrankedusers.length * 60,
+            height: screenheight * 0.7 + globalrankedusers.length * 60.0 + 16.0,
             width: screenwidth,
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

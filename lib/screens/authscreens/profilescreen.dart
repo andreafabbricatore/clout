@@ -489,9 +489,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: SizedBox(
             height: joinedevents
                 ? screenheight * 0.4 +
-                    (joinedEvents.length * screenheight * 0.37)
+                    (joinedEvents.length * (screenheight * 0.1 + 210.0))
                 : screenheight * 0.4 +
-                    (hostedEvents.length * screenheight * 0.37),
+                    (hostedEvents.length * (screenheight * 0.1 + 210.0)),
             width: screenwidth,
             child: Column(children: [
               ProfileTopContainer(

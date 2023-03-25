@@ -1125,7 +1125,6 @@ class db_conn {
 
   Future<List<AppUser>> geteventparticipantslist(Event event) async {
     try {
-      List<AppUser> temp = [];
       List<AppUser> participants = [];
       List<List<dynamic>> subList = [];
       for (var i = 0; i < event.participants.length; i += 10) {
