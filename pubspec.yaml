@@ -140,7 +140,7 @@ flutter:
     - family: Archivo
       fonts:
         - asset: assets/fonts/Archivo-Regular.ttf
-        - asset: assets/fonts/Archivo-ExtraBold.ttf
+        - asset: assets/fonts/Archivo-Black.ttf
           weight: 900
   #   - family: Trajan Pro
   #     fonts:

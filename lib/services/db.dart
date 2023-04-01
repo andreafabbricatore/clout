@@ -323,6 +323,7 @@ class db_conn {
         'searchfield': searchfield,
         'isinviteonly': event.isinviteonly
       });
+      chats.doc(event.chatid).update({"chatname": event.title});
       event.participants.removeWhere((element) => element == event.hostdocid);
       updates.add({
         'target': event.participants,
@@ -895,61 +896,6 @@ class db_conn {
     try {
       QuerySnapshot querySnapshot =
           await events.where('interest', whereNotIn: interests).get();
-      List<Event> eventlist = [];
-      querySnapshot.docs.forEach((element) {
-        eventlist.add(Event.fromJson(element.data(), element.id));
-      });
-      return eventlist;
-    } catch (e) {
-      throw Exception("Could not connect");
-    }
-  }
-
-  Future<List<Event>> getCurrCityEvents(String city) async {
-    try {
-      QuerySnapshot querySnapshot = await events
-          .orderBy('time')
-          .startAfter([DateTime.now()])
-          .where('city', arrayContainsAny: city.toLowerCase().split(" "))
-          .get();
-      List<Event> eventlist = [];
-      querySnapshot.docs.forEach((element) {
-        eventlist.add(Event.fromJson(element.data(), element.id));
-      });
-      return eventlist;
-    } catch (e) {
-      throw Exception("Could not connect");
-    }
-  }
-
-  Future<List<Event>> getCurrCityEventsByInterest(
-      String city, String interest) async {
-    try {
-      QuerySnapshot querySnapshot = await events
-          .orderBy('time')
-          .startAfter([DateTime.now()])
-          .where('city', arrayContainsAny: city.toLowerCase().split(" "))
-          .where('interest', isEqualTo: interest)
-          .get();
-      List<Event> eventlist = [];
-      querySnapshot.docs.forEach((element) {
-        eventlist.add(Event.fromJson(element.data(), element.id));
-      });
-      return eventlist;
-    } catch (e) {
-      throw Exception("Could not connect");
-    }
-  }
-
-  Future<List<Event>> getCurrCityEventsByDate(
-      String city, DateTime date) async {
-    try {
-      QuerySnapshot querySnapshot = await events
-          .orderBy('time')
-          .startAfter([date])
-          .endBefore([DateTime(date.year, date.month, date.day + 1)])
-          .where('city', arrayContains: city.toLowerCase())
-          .get();
       List<Event> eventlist = [];
       querySnapshot.docs.forEach((element) {
         eventlist.add(Event.fromJson(element.data(), element.id));

@@ -83,19 +83,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Future<void> newgetUserAppLocation() async {
     //broken
     String url =
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${_userLocation?.latitude},${_userLocation?.longitude}&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${_userLocation?.latitude},${_userLocation?.longitude}&result_type=country&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
     url = Uri.parse(url).toString();
+
     _dio.options.contentType = Headers.jsonContentType;
     final responseData = await _dio.get(url);
-    String address =
-        responseData.data['results'][0]['address_components'][1]['short_name'];
-    String city =
-        responseData.data['results'][0]['address_components'][2]['short_name'];
-    String country =
-        responseData.data['results'][0]['address_components'][6]['long_name'];
+    String country = responseData.data['results'][0]['address_components'][0]
+            ['long_name']
+        .toString()
+        .toLowerCase();
     curruserlocation = AppLocation(
-        address: address,
-        city: city,
+        address: "",
+        city: "",
         country: country,
         center: [_userLocation?.longitude, _userLocation?.latitude]);
   }
@@ -122,20 +121,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
       Stopwatch stopwatch = Stopwatch()..start();
       //await newgetUserAppLocation();
       await widget.analytics.setUserId(id: widget.uid);
-      await getUserAppLocation();
+      await newgetUserAppLocation();
       await db.updatelastuserloc(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
-      if (curruserlocation.address != "" &&
-          curruserlocation.city != "" &&
-          curruserlocation.country != "" &&
+      if (curruserlocation.country != "" &&
           !listEquals(curruserlocation.center, [0.0, 0.0])) {
         AppUser curruser = await db.getUserFromUID(widget.uid);
-
-        //
-        String city =
-            await getcitywithoutnums(curruserlocation.city.toLowerCase());
-        //
-        curruserlocation.city = city;
 
         stopwatch.stop();
 

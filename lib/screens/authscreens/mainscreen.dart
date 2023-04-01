@@ -6,6 +6,7 @@ import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
+import 'package:clout/screens/authscreens/cloutscorescreen.dart';
 import 'package:clout/screens/authscreens/createeventscreen.dart';
 import 'package:clout/screens/authscreens/deeplinkeventdetailscreen.dart';
 import 'package:clout/screens/authscreens/favscreen.dart';
@@ -82,10 +83,11 @@ class _MainScreenState extends State<MainScreen> {
         startinterest: "Sports",
         analytics: widget.analytics,
       ),
-      FavScreen(
+      CloutScoreScreen(
         curruser: widget.curruser,
         curruserlocation: widget.curruserlocation,
         analytics: widget.analytics,
+        showleading: false,
       ),
       ProfileScreen(
         user: widget.curruser,
@@ -357,10 +359,10 @@ class _MainScreenState extends State<MainScreen> {
             ),
             BottomNavyBarItem(
               icon: const Icon(
-                Icons.bookmark,
+                Icons.people_outline_sharp,
               ),
               title: const Text(
-                "Favorites",
+                "Score",
                 textScaleFactor: 1.0,
               ),
               activeColor: Theme.of(context).primaryColor,

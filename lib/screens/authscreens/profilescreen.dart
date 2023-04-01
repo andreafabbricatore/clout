@@ -5,6 +5,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/cloutscorescreen.dart';
 import 'package:clout/screens/authscreens/editprofilescreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
+import 'package:clout/screens/authscreens/favscreen.dart';
 import 'package:clout/screens/authscreens/followerfollowingscreen.dart';
 import 'package:clout/screens/authscreens/settings.dart';
 import 'package:clout/services/db.dart';
@@ -164,6 +165,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     refresh();
   }
 
+  void favorites() async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => FavScreen(
+                  curruser: widget.curruser,
+                  analytics: widget.analytics,
+                  curruserlocation: widget.curruserlocation,
+                ),
+            settings: RouteSettings(name: "FavoritesScreen")));
+    refresh();
+  }
+
   void followerscreen() async {
     try {
       List<AppUser> followers = await db.getfollowerslist(widget.user);
@@ -222,6 +236,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   curruser: widget.curruser,
                   curruserlocation: widget.curruserlocation,
                   analytics: widget.analytics,
+                  showleading: true,
                 ),
             settings: RouteSettings(name: "CloutScoreScreen")));
   }
@@ -404,12 +419,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     )),
                 InkWell(
                   onTap: () {
-                    settings();
+                    showModalBottomSheet(
+                        backgroundColor: Colors.white,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SizedBox(
+                            height: screenheight * 0.16,
+                            width: screenwidth,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  16.0, 8.0, 0.0, 0.0),
+                              child: Column(children: [
+                                Container(
+                                  width: 40,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.transparent),
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: const Color.fromARGB(60, 0, 0, 0),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: screenheight * 0.01,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    settings();
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.settings, size: 30),
+                                      SizedBox(
+                                        width: 6,
+                                      ),
+                                      Text(
+                                        "Settings",
+                                        style: TextStyle(fontSize: 20),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: screenheight * 0.02,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    favorites();
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.bookmark, size: 30),
+                                      SizedBox(
+                                        width: 6,
+                                      ),
+                                      Text(
+                                        "Favorites",
+                                        style: TextStyle(fontSize: 20),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          );
+                        });
                   },
                   child: const Padding(
                     padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: Icon(
-                      Icons.settings,
+                      Icons.more_vert_outlined,
                       color: Colors.black,
                     ),
                   ),

@@ -14,11 +14,13 @@ class CloutScoreScreen extends StatefulWidget {
       {Key? key,
       required this.curruser,
       required this.curruserlocation,
-      required this.analytics})
+      required this.analytics,
+      required this.showleading})
       : super(key: key);
   AppUser curruser;
   AppLocation curruserlocation;
   FirebaseAnalytics analytics;
+  bool showleading;
 
   @override
   State<CloutScoreScreen> createState() => _CloutScoreScreenState();
@@ -114,15 +116,17 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
               fontSize: 30),
           textScaleFactor: 1.0,
         ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
+        leading: widget.showleading
+            ? GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  color: Theme.of(context).primaryColor,
+                ),
+              )
+            : Container(),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
