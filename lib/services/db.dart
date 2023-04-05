@@ -240,7 +240,8 @@ class db_conn {
           'searchfield': searchfield,
           'chatid': '',
           'isinviteonly': newevent.isinviteonly,
-          'presentparticipants': newevent.presentparticipants
+          'presentparticipants': newevent.presentparticipants,
+          'favoritedby': [],
         }).then((value) {
           eventid = value.id;
         });
@@ -481,7 +482,13 @@ class db_conn {
           }, SetOptions(merge: true));
         }
         users.doc(x).set({
-          'joined_events': FieldValue.arrayRemove([event.docid])
+          'joined_events': FieldValue.arrayRemove([event.docid]),
+        }, SetOptions(merge: true));
+      }
+      List favoritedby = eventSnapshot['favoritedby'];
+      for (String x in favoritedby) {
+        users.doc(x).set({
+          'favorites': FieldValue.arrayRemove([event.docid]),
         }, SetOptions(merge: true));
       }
       if (eventSnapshot['custom_image']) {
@@ -528,6 +535,12 @@ class db_conn {
           'joined_events': FieldValue.arrayRemove(
             [event.docid],
           )
+        }, SetOptions(merge: true));
+      }
+      List favoritedby = eventSnapshot['favoritedby'];
+      for (String x in favoritedby) {
+        users.doc(x).set({
+          'favorites': FieldValue.arrayRemove([event.docid]),
         }, SetOptions(merge: true));
       }
       if (eventSnapshot['custom_image']) {
@@ -1408,6 +1421,9 @@ class db_conn {
       List favorites = curruserdoc['favorites'];
       favorites.add(eventid);
       users.doc(curruserdocid).update({'favorites': favorites});
+      events.doc(eventid).set({
+        'favoritedby': FieldValue.arrayUnion([curruserdocid])
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception("Could not add to favorites");
     }
@@ -1419,6 +1435,9 @@ class db_conn {
       List favorites = curruserdoc['favorites'];
       favorites.removeWhere((element) => element == eventid);
       users.doc(curruserdocid).update({'favorites': favorites});
+      events.doc(eventid).set({
+        'favoritedby': FieldValue.arrayRemove([curruserdocid])
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception("Could not remove from favorites");
     }
@@ -1557,12 +1576,12 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await users.get().then(
+    await events.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users.doc(element.id).set(
-                  {"donesignuptime": FieldValue.serverTimestamp()},
-                  SetOptions(merge: true));
+              await events
+                  .doc(element.id)
+                  .set({"favoritedby": []}, SetOptions(merge: true));
             },
           ),
         );
