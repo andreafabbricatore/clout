@@ -223,8 +223,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               TextStyle(color: Theme.of(context).primaryColor),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              launchUrl(Uri.parse(
-                                  "https://termify.io/eula/1664706776"));
+                              launchUrl(
+                                  Uri.parse("https://outwithclout.com/#/eula/"),
+                                  mode: LaunchMode.inAppWebView);
                             }),
                       const TextSpan(text: " and "),
                       TextSpan(
@@ -233,8 +234,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               TextStyle(color: Theme.of(context).primaryColor),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              launchUrl(Uri.parse(
-                                  "https://termify.io/privacy-policy/1664707655"));
+                              launchUrl(
+                                  Uri.parse(
+                                      "https://outwithclout.com/#/privacy_policy/"),
+                                  mode: LaunchMode.inAppWebView);
                             }),
                       const TextSpan(text: "."),
                     ]),

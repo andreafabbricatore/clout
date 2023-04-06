@@ -11,6 +11,7 @@ import 'package:clout/screens/authscreens/createeventscreen.dart';
 import 'package:clout/screens/authscreens/deeplinkeventdetailscreen.dart';
 import 'package:clout/screens/authscreens/favscreen.dart';
 import 'package:clout/screens/authscreens/homescreen.dart';
+import 'package:clout/screens/authscreens/homescreenholder.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
@@ -66,21 +67,10 @@ class _MainScreenState extends State<MainScreen> {
 
   void parampasser() {
     page = [
-      HomeScreen(
+      HomeScreenHolder(
         curruser: widget.curruser,
         curruserlocation: widget.curruserlocation,
         justloaded: widget.justloaded,
-        analytics: widget.analytics,
-      ),
-      SearchScreen(
-        curruser: widget.curruser,
-        curruserlocation: widget.curruserlocation,
-        analytics: widget.analytics,
-      ),
-      CreateEventScreen(
-        curruser: widget.curruser,
-        allowbackarrow: false,
-        startinterest: "Sports",
         analytics: widget.analytics,
       ),
       CloutScoreScreen(
@@ -89,6 +79,16 @@ class _MainScreenState extends State<MainScreen> {
         analytics: widget.analytics,
         showleading: false,
       ),
+      CreateEventScreen(
+        curruser: widget.curruser,
+        allowbackarrow: false,
+        startinterest: "Sports",
+        analytics: widget.analytics,
+      ),
+      FavScreen(
+          curruser: widget.curruser,
+          curruserlocation: widget.curruserlocation,
+          analytics: widget.analytics),
       ProfileScreen(
         user: widget.curruser,
         curruser: widget.curruser,
@@ -337,10 +337,10 @@ class _MainScreenState extends State<MainScreen> {
             ),
             BottomNavyBarItem(
               icon: const Icon(
-                Icons.search,
+                Icons.people_outline_sharp,
               ),
               title: const Text(
-                "Search",
+                "Score",
                 textScaleFactor: 1.0,
               ),
               activeColor: Theme.of(context).primaryColor,
@@ -359,10 +359,10 @@ class _MainScreenState extends State<MainScreen> {
             ),
             BottomNavyBarItem(
               icon: const Icon(
-                Icons.people_outline_sharp,
+                Icons.bookmark_outlined,
               ),
               title: const Text(
-                "Score",
+                "Favorites",
                 textScaleFactor: 1.0,
               ),
               activeColor: Theme.of(context).primaryColor,
@@ -380,6 +380,9 @@ class _MainScreenState extends State<MainScreen> {
           ],
           onItemSelected: (newIndex) {
             if (newIndex == 0) {
+              setState(() {
+                widget.justloaded = false;
+              });
               parampasser();
             }
             setState(() => _index = newIndex);

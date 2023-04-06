@@ -146,7 +146,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Row(
               children: [
                 SizedBox(
-                  width: searching ? screenwidth * 0.945 : screenwidth * 0.85,
+                  width: screenwidth * 0.945,
                   child: TextField(
                     controller: searchcontroller,
                     onChanged: (String searchquery) async {
@@ -208,28 +208,6 @@ class _SearchScreenState extends State<SearchScreen> {
                         )),
                   ),
                 ),
-                searching ? Container() : SizedBox(width: screenwidth * 0.02),
-                searching
-                    ? Container()
-                    : GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => CalendarSearchScreen(
-                                        curruserlocation:
-                                            widget.curruserlocation,
-                                        curruser: widget.curruser,
-                                        analytics: widget.analytics,
-                                      ),
-                                  settings: RouteSettings(
-                                      name: "CalendarSearchScreen")));
-                        },
-                        child: SizedBox(
-                          width: screenwidth * 0.05,
-                          child: const Icon(Icons.calendar_today_rounded),
-                        ),
-                      )
               ],
             ),
           ),

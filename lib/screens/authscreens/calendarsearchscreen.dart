@@ -151,7 +151,6 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                       event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
-                      interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),

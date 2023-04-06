@@ -145,7 +145,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       event: event,
                       curruser: widget.curruser,
                       participants: participants,
-                      interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),

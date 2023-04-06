@@ -129,7 +129,6 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
                       event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
-                      interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),

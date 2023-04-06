@@ -14,10 +14,12 @@ class ChatListScreen extends StatefulWidget {
       {super.key,
       required this.curruser,
       required this.curruserlocation,
-      required this.analytics});
+      required this.analytics,
+      required this.returnHome});
   AppUser curruser;
   AppLocation curruserlocation;
   FirebaseAnalytics analytics;
+  final Function() returnHome;
   @override
   State<ChatListScreen> createState() => _ChatListScreenState();
 }
@@ -131,29 +133,30 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            widget.curruser.username,
-            textScaleFactor: 1.0,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25),
-          ),
-          backgroundColor: Colors.white,
-          shadowColor: Colors.white,
-          elevation: 0.0,
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.arrow_back_ios,
-                color: Theme.of(context).primaryColor,
-              ),
+            centerTitle: true,
+            title: Text(
+              widget.curruser.username,
+              textScaleFactor: 1.0,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25),
             ),
-          ),
-        ),
+            backgroundColor: Colors.white,
+            shadowColor: Colors.white,
+            elevation: 0.0,
+            leading: GestureDetector(
+              onTap: () {
+                widget.returnHome.call();
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            )),
         body: RefreshIndicator(
           onRefresh: refresh,
           color: Theme.of(context).primaryColor,

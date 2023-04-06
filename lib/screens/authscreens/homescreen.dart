@@ -6,6 +6,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/chatlistscreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/notificationscreen.dart';
+import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,12 +17,14 @@ class HomeScreen extends StatefulWidget {
   AppUser curruser;
   AppLocation curruserlocation;
   FirebaseAnalytics analytics;
+  final Function(int index) changePage;
   HomeScreen(
       {Key? key,
       required this.justloaded,
       required this.curruser,
       required this.curruserlocation,
-      required this.analytics})
+      required this.analytics,
+      required this.changePage})
       : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -197,7 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
-                      interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),
@@ -223,8 +225,17 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
-        automaticallyImplyLeading: false,
         centerTitle: true,
+        leading: GestureDetector(
+          onTap: () {
+            widget.changePage.call(0);
+          },
+          child: Icon(
+            Icons.search,
+            color: Colors.black,
+            size: 30,
+          ),
+        ),
         actions: [
           GestureDetector(
             onTap: () async {
@@ -279,17 +290,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           GestureDetector(
-            onTap: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => ChatListScreen(
-                            curruser: widget.curruser,
-                            curruserlocation: widget.curruserlocation,
-                            analytics: widget.analytics,
-                          ),
-                      settings: RouteSettings(name: "ChatListScreen")));
-              refresh();
+            onTap: () {
+              widget.changePage.call(2);
             },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 9, 0),
@@ -335,23 +337,24 @@ class _HomeScreenState extends State<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: refresh,
         color: Theme.of(context).primaryColor,
-        child: Padding(
-            padding: EdgeInsets.all(screenheight * 0.02),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                EventListView(
-                  eventList: totaleventlist,
-                  onTap: navigate,
-                  scrollable: true,
-                  leftpadding: 2.0,
-                  curruser: widget.curruser,
-                  interactfav: interactfav,
-                  screenheight: screenheight,
-                  screenwidth: screenwidth,
-                )
-              ],
-            )),
+        child: SizedBox(
+          height: totaleventlist.length * (screenheight * 0.1 + 210.0) >=
+                  screenheight
+              ? totaleventlist.length * (screenheight * 0.1 + 210.0)
+              : screenheight,
+          child: Padding(
+              padding: EdgeInsets.all(screenheight * 0.02),
+              child: EventListView(
+                eventList: totaleventlist,
+                onTap: navigate,
+                scrollable: true,
+                leftpadding: 2.0,
+                curruser: widget.curruser,
+                interactfav: interactfav,
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+              )),
+        ),
       ),
     );
   }

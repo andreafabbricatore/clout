@@ -130,7 +130,6 @@ class _FavScreenState extends State<FavScreen> {
                       event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
-                      interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),
@@ -151,20 +150,11 @@ class _FavScreenState extends State<FavScreen> {
               fontWeight: FontWeight.bold,
               fontSize: 30),
         ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.0,
         centerTitle: true,
-        automaticallyImplyLeading: true,
+        automaticallyImplyLeading: false,
       ),
       body: Column(children: [
         favorites.isEmpty

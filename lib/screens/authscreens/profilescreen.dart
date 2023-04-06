@@ -360,7 +360,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
-                      interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),
@@ -417,14 +416,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
                       child: const Icon(Icons.ios_share, color: Colors.black),
                     )),
-                InkWell(
+                GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
                         backgroundColor: Colors.white,
                         context: context,
                         builder: (BuildContext context) {
                           return SizedBox(
-                            height: screenheight * 0.16,
+                            height: screenheight * 0.1,
                             width: screenwidth,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(
@@ -464,24 +463,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(
                                   height: screenheight * 0.02,
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    favorites();
-                                  },
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.bookmark, size: 30),
-                                      SizedBox(
-                                        width: 6,
-                                      ),
-                                      Text(
-                                        "Favorites",
-                                        style: TextStyle(fontSize: 20),
-                                      )
-                                    ],
-                                  ),
-                                ),
                               ]),
                             ),
                           );
@@ -508,45 +489,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
                       child: const Icon(Icons.ios_share, color: Colors.black),
                     )),
-                InkWell(
+                GestureDetector(
                   onTap: () async {
                     showModalBottomSheet(
                         backgroundColor: Colors.white,
                         context: context,
                         builder: (BuildContext context) {
                           return SizedBox(
-                            height: screenheight * 0.18,
+                            height: screenheight * 0.16,
+                            width: screenwidth,
                             child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        await reportuser();
-                                      },
-                                      child: const Text("Report User",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w300)),
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(width: 0.05)),
-                                    ),
-                                    GestureDetector(
-                                        onTap: () async {
-                                          await blockuser();
-                                        },
-                                        child: const Text("Block User",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w300))),
-                                  ]),
+                              padding: const EdgeInsets.fromLTRB(
+                                  16.0, 8.0, 0.0, 0.0),
+                              child: Column(children: [
+                                Container(
+                                  width: 40,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.transparent),
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: const Color.fromARGB(60, 0, 0, 0),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: screenheight * 0.01,
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await reportuser();
+                                    Navigator.pop(context);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.flag_circle, size: 30),
+                                      SizedBox(
+                                        width: 6,
+                                      ),
+                                      Text(
+                                        "Report ${widget.user.fullname}",
+                                        style: TextStyle(fontSize: 20),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: screenheight * 0.02,
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await blockuser();
+                                    Navigator.pop(context);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.block, size: 30),
+                                      SizedBox(
+                                        width: 6,
+                                      ),
+                                      Text(
+                                        "Block ${widget.user.fullname}",
+                                        style: TextStyle(fontSize: 20),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ]),
                             ),
                           );
                         });

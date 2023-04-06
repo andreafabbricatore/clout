@@ -156,7 +156,6 @@ class _SearchBarListViewState extends State<SearchBarListView> {
                       event: chosenEvent,
                       curruser: widget.curruser,
                       participants: participants,
-                      interactfav: interactfav,
                       curruserlocation: widget.curruserlocation,
                       analytics: widget.analytics,
                     ),
