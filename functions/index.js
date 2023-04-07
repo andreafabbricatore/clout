@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const { event } = require("firebase-functions/v1/analytics");
+const axios = require('axios')
 admin.initializeApp();
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -14,9 +14,12 @@ const fcm = admin.messaging();
 
 exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(async (snapshot) => {
     const noti = snapshot.data();
-    const querySnapshot = await db.collection("users").where("uid", "in", noti.target).get();
     let finaltokens = [];
-    querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
+    try {
+        const querySnapshot = await db.collection("users").where("uid", "in", noti.target).get();
+        querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
+    } catch(e) {}
+    
     const payload = {
         notification: {
             title: "Clout",
@@ -28,12 +31,47 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
         },
     };
     if (noti.type != 'deleted') {
-        querySnapshot.docs.forEach(async (element) => {
-            await db.collection("users").doc(element.id).set({ "notificationcounter": admin.firestore.FieldValue.increment(1), "notifications": admin.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": admin.firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid }) }, { merge: true });
-        });
+        try {
+            querySnapshot.docs.forEach(async (element) => {
+                await db.collection("users").doc(element.id).set({ "notificationcounter": admin.firestore.FieldValue.increment(1), "notifications": admin.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": admin.firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid }) }, { merge: true });
+            });
+        } catch(e) {}
+    }
+    if (noti.type == "modified") {
+        const eventSnapshot = await db.collection("events").doc(noti.eventid).get();
+        var event = eventSnapshot.data();
+        const cronjobid = event.cronjobid;
+        console.log(cronjobid);
+        var eventdate = new Date(event.time.seconds*1000)
+        eventdate.setHours(eventdate.getHours() - 1);
+        var postData = {
+            "job": {
+                "schedule": {
+                    "timezone": "Europe/London",
+                    "hours": [eventdate.getUTCHours()+1],
+                    "mdays": [eventdate.getUTCDate()],
+                    "minutes": [eventdate.getUTCMinutes()],
+                    "months": [eventdate.getUTCMonth()+1],
+                    "wdays": [eventdate.getUTCDay()]
+                },
+            }
+        };
+        console.log(postData);
+        axios.patch("https://api.cron-job.org/jobs/" + cronjobid, postData, {headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer sIdSzuqiTxr1TEX24M08U2H8ufFmBpxnjlfLKJpw32A="
+        }});
+    } else if (noti.type == "deleted") {
+        const cronjobid = noti.cronjobid;
+        axios.delete("https://api.cron-job.org/jobs/" + cronjobid, {headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer sIdSzuqiTxr1TEX24M08U2H8ufFmBpxnjlfLKJpw32A="
+        }});
     }
     await db.collection("updates").doc(snapshot.id).delete();
-    return fcm.sendToDevice(finaltokens, payload);
+    try {
+        return fcm.sendToDevice(finaltokens, payload);
+    } catch(e) {}
 });
 
 exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onCreate(async (snapshot) => {
@@ -45,7 +83,7 @@ exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onC
     const payload = {
         notification: {
             title: "Admin Message",
-            body: user.fullname + " just signed up to Clout.",
+            body: user.email + " just signed up to Clout.",
         }
     };
     return fcm.sendToDevice(finaltokens, payload);
@@ -102,9 +140,38 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
     }
 });
 
-exports.eventNotifyFollowers = functions.firestore.document("events/{id}").onCreate(async (snapshot) => {
+exports.eventNotify = functions.firestore.document("events/{id}").onCreate(async (snapshot) => {
     var _a, _b;
     const event = snapshot.data();
+    var eventdate = new Date(event.time.seconds*1000)
+    eventdate.setHours(eventdate.getHours() - 1);
+    var postData = {
+        "job": {
+            "url": "https://us-central1-clout-1108.cloudfunctions.net/eventReminder",
+            "enabled": "true",
+            "saveResponses": true,
+            "schedule": {
+                "timezone": "Europe/London",
+                "hours": [eventdate.getUTCHours()+1],
+                "mdays": [eventdate.getUTCDate()],
+                "minutes": [eventdate.getUTCMinutes()],
+                "months": [eventdate.getUTCMonth()+1],
+                "wdays": [eventdate.getUTCDay()]
+            },
+            "requestMethod": 1,
+            "extendedData": {
+                "headers": {
+                    "eventid": snapshot.id
+                }
+            }
+        }
+        };
+
+    var response = await axios.put("https://api.cron-job.org/jobs", postData, {headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer sIdSzuqiTxr1TEX24M08U2H8ufFmBpxnjlfLKJpw32A="
+    }});
+    await db.collection("events").doc(snapshot.id).set({ "cronjobid": response.data.jobId}, { merge: true });
     if (event.isinviteonly == false) {
         const hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
         const followers = (_a = hostdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.followers;
@@ -130,6 +197,7 @@ exports.eventNotifyFollowers = functions.firestore.document("events/{id}").onCre
                 eventid: snapshot.id,
             },
         };
+
         if (finaltokens.length != 0) {
             return fcm.sendToDevice(finaltokens, payload);
         }
@@ -144,7 +212,7 @@ exports.eventNotifyFollowers = functions.firestore.document("events/{id}").onCre
 
 exports.eventReminder = functions.https.onRequest(async (req, res) => {
     try {
-        let eventid = req.body.eventid;
+        let eventid = req.headers.eventid;
         const eventSnapshot = await db.collection("events").doc(eventid).get();
         const participants = (_a = eventSnapshot.data()) === null || _a === void 0 ? void 0 : _a.participants;
         const querySnapshot = await db.collection("users").where("uid", "in", participants).get();
