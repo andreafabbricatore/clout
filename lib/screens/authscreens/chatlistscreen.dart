@@ -5,6 +5,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +85,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
     Future<void> chatnavigate(Chat chat, int index) async {
       await Navigator.push(
           context,
@@ -157,9 +159,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 ),
               ),
             )),
-        body: RefreshIndicator(
+        body: CustomRefreshIndicator(
           onRefresh: refresh,
-          color: Theme.of(context).primaryColor,
+          builder: (context, child, controller) {
+            return Stack(
+              children: [
+                Container(
+                  color: Colors.white,
+                  height: controller.value * screenheight * 0.1,
+                  width: screenwidth,
+                ),
+                child
+              ],
+            );
+          },
           child: Column(children: [
             Center(
               child: Focus(
@@ -187,6 +200,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       }
                     },
                     decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
                         hintText: 'Search',
                         prefixIcon:
                             const Icon(Icons.search, color: Colors.grey),

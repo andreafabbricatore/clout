@@ -1,9 +1,11 @@
+import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/unautheventlistview.dart';
 import 'package:clout/components/unauthnoeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:clout/components/event.dart';
@@ -129,24 +131,33 @@ class _UnAuthInterestSearchScreenState
           ),
         ),
       ),
-      body: RefreshIndicator(
+      body: CustomRefreshIndicator(
         onRefresh: refresh,
-        color: Theme.of(context).primaryColor,
+        builder: (context, child, controller) {
+          return LoadingWidget(
+            screenheight: screenheight,
+            screenwidth: screenwidth,
+            controller: controller,
+            child: child,
+          );
+        },
         child: Padding(
             padding: EdgeInsets.all(screenheight * 0.02),
             child: widget.events.isNotEmpty
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      UnAuthEventListView(
-                        eventList: widget.events,
-                        onTap: navigate,
-                        scrollable: true,
-                        leftpadding: 2.0,
-                        screenheight: screenheight,
-                        screenwidth: screenwidth,
-                      )
-                    ],
+                ? SizedBox(
+                    height: widget.events.length *
+                                (screenheight * 0.1 + 210.0) >=
+                            screenheight
+                        ? widget.events.length * (screenheight * 0.1 + 210.0)
+                        : screenheight,
+                    child: UnAuthEventListView(
+                      eventList: widget.events,
+                      onTap: navigate,
+                      scrollable: true,
+                      leftpadding: 2.0,
+                      screenheight: screenheight,
+                      screenwidth: screenwidth,
+                    ),
                   )
                 : Center(
                     child: UnAuthnoEventsBox(

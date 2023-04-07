@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/chatlistscreen.dart';
@@ -8,9 +9,11 @@ import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/notificationscreen.dart';
 import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   bool justloaded;
@@ -211,151 +214,160 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          "Clout.",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.w900,
-            fontSize: 50,
-          ),
-          textScaleFactor: 1.0,
-        ),
         backgroundColor: Colors.white,
-        shadowColor: Colors.white,
-        elevation: 0.0,
-        centerTitle: true,
-        leading: GestureDetector(
-          onTap: () {
-            widget.changePage.call(0);
-          },
-          child: Icon(
-            Icons.search,
-            color: Colors.black,
-            size: 30,
-          ),
-        ),
-        actions: [
-          GestureDetector(
-            onTap: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => NotificationScreen(
-                            curruser: widget.curruser,
-                            curruserlocation: widget.curruserlocation,
-                            analytics: widget.analytics,
-                          ),
-                      settings: RouteSettings(name: "NotificationScreen")));
-              refresh();
-            },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-              child: Center(
-                child: SizedBox(
-                  height: 30,
-                  width: 32,
-                  child: Stack(children: [
-                    const Icon(
-                      CupertinoIcons.heart,
-                      color: Colors.black,
-                      size: 30,
-                    ),
-                    widget.curruser.notificationcounter != 0
-                        ? Align(
-                            alignment: Alignment.topRight,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100.0),
-                              child: Container(
-                                height: 15,
-                                width: 15,
-                                color: const Color.fromARGB(255, 255, 48, 117),
-                                child: Text(
-                                  widget.curruser.notificationcounter > 9
-                                      ? ""
-                                      : widget.curruser.notificationcounter
-                                          .toString(),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 14),
-                                ),
-                              ),
-                            ),
-                          )
-                        : Container(),
-                  ]),
-                ),
-              ),
+        appBar: AppBar(
+          title: Text(
+            "Clout.",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w900,
+              fontSize: 50,
             ),
+            textScaleFactor: 1.0,
           ),
-          GestureDetector(
+          backgroundColor: Colors.white,
+          shadowColor: Colors.white,
+          elevation: 0.0,
+          centerTitle: true,
+          leading: GestureDetector(
             onTap: () {
-              widget.changePage.call(2);
+              widget.changePage.call(0);
             },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 9, 0),
-              child: Center(
-                child: SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: Stack(children: [
-                    const Icon(
-                      Icons.chat_bubble_outline_rounded,
-                      color: Colors.black,
-                      size: 30,
-                    ),
-                    widget.curruser.chatnotificationcounter != 0
-                        ? Align(
-                            alignment: Alignment.topRight,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100.0),
-                              child: Container(
-                                height: 15,
-                                width: 15,
-                                color: const Color.fromARGB(255, 255, 48, 117),
-                                child: Text(
-                                  widget.curruser.chatnotificationcounter > 9
-                                      ? ""
-                                      : widget.curruser.chatnotificationcounter
-                                          .toString(),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 14),
+            child: Icon(
+              Icons.search,
+              color: Colors.black,
+              size: 30,
+            ),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => NotificationScreen(
+                              curruser: widget.curruser,
+                              curruserlocation: widget.curruserlocation,
+                              analytics: widget.analytics,
+                            ),
+                        settings: RouteSettings(name: "NotificationScreen")));
+                refresh();
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                child: Center(
+                  child: SizedBox(
+                    height: 30,
+                    width: 32,
+                    child: Stack(children: [
+                      const Icon(
+                        CupertinoIcons.heart,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                      widget.curruser.notificationcounter != 0
+                          ? Align(
+                              alignment: Alignment.topRight,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(100.0),
+                                child: Container(
+                                  height: 15,
+                                  width: 15,
+                                  color:
+                                      const Color.fromARGB(255, 255, 48, 117),
+                                  child: Text(
+                                    widget.curruser.notificationcounter > 9
+                                        ? ""
+                                        : widget.curruser.notificationcounter
+                                            .toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 14),
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        : Container(),
-                  ]),
+                            )
+                          : Container(),
+                    ]),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: refresh,
-        color: Theme.of(context).primaryColor,
-        child: SizedBox(
-          height: totaleventlist.length * (screenheight * 0.1 + 210.0) >=
-                  screenheight
-              ? totaleventlist.length * (screenheight * 0.1 + 210.0)
-              : screenheight,
-          child: Padding(
-              padding: EdgeInsets.all(screenheight * 0.02),
-              child: EventListView(
-                eventList: totaleventlist,
-                onTap: navigate,
-                scrollable: true,
-                leftpadding: 2.0,
-                curruser: widget.curruser,
-                interactfav: interactfav,
-                screenheight: screenheight,
-                screenwidth: screenwidth,
-              )),
+            GestureDetector(
+              onTap: () {
+                widget.changePage.call(2);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 9, 0),
+                child: Center(
+                  child: SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: Stack(children: [
+                      const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                      widget.curruser.chatnotificationcounter != 0
+                          ? Align(
+                              alignment: Alignment.topRight,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(100.0),
+                                child: Container(
+                                  height: 15,
+                                  width: 15,
+                                  color:
+                                      const Color.fromARGB(255, 255, 48, 117),
+                                  child: Text(
+                                    widget.curruser.chatnotificationcounter > 9
+                                        ? ""
+                                        : widget
+                                            .curruser.chatnotificationcounter
+                                            .toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 14),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ]),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-    );
+        body: CustomRefreshIndicator(
+          onRefresh: refresh,
+          builder: (context, child, controller) {
+            return LoadingWidget(
+              screenheight: screenheight,
+              screenwidth: screenwidth,
+              controller: controller,
+              child: child,
+            );
+          },
+          child: SizedBox(
+            height: totaleventlist.length * (screenheight * 0.1 + 210.0) >=
+                    screenheight
+                ? totaleventlist.length * (screenheight * 0.1 + 210.0)
+                : screenheight,
+            child: Padding(
+                padding: EdgeInsets.all(screenheight * 0.02),
+                child: EventListView(
+                  eventList: totaleventlist,
+                  onTap: navigate,
+                  scrollable: true,
+                  leftpadding: 2.0,
+                  curruser: widget.curruser,
+                  interactfav: interactfav,
+                  screenheight: screenheight,
+                  screenwidth: screenwidth,
+                )),
+          ),
+        ));
   }
 }

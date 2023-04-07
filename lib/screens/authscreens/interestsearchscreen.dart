@@ -1,9 +1,11 @@
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
@@ -168,26 +170,35 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
           ),
         ),
       ),
-      body: RefreshIndicator(
+      body: CustomRefreshIndicator(
         onRefresh: refresh,
-        color: Theme.of(context).primaryColor,
+        builder: (context, child, controller) {
+          return LoadingWidget(
+            screenheight: screenheight,
+            screenwidth: screenwidth,
+            controller: controller,
+            child: child,
+          );
+        },
         child: Padding(
             padding: EdgeInsets.all(screenheight * 0.02),
             child: widget.events.isNotEmpty
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      EventListView(
-                        eventList: widget.events,
-                        onTap: navigate,
-                        scrollable: true,
-                        leftpadding: 2.0,
-                        curruser: widget.curruser,
-                        interactfav: interactfav,
-                        screenheight: screenheight,
-                        screenwidth: screenwidth,
-                      )
-                    ],
+                ? SizedBox(
+                    height: widget.events.length *
+                                (screenheight * 0.1 + 210.0) >=
+                            screenheight
+                        ? widget.events.length * (screenheight * 0.1 + 210.0)
+                        : screenheight,
+                    child: EventListView(
+                      eventList: widget.events,
+                      onTap: navigate,
+                      scrollable: true,
+                      leftpadding: 2.0,
+                      curruser: widget.curruser,
+                      interactfav: interactfav,
+                      screenheight: screenheight,
+                      screenwidth: screenwidth,
+                    ),
                   )
                 : Center(
                     child: noEventsBox(

@@ -272,6 +272,14 @@ class _MainScreenState extends State<MainScreen> {
       } catch (e) {
         displayErrorSnackBar("Could not display event");
       }
+    } else if (message.data["type"] == "reminder") {
+      try {
+        Event event = await db.getEventfromDocId(message.data["eventid"]);
+        List<AppUser> participants = await db.geteventparticipantslist(event);
+        godeeplinkeventdetailscreen(event, participants);
+      } catch (e) {
+        displayErrorSnackBar("Could not display event");
+      }
     }
   }
 

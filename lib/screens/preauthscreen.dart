@@ -89,7 +89,9 @@ class _PreAuthScreenState extends State<PreAuthScreen> {
                             });
                           }
                         : () {
-                            controller.jumpToPage(2);
+                            controller.animateToPage(2,
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.linear);
                           },
                     child: currpage == 2
                         ? PrimaryButton(

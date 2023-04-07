@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/unautheventlistview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
@@ -130,42 +132,49 @@ class _UnAuthHomeScreenState extends State<UnAuthHomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          "Clout.",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.w900,
-            fontSize: 50,
-          ),
-          textScaleFactor: 1.0,
-        ),
         backgroundColor: Colors.white,
-        shadowColor: Colors.white,
-        elevation: 0.0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-      ),
-      body: RefreshIndicator(
-        onRefresh: refreshevents,
-        color: Theme.of(context).primaryColor,
-        child: Padding(
-            padding: EdgeInsets.all(screenheight * 0.02),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                UnAuthEventListView(
+        appBar: AppBar(
+          title: Text(
+            "Clout.",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w900,
+              fontSize: 50,
+            ),
+            textScaleFactor: 1.0,
+          ),
+          backgroundColor: Colors.white,
+          shadowColor: Colors.white,
+          elevation: 0.0,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+        ),
+        body: CustomRefreshIndicator(
+          onRefresh: refreshevents,
+          builder: (context, child, controller) {
+            return LoadingWidget(
+              screenheight: screenheight,
+              screenwidth: screenwidth,
+              controller: controller,
+              child: child,
+            );
+          },
+          child: SizedBox(
+            height: totaleventlist.length * (screenheight * 0.1 + 210.0) >=
+                    screenheight
+                ? totaleventlist.length * (screenheight * 0.1 + 210.0)
+                : screenheight,
+            child: Padding(
+                padding: EdgeInsets.all(screenheight * 0.02),
+                child: UnAuthEventListView(
                   eventList: totaleventlist,
                   onTap: navigate,
                   scrollable: true,
                   leftpadding: 2.0,
                   screenheight: screenheight,
                   screenwidth: screenwidth,
-                )
-              ],
-            )),
-      ),
-    );
+                )),
+          ),
+        ));
   }
 }

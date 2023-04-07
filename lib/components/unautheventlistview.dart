@@ -138,22 +138,20 @@ class UnAuthEventListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-        physics: scrollable
-            ? const AlwaysScrollableScrollPhysics()
-            : const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        itemCount: eventList.length,
-        itemBuilder: (_, index) {
-          Event event = eventList.reversed.toList()[index];
-          return Padding(
-            padding: EdgeInsets.only(bottom: 0, top: 10, left: leftpadding),
-            child: _listViewItem(event, index),
-          );
-        },
-      ),
+    return ListView.builder(
+      physics: scrollable
+          ? const AlwaysScrollableScrollPhysics()
+          : const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      itemCount: eventList.length,
+      itemBuilder: (_, index) {
+        Event event = eventList.reversed.toList()[index];
+        return Padding(
+          padding: EdgeInsets.only(bottom: 0, top: 10, left: leftpadding),
+          child: _listViewItem(event, index),
+        );
+      },
     );
   }
 }

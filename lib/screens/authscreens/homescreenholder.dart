@@ -27,11 +27,13 @@ class _HomeScreenHolderState extends State<HomeScreenHolder> {
 
   bool showleading = false;
   void changePage(int index) {
-    controller.jumpToPage(index);
+    controller.animateToPage(index,
+        duration: const Duration(milliseconds: 250), curve: Curves.linear);
   }
 
   void returnhome() {
-    controller.jumpToPage(1);
+    controller.animateToPage(1,
+        duration: const Duration(milliseconds: 250), curve: Curves.linear);
   }
 
   @override

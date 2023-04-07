@@ -1,4 +1,5 @@
 import 'package:clout/components/eventlistview.dart';
+import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/profiletopcontainer.dart';
 import 'package:clout/components/user.dart';
@@ -9,6 +10,7 @@ import 'package:clout/screens/authscreens/favscreen.dart';
 import 'package:clout/screens/authscreens/followerfollowingscreen.dart';
 import 'package:clout/screens/authscreens/settings.dart';
 import 'package:clout/services/db.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
@@ -518,7 +520,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 GestureDetector(
                                   onTap: () async {
                                     await reportuser();
-                                    Navigator.pop(context);
                                   },
                                   child: Row(
                                     children: [
@@ -539,7 +540,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 GestureDetector(
                                   onTap: () async {
                                     await blockuser();
-                                    Navigator.pop(context);
                                   },
                                   child: Row(
                                     children: [
@@ -571,9 +571,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: const Border(
             bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
       ),
-      body: RefreshIndicator(
+      body: CustomRefreshIndicator(
         onRefresh: refresh,
-        color: Theme.of(context).primaryColor,
+        builder: (context, child, controller) {
+          return LoadingWidget(
+            screenheight: screenheight,
+            screenwidth: screenwidth,
+            controller: controller,
+            child: child,
+          );
+        },
         child: SingleChildScrollView(
           child: SizedBox(
             height: joinedevents

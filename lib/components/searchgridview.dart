@@ -40,7 +40,7 @@ class SearchGridView extends StatelessWidget {
         gridDelegate:
             const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         shrinkWrap: true,
-        itemCount: interests.length + 1,
+        itemCount: interests.length,
         itemBuilder: ((context, index) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),

@@ -507,6 +507,15 @@ class db_conn {
       await batch.commit();
       await deletechat(event.chatid);
       await events.doc(event.docid).delete();
+      participants.removeWhere((element) => element == event.hostdocid);
+      await updates.add({
+        'target': participants,
+        'description': '${event.title} was deleted.',
+        'notification': '${event.title} was deleted.',
+        'eventid': event.docid,
+        'userid': host.uid,
+        'type': 'deleted'
+      });
     } catch (e) {
       throw Exception("Could not delete event");
     }
@@ -559,6 +568,15 @@ class db_conn {
       await batch.commit();
       await deletechat(event.chatid);
       await events.doc(event.docid).delete();
+      participants.removeWhere((element) => element == event.hostdocid);
+      await updates.add({
+        'target': participants,
+        'description': '${event.title} was deleted.',
+        'notification': '${event.title} was deleted.',
+        'eventid': event.docid,
+        'userid': host.uid,
+        'type': 'deleted'
+      });
     } catch (e) {
       throw Exception("Could not delete event");
     }
@@ -1511,28 +1529,17 @@ class db_conn {
     try {
       DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
       DocumentSnapshot userdoc = await users.doc(userdocid).get();
-      List blockedusers = curruserdoc['blocked_users'];
-      List blockedby = userdoc['blocked_by'];
-      List curruserfollowers = curruserdoc['followers'];
-      List curruserfollowing = curruserdoc['following'];
-      List userfollowers = userdoc['followers'];
-      List userfollowing = userdoc['following'];
       List curruserjoinedevents = curruserdoc['joined_events'];
       List curruserhostedevents = curruserdoc['hosted_events'];
       List userjoinedevents = userdoc['joined_events'];
       List userhostedevents = userdoc['hosted_events'];
-      blockedusers.add(userdocid);
-      blockedby.add(curruserdocid);
-      curruserfollowers.removeWhere((element) => element == userdocid);
-      curruserfollowing.removeWhere((element) => element == userdocid);
-      userfollowers.removeWhere((element) => element == curruserdocid);
-      userfollowing.removeWhere((element) => element == curruserdocid);
       AppUser user = AppUser.fromJson(userdoc, userdocid);
       for (int i = 0; i < curruserhostedevents.length; i++) {
         if (userjoinedevents.contains(curruserhostedevents[i])) {
           DocumentSnapshot eventdoc =
               await events.doc(curruserhostedevents[i]).get();
-          Event event = Event.fromJson(eventdoc, curruserhostedevents[i]);
+          Event event =
+              Event.fromJson(eventdoc.data(), curruserhostedevents[i]);
           removeparticipant(user, event);
         }
       }
@@ -1541,20 +1548,22 @@ class db_conn {
         if (userhostedevents.contains(curruserjoinedevents[i])) {
           DocumentSnapshot eventdoc =
               await events.doc(curruserjoinedevents[i]).get();
-          Event event = Event.fromJson(eventdoc, curruserhostedevents[i]);
+
+          Event event =
+              Event.fromJson(eventdoc.data(), curruserhostedevents[i]);
           leaveevent(curruser, event);
         }
       }
-      users.doc(curruserdocid).update({
-        'blocked_users': blockedusers,
-        'followers': curruserfollowers,
-        'following': curruserfollowing
-      });
-      users.doc(userdocid).update({
-        'blocked_by': blockedby,
-        'followers': userfollowers,
-        'following': userfollowing
-      });
+      users.doc(curruserdocid).set({
+        'blocked_users': FieldValue.arrayUnion([userdocid]),
+        'followers': FieldValue.arrayRemove([userdocid]),
+        'following': FieldValue.arrayRemove([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'blocked_by': FieldValue.arrayUnion([curruserdocid]),
+        'followers': FieldValue.arrayRemove([curruserdocid]),
+        'following': FieldValue.arrayRemove([curruserdocid])
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception();
     }

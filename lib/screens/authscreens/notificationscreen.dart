@@ -1,4 +1,5 @@
 import 'package:clout/components/event.dart';
+import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/notificationslistview.dart';
 import 'package:clout/components/user.dart';
@@ -6,6 +7,7 @@ import 'package:clout/components/notification.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -124,6 +126,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
     Future<void> usernavigate(String uid, int index) async {
       try {
         AppUser user = await db.getUserFromUID(uid);
@@ -180,9 +183,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
       ),
-      body: RefreshIndicator(
+      body: CustomRefreshIndicator(
         onRefresh: refresh,
-        color: Theme.of(context).primaryColor,
+        builder: (context, child, controller) {
+          return LoadingWidget(
+            screenheight: screenheight,
+            screenwidth: screenwidth,
+            controller: controller,
+            child: child,
+          );
+        },
         child: Column(children: [
           NotificationsListView(
             notificationlist: notis,
