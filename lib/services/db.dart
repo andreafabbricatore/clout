@@ -324,7 +324,9 @@ class db_conn {
         'searchfield': searchfield,
         'isinviteonly': event.isinviteonly
       });
-      chats.doc(event.chatid).update({"chatname": event.title});
+      chats.doc(event.chatid).update({
+        "chatname": [event.title]
+      });
       event.participants.removeWhere((element) => element == event.hostdocid);
       updates.add({
         'target': event.participants,
@@ -514,6 +516,7 @@ class db_conn {
         'notification': '${event.title} was deleted.',
         'eventid': event.docid,
         'userid': host.uid,
+        'cronjobid': eventSnapshot['cronjobid'],
         'type': 'deleted'
       });
     } catch (e) {
@@ -575,6 +578,7 @@ class db_conn {
         'notification': '${event.title} was deleted.',
         'eventid': event.docid,
         'userid': host.uid,
+        'cronjobid': eventSnapshot['cronjobid'],
         'type': 'deleted'
       });
     } catch (e) {
@@ -1590,7 +1594,7 @@ class db_conn {
             (element) async {
               await events
                   .doc(element.id)
-                  .set({"favoritedby": []}, SetOptions(merge: true));
+                  .set({"cronjobid": 000000000}, SetOptions(merge: true));
             },
           ),
         );
@@ -1816,10 +1820,14 @@ class db_conn {
     }
   }
 
-  Future<void> updatelastuserloc(String uid, double lat, double lng) async {
+  Future<void> updatelastuserlocandusage(
+      String uid, double lat, double lng) async {
     try {
-      await users.doc(uid).set(
-          {'lastknownlat': lat, 'lastknownlng': lng}, SetOptions(merge: true));
+      await users.doc(uid).set({
+        'lastknownlat': lat,
+        'lastknownlng': lng,
+        'lastusagetime': FieldValue.serverTimestamp()
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception();
     }
@@ -1879,12 +1887,13 @@ class db_conn {
           .set({"appversion": packageInfo.version}, SetOptions(merge: true));
       QuerySnapshot querySnapshot = await appupdate.get();
       bool needupdatestatus = false;
-      String requiredversion = "";
+      List requiredversion = [];
       querySnapshot.docs.forEach((element) {
         needupdatestatus = element['need_update_status'];
         requiredversion = element['app_version'];
       });
-      return (needupdatestatus && requiredversion != packageInfo.version);
+      return (needupdatestatus &&
+          !requiredversion.contains(packageInfo.version));
     } catch (e) {
       throw Exception("Could not pull update status");
     }

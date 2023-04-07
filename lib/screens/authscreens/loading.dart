@@ -122,7 +122,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       //await newgetUserAppLocation();
       await widget.analytics.setUserId(id: widget.uid);
       await newgetUserAppLocation();
-      await db.updatelastuserloc(
+      await db.updatelastuserlocandusage(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
       if (curruserlocation.country != "" &&
           !listEquals(curruserlocation.center, [0.0, 0.0])) {

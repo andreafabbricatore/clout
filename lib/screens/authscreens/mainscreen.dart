@@ -8,7 +8,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/screens/authscreens/cloutscorescreen.dart';
 import 'package:clout/screens/authscreens/createeventscreen.dart';
-import 'package:clout/screens/authscreens/deeplinkeventdetailscreen.dart';
+import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/favscreen.dart';
 import 'package:clout/screens/authscreens/homescreen.dart';
 import 'package:clout/screens/authscreens/homescreenholder.dart';
@@ -142,7 +142,7 @@ class _MainScreenState extends State<MainScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (_) => DeepLinkEventDetailScreen(
+            builder: (_) => EventDetailScreen(
                   event: chosenEvent,
                   curruser: widget.curruser,
                   participants: participants,

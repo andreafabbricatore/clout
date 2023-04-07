@@ -525,7 +525,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               shareevent(text);
             },
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 0, 3.0, 8),
               child: Icon(
                 Icons.ios_share,
                 color: Colors.black,
@@ -928,7 +928,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   });
             },
             child: const Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+              padding: EdgeInsets.fromLTRB(0, 0, 16.0, 4),
               child: Icon(
                 Icons.more_vert_outlined,
                 color: Colors.black,
