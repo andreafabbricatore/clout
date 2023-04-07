@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const firebase_admin_1 = require("firebase-admin");
+const { event } = require("firebase-functions/v1/analytics");
 admin.initializeApp();
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -27,10 +27,27 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
             userid: noti.userid,
         },
     };
-    querySnapshot.docs.forEach(async (element) => {
-        await db.collection("users").doc(element.id).set({ "notificationcounter": firebase_admin_1.firestore.FieldValue.increment(1), "notifications": firebase_admin_1.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": firebase_admin_1.firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid }) }, { merge: true });
-    });
+    if (noti.type != 'deleted') {
+        querySnapshot.docs.forEach(async (element) => {
+            await db.collection("users").doc(element.id).set({ "notificationcounter": admin.firestore.FieldValue.increment(1), "notifications": admin.firestore.FieldValue.arrayUnion({ "notification": noti.notification, "type": noti.type, "time": admin.firestore.Timestamp.now(), "eventid": noti.eventid, "userid": noti.userid }) }, { merge: true });
+        });
+    }
     await db.collection("updates").doc(snapshot.id).delete();
+    return fcm.sendToDevice(finaltokens, payload);
+});
+
+exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onCreate(async (snapshot) => {
+    const user = snapshot.data();
+    let targets = ['cl1JMFn20pSmiFPAEwXkS7cho9r1', 'PSxzApY59nN8tllIDe8PUuPSb4l2'];
+    const querySnapshot = await db.collection("users").where("uid", "in", targets).get();
+    let finaltokens = [];
+    querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
+    const payload = {
+        notification: {
+            title: "Admin Message",
+            body: user.fullname + " just signed up to Clout.",
+        }
+    };
     return fcm.sendToDevice(finaltokens, payload);
 });
 
@@ -58,7 +75,7 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
                 },
             };
             querySnapshot.docs.forEach(async (element) => {
-                await db.collection("users").doc(element.id).set({ "chatnotificationcounter": firebase_admin_1.firestore.FieldValue.increment(1) }, { merge: true });
+                await db.collection("users").doc(element.id).set({ "chatnotificationcounter": admin.firestore.FieldValue.increment(1) }, { merge: true });
             });
             await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + chat.content });
             return fcm.sendToDevice(finaltokens, payload);
@@ -74,7 +91,7 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
                 },
             };
             querySnapshot.docs.forEach(async (element) => {
-                await db.collection("users").doc(element.id).set({ "chatnotificationcounter": firebase_admin_1.firestore.FieldValue.increment(1) }, { merge: true });
+                await db.collection("users").doc(element.id).set({ "chatnotificationcounter": admin.firestore.FieldValue.increment(1) }, { merge: true });
             });
             await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + chat.content });
             return fcm.sendToDevice(finaltokens, payload);
@@ -122,6 +139,30 @@ exports.eventNotifyFollowers = functions.firestore.document("events/{id}").onCre
     }
     else {
         return;
+    }
+});
+
+exports.eventReminder = functions.https.onRequest(async (req, res) => {
+    try {
+        let eventid = req.body.eventid;
+        const eventSnapshot = await db.collection("events").doc(eventid).get();
+        const participants = (_a = eventSnapshot.data()) === null || _a === void 0 ? void 0 : _a.participants;
+        const querySnapshot = await db.collection("users").where("uid", "in", participants).get();
+        let finaltokens = [];
+        querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
+        const payload = {
+            notification: {
+                title: "Clout",
+                body: ((_b = eventSnapshot.data()) === null || _b === void 0 ? void 0 : _b.title) + " is starting soon. Are you ready?",
+            }, data: {
+                type: "reminder",
+                eventid: eventid,
+                userid: "",
+            },
+        };
+
+        return fcm.sendToDevice(finaltokens, payload);
+    } catch (error) {
     }
 });
 
