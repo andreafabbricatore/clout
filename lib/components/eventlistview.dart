@@ -73,7 +73,10 @@ class EventListView extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
                   child: Text(
                     event.participants.length != event.maxparticipants
-                        ? "${event.participants.length}/${event.maxparticipants} participants"
+                        ? (event.showparticipants ||
+                                curruser.uid == event.hostdocid)
+                            ? "${event.participants.length}/${event.maxparticipants} participants"
+                            : "?/${event.maxparticipants} participants"
                         : "Participant number reached",
                     style: const TextStyle(
                         fontSize: 12,

@@ -56,7 +56,8 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
       chatid: "",
       isinviteonly: false,
       presentparticipants: [],
-      customimage: false);
+      customimage: false,
+      showparticipants: true);
 
   List<String> allinterests = [
     "Sports",
@@ -97,6 +98,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   List LatLngs = [];
   bool authbuttonpressed = false;
+  bool hideparticipants = false;
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -667,6 +669,34 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                 : "Anyone can join the event",
             style: const TextStyle(color: Color.fromARGB(53, 0, 0, 0)),
             textScaleFactor: 1.0,
+          ),
+          SizedBox(
+            height: screenheight * 0.01,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Checkbox(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  activeColor: Theme.of(context).primaryColor,
+                  value: hideparticipants,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        hideparticipants = value;
+                      });
+                    }
+                  }),
+              Text(
+                "Hide participant information.",
+                style: TextStyle(
+                    color: !hideparticipants
+                        ? Colors.grey
+                        : Theme.of(context).primaryColor),
+                textScaleFactor: 1.0,
+              ),
+            ],
           ),
           SizedBox(
             height: screenheight * 0.03,

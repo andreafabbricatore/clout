@@ -54,7 +54,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   String qrmessage = "";
   bool showqrmessage = false;
   bool deletebuttonpressed = false;
-  bool showparticipants = true;
+  bool expandparticipants = true;
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
@@ -1143,7 +1143,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 child: Text(
                   widget.event.participants.length !=
                           widget.event.maxparticipants
-                      ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
+                      ? (widget.event.showparticipants ||
+                              widget.curruser.uid == widget.event.hostdocid)
+                          ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
+                          : "?/${widget.event.maxparticipants} participants"
                       : "Participant number reached",
                   style: const TextStyle(
                       fontSize: 20,
@@ -1153,43 +1156,98 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      showparticipants = !showparticipants;
-                    });
-                  },
-                  child: Transform.flip(
-                    child: Icon(Icons.arrow_drop_down_outlined, size: 30),
-                    flipY: showparticipants,
-                  ))
+              (widget.event.showparticipants ||
+                      widget.curruser.uid == widget.event.hostdocid)
+                  ? GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          expandparticipants = !expandparticipants;
+                        });
+                      },
+                      child: Transform.flip(
+                        child: Icon(Icons.arrow_drop_down_outlined, size: 30),
+                        flipY: expandparticipants,
+                      ))
+                  : Container()
             ],
           ),
           SizedBox(
             height: screenheight * 0.005,
           ),
-          !showparticipants
-              ? Container()
-              : SizedBox(
-                  height: 16.0 + 60.0 * widget.participants.length,
-                  width: screenwidth,
-                  child: Column(
-                    children: [
-                      UserListView(
-                        userres: widget.participants,
-                        curruser: widget.curruser,
-                        onTap: usernavigate,
-                        screenwidth: screenwidth,
-                        showcloutscore: false,
-                        showrembutton:
-                            (widget.curruser.uid == widget.event.hostdocid) &&
+          (widget.event.showparticipants ||
+                  widget.curruser.uid == widget.event.hostdocid)
+              ? !expandparticipants
+                  ? Container()
+                  : SizedBox(
+                      height: 16.0 + 60.0 * widget.participants.length,
+                      width: screenwidth,
+                      child: Column(
+                        children: [
+                          UserListView(
+                            userres: widget.participants,
+                            curruser: widget.curruser,
+                            onTap: usernavigate,
+                            screenwidth: screenwidth,
+                            showcloutscore: false,
+                            showrembutton: (widget.curruser.uid ==
+                                    widget.event.hostdocid) &&
                                 (joinedval != "Finished"),
-                        removeUser: remuser,
-                        presentparticipants: widget.event.presentparticipants,
-                        physics: NeverScrollableScrollPhysics(),
+                            removeUser: remuser,
+                            presentparticipants:
+                                widget.event.presentparticipants,
+                            physics: NeverScrollableScrollPhysics(),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    )
+              : Container(
+                  width: screenwidth * 0.8,
+                  height: joinedval == "Leave"
+                      ? screenheight * 0.15 + 76
+                      : screenheight * 0.2,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        joinedval == "Leave"
+                            ? UserListView(
+                                userres: [widget.curruser],
+                                curruser: widget.curruser,
+                                onTap: usernavigate,
+                                screenwidth: screenwidth,
+                                showcloutscore: false,
+                                showrembutton: (widget.curruser.uid ==
+                                        widget.event.hostdocid) &&
+                                    (joinedval != "Finished"),
+                                removeUser: remuser,
+                                presentparticipants:
+                                    widget.event.presentparticipants,
+                                physics: NeverScrollableScrollPhysics(),
+                              )
+                            : Container(),
+                        joinedval == "Leave"
+                            ? Container()
+                            : SizedBox(
+                                height: screenheight * 0.05,
+                              ),
+                        const Icon(
+                          Icons.lock,
+                          color: Colors.black,
+                          size: 60,
+                        ),
+                        SizedBox(height: screenheight * 0.02),
+                        const Text(
+                          "Host has hidden joined participants.",
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w200),
+                          textScaleFactor: 1.0,
+                          overflow: TextOverflow.visible,
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.03,
+                        ),
+                      ]),
                 ),
           SizedBox(
             height: screenheight * 0.02,

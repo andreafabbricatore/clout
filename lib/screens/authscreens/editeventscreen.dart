@@ -73,6 +73,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   List LatLngs = [];
+  bool hideparticipants = false;
 
   void setup() {
     setState(() {
@@ -87,6 +88,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
           country: widget.event.country,
           center: [widget.event.lat, widget.event.lng]);
       isinviteonly = widget.event.isinviteonly;
+      hideparticipants = !widget.event.showparticipants;
     });
     _addMarker(LatLng(chosenLocation.center[0], chosenLocation.center[1]));
   }
@@ -591,6 +593,34 @@ class _EditEventScreenState extends State<EditEventScreen> {
             textScaleFactor: 1.0,
           ),
           SizedBox(
+            height: screenheight * 0.01,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Checkbox(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  activeColor: Theme.of(context).primaryColor,
+                  value: hideparticipants,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        hideparticipants = value;
+                      });
+                    }
+                  }),
+              Text(
+                "Hide participant information.",
+                style: TextStyle(
+                    color: !hideparticipants
+                        ? Colors.grey
+                        : Theme.of(context).primaryColor),
+                textScaleFactor: 1.0,
+              ),
+            ],
+          ),
+          SizedBox(
             height: screenheight * 0.03,
           ),
           GestureDetector(
@@ -634,6 +664,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                           widget.event.lat = chosenLocation.center[0];
                           widget.event.lng = chosenLocation.center[1];
                           widget.event.isinviteonly = isinviteonly;
+                          widget.event.showparticipants = !hideparticipants;
                         });
                         try {
                           if (imagepath == null) {

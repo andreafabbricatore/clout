@@ -103,6 +103,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     Future<void> userchatinteract(AppUser user, int index) async {
       bool userchatexists =
           await db.checkuserchatexists(widget.curruser, user.uid);
+      print(userchatexists);
       if (!userchatexists) {
         await db.createuserchat(widget.curruser, user.uid);
       }

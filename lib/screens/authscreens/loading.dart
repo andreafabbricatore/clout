@@ -201,6 +201,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await undermaintenance();
       if (!maintenance) {
         await needupdate();
+
         if (!update) {
           await appinit();
         }

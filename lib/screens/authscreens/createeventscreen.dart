@@ -53,7 +53,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       chatid: "",
       isinviteonly: false,
       presentparticipants: [],
-      customimage: false);
+      customimage: false,
+      showparticipants: true);
 
   List<String> allinterests = [
     "Sports",
@@ -93,6 +94,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   GoogleMapController? mapController;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   List LatLngs = [];
+  bool hideparticipants = false;
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -612,6 +614,34 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             textScaleFactor: 1.0,
           ),
           SizedBox(
+            height: screenheight * 0.01,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Checkbox(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  activeColor: Theme.of(context).primaryColor,
+                  value: hideparticipants,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        hideparticipants = value;
+                      });
+                    }
+                  }),
+              Text(
+                "Hide participant information.",
+                style: TextStyle(
+                    color: !hideparticipants
+                        ? Colors.grey
+                        : Theme.of(context).primaryColor),
+                textScaleFactor: 1.0,
+              ),
+            ],
+          ),
+          SizedBox(
             height: screenheight * 0.03,
           ),
           GestureDetector(
@@ -657,6 +687,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.lng = chosenLocation.center[1];
                           event.isinviteonly = isinviteonly;
                           event.presentparticipants = [widget.curruser.uid];
+                          event.showparticipants = !hideparticipants;
                         });
                         try {
                           if (imagepath == null) {

@@ -437,7 +437,9 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
           ),
           Text(
             widget.event.participants.length != widget.event.maxparticipants
-                ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
+                ? widget.event.showparticipants
+                    ? "${widget.event.participants.length}/${widget.event.maxparticipants} participants"
+                    : "?/${widget.event.maxparticipants} participants"
                 : "Participant number reached",
             style: const TextStyle(
                 fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
@@ -446,21 +448,45 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
           SizedBox(
             height: screenheight * 0.005,
           ),
-          SizedBox(
-            height: 16.0 + 60.0 * widget.participants.length,
-            width: screenwidth,
-            child: Column(
-              children: [
-                UnAuthUserListView(
-                  userres: widget.participants,
-                  screenwidth: screenwidth,
-                  presentparticipants: widget.event.presentparticipants,
-                  onTap: usernavigate,
-                  physics: NeverScrollableScrollPhysics(),
+          widget.event.showparticipants
+              ? SizedBox(
+                  height: 16.0 + 60.0 * widget.participants.length,
+                  width: screenwidth,
+                  child: Column(
+                    children: [
+                      UnAuthUserListView(
+                        userres: widget.participants,
+                        screenwidth: screenwidth,
+                        presentparticipants: widget.event.presentparticipants,
+                        onTap: usernavigate,
+                        physics: NeverScrollableScrollPhysics(),
+                      ),
+                    ],
+                  ),
+                )
+              : SizedBox(
+                  width: screenwidth * 0.8,
+                  height: screenheight * 0.2,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.lock,
+                          color: Colors.black,
+                          size: 60,
+                        ),
+                        SizedBox(height: screenheight * 0.02),
+                        const Text(
+                          "Host has hidden joined participants.",
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w200),
+                          textScaleFactor: 1.0,
+                          overflow: TextOverflow.visible,
+                        )
+                      ]),
                 ),
-              ],
-            ),
-          ),
           SizedBox(
             height: screenheight * 0.02,
           ),

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
@@ -242,6 +241,7 @@ class db_conn {
           'isinviteonly': newevent.isinviteonly,
           'presentparticipants': newevent.presentparticipants,
           'favoritedby': [],
+          'showparticipants': newevent.showparticipants
         }).then((value) {
           eventid = value.id;
         });
@@ -322,7 +322,8 @@ class db_conn {
         'lat': event.lat,
         'lng': event.lng,
         'searchfield': searchfield,
-        'isinviteonly': event.isinviteonly
+        'isinviteonly': event.isinviteonly,
+        'showparticipants': event.showparticipants
       });
       chats.doc(event.chatid).update({
         "chatname": [event.title]
@@ -1594,7 +1595,7 @@ class db_conn {
             (element) async {
               await events
                   .doc(element.id)
-                  .set({"cronjobid": 000000000}, SetOptions(merge: true));
+                  .set({'showparticipants': true}, SetOptions(merge: true));
             },
           ),
         );
@@ -1804,8 +1805,10 @@ class db_conn {
       AppUser curruser, String otheruserdocid) async {
     try {
       late Chat userchat;
+      print("here");
       await chats.get().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
+              print(doc.id);
               if ((doc['type'] == 'user') &&
                   userchatparticipantsequality(
                       doc['participants'], otheruserdocid, curruser.uid) &&
@@ -1904,12 +1907,13 @@ class db_conn {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       QuerySnapshot querySnapshot = await appupdate.get();
       bool needupdatestatus = false;
-      String requiredversion = "";
+      List requiredversion = [];
       querySnapshot.docs.forEach((element) {
         needupdatestatus = element['need_update_status'];
         requiredversion = element['app_version'];
       });
-      return (needupdatestatus && requiredversion != packageInfo.version);
+      return (needupdatestatus &&
+          !requiredversion.contains(packageInfo.version));
     } catch (e) {
       throw Exception("Could not pull update status");
     }
