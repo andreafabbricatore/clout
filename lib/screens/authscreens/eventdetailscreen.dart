@@ -1202,13 +1202,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     )
               : Container(
                   width: screenwidth * 0.8,
-                  height: joinedval == "Leave"
-                      ? screenheight * 0.15 + 76
-                      : screenheight * 0.2,
+                  height:
+                      widget.event.participants.contains(widget.curruser.uid)
+                          ? screenheight * 0.15 + 76
+                          : screenheight * 0.2,
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        joinedval == "Leave"
+                        widget.event.participants.contains(widget.curruser.uid)
                             ? UserListView(
                                 userres: [widget.curruser],
                                 curruser: widget.curruser,
@@ -1222,9 +1223,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 presentparticipants:
                                     widget.event.presentparticipants,
                                 physics: NeverScrollableScrollPhysics(),
+                                toppadding: false,
                               )
                             : Container(),
-                        joinedval == "Leave"
+                        widget.event.participants.contains(widget.curruser.uid)
                             ? Container()
                             : SizedBox(
                                 height: screenheight * 0.05,

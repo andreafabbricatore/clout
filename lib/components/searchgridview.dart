@@ -21,7 +21,7 @@ class SearchGridView extends StatelessWidget {
           child: Text(
         interest,
         style: const TextStyle(
-            fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 33, fontWeight: FontWeight.bold, color: Colors.white),
         textScaleFactor: 1.0,
       )),
     );

@@ -13,7 +13,8 @@ class UserListView extends StatefulWidget {
       this.removeUser,
       this.removebuttonblack = false,
       this.physics = const AlwaysScrollableScrollPhysics(),
-      this.presentparticipants = const []})
+      this.presentparticipants = const [],
+      this.toppadding = true})
       : super(key: key);
   List<AppUser> userres;
   AppUser curruser;
@@ -22,6 +23,7 @@ class UserListView extends StatefulWidget {
   bool showrembutton;
   bool removebuttonblack;
   List presentparticipants;
+  bool toppadding;
   var physics;
 
   final Function(AppUser user, int index)? onTap;
@@ -146,7 +148,7 @@ class _UserListViewState extends State<UserListView> {
     return Expanded(
       child: ListView.builder(
           physics: widget.physics,
-          padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
+          padding: EdgeInsets.fromLTRB(8, widget.toppadding ? 16 : 0, 0, 0),
           shrinkWrap: true,
           itemCount: widget.userres.length,
           itemBuilder: (_, index) {

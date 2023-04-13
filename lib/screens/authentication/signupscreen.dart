@@ -1549,7 +1549,7 @@ class _InterestScreenState extends State<InterestScreen> {
             child: Text(
           interest,
           style: TextStyle(
-              fontSize: 35,
+              fontSize: 33,
               fontWeight: FontWeight.bold,
               color: selectedinterests.contains(interest)
                   ? Theme.of(context).primaryColor

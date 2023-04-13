@@ -181,10 +181,10 @@ exports.eventNotify = functions.firestore.document("events/{id}").onCreate(async
             var _a, _b, _c;
             const userlat = (_a = doc.data()) === null || _a === void 0 ? void 0 : _a.lastknownlat;
             const userlng = (_b = doc.data()) === null || _b === void 0 ? void 0 : _b.lastknownlng;
-            if (userlat < event.lat + 0.06 &&
-                userlat > event.lat - 0.06 &&
-                userlng < event.lng + 0.06 &&
-                userlng > event.lng - 0.06) {
+            if (userlat < event.lat + 0.14 &&
+                userlat > event.lat - 0.14 &&
+                userlng < event.lng + 0.14 &&
+                userlng > event.lng - 0.14) {
                 finaltokens = finaltokens.concat((_c = doc.data()) === null || _c === void 0 ? void 0 : _c.tokens);
             }
         });

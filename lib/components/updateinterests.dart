@@ -52,7 +52,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
           child: Text(
         interest,
         style: TextStyle(
-            fontSize: 35,
+            fontSize: 33,
             fontWeight: FontWeight.bold,
             color: widget.curruser.interests.contains(interest)
                 ? Theme.of(context).primaryColor

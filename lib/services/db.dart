@@ -962,10 +962,10 @@ class db_conn {
         if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
           continue;
         }
-        if ((tempeventlist[i].lat < lat + 0.06 &&
-            tempeventlist[i].lat > lat - 0.06 &&
-            tempeventlist[i].lng < lng + 0.06 &&
-            tempeventlist[i].lng > lng - 0.06)) {
+        if ((tempeventlist[i].lat < lat + 0.14 &&
+            tempeventlist[i].lat > lat - 0.14 &&
+            tempeventlist[i].lng < lng + 0.14 &&
+            tempeventlist[i].lng > lng - 0.14)) {
           eventlist.add(tempeventlist[i]);
         }
       }
@@ -992,10 +992,10 @@ class db_conn {
       });
 
       for (int i = 0; i < tempeventlist.length; i++) {
-        if ((tempeventlist[i].lat < lat + 0.06 &&
-            tempeventlist[i].lat > lat - 0.06 &&
-            tempeventlist[i].lng < lng + 0.06 &&
-            tempeventlist[i].lng > lng - 0.06)) {
+        if ((tempeventlist[i].lat < lat + 0.14 &&
+            tempeventlist[i].lat > lat - 0.14 &&
+            tempeventlist[i].lng < lng + 0.14 &&
+            tempeventlist[i].lng > lng - 0.14)) {
           eventlist.add(tempeventlist[i]);
         }
       }
@@ -1151,10 +1151,10 @@ class db_conn {
         if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
           continue;
         }
-        if ((tempeventlist[i].lat < lat + 0.06 &&
-            tempeventlist[i].lat > lat - 0.06 &&
-            tempeventlist[i].lng < lng + 0.06 &&
-            tempeventlist[i].lng > lng - 0.06)) {
+        if ((tempeventlist[i].lat < lat + 0.14 &&
+            tempeventlist[i].lat > lat - 0.14 &&
+            tempeventlist[i].lng < lng + 0.14 &&
+            tempeventlist[i].lng > lng - 0.14)) {
           eventlist.add(tempeventlist[i]);
         }
       }
@@ -1181,10 +1181,10 @@ class db_conn {
       });
 
       for (int i = 0; i < tempeventlist.length; i++) {
-        if ((tempeventlist[i].lat < lat + 0.06 &&
-            tempeventlist[i].lat > lat - 0.06 &&
-            tempeventlist[i].lng < lng + 0.06 &&
-            tempeventlist[i].lng > lng - 0.06)) {
+        if ((tempeventlist[i].lat < lat + 0.14 &&
+            tempeventlist[i].lat > lat - 0.14 &&
+            tempeventlist[i].lng < lng + 0.14 &&
+            tempeventlist[i].lng > lng - 0.14)) {
           eventlist.add(tempeventlist[i]);
         }
       }
@@ -1301,10 +1301,10 @@ class db_conn {
         if (curruser.blockedusers.contains(tempeventlist[i].hostdocid)) {
           continue;
         }
-        if ((tempeventlist[i].lat < lat + 0.06 &&
-            tempeventlist[i].lat > lat - 0.06 &&
-            tempeventlist[i].lng < lng + 0.06 &&
-            tempeventlist[i].lng > lng - 0.06)) {
+        if ((tempeventlist[i].lat < lat + 0.14 &&
+            tempeventlist[i].lat > lat - 0.14 &&
+            tempeventlist[i].lng < lng + 0.14 &&
+            tempeventlist[i].lng > lng - 0.14)) {
           eventlist.add(tempeventlist[i]);
         }
       }
