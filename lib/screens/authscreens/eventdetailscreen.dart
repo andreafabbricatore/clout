@@ -1031,95 +1031,141 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             child: Stack(
               alignment: AlignmentDirectional.bottomEnd,
               children: [
-                GoogleMap(
-                    markers: Set<Marker>.of(markers.values),
-                    myLocationButtonEnabled: false,
-                    zoomGesturesEnabled: true,
-                    initialCameraPosition: CameraPosition(
-                        target: LatLng(widget.event.lat, widget.event.lng),
-                        zoom: 15)),
+                widget.event.showlocation
+                    ? GoogleMap(
+                        markers: Set<Marker>.of(markers.values),
+                        myLocationButtonEnabled: false,
+                        zoomGesturesEnabled: true,
+                        initialCameraPosition: CameraPosition(
+                            target: LatLng(widget.event.lat, widget.event.lng),
+                            zoom: 15))
+                    : Container(),
                 GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        backgroundColor: Colors.white,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SizedBox(
-                            height: screenheight * 0.18,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        await Maps.MapLauncher.showMarker(
-                                            mapType: Maps.MapType.apple,
-                                            coords: Maps.Coords(
-                                                widget.event.lat,
-                                                widget.event.lng),
-                                            title: widget.event.address);
-                                      },
-                                      child: RichText(
-                                        text: const TextSpan(
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w300),
-                                            children: [
-                                              TextSpan(text: "Open in "),
-                                              TextSpan(
-                                                  text: "Apple Maps",
+                  onTap: !widget.event.showlocation
+                      ? null
+                      : () {
+                          showModalBottomSheet(
+                              backgroundColor: Colors.white,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return SizedBox(
+                                  height: screenheight * 0.18,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await Maps.MapLauncher.showMarker(
+                                                  mapType: Maps.MapType.apple,
+                                                  coords: Maps.Coords(
+                                                      widget.event.lat,
+                                                      widget.event.lng),
+                                                  title: widget.event.address);
+                                            },
+                                            child: RichText(
+                                              text: const TextSpan(
                                                   style: TextStyle(
                                                       fontSize: 20,
-                                                      color: Color.fromARGB(
-                                                          255, 255, 48, 117),
+                                                      color: Colors.black,
                                                       fontWeight:
-                                                          FontWeight.w300)),
-                                            ]),
-                                      ),
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(width: 0.05)),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        await Maps.MapLauncher.showMarker(
-                                            mapType: Maps.MapType.google,
-                                            coords: Maps.Coords(
-                                                widget.event.lat,
-                                                widget.event.lng),
-                                            title: widget.event.address);
-                                      },
-                                      child: RichText(
-                                        text: const TextSpan(
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w300),
-                                            children: [
-                                              TextSpan(text: "Open in "),
-                                              TextSpan(
-                                                  text: "Google Maps",
+                                                          FontWeight.w300),
+                                                  children: [
+                                                    TextSpan(text: "Open in "),
+                                                    TextSpan(
+                                                        text: "Apple Maps",
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    255,
+                                                                    48,
+                                                                    117),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300)),
+                                                  ]),
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                border:
+                                                    Border.all(width: 0.05)),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await Maps.MapLauncher.showMarker(
+                                                  mapType: Maps.MapType.google,
+                                                  coords: Maps.Coords(
+                                                      widget.event.lat,
+                                                      widget.event.lng),
+                                                  title: widget.event.address);
+                                            },
+                                            child: RichText(
+                                              text: const TextSpan(
                                                   style: TextStyle(
                                                       fontSize: 20,
-                                                      color: Color.fromARGB(
-                                                          255, 255, 48, 117),
+                                                      color: Colors.black,
                                                       fontWeight:
-                                                          FontWeight.w300)),
-                                            ]),
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                          );
-                        });
-                  },
+                                                          FontWeight.w300),
+                                                  children: [
+                                                    TextSpan(text: "Open in "),
+                                                    TextSpan(
+                                                        text: "Google Maps",
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    255,
+                                                                    48,
+                                                                    117),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300)),
+                                                  ]),
+                                            ),
+                                          ),
+                                        ]),
+                                  ),
+                                );
+                              });
+                        },
                   child: Container(
-                    color: Colors.transparent,
+                    width: screenwidth,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: widget.event.showlocation
+                          ? Colors.transparent
+                          : Color.fromARGB(240, 255, 48, 117),
+                    ),
+                    child: widget.event.showlocation
+                        ? Container()
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                                const Icon(
+                                  Icons.lock,
+                                  color: Colors.black,
+                                  size: 60,
+                                ),
+                                SizedBox(height: screenheight * 0.02),
+                                const Text(
+                                  "Secret location.\nWill be revealed one hour before.",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w200),
+                                  textScaleFactor: 1.0,
+                                  overflow: TextOverflow.visible,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ]),
                   ),
                 )
               ],

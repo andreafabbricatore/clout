@@ -26,8 +26,10 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final emailController = TextEditingController();
   final pswController = TextEditingController();
+  final referralController = TextEditingController();
   db_conn db = db_conn();
   bool signupbuttonpressed = false;
+  bool referralbuttonpressed = false;
 
   void displayErrorSnackBar(
     String error,
@@ -174,7 +176,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             await db.createuserinstance(
                                 emailController.text.trim(),
                                 uid); //set all signup attributes to false
-                            gopicandnamescreen();
+                            if (referralController.text.isNotEmpty) {
+                              try {
+                                await db.referralcloutinc(
+                                    uid, referralController.text.trim());
+                                gopicandnamescreen();
+                              } catch (e) {
+                                displayErrorSnackBar(
+                                    "Invalid code, change it or remove it.");
+                              }
+                            } else {
+                              gopicandnamescreen();
+                            }
                           } catch (e) {
                             displayErrorSnackBar(
                                 "Could not Sign Up, please try again");
@@ -203,7 +216,68 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   text: "Sign Up",
                   bold: true,
                 )),
-            SizedBox(height: screenheight * 0.3),
+            SizedBox(height: screenheight * 0.02),
+            Center(
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(
+                          builder: (BuildContext context, setState) {
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              backgroundColor: Colors.white,
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                                height: screenheight * 0.25,
+                                decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Column(children: [
+                                  const Text("Enter Referral Code",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25)),
+                                  SizedBox(
+                                    height: screenheight * 0.02,
+                                  ),
+                                  textdatafield(screenwidth * 0.4, "Enter Code",
+                                      referralController),
+                                  SizedBox(
+                                    height: screenheight * 0.03,
+                                  ),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: PrimaryButton(
+                                          screenwidth: screenwidth,
+                                          buttonpressed: referralbuttonpressed,
+                                          text: "Submit Code",
+                                          buttonwidth: screenwidth * 0.7,
+                                          bold: false)),
+                                ]),
+                              ),
+                            );
+                          },
+                        );
+                      });
+                },
+                child: Text(
+                  "Invited by a friend?",
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: screenheight * 0.28),
             SizedBox(
               width: screenwidth * 0.6,
               child: RichText(

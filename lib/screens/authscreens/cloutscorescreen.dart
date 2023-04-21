@@ -192,7 +192,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 onTap: () async {
                   String link = await createShareLink();
                   String text =
-                      "${widget.curruser.fullname} wants you to join them on Clout.\nPress the link after signing up to boost your Clout score.\n\n$link";
+                      "${widget.curruser.fullname} wants you to join them on Clout.\n$link\nReferral Code: ${widget.curruser.uid}";
                   refer(text);
                 },
                 child: Container(

@@ -58,6 +58,8 @@ class db_conn {
       FirebaseFirestore.instance.collection('maintenance');
   CollectionReference appupdate =
       FirebaseFirestore.instance.collection('appupdate');
+  CollectionReference emailverification =
+      FirebaseFirestore.instance.collection('email_verification');
 
   Future createuserinstance(String email, String uid) async {
     try {
@@ -98,7 +100,8 @@ class db_conn {
         'notificationcounter': 0,
         'chatnotificationcounter': 0,
         'appversion': packageInfo.version,
-        'donesignuptime': DateTime(1900, 1, 1, 0, 0)
+        'donesignuptime': DateTime(1900, 1, 1, 0, 0),
+        'lastusagetime': FieldValue.serverTimestamp()
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -241,7 +244,8 @@ class db_conn {
           'isinviteonly': newevent.isinviteonly,
           'presentparticipants': newevent.presentparticipants,
           'favoritedby': [],
-          'showparticipants': newevent.showparticipants
+          'showparticipants': newevent.showparticipants,
+          'showlocation': newevent.showlocation
         }).then((value) {
           eventid = value.id;
         });
@@ -323,7 +327,8 @@ class db_conn {
         'lng': event.lng,
         'searchfield': searchfield,
         'isinviteonly': event.isinviteonly,
-        'showparticipants': event.showparticipants
+        'showparticipants': event.showparticipants,
+        'showlocation': event.showlocation
       });
       chats.doc(event.chatid).update({
         "chatname": [event.title]
@@ -384,15 +389,17 @@ class db_conn {
           chats.doc(event.chatid).set({
             'participants': FieldValue.arrayUnion([curruser.uid])
           }, SetOptions(merge: true));
-          chats.doc(event.chatid).collection('messages').add({
-            'content': "${curruser.username} joined the event",
-            'sender': 'server',
-            'timestamp': DateTime.now()
-          });
-          chats.doc(event.chatid).update({
-            'mostrecentmessage': "${curruser.username} joined the event",
-            "lastmessagetime": DateTime.now()
-          });
+          if (event.showparticipants) {
+            chats.doc(event.chatid).collection('messages').add({
+              'content': "${curruser.username} joined the event",
+              'sender': 'server',
+              'timestamp': DateTime.now()
+            });
+            chats.doc(event.chatid).update({
+              'mostrecentmessage': "${curruser.username} joined the event",
+              "lastmessagetime": DateTime.now()
+            });
+          }
         }
       } catch (e) {
         throw Exception("Could not notify host that you joined");
@@ -421,15 +428,17 @@ class db_conn {
         chats.doc(event.chatid).set({
           'participants': FieldValue.arrayRemove([curruser.uid])
         }, SetOptions(merge: true));
-        chats.doc(event.chatid).collection('messages').add({
-          'content': "${curruser.username} left the event",
-          'sender': 'server',
-          'timestamp': DateTime.now()
-        });
-        chats.doc(event.chatid).update({
-          'mostrecentmessage': "${curruser.username} left the event",
-          "lastmessagetime": DateTime.now()
-        });
+        if (event.showparticipants) {
+          chats.doc(event.chatid).collection('messages').add({
+            'content': "${curruser.username} left the event",
+            'sender': 'server',
+            'timestamp': DateTime.now()
+          });
+          chats.doc(event.chatid).update({
+            'mostrecentmessage': "${curruser.username} left the event",
+            "lastmessagetime": DateTime.now()
+          });
+        }
       }
     } catch (e) {
       throw Exception("Could not leave event");
@@ -449,15 +458,17 @@ class db_conn {
       chats.doc(event.chatid).set({
         'participants': FieldValue.arrayRemove([user.uid])
       }, SetOptions(merge: true));
-      chats.doc(event.chatid).collection('messages').add({
-        'content': "${user.username} was removed from the event",
-        'sender': 'server',
-        'timestamp': DateTime.now()
-      });
-      chats.doc(event.chatid).update({
-        'mostrecentmessage': "${user.username} was removed from the event",
-        "lastmessagetime": DateTime.now()
-      });
+      if (event.showparticipants) {
+        chats.doc(event.chatid).collection('messages').add({
+          'content': "${user.username} was removed from the event",
+          'sender': 'server',
+          'timestamp': DateTime.now()
+        });
+        chats.doc(event.chatid).update({
+          'mostrecentmessage': "${user.username} was removed from the event",
+          "lastmessagetime": DateTime.now()
+        });
+      }
       updates.add({
         'target': [user.uid],
         'description': 'You were kicked out of the event: ${event.title}',
@@ -1595,7 +1606,7 @@ class db_conn {
             (element) async {
               await events
                   .doc(element.id)
-                  .set({'showparticipants': true}, SetOptions(merge: true));
+                  .set({'showlocation': true}, SetOptions(merge: true));
             },
           ),
         );
@@ -1935,6 +1946,16 @@ class db_conn {
       } else {
         throw Exception();
       }
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> forceverifyemail(String curruserid) async {
+    try {
+      await emailverification
+          .doc(curruserid)
+          .set({'time': FieldValue.serverTimestamp()});
     } catch (e) {
       throw Exception();
     }

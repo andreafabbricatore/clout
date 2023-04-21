@@ -74,6 +74,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   List LatLngs = [];
   bool hideparticipants = false;
+  bool secretlocation = false;
 
   void setup() {
     setState(() {
@@ -89,6 +90,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
           center: [widget.event.lat, widget.event.lng]);
       isinviteonly = widget.event.isinviteonly;
       hideparticipants = !widget.event.showparticipants;
+      secretlocation = !widget.event.showlocation;
     });
     _addMarker(LatLng(chosenLocation.center[0], chosenLocation.center[1]));
   }
@@ -243,7 +245,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
                   //print(imagepath);
                 }
               } catch (e) {
-                displayErrorSnackBar("Error with profile picture");
+                displayErrorSnackBar(
+                    "Could not load. Make sure photo permissions are granted.");
               }
             },
             child: ClipRRect(
@@ -518,8 +521,35 @@ class _EditEventScreenState extends State<EditEventScreen> {
                     },
                   ),
                 ),
+          emptylocation
+              ? Container()
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        activeColor: Theme.of(context).primaryColor,
+                        value: secretlocation,
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              secretlocation = value;
+                            });
+                          }
+                        }),
+                    Text(
+                      "Make location secret.",
+                      style: TextStyle(
+                          color: !secretlocation
+                              ? Colors.grey
+                              : Theme.of(context).primaryColor),
+                      textScaleFactor: 1.0,
+                    ),
+                  ],
+                ),
           SizedBox(
-            height: screenheight * 0.03,
+            height: screenheight * 0.01,
           ),
           Container(
             height: screenwidth * 0.13,
@@ -665,6 +695,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                           widget.event.lng = chosenLocation.center[1];
                           widget.event.isinviteonly = isinviteonly;
                           widget.event.showparticipants = !hideparticipants;
+                          widget.event.showlocation = !secretlocation;
                         });
                         try {
                           if (imagepath == null) {

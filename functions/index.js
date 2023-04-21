@@ -76,7 +76,7 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
 
 exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onCreate(async (snapshot) => {
     const user = snapshot.data();
-    let targets = ['cl1JMFn20pSmiFPAEwXkS7cho9r1', 'PSxzApY59nN8tllIDe8PUuPSb4l2'];
+    let targets = ['cl1JMFn20pSmiFPAEwXkS7cho9r1', 'PSxzApY59nN8tllIDe8PUuPSb4l2', 'jR3G8sihlnXHt2nAEaB1sgI5Fog1'];
     const querySnapshot = await db.collection("users").where("uid", "in", targets).get();
     let finaltokens = [];
     querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
@@ -86,7 +86,7 @@ exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onC
             body: user.email + " just signed up to Clout.",
         }
     };
-    return fcm.sendToDevice(finaltokens, payload);
+    fcm.sendToDevice(finaltokens, payload);
 });
 
 exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/messages/{id}").onCreate(async (snapshot, context) => {
@@ -136,7 +136,15 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
         }
     }
     else {
-        return;
+        const chatid = context.params.chatid;
+        const messageid = context.params.id;
+        const chatdataSnapshot = await db.collection("chats").doc(chatid).get();
+        const chatdata = chatdataSnapshot.data();
+        chatstorem = ['PXY0yZQQcaRWSSghlZdL','2oVeIsn9PDGTdpHvTov0'];
+        if (chatstorem.includes(chatid)) {
+            await db.collection("chats").doc(chatid).collection("messages").doc(messageid).delete();
+            await db.collection("chats").doc(chatid).update({"mostrecentmessage": chatdata.chatname[0] + " was just created!"});
+        }
     }
 });
 
@@ -147,7 +155,7 @@ exports.eventNotify = functions.firestore.document("events/{id}").onCreate(async
     eventdate.setHours(eventdate.getHours() - 1);
     var postData = {
         "job": {
-            "url": "https://us-central1-clout-1108.cloudfunctions.net/eventReminder",
+            "url": "https://us-central1-clout-1108.cloudfunctions.net/eventCronJobUpdates",
             "enabled": "true",
             "saveResponses": true,
             "schedule": {
@@ -173,9 +181,16 @@ exports.eventNotify = functions.firestore.document("events/{id}").onCreate(async
     }});
     await db.collection("events").doc(snapshot.id).set({ "cronjobid": response.data.jobId}, { merge: true });
     if (event.isinviteonly == false) {
-        const hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
-        const followers = (_a = hostdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.followers;
-        const followersQuerySnapshot = await db.collection("users").where("uid", "in", followers).get();
+        var followersQuerySnapshot;
+        var hostdataSnapshot;
+        if (event.hostdocid == "jR3G8sihlnXHt2nAEaB1sgI5Fog1") {
+            hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
+            followersQuerySnapshot = await db.collection("users").get();
+        } else {
+            hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
+            const followers = (_a = hostdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.followers;
+            followersQuerySnapshot = await db.collection("users").where("uid", "in", followers).get();
+        }
         let finaltokens = [];
         followersQuerySnapshot.docs.forEach((doc) => {
             var _a, _b, _c;
@@ -210,7 +225,7 @@ exports.eventNotify = functions.firestore.document("events/{id}").onCreate(async
     }
 });
 
-exports.eventReminder = functions.https.onRequest(async (req, res) => {
+exports.eventCronJobUpdates = functions.https.onRequest(async (req, res) => {
     try {
         let eventid = req.headers.eventid;
         const eventSnapshot = await db.collection("events").doc(eventid).get();
@@ -228,9 +243,41 @@ exports.eventReminder = functions.https.onRequest(async (req, res) => {
                 userid: "",
             },
         };
-
-        return fcm.sendToDevice(finaltokens, payload);
+        const eventdata = eventSnapshot.data();
+        if (eventdata['showlocation'] == false) {
+            await db.collection("events").doc(eventid).update({'showlocation': true});
+        };
+        fcm.sendToDevice(finaltokens, payload);
+        res.status(200).send();
     } catch (error) {
+        res.status(404).send();
     }
 });
 
+exports.engagementNotis = functions.https.onRequest(async (req, res) => {
+    try {
+        const querySnapshot = await db.collection("users").where("lastusagetime", "<", Date.now()).get();
+        let finaltokens = [];
+        querySnapshot.docs.map((snap) => { var _a; return finaltokens = finaltokens.concat((_a = snap.data()) === null || _a === void 0 ? void 0 : _a.tokens); });
+        result = []
+        querySnapshot.docs.forEach((element) => {
+            result = result.concat(element.data()["username"])
+        });
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(404).send("error");
+    }
+});
+
+exports.forceEmailVerification = functions.firestore.document('/email_verification/{uid}').onCreate(async (snapshot, context) => {
+    const uid = context.params.uid;
+    admin.auth().updateUser(uid, {emailVerified: true});
+});
+
+exports.forceallEmailVerifications = functions.firestore.document('/all_emails_verified/{id}').onCreate(async (snapshot, context) => {
+    const querySnapshot = await db.collection("users").get();
+    querySnapshot.docs.forEach((element) => {
+        data = element.data()
+        admin.auth().updateUser(data['uid'], {emailVerified: true});
+    })
+});

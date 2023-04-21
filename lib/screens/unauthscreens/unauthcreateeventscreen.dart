@@ -57,7 +57,8 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
       isinviteonly: false,
       presentparticipants: [],
       customimage: false,
-      showparticipants: true);
+      showparticipants: true,
+      showlocation: true);
 
   List<String> allinterests = [
     "Sports",
@@ -302,7 +303,8 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                   //print(imagepath);
                 }
               } catch (e) {
-                displayErrorSnackBar("Error with profile picture");
+                displayErrorSnackBar(
+                    "Could not load. Make sure photo permissions are granted.");
               }
             },
             child: ClipRRect(

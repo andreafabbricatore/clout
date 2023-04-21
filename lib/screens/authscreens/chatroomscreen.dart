@@ -136,7 +136,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             chatname,
             textScaleFactor: 1.0,
             style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25),
           ),
         ),
         backgroundColor: Colors.white,

@@ -29,6 +29,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   db_conn db = db_conn();
   String sendagain = "Press below to send";
   String sendbuttontext = "Send Email";
+  int pressed = 0;
+  bool forceverifiedpressed = false;
 
   Future<void> sendverificationemail() async {
     await FirebaseAuth.instance.currentUser!.sendEmailVerification();
@@ -144,6 +146,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                       sendagain = "Press below to send again";
                                       sendbuttontext = "Resend email";
                                       sendbuttonpressed = false;
+                                      pressed = pressed + 1;
                                     });
                                   },
                             child: PrimaryButton(
@@ -153,8 +156,59 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                               buttonwidth: screenwidth * 0.6,
                               bold: false,
                             ))),
+                    pressed >= 2
+                        ? Center(
+                            child: RichText(
+                              textAlign: TextAlign.justify,
+                              textScaleFactor: 1.0,
+                              text: TextSpan(
+                                  style: const TextStyle(
+                                      color: Colors.grey, fontSize: 15),
+                                  children: forceverifiedpressed
+                                      ? [
+                                          TextSpan(
+                                              text: "Verifying...",
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .primaryColor))
+                                        ]
+                                      : [
+                                          const TextSpan(
+                                              text: "Cannot verify email? "),
+                                          TextSpan(
+                                              text: "Press here.",
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .primaryColor),
+                                              recognizer: TapGestureRecognizer()
+                                                ..onTap = forceverifiedpressed
+                                                    ? null
+                                                    : () {
+                                                        setState(() {
+                                                          forceverifiedpressed =
+                                                              true;
+                                                        });
+                                                        try {
+                                                          db.forceverifyemail(
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid);
+                                                        } catch (e) {
+                                                          displayErrorSnackBar(
+                                                              "Check your internet connection.");
+                                                        }
+                                                        setState(() {
+                                                          forceverifiedpressed =
+                                                              false;
+                                                        });
+                                                      }),
+                                        ]),
+                            ),
+                          )
+                        : Container(),
                     SizedBox(
-                      height: screenheight * 0.35,
+                      height: screenheight * 0.3,
                     ),
                     Center(
                       child: RichText(

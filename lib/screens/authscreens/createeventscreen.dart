@@ -54,7 +54,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       isinviteonly: false,
       presentparticipants: [],
       customimage: false,
-      showparticipants: true);
+      showparticipants: true,
+      showlocation: true);
 
   List<String> allinterests = [
     "Sports",
@@ -95,6 +96,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   List LatLngs = [];
   bool hideparticipants = false;
+  bool secretlocation = false;
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -245,7 +247,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   //print(imagepath);
                 }
               } catch (e) {
-                displayErrorSnackBar("Error with profile picture");
+                displayErrorSnackBar(
+                    "Could not load. Make sure photo permissions are granted.");
               }
             },
             child: ClipRRect(
@@ -539,8 +542,35 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     },
                   ),
                 ),
+          emptylocation
+              ? Container()
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        activeColor: Theme.of(context).primaryColor,
+                        value: secretlocation,
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              secretlocation = value;
+                            });
+                          }
+                        }),
+                    Text(
+                      "Make location secret.",
+                      style: TextStyle(
+                          color: !secretlocation
+                              ? Colors.grey
+                              : Theme.of(context).primaryColor),
+                      textScaleFactor: 1.0,
+                    ),
+                  ],
+                ),
           SizedBox(
-            height: emptylocation ? 0 : screenheight * 0.03,
+            height: emptylocation ? 0 : screenheight * 0.01,
           ),
           Container(
             height: screenwidth * 0.13,
@@ -688,6 +718,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.isinviteonly = isinviteonly;
                           event.presentparticipants = [widget.curruser.uid];
                           event.showparticipants = !hideparticipants;
+                          event.showlocation = !secretlocation;
                         });
                         try {
                           if (imagepath == null) {

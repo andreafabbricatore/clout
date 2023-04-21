@@ -19,6 +19,7 @@ class Event {
   List presentparticipants;
   bool customimage;
   bool showparticipants;
+  bool showlocation;
 
   Event(
       {required this.title,
@@ -40,7 +41,8 @@ class Event {
       required this.isinviteonly,
       required this.presentparticipants,
       required this.customimage,
-      required this.showparticipants});
+      required this.showparticipants,
+      required this.showlocation});
 
   factory Event.fromJson(dynamic json, String docid) {
     return Event(
@@ -63,6 +65,7 @@ class Event {
         isinviteonly: json['isinviteonly'] as bool,
         presentparticipants: json['presentparticipants'] as List,
         customimage: json['custom_image'] as bool,
-        showparticipants: json['showparticipants'] as bool);
+        showparticipants: json['showparticipants'] as bool,
+        showlocation: json['showlocation'] as bool);
   }
 }
