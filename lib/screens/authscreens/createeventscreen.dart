@@ -235,7 +235,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          InkWell(
+          GestureDetector(
             onTap: () async {
               try {
                 XFile? image =
@@ -394,7 +394,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
           ),
           SizedBox(height: screenheight * 0.02),
-          InkWell(
+          GestureDetector(
             onTap: () {
               showCupertinoModalPopup(
                   context: context,
@@ -446,7 +446,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
           ),
           SizedBox(height: screenheight * 0.02),
-          InkWell(
+          GestureDetector(
             onTap: () async {
               Position _locationData = await Geolocator.getCurrentPosition();
               setState(() {

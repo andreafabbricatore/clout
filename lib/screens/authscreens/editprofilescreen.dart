@@ -308,7 +308,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
-      final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+      final lastIndex = filePath.lastIndexOf(".");
       final splitted = filePath.substring(0, (lastIndex));
       final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
       var result = await FlutterImageCompress.compressAndGetFile(

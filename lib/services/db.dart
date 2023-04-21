@@ -273,7 +273,8 @@ class db_conn {
         await chats.doc(chatid).collection('messages').add({
           'content': "${newevent.title} was just created!",
           'sender': 'server',
-          'timestamp': DateTime.now()
+          'timestamp': DateTime.now(),
+          "type": "text"
         });
         await events.doc(eventid).update({"chatid": chatid});
         await users.doc(curruser.uid).set({
@@ -393,7 +394,8 @@ class db_conn {
             chats.doc(event.chatid).collection('messages').add({
               'content': "${curruser.username} joined the event",
               'sender': 'server',
-              'timestamp': DateTime.now()
+              'timestamp': DateTime.now(),
+              "type": "text"
             });
             chats.doc(event.chatid).update({
               'mostrecentmessage': "${curruser.username} joined the event",
@@ -432,7 +434,8 @@ class db_conn {
           chats.doc(event.chatid).collection('messages').add({
             'content': "${curruser.username} left the event",
             'sender': 'server',
-            'timestamp': DateTime.now()
+            'timestamp': DateTime.now(),
+            "type": "text"
           });
           chats.doc(event.chatid).update({
             'mostrecentmessage': "${curruser.username} left the event",
@@ -462,7 +465,8 @@ class db_conn {
         chats.doc(event.chatid).collection('messages').add({
           'content': "${user.username} was removed from the event",
           'sender': 'server',
-          'timestamp': DateTime.now()
+          'timestamp': DateTime.now(),
+          "type": "text"
         });
         chats.doc(event.chatid).update({
           'mostrecentmessage': "${user.username} was removed from the event",
@@ -1366,6 +1370,7 @@ class db_conn {
           .where("setinterests", isNotEqualTo: false)
           .orderBy("setinterests")
           .orderBy('clout', descending: true)
+          .limit(30)
           .get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
@@ -1601,12 +1606,20 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await events.get().then(
+    await chats.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await events
+              await chats
                   .doc(element.id)
-                  .set({'showlocation': true}, SetOptions(merge: true));
+                  .collection("messages")
+                  .get()
+                  .then((value) => value.docs.forEach((chatdoc) async {
+                        await chats
+                            .doc(element.id)
+                            .collection("messages")
+                            .doc(chatdoc.id)
+                            .set({"type": "text"}, SetOptions(merge: true));
+                      }));
             },
           ),
         );
@@ -1669,13 +1682,17 @@ class db_conn {
   }
 
   Future sendmessage(String content, AppUser sender, String docid,
-      String notititle, String type) async {
+      String notititle, String type, String messagetype) async {
     try {
       String notification = "";
       if (type == "event") {
         notification = '${sender.username}: $content';
       } else {
-        notification = content;
+        if (messagetype == "event") {
+          notification = "Shared an event.";
+        } else {
+          notification = content;
+        }
       }
       await chats.doc(docid).collection('messages').add({
         'content': content,
@@ -1684,6 +1701,7 @@ class db_conn {
         'timestamp': DateTime.now(),
         'notification': notification,
         'notititle': notititle,
+        'type': messagetype
       });
       return chats.doc(docid).set({
         'readby': [sender.uid],
@@ -1816,10 +1834,8 @@ class db_conn {
       AppUser curruser, String otheruserdocid) async {
     try {
       late Chat userchat;
-      print("here");
       await chats.get().then((QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach((doc) {
-              print(doc.id);
               if ((doc['type'] == 'user') &&
                   userchatparticipantsequality(
                       doc['participants'], otheruserdocid, curruser.uid) &&

@@ -253,7 +253,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                               widget.curruser,
                               widget.chatinfo.chatid,
                               chatname,
-                              widget.chatinfo.type);
+                              widget.chatinfo.type,
+                              "text");
                           _textmessage.clear();
                         }
                       },

@@ -163,6 +163,7 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
           screenwidth: screenwidth,
           showcloutscore: false,
           showrembutton: false,
+          showsendbutton: false,
         )
       ]),
     );

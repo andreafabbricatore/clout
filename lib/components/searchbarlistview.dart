@@ -209,6 +209,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
             screenwidth: screenwidth,
             showcloutscore: false,
             showrembutton: false,
+            showsendbutton: false,
           );
   }
 }

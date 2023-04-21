@@ -253,6 +253,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     screenwidth: screenwidth,
                     showcloutscore: false,
                     showrembutton: false,
+                    showsendbutton: false,
                   )
           ]),
         ));

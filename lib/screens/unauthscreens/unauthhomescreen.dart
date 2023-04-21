@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
+import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/unautheventlistview.dart';
+import 'package:clout/components/unauthnoeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/services/db.dart';
@@ -26,6 +28,7 @@ class _UnAuthHomeScreenState extends State<UnAuthHomeScreen> {
   List<Event> interesteventlist = [];
   List<Event> totaleventlist = [];
   final double _offsetToArmed = 200;
+  bool blank = true;
 
   void displayErrorSnackBar(
     String error,
@@ -75,6 +78,11 @@ class _UnAuthHomeScreenState extends State<UnAuthHomeScreen> {
       }
       setState(() {
         totaleventlist = generaleventlist;
+        if (totaleventlist.isEmpty) {
+          blank = false;
+        } else {
+          blank = true;
+        }
       });
     } catch (e) {
       displayErrorSnackBar("Could not get events around you");
@@ -166,14 +174,28 @@ class _UnAuthHomeScreenState extends State<UnAuthHomeScreen> {
                 : screenheight,
             child: Padding(
                 padding: EdgeInsets.all(screenheight * 0.02),
-                child: UnAuthEventListView(
-                  eventList: totaleventlist,
-                  onTap: navigate,
-                  scrollable: true,
-                  leftpadding: 2.0,
-                  screenheight: screenheight,
-                  screenwidth: screenwidth,
-                )),
+                child: totaleventlist.isNotEmpty
+                    ? UnAuthEventListView(
+                        eventList: totaleventlist,
+                        onTap: navigate,
+                        scrollable: true,
+                        leftpadding: 2.0,
+                        screenheight: screenheight,
+                        screenwidth: screenwidth,
+                      )
+                    : ListView(
+                        children: [
+                          Center(
+                            child: UnAuthdelayedNoEventsBox(
+                                screenheight: screenheight,
+                                screenwidth: screenwidth,
+                                interest: "Sports",
+                                analytics: widget.analytics,
+                                allcolor: Colors.black,
+                                blank: blank),
+                          ),
+                        ],
+                      )),
           ),
         ));
   }

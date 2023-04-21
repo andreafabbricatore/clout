@@ -217,7 +217,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 height: screenheight * 0.02,
               ),
               const Text(
-                "Global Ranking",
+                "Top 30 Users",
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -235,6 +235,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 showcloutscore: true,
                 showrembutton: false,
                 physics: const NeverScrollableScrollPhysics(),
+                showsendbutton: false,
               ),
               SizedBox(
                 height: screenheight * 0.02,

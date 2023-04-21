@@ -3,6 +3,7 @@ import 'package:clout/components/event.dart';
 import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/components/location.dart';
+import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/chatlistscreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
@@ -39,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Event> interesteventlist = [];
   List<Event> totaleventlist = [];
   final double _offsetToArmed = 200;
+  bool blank = true;
 
   void displayErrorSnackBar(
     String error,
@@ -103,6 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       setState(() {
         totaleventlist = interesteventlist + generaleventlist;
+        if (totaleventlist.isEmpty) {
+          blank = false;
+        } else {
+          blank = true;
+        }
       });
     } catch (e) {
       displayErrorSnackBar("Could not get events around you");
@@ -357,16 +364,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 : screenheight,
             child: Padding(
                 padding: EdgeInsets.all(screenheight * 0.02),
-                child: EventListView(
-                  eventList: totaleventlist,
-                  onTap: navigate,
-                  scrollable: true,
-                  leftpadding: 2.0,
-                  curruser: widget.curruser,
-                  interactfav: interactfav,
-                  screenheight: screenheight,
-                  screenwidth: screenwidth,
-                )),
+                child: totaleventlist.isNotEmpty
+                    ? EventListView(
+                        eventList: totaleventlist,
+                        onTap: navigate,
+                        scrollable: true,
+                        leftpadding: 2.0,
+                        curruser: widget.curruser,
+                        interactfav: interactfav,
+                        screenheight: screenheight,
+                        screenwidth: screenwidth,
+                      )
+                    : ListView(
+                        children: [
+                          Center(
+                            child: delayedNoEventsBox(
+                                screenheight: screenheight,
+                                curruser: widget.curruser,
+                                screenwidth: screenwidth,
+                                interest: "Sports",
+                                analytics: widget.analytics,
+                                allcolor: Colors.black,
+                                blank: blank),
+                          ),
+                        ],
+                      )),
           ),
         ));
   }

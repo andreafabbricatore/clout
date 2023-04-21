@@ -233,7 +233,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          InkWell(
+          GestureDetector(
             onTap: () async {
               try {
                 XFile? image =
@@ -388,7 +388,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             ),
           ),
           SizedBox(height: screenheight * 0.02),
-          InkWell(
+          GestureDetector(
             onTap: () {
               showCupertinoModalPopup(
                   context: context,
