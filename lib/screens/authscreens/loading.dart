@@ -197,7 +197,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   void loadinglogic() async {
     try {
-      await db.addAttributetoAllDocuments();
       await ensurelocation();
       await undermaintenance();
       if (!maintenance) {

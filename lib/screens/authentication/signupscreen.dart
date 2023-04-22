@@ -178,8 +178,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 uid); //set all signup attributes to false
                             if (referralController.text.isNotEmpty) {
                               try {
-                                await db.referralcloutinc(
-                                    uid, referralController.text.trim());
+                                String shareruid = referralController.text
+                                    .trim()
+                                    .split("/")
+                                    .last;
+                                await db.referralcloutinc(uid, shareruid);
+                                displayErrorSnackBar("Successfully referred!");
                                 gopicandnamescreen();
                               } catch (e) {
                                 displayErrorSnackBar(
@@ -238,7 +242,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10))),
                                 child: Column(children: [
-                                  const Text("Enter Referral Code",
+                                  const Text("Enter Referral Link",
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -246,7 +250,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   SizedBox(
                                     height: screenheight * 0.02,
                                   ),
-                                  textdatafield(screenwidth * 0.4, "Enter Code",
+                                  textdatafield(screenwidth * 0.4, "Enter Link",
                                       referralController),
                                   SizedBox(
                                     height: screenheight * 0.03,
@@ -258,7 +262,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       child: PrimaryButton(
                                           screenwidth: screenwidth,
                                           buttonpressed: referralbuttonpressed,
-                                          text: "Submit Code",
+                                          text: "Save",
                                           buttonwidth: screenwidth * 0.7,
                                           bold: false)),
                                 ]),

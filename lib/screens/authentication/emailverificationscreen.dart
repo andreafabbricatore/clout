@@ -156,6 +156,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                               buttonwidth: screenwidth * 0.6,
                               bold: false,
                             ))),
+                    SizedBox(
+                      height: screenheight * 0.01,
+                    ),
                     pressed >= 2
                         ? Center(
                             child: RichText(

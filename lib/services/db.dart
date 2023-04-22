@@ -1606,20 +1606,12 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await chats.get().then(
+    await events.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await chats
+              await events
                   .doc(element.id)
-                  .collection("messages")
-                  .get()
-                  .then((value) => value.docs.forEach((chatdoc) async {
-                        await chats
-                            .doc(element.id)
-                            .collection("messages")
-                            .doc(chatdoc.id)
-                            .set({"type": "text"}, SetOptions(merge: true));
-                      }));
+                  .set({'showlocation': true}, SetOptions(merge: true));
             },
           ),
         );
@@ -1681,28 +1673,51 @@ class db_conn {
         );
   }
 
-  Future sendmessage(String content, AppUser sender, String docid,
-      String notititle, String type, String messagetype) async {
+  Future sendmessage(
+      String content,
+      AppUser sender,
+      String docid,
+      String notititle,
+      String type,
+      String messagetype,
+      String bannerurl,
+      String eventtitle,
+      DateTime date) async {
     try {
       String notification = "";
       if (type == "event") {
         notification = '${sender.username}: $content';
       } else {
         if (messagetype == "event") {
-          notification = "Shared an event.";
+          notification = "shared an event.";
         } else {
           notification = content;
         }
       }
-      await chats.doc(docid).collection('messages').add({
-        'content': content,
-        'sender': sender.username,
-        'senderuid': sender.uid,
-        'timestamp': DateTime.now(),
-        'notification': notification,
-        'notititle': notititle,
-        'type': messagetype
-      });
+      if (messagetype != "event") {
+        await chats.doc(docid).collection('messages').add({
+          'content': content,
+          'sender': sender.username,
+          'senderuid': sender.uid,
+          'timestamp': DateTime.now(),
+          'notification': notification,
+          'notititle': notititle,
+          'type': messagetype
+        });
+      } else {
+        await chats.doc(docid).collection('messages').add({
+          'content': content,
+          'sender': sender.username,
+          'senderuid': sender.uid,
+          'timestamp': DateTime.now(),
+          'notification': notification,
+          'notititle': notititle,
+          'banner_url': bannerurl,
+          'event_title': eventtitle,
+          'date': date,
+          'type': messagetype
+        });
+      }
       return chats.doc(docid).set({
         'readby': [sender.uid],
         "lastmessagetime": DateTime.now()
@@ -1812,15 +1827,16 @@ class db_conn {
   }
 
   Future<bool> checkuserchatexists(
-      AppUser curruser, String otheruserdocid) async {
+      String curruserid, String otheruserdocid) async {
     int instances = 0;
     try {
-      for (int i = 0; i < curruser.chats.length; i++) {
-        DocumentSnapshot chatsnapshot =
-            await chats.doc(curruser.chats[i]).get();
+      DocumentSnapshot currusersnapshot = await users.doc(curruserid).get();
+      List chatlist = currusersnapshot['chats'];
+      for (int i = 0; i < chatlist.length; i++) {
+        DocumentSnapshot chatsnapshot = await chats.doc(chatlist[i]).get();
         if ((chatsnapshot['type'] == 'user') &&
             userchatparticipantsequality(
-                chatsnapshot['participants'], otheruserdocid, curruser.uid)) {
+                chatsnapshot['participants'], otheruserdocid, curruserid)) {
           instances = instances + 1;
         }
       }
@@ -1831,19 +1847,20 @@ class db_conn {
   }
 
   Future<Chat> getUserChatFromParticipants(
-      AppUser curruser, String otheruserdocid) async {
+      String curruserid, String otheruserdocid) async {
     try {
       late Chat userchat;
-      await chats.get().then((QuerySnapshot querySnapshot) => {
-            querySnapshot.docs.forEach((doc) {
-              if ((doc['type'] == 'user') &&
-                  userchatparticipantsequality(
-                      doc['participants'], otheruserdocid, curruser.uid) &&
-                  doc['participants'].length == 2) {
-                userchat = Chat.fromJson(doc.data(), doc.id);
-              }
-            })
-          });
+      DocumentSnapshot currusersnapshot = await users.doc(curruserid).get();
+      List chatlist = currusersnapshot['chats'];
+      for (int i = 0; i < chatlist.length; i++) {
+        DocumentSnapshot chatsnapshot = await chats.doc(chatlist[i]).get();
+        if ((chatsnapshot['type'] == 'user') &&
+            userchatparticipantsequality(
+                chatsnapshot['participants'], otheruserdocid, curruserid)) {
+          userchat = Chat.fromJson(chatsnapshot.data(), chatsnapshot.id);
+        }
+      }
+
       return userchat;
     } catch (e) {
       throw Exception();

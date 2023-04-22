@@ -770,25 +770,42 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       shareevent("Join ${widget.event.title} on Clout!\n\n$link");
     }
 
-    Future<void> sendevent() async {
+    Future<bool> sendevent() async {
       try {
         for (int i = 0; i < selectedsenders.length; i++) {
-          bool userchatexists =
-              await db.checkuserchatexists(widget.curruser, selectedsenders[i]);
+          bool userchatexists = await db.checkuserchatexists(
+              widget.curruser.uid, selectedsenders[i]);
 
           if (!userchatexists) {
             await db.createuserchat(widget.curruser, selectedsenders[i]);
           }
+
           Chat userchat = await db.getUserChatFromParticipants(
-              widget.curruser, selectedsenders[i]);
+              widget.curruser.uid, selectedsenders[i]);
+
           List temp = userchat.chatname;
           temp.removeWhere((element) => element == widget.curruser.username);
           String chatname = temp[0];
-          db.sendmessage(widget.event.docid, widget.curruser, userchat.chatid,
-              chatname, userchat.type, "event");
+          db.sendmessage(
+              widget.event.docid,
+              widget.curruser,
+              userchat.chatid,
+              chatname,
+              userchat.type,
+              "event",
+              widget.event.image,
+              widget.event.title,
+              widget.event.datetime);
         }
+        setState(() {
+          selectedsenders = [];
+        });
+        return true;
       } catch (e) {
-        displayErrorSnackBar("Could not send");
+        setState(() {
+          selectedsenders = [];
+        });
+        return false;
       }
     }
 
@@ -861,12 +878,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                       setState(() {
                                         sharebuttonpressed = true;
                                       });
-                                      await sendevent();
+                                      bool sendres = await sendevent();
                                       setState(() {
                                         sharebuttonpressed = false;
                                       });
                                       Navigator.pop(context);
-                                      displayErrorSnackBar("Sent!");
+                                      displayErrorSnackBar(sendres
+                                          ? "Sent!"
+                                          : "Could not send.");
                                     },
                           child: Container(
                             //if finished works, if joined works,

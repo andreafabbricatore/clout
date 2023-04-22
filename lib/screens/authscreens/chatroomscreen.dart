@@ -187,8 +187,40 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     if (widget.curruser.username == data['sender']) {
                       return Align(
                           alignment: Alignment.centerRight,
-                          child: chatbubble(
-                              data['sender'], data['content'], true));
+                          child: data['type'] == "event"
+                              ? GestureDetector(
+                                  onTap: () async {
+                                    Event chosenEvent = await db
+                                        .getEventfromDocId(data['content']);
+                                    List<AppUser> participants = await db
+                                        .geteventparticipantslist(chosenEvent);
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 50));
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => EventDetailScreen(
+                                                  event: chosenEvent,
+                                                  curruser: widget.curruser,
+                                                  participants: participants,
+                                                  curruserlocation:
+                                                      widget.curruserlocation,
+                                                  analytics: widget.analytics,
+                                                ),
+                                            settings: RouteSettings(
+                                                name: "EventDetailScreen")));
+                                  },
+                                  child: eventchatbubble(
+                                      data['sender'],
+                                      data['event_title'],
+                                      data['banner_url'],
+                                      data['date'].toDate(),
+                                      true,
+                                      screenheight,
+                                      screenwidth),
+                                )
+                              : chatbubble(
+                                  data['sender'], data['content'], true));
                     } else if (data['sender'] == 'server') {
                       return Align(
                           alignment: Alignment.center,
@@ -217,8 +249,40 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     } else {
                       return Align(
                           alignment: Alignment.centerLeft,
-                          child: chatbubble(
-                              data['sender'], data['content'], false));
+                          child: data['type'] == "event"
+                              ? GestureDetector(
+                                  onTap: () async {
+                                    Event chosenEvent = await db
+                                        .getEventfromDocId(data['content']);
+                                    List<AppUser> participants = await db
+                                        .geteventparticipantslist(chosenEvent);
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 50));
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => EventDetailScreen(
+                                                  event: chosenEvent,
+                                                  curruser: widget.curruser,
+                                                  participants: participants,
+                                                  curruserlocation:
+                                                      widget.curruserlocation,
+                                                  analytics: widget.analytics,
+                                                ),
+                                            settings: RouteSettings(
+                                                name: "EventDetailScreen")));
+                                  },
+                                  child: eventchatbubble(
+                                      data['sender'],
+                                      data['event_title'],
+                                      data['banner_url'],
+                                      data['date'].toDate(),
+                                      false,
+                                      screenheight,
+                                      screenwidth),
+                                )
+                              : chatbubble(
+                                  data['sender'], data['content'], false));
                     }
                   }).toList(),
                 );
@@ -254,7 +318,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                               widget.chatinfo.chatid,
                               chatname,
                               widget.chatinfo.type,
-                              "text");
+                              "text",
+                              "",
+                              "",
+                              DateTime.now());
                           _textmessage.clear();
                         }
                       },

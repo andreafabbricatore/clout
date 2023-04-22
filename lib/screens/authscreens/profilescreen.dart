@@ -313,16 +313,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void refer() async {
-    final dynamicLinkParams = DynamicLinkParameters(
-      link: Uri.parse(
-          "https://outwithclout.com/#/referral/${widget.curruser.uid}"),
-      uriPrefix: "https://outwithclout.page.link",
-    );
-    final dynamicLink =
-        await FirebaseDynamicLinks.instance.buildShortLink(dynamicLinkParams);
-    String link = dynamicLink.shortUrl.toString();
     String text =
-        "${widget.curruser.fullname} wants you to join them on Clout.\n$link\nReferral Code: ${widget.curruser.uid}";
+        "${widget.curruser.fullname} wants you to join them on Clout.\nhttps://outwithclout.com/#/referral/${widget.curruser.uid}";
     final box = context.findRenderObject() as RenderBox?;
     await widget.analytics.logEvent(name: "referred_user", parameters: {});
     await Share.share(

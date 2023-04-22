@@ -115,7 +115,11 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
             querySnapshot.docs.forEach(async (element) => {
                 await db.collection("users").doc(element.id).set({ "chatnotificationcounter": admin.firestore.FieldValue.increment(1) }, { merge: true });
             });
-            await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + chat.content });
+            if (chat.type != "event") {
+                await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + chat.content });
+            } else {
+                await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + "shared an event."});
+            }
             return fcm.sendToDevice(finaltokens, payload);
         }
         else {
@@ -272,6 +276,7 @@ exports.engagementNotis = functions.https.onRequest(async (req, res) => {
 exports.forceEmailVerification = functions.firestore.document('/email_verification/{uid}').onCreate(async (snapshot, context) => {
     const uid = context.params.uid;
     admin.auth().updateUser(uid, {emailVerified: true});
+    db.collection("email_verification").doc(snapshot.id).delete();
 });
 
 exports.forceallEmailVerifications = functions.firestore.document('/all_emails_verified/{id}').onCreate(async (snapshot, context) => {

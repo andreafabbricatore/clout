@@ -114,7 +114,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   ),
                 ),
                 SizedBox(
-                  width: screenwidth * 0.15,
+                  width: screenwidth * 0.13,
                 ),
                 GestureDetector(
                   onTap: widget.iscurruser
@@ -166,10 +166,10 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: screenwidth * 0.55,
+                    width: screenwidth * 0.64,
                     child: Text(
                       "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
                       textAlign: TextAlign.start,
