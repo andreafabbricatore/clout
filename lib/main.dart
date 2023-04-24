@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
       ),
       theme: ThemeData(
           primaryColor: const Color.fromARGB(255, 255, 48, 117),
+          primarySwatch: Colors.grey,
           fontFamily: "Archivo",
           textSelectionTheme: const TextSelectionThemeData(
               cursorColor: Color.fromARGB(150, 255, 48, 117),

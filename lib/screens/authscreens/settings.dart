@@ -9,6 +9,7 @@ import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -76,6 +77,128 @@ class _SettingsScreenState extends State<SettingsScreen> {
           fullscreenDialog: true,
           settings: RouteSettings(name: "AuthenticationWrapper")),
     );
+  }
+
+  void deleteaccountdialog(
+      double screenheight, double screenwidth, String verificationId) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  height: screenheight * 0.3,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter Code to Delete",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        Center(
+                          child: SizedBox(
+                            width: screenwidth * 0.6,
+                            child: Pinput(
+                              length: 6,
+                              pinAnimationType: PinAnimationType.slide,
+                              showCursor: true,
+                              focusedPinTheme: PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(
+                                      fontSize: 25,
+                                      color: Theme.of(context).primaryColor)),
+                              defaultPinTheme: const PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color: Color.fromARGB(
+                                              255, 151, 149, 149)),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(fontSize: 25)),
+                              onCompleted: (String verificationCode) async {
+                                try {
+                                  PhoneAuthCredential credential =
+                                      PhoneAuthProvider.credential(
+                                          verificationId: verificationId,
+                                          smsCode: verificationCode);
+                                  //link credential
+                                  UserCredential usercredential =
+                                      await FirebaseAuth.instance
+                                          .signInWithCredential(credential);
+                                } catch (e) {
+                                  displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.");
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.05,
+                        ),
+                        GestureDetector(
+                            onTap: deletebuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      deletebuttonpressed = true;
+                                    });
+                                    try {
+                                      await db.deleteuser(widget.curruser);
+                                      await FirebaseAuth.instance.currentUser!
+                                          .delete();
+                                      emailaddress.clear();
+                                      psw.clear();
+                                      newpsw.clear();
+                                      goauthwrapper();
+                                    } catch (e) {
+                                      displayErrorSnackBar(
+                                          "Invalid Action, try again");
+                                    } finally {
+                                      setState(() {
+                                        deletebuttonpressed = false;
+                                      });
+                                    }
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: deletebuttonpressed,
+                                text: "Delete Account :(",
+                                buttonwidth: screenwidth * 0.5,
+                                bold: false)),
+                      ]),
+                ),
+              );
+            },
+          );
+        });
   }
 
   @override
@@ -420,94 +543,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             height: screenheight * 0.02,
                           ),
                           GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return Dialog(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          backgroundColor: Colors.white,
-                                          child: Container(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 20, 10, 10),
-                                            height: screenheight * 0.35,
-                                            decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10))),
-                                            child: Column(children: [
-                                              const Text("Delete Account",
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 25)),
-                                              SizedBox(
-                                                height: screenheight * 0.02,
-                                              ),
-                                              const Text(
-                                                "We hate to see you go...\nEnter Password to permamently delete your account",
-                                                style: TextStyle(fontSize: 15),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              SizedBox(
-                                                height: screenheight * 0.02,
-                                              ),
-                                              textdatafield(screenwidth * 0.4,
-                                                  "Enter Password", psw),
-                                              SizedBox(
-                                                height: screenheight * 0.04,
-                                              ),
-                                              GestureDetector(
-                                                  onTap: deletebuttonpressed
-                                                      ? null
-                                                      : () async {
-                                                          setState(() {
-                                                            deletebuttonpressed =
-                                                                true;
-                                                          });
-                                                          try {
-                                                            await db.deleteuser(
-                                                                widget
-                                                                    .curruser);
-                                                            await FirebaseAuth
-                                                                .instance
-                                                                .currentUser!
-                                                                .delete();
-                                                            emailaddress
-                                                                .clear();
-                                                            psw.clear();
-                                                            newpsw.clear();
-                                                            goauthwrapper();
-                                                          } catch (e) {
-                                                            displayErrorSnackBar(
-                                                                "Invalid Action, try again");
-                                                          } finally {
-                                                            setState(() {
-                                                              deletebuttonpressed =
-                                                                  false;
-                                                            });
-                                                          }
-                                                        },
-                                                  child: PrimaryButton(
-                                                    bold: false,
-                                                    screenwidth: screenwidth,
-                                                    buttonpressed:
-                                                        deletebuttonpressed,
-                                                    text: "Delete Account :(",
-                                                    buttonwidth:
-                                                        screenwidth * 0.7,
-                                                  )),
-                                            ]),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  });
+                            onTap: () async {
+                              await FirebaseAuth.instance.verifyPhoneNumber(
+                                phoneNumber: FirebaseAuth
+                                    .instance.currentUser!.phoneNumber,
+                                verificationCompleted:
+                                    (PhoneAuthCredential credential) {},
+                                verificationFailed: (FirebaseAuthException e) {
+                                  displayErrorSnackBar(
+                                      "Could not verify phone number");
+                                },
+                                codeSent:
+                                    (String verificationId, int? resendToken) {
+                                  deleteaccountdialog(screenheight, screenwidth,
+                                      verificationId);
+                                },
+                                codeAutoRetrievalTimeout:
+                                    (String verificationId) {},
+                              );
                             },
                             child: SizedBox(
                                 height: 50,

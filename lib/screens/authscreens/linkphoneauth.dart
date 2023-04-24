@@ -2,10 +2,10 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/screens/authscreens/loading.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:phone_form_field/phone_form_field.dart' as pf;
+import 'package:pinput/pinput.dart';
 
 class LinkPhoneInputScreen extends StatefulWidget {
   LinkPhoneInputScreen(
@@ -17,9 +17,7 @@ class LinkPhoneInputScreen extends StatefulWidget {
 }
 
 class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
-  final TextEditingController controller = TextEditingController();
-  String initialCountry = 'IT';
-  PhoneNumber userNumber = PhoneNumber(isoCode: 'IT');
+  pf.PhoneNumber? userNumber;
   bool sendcodebuttonpressed = false;
 
   void verifycode(String verificationId) {
@@ -28,7 +26,6 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => LinkOTPInputScreen(
-                    userNumber: userNumber,
                     verificationId: verificationId,
                     analytics: widget.analytics,
                     updatephonenumber: widget.updatephonenumber,
@@ -91,30 +88,40 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
           ),
           Center(
             child: SizedBox(
-              width: screenwidth * 0.8,
-              child: InternationalPhoneNumberInput(
-                onInputChanged: (PhoneNumber number) {
-                  setState(() {
-                    userNumber = number;
-                  });
-                },
-                selectorConfig: const SelectorConfig(
-                  selectorType: PhoneInputSelectorType.DROPDOWN,
-                ),
-                ignoreBlank: false,
-                autoValidateMode: AutovalidateMode.disabled,
-                selectorTextStyle: const TextStyle(color: Colors.black),
-                initialValue: userNumber,
-                textFieldController: controller,
-                inputBorder: const UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color.fromARGB(255, 255, 48, 117))),
-                inputDecoration: const InputDecoration(
+              width: screenwidth * 0.75,
+              child: pf.PhoneFormField(
+                controller: null, // controller & initialValue value
+                initialValue: null, // can't be supplied simultaneously
+                shouldFormat: true, // default
+                defaultCountry: pf.IsoCode.IT, // default
+                decoration: const InputDecoration(
+                    errorBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromARGB(255, 255, 48, 117))),
                     focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
                             color: Color.fromARGB(255, 255, 48, 117))),
                     hintStyle: TextStyle(color: Color.fromARGB(39, 0, 0, 0))),
-                formatInput: true,
+                validator: pf.PhoneValidator
+                    .validMobile(), // default PhoneValidator.valid()
+                isCountryChipPersistent: true, // default
+                isCountrySelectionEnabled: true, // default
+                countrySelectorNavigator:
+                    const pf.CountrySelectorNavigator.draggableBottomSheet(),
+                showFlagInInput: true, // default
+                flagSize: 16, // default
+                autofillHints: const [
+                  AutofillHints.telephoneNumber
+                ], // default to null
+                enabled: true, // default
+                autofocus: false, // default
+                onSaved: null, // default null
+                onChanged: (pf.PhoneNumber? p) {
+                  setState(() {
+                    userNumber = p;
+                  });
+                }, // default null
+                // ... + other textfield params
               ),
             ),
           ),
@@ -128,22 +135,26 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                     setState(() {
                       sendcodebuttonpressed = true;
                     });
-                    await FirebaseAuth.instance.verifyPhoneNumber(
-                      phoneNumber: userNumber.phoneNumber,
-                      verificationCompleted:
-                          (PhoneAuthCredential credential) {},
-                      verificationFailed: (FirebaseAuthException e) {
-                        displayErrorSnackBar("Could not verify phone number");
-                      },
-                      codeSent: (String verificationId, int? resendToken) {
-                        try {
-                          verifycode(verificationId);
-                        } catch (e) {
+                    if (userNumber!.nsn.isNotEmpty) {
+                      await FirebaseAuth.instance.verifyPhoneNumber(
+                        phoneNumber:
+                            "+" + userNumber!.countryCode + userNumber!.nsn,
+                        verificationCompleted:
+                            (PhoneAuthCredential credential) {},
+                        verificationFailed: (FirebaseAuthException e) {
                           displayErrorSnackBar("Could not verify phone number");
-                        }
-                      },
-                      codeAutoRetrievalTimeout: (String verificationId) {},
-                    );
+                        },
+                        codeSent: (String verificationId, int? resendToken) {
+                          try {
+                            verifycode(verificationId);
+                          } catch (e) {
+                            displayErrorSnackBar(
+                                "Could not verify phone number");
+                          }
+                        },
+                        codeAutoRetrievalTimeout: (String verificationId) {},
+                      );
+                    }
 
                     setState(() {
                       sendcodebuttonpressed = false;
@@ -165,11 +176,9 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
 class LinkOTPInputScreen extends StatefulWidget {
   LinkOTPInputScreen(
       {super.key,
-      required this.userNumber,
       required this.verificationId,
       required this.analytics,
       required this.updatephonenumber});
-  PhoneNumber userNumber;
   String verificationId;
   FirebaseAnalytics analytics;
   bool updatephonenumber;
@@ -235,30 +244,59 @@ class _LinkOTPInputScreenState extends State<LinkOTPInputScreen> {
         SizedBox(
           height: screenheight * 0.2,
         ),
-        OtpTextField(
-          numberOfFields: 6,
-          borderColor: Theme.of(context).primaryColor,
-          focusedBorderColor: Theme.of(context).primaryColor,
-          showFieldAsBox: false,
-          onCodeChanged: (String code) {},
-          onSubmit: (String verificationCode) async {
-            PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                verificationId: widget.verificationId,
-                smsCode: verificationCode);
-
-            try {
-              if (widget.updatephonenumber) {
-                await FirebaseAuth.instance.currentUser
-                    ?.updatePhoneNumber(credential);
-              } else {
-                await FirebaseAuth.instance.currentUser
-                    ?.linkWithCredential(credential);
-              }
-              donechange();
-            } catch (e) {
-              displayErrorSnackBar("Could not verify phone number.");
-            }
-          },
+        Center(
+          child: SizedBox(
+            width: screenwidth * 0.8,
+            child: Pinput(
+              length: 6,
+              pinAnimationType: PinAnimationType.slide,
+              showCursor: true,
+              focusedPinTheme: PinTheme(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      bottom: BorderSide(
+                          width: 1.5, color: Theme.of(context).primaryColor),
+                    ),
+                  ),
+                  textStyle: TextStyle(
+                      fontSize: 25, color: Theme.of(context).primaryColor)),
+              defaultPinTheme: const PinTheme(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      bottom: BorderSide(
+                          width: 1.5,
+                          color: Color.fromARGB(255, 151, 149, 149)),
+                    ),
+                  ),
+                  textStyle: TextStyle(fontSize: 25)),
+              onCompleted: (String verificationCode) async {
+                try {
+                  PhoneAuthCredential credential = PhoneAuthProvider.credential(
+                      verificationId: widget.verificationId,
+                      smsCode: verificationCode);
+                  try {
+                    if (widget.updatephonenumber) {
+                      await FirebaseAuth.instance.currentUser
+                          ?.updatePhoneNumber(credential);
+                    } else {
+                      await FirebaseAuth.instance.currentUser
+                          ?.linkWithCredential(credential);
+                    }
+                    donechange();
+                  } catch (e) {
+                    displayErrorSnackBar("Could not verify phone number.");
+                  }
+                } catch (e) {
+                  displayErrorSnackBar(
+                      "Make sure OTP code was inserted correctly.");
+                }
+              },
+            ),
+          ),
         ),
       ]),
     );

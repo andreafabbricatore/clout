@@ -49,7 +49,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               text: "Get ",
                             ),
                             TextSpan(
-                                text: "Clout,\n",
+                                text: "Clout.\n",
                                 style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                 )),
@@ -57,7 +57,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               text: "Go ",
                             ),
                             TextSpan(
-                                text: "Out!",
+                                text: "Out.",
                                 style: TextStyle(
                                     color: Theme.of(context).primaryColor)),
                           ])),

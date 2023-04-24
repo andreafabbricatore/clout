@@ -16,6 +16,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:pinput/pinput.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PhoneSignupScreen extends StatefulWidget {
@@ -706,7 +707,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
   bool continuebuttonpressed = false;
-  TextEditingController psw = TextEditingController();
+
   void displayErrorSnackBar(
     String error,
   ) {
@@ -772,6 +773,126 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
     );
   }
 
+  void cancelsignupdialog(
+      double screenheight, double screenwidth, String verificationId) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  height: screenheight * 0.3,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter Code to Cancel",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        Center(
+                          child: SizedBox(
+                            width: screenwidth * 0.6,
+                            child: Pinput(
+                              length: 6,
+                              pinAnimationType: PinAnimationType.slide,
+                              showCursor: true,
+                              focusedPinTheme: PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(
+                                      fontSize: 25,
+                                      color: Theme.of(context).primaryColor)),
+                              defaultPinTheme: const PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color: Color.fromARGB(
+                                              255, 151, 149, 149)),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(fontSize: 25)),
+                              onCompleted: (String verificationCode) async {
+                                try {
+                                  PhoneAuthCredential credential =
+                                      PhoneAuthProvider.credential(
+                                          verificationId: verificationId,
+                                          smsCode: verificationCode);
+                                  //link credential
+                                  UserCredential usercredential =
+                                      await FirebaseAuth.instance
+                                          .signInWithCredential(credential);
+                                } catch (e) {
+                                  displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.");
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.05,
+                        ),
+                        GestureDetector(
+                            onTap: cancelbuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      cancelbuttonpressed = true;
+                                    });
+                                    try {
+                                      await db.firstcancelsignup(FirebaseAuth
+                                          .instance.currentUser!.uid);
+                                      await FirebaseAuth.instance.currentUser!
+                                          .delete();
+                                      goauthscreen();
+                                    } catch (e) {
+                                      displayErrorSnackBar(
+                                          "Could not cancel signup");
+                                    } finally {
+                                      setState(() {
+                                        cancelbuttonpressed = false;
+                                      });
+                                    }
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: cancelbuttonpressed,
+                                text: "Cancel Sign Up",
+                                buttonwidth: screenwidth * 0.5,
+                                bold: false)),
+                      ]),
+                ),
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -782,63 +903,18 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return StatefulBuilder(
-                    builder: (BuildContext context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          height: screenheight * 0.15,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                    onTap: cancelbuttonpressed
-                                        ? null
-                                        : () async {
-                                            setState(() {
-                                              cancelbuttonpressed = true;
-                                            });
-                                            try {
-                                              await db.firstcancelsignup(
-                                                  FirebaseAuth.instance
-                                                      .currentUser!.uid);
-                                              await FirebaseAuth
-                                                  .instance.currentUser!
-                                                  .delete();
-                                              print("here");
-                                              psw.clear();
-                                              goauthscreen();
-                                            } catch (e) {
-                                              print(e);
-                                            } finally {
-                                              setState(() {
-                                                cancelbuttonpressed = false;
-                                              });
-                                            }
-                                          },
-                                    child: PrimaryButton(
-                                        screenwidth: screenwidth,
-                                        buttonpressed: cancelbuttonpressed,
-                                        text: "Cancel Sign Up",
-                                        buttonwidth: screenwidth * 0.5,
-                                        bold: false)),
-                              ]),
-                        ),
-                      );
-                    },
-                  );
-                });
+          onTap: () async {
+            await FirebaseAuth.instance.verifyPhoneNumber(
+              phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
+              verificationCompleted: (PhoneAuthCredential credential) {},
+              verificationFailed: (FirebaseAuthException e) {
+                displayErrorSnackBar("Could not verify phone number");
+              },
+              codeSent: (String verificationId, int? resendToken) {
+                cancelsignupdialog(screenheight, screenwidth, verificationId);
+              },
+              codeAutoRetrievalTimeout: (String verificationId) {},
+            );
           },
           child: const Padding(
             padding: EdgeInsets.all(8.0),
@@ -1008,7 +1084,6 @@ class _UsernameScreenState extends State<UsernameScreen> {
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
   bool continuebuttonpressed = false;
-  TextEditingController psw = TextEditingController();
 
   void displayErrorSnackBar(
     String error,
@@ -1051,6 +1126,127 @@ class _UsernameScreenState extends State<UsernameScreen> {
     );
   }
 
+  void cancelsignupdialog(
+      double screenheight, double screenwidth, String verificationId) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  height: screenheight * 0.3,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter Code to Cancel",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        Center(
+                          child: SizedBox(
+                            width: screenwidth * 0.6,
+                            child: Pinput(
+                              length: 6,
+                              pinAnimationType: PinAnimationType.slide,
+                              showCursor: true,
+                              focusedPinTheme: PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(
+                                      fontSize: 25,
+                                      color: Theme.of(context).primaryColor)),
+                              defaultPinTheme: const PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color: Color.fromARGB(
+                                              255, 151, 149, 149)),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(fontSize: 25)),
+                              onCompleted: (String verificationCode) async {
+                                try {
+                                  PhoneAuthCredential credential =
+                                      PhoneAuthProvider.credential(
+                                          verificationId: verificationId,
+                                          smsCode: verificationCode);
+                                  //link credential
+                                  UserCredential usercredential =
+                                      await FirebaseAuth.instance
+                                          .signInWithCredential(credential);
+                                } catch (e) {
+                                  displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.");
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.05,
+                        ),
+                        GestureDetector(
+                            onTap: cancelbuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      cancelbuttonpressed = true;
+                                    });
+                                    try {
+                                      await db.cancelsignup(FirebaseAuth
+                                          .instance.currentUser!.uid);
+                                      await FirebaseAuth.instance.currentUser!
+                                          .delete();
+
+                                      goauthscreen();
+                                    } catch (e) {
+                                      displayErrorSnackBar(
+                                          "Could not cancel signup");
+                                    } finally {
+                                      setState(() {
+                                        cancelbuttonpressed = false;
+                                      });
+                                    }
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: cancelbuttonpressed,
+                                text: "Cancel Sign Up",
+                                buttonwidth: screenwidth * 0.5,
+                                bold: false)),
+                      ]),
+                ),
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
@@ -1060,60 +1256,18 @@ class _UsernameScreenState extends State<UsernameScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return StatefulBuilder(
-                    builder: (BuildContext context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          height: screenheight * 0.15,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Column(children: [
-                            GestureDetector(
-                                onTap: cancelbuttonpressed
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          cancelbuttonpressed = true;
-                                        });
-                                        try {
-                                          await db.cancelsignup(FirebaseAuth
-                                              .instance.currentUser!.uid);
-                                          await FirebaseAuth
-                                              .instance.currentUser!
-                                              .delete();
-                                          psw.clear();
-                                          goauthscreen();
-                                        } catch (e) {
-                                          displayErrorSnackBar(
-                                              "Could not cancel signup, please try again and makes sure password is correct");
-                                        } finally {
-                                          setState(() {
-                                            cancelbuttonpressed = false;
-                                          });
-                                        }
-                                      },
-                                child: PrimaryButton(
-                                    screenwidth: screenwidth,
-                                    buttonpressed: cancelbuttonpressed,
-                                    text: "Cancel Sign Up",
-                                    buttonwidth: screenwidth * 0.5,
-                                    bold: false)),
-                          ]),
-                        ),
-                      );
-                    },
-                  );
-                });
+          onTap: () async {
+            await FirebaseAuth.instance.verifyPhoneNumber(
+              phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
+              verificationCompleted: (PhoneAuthCredential credential) {},
+              verificationFailed: (FirebaseAuthException e) {
+                displayErrorSnackBar("Could not verify phone number");
+              },
+              codeSent: (String verificationId, int? resendToken) {
+                cancelsignupdialog(screenheight, screenwidth, verificationId);
+              },
+              codeAutoRetrievalTimeout: (String verificationId) {},
+            );
           },
           child: const Padding(
             padding: EdgeInsets.all(8.0),
@@ -1223,7 +1377,6 @@ class _MiscScreenState extends State<MiscScreen> {
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
   bool continuebuttonpressed = false;
-  TextEditingController psw = TextEditingController();
   void displayErrorSnackBar(
     String error,
   ) {
@@ -1520,6 +1673,127 @@ class _MiscScreenState extends State<MiscScreen> {
     );
   }
 
+  void cancelsignupdialog(
+      double screenheight, double screenwidth, String verificationId) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  height: screenheight * 0.3,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter Code to Cancel",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        Center(
+                          child: SizedBox(
+                            width: screenwidth * 0.6,
+                            child: Pinput(
+                              length: 6,
+                              pinAnimationType: PinAnimationType.slide,
+                              showCursor: true,
+                              focusedPinTheme: PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(
+                                      fontSize: 25,
+                                      color: Theme.of(context).primaryColor)),
+                              defaultPinTheme: const PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color: Color.fromARGB(
+                                              255, 151, 149, 149)),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(fontSize: 25)),
+                              onCompleted: (String verificationCode) async {
+                                try {
+                                  PhoneAuthCredential credential =
+                                      PhoneAuthProvider.credential(
+                                          verificationId: verificationId,
+                                          smsCode: verificationCode);
+                                  //link credential
+                                  UserCredential usercredential =
+                                      await FirebaseAuth.instance
+                                          .signInWithCredential(credential);
+                                } catch (e) {
+                                  displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.");
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.05,
+                        ),
+                        GestureDetector(
+                            onTap: cancelbuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      cancelbuttonpressed = true;
+                                    });
+                                    try {
+                                      await db.cancelsignup(FirebaseAuth
+                                          .instance.currentUser!.uid);
+                                      await FirebaseAuth.instance.currentUser!
+                                          .delete();
+
+                                      goauthscreen();
+                                    } catch (e) {
+                                      displayErrorSnackBar(
+                                          "Could not cancel signup");
+                                    } finally {
+                                      setState(() {
+                                        cancelbuttonpressed = false;
+                                      });
+                                    }
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: cancelbuttonpressed,
+                                text: "Cancel Sign Up",
+                                buttonwidth: screenwidth * 0.5,
+                                bold: false)),
+                      ]),
+                ),
+              );
+            },
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1534,60 +1808,18 @@ class _MiscScreenState extends State<MiscScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return StatefulBuilder(
-                    builder: (BuildContext context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          height: screenheight * 0.15,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Column(children: [
-                            GestureDetector(
-                                onTap: cancelbuttonpressed
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          cancelbuttonpressed = true;
-                                        });
-                                        try {
-                                          await db.cancelsignup(FirebaseAuth
-                                              .instance.currentUser!.uid);
-                                          await FirebaseAuth
-                                              .instance.currentUser!
-                                              .delete();
-                                          psw.clear();
-                                          goauthscreen();
-                                        } catch (e) {
-                                          displayErrorSnackBar(
-                                              "Could not cancel signup, please try again and makes sure password is correct");
-                                        } finally {
-                                          setState(() {
-                                            cancelbuttonpressed = false;
-                                          });
-                                        }
-                                      },
-                                child: PrimaryButton(
-                                    screenwidth: screenwidth,
-                                    buttonpressed: cancelbuttonpressed,
-                                    text: "Cancel Sign Up",
-                                    buttonwidth: screenwidth * 0.5,
-                                    bold: false)),
-                          ]),
-                        ),
-                      );
-                    },
-                  );
-                });
+          onTap: () async {
+            await FirebaseAuth.instance.verifyPhoneNumber(
+              phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
+              verificationCompleted: (PhoneAuthCredential credential) {},
+              verificationFailed: (FirebaseAuthException e) {
+                displayErrorSnackBar("Could not verify phone number");
+              },
+              codeSent: (String verificationId, int? resendToken) {
+                cancelsignupdialog(screenheight, screenwidth, verificationId);
+              },
+              codeAutoRetrievalTimeout: (String verificationId) {},
+            );
           },
           child: const Padding(
             padding: EdgeInsets.all(8.0),
@@ -1818,7 +2050,6 @@ class _InterestScreenState extends State<InterestScreen> {
   db_conn db = db_conn();
   bool buttonpressed = false;
   bool cancelbuttonpressed = false;
-  TextEditingController psw = TextEditingController();
 
   void displayErrorSnackBar(
     String error,
@@ -1861,6 +2092,127 @@ class _InterestScreenState extends State<InterestScreen> {
           fullscreenDialog: true,
           settings: RouteSettings(name: "AuthenticationWrapper")),
     );
+  }
+
+  void cancelsignupdialog(
+      double screenheight, double screenwidth, String verificationId) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  height: screenheight * 0.3,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter Code to Cancel",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        Center(
+                          child: SizedBox(
+                            width: screenwidth * 0.6,
+                            child: Pinput(
+                              length: 6,
+                              pinAnimationType: PinAnimationType.slide,
+                              showCursor: true,
+                              focusedPinTheme: PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(
+                                      fontSize: 25,
+                                      color: Theme.of(context).primaryColor)),
+                              defaultPinTheme: const PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color: Color.fromARGB(
+                                              255, 151, 149, 149)),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(fontSize: 25)),
+                              onCompleted: (String verificationCode) async {
+                                try {
+                                  PhoneAuthCredential credential =
+                                      PhoneAuthProvider.credential(
+                                          verificationId: verificationId,
+                                          smsCode: verificationCode);
+                                  //link credential
+                                  UserCredential usercredential =
+                                      await FirebaseAuth.instance
+                                          .signInWithCredential(credential);
+                                } catch (e) {
+                                  displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.");
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.05,
+                        ),
+                        GestureDetector(
+                            onTap: cancelbuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      cancelbuttonpressed = true;
+                                    });
+                                    try {
+                                      await db.cancelsignup(FirebaseAuth
+                                          .instance.currentUser!.uid);
+                                      await FirebaseAuth.instance.currentUser!
+                                          .delete();
+
+                                      goauthscreen();
+                                    } catch (e) {
+                                      displayErrorSnackBar(
+                                          "Could not cancel signup");
+                                    } finally {
+                                      setState(() {
+                                        cancelbuttonpressed = false;
+                                      });
+                                    }
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: cancelbuttonpressed,
+                                text: "Cancel Sign Up",
+                                buttonwidth: screenwidth * 0.5,
+                                bold: false)),
+                      ]),
+                ),
+              );
+            },
+          );
+        });
   }
 
   Widget _listviewitem(String interest) {
@@ -1915,60 +2267,18 @@ class _InterestScreenState extends State<InterestScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return StatefulBuilder(
-                    builder: (BuildContext context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          height: screenheight * 0.15,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Column(children: [
-                            GestureDetector(
-                                onTap: cancelbuttonpressed
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          cancelbuttonpressed = true;
-                                        });
-                                        try {
-                                          await db.cancelsignup(FirebaseAuth
-                                              .instance.currentUser!.uid);
-                                          await FirebaseAuth
-                                              .instance.currentUser!
-                                              .delete();
-                                          psw.clear();
-                                          goauthscreen();
-                                        } catch (e) {
-                                          displayErrorSnackBar(
-                                              "Could not cancel signup, please try again and makes sure password is correct");
-                                        } finally {
-                                          setState(() {
-                                            cancelbuttonpressed = false;
-                                          });
-                                        }
-                                      },
-                                child: PrimaryButton(
-                                    screenwidth: screenwidth,
-                                    buttonpressed: cancelbuttonpressed,
-                                    text: "Cancel Sign Up",
-                                    buttonwidth: screenwidth * 0.5,
-                                    bold: false)),
-                          ]),
-                        ),
-                      );
-                    },
-                  );
-                });
+          onTap: () async {
+            await FirebaseAuth.instance.verifyPhoneNumber(
+              phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
+              verificationCompleted: (PhoneAuthCredential credential) {},
+              verificationFailed: (FirebaseAuthException e) {
+                displayErrorSnackBar("Could not verify phone number");
+              },
+              codeSent: (String verificationId, int? resendToken) {
+                cancelsignupdialog(screenheight, screenwidth, verificationId);
+              },
+              codeAutoRetrievalTimeout: (String verificationId) {},
+            );
           },
           child: const Padding(
             padding: EdgeInsets.all(8.0),
