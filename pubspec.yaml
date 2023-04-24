@@ -82,6 +82,9 @@ dependencies:
   flutter_emoji: ^2.4.0
   package_info_plus: ^3.1.0
   flutter_datetime_picker: ^1.5.1
+  flutter_multi_formatter: ^2.10.2
+  intl_phone_number_input: ^0.7.3+1
+  flutter_otp_text_field: ^1.1.0+2
 
 flutter_icons:
   #  image_path: "assets/images/icon-128x128.png"

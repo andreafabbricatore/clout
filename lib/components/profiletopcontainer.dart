@@ -166,10 +166,10 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: screenwidth * 0.64,
+                    width: screenwidth * 0.55,
                     child: Text(
                       "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
                       textAlign: TextAlign.start,

@@ -61,12 +61,11 @@ class db_conn {
   CollectionReference emailverification =
       FirebaseFirestore.instance.collection('email_verification');
 
-  Future createuserinstance(String email, String uid) async {
+  Future createuserinstance(String uid) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       await users.doc(uid).set({
         'fullname': '',
-        'email': email,
         'username': '',
         'uid': uid,
         'gender': '',
@@ -1637,7 +1636,6 @@ class db_conn {
               });
               users.doc(user.uid).set({
                 'fullname': user.fullname,
-                'email': user.email,
                 'username': user.username,
                 'uid': user.uid,
                 'gender': user.gender,

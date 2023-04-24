@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
+import 'package:clout/screens/authentication/signupscreen.dart';
+import 'package:clout/screens/authscreens/linkphoneauth.dart';
 import 'package:clout/screens/authscreens/mainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
@@ -63,21 +65,48 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
-  //change to google maps
-  Future<void> getUserAppLocation() async {
-    String searchquery =
-        "${_userLocation?.longitude},${_userLocation?.latitude}";
-    String accessToken = dotenv.get('MAPBOX_ACCESS_TOKEN');
-    String url =
-        'https://api.mapbox.com/geocoding/v5/mapbox.places/$searchquery.json?limit=1&types=poi%2Caddress&access_token=$accessToken';
-    url = Uri.parse(url).toString();
-
-    _dio.options.contentType = Headers.jsonContentType;
-    final responseData = await _dio.get(url);
-    List<AppLocation> response = (responseData.data['features'] as List)
-        .map((e) => AppLocation.fromJson(e))
-        .toList();
-    curruserlocation = response[0];
+  Future<void> finishsignup(AppUser curruser) async {
+    if (curruser.setnameandpfp == false) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => PicandNameScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "PicandNameScreen"),
+            fullscreenDialog: true),
+      );
+    } else if (curruser.setusername == false) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => UsernameScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "UsernameScreen"),
+            fullscreenDialog: true),
+      );
+    } else if (curruser.setmisc == false) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => MiscScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "MiscScreen"),
+            fullscreenDialog: true),
+      );
+    } else if (curruser.setinterests == false) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => InterestScreen(
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "InterestScreen"),
+            fullscreenDialog: true),
+      );
+    }
   }
 
   Future<void> newgetUserAppLocation() async {
@@ -118,26 +147,21 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         error = false;
       });
+      linkauth();
       Stopwatch stopwatch = Stopwatch()..start();
       //await newgetUserAppLocation();
       await widget.analytics.setUserId(id: widget.uid);
-      await newgetUserAppLocation();
       await db.updatelastuserlocandusage(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
-      if (curruserlocation.country != "" &&
-          !listEquals(curruserlocation.center, [0.0, 0.0])) {
-        AppUser curruser = await db.getUserFromUID(widget.uid);
+      AppUser curruser = await db.getUserFromUID(widget.uid);
+      await finishsignup(curruser);
+      await newgetUserAppLocation();
+      stopwatch.stop();
 
-        stopwatch.stop();
-
-        int diff = stopwatch.elapsed.inSeconds.ceil() > 2
-            ? stopwatch.elapsed.inSeconds.ceil()
-            : 2 - stopwatch.elapsed.inSeconds.ceil();
-        Timer(Duration(seconds: diff), () => doneLoading(curruser));
-      } else {
-        stopwatch.stop();
-        throw Exception();
-      }
+      int diff = stopwatch.elapsed.inSeconds.ceil() > 2
+          ? stopwatch.elapsed.inSeconds.ceil()
+          : 2 - stopwatch.elapsed.inSeconds.ceil();
+      Timer(Duration(seconds: diff), () => doneLoading(curruser));
     } catch (e) {
       setState(() {
         error = true;
@@ -195,13 +219,33 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
+  Future<void> linkauth() async {
+    List<UserInfo>? providersdata =
+        FirebaseAuth.instance.currentUser?.providerData;
+    List providers = [];
+    for (int i = 0; i < providersdata!.length; i++) {
+      providers.add(providersdata[i].providerId);
+    }
+    if (!providers.contains('phone')) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => LinkPhoneInputScreen(
+            analytics: widget.analytics,
+            updatephonenumber: false,
+          ),
+          fullscreenDialog: true,
+        ),
+      );
+    }
+  }
+
   void loadinglogic() async {
     try {
       await ensurelocation();
       await undermaintenance();
       if (!maintenance) {
         await needupdate();
-
         if (!update) {
           await appinit();
         }

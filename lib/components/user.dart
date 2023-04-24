@@ -8,7 +8,6 @@ class AppUser {
   List interests;
   String gender;
   String fullname;
-  String email;
   DateTime birthday;
   DateTime donesignuptime;
   List followers;
@@ -41,7 +40,6 @@ class AppUser {
       required this.interests,
       required this.gender,
       required this.fullname,
-      required this.email,
       required this.birthday,
       required this.followers,
       required this.following,
@@ -75,7 +73,6 @@ class AppUser {
         interests: json['interests'] as List,
         gender: json['gender'],
         fullname: json['fullname'],
-        email: json['email'],
         birthday: json['birthday'].toDate(),
         donesignuptime: json['donesignuptime'].toDate(),
         followers: json['followers'] as List,

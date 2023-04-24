@@ -90,6 +90,25 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
     return newcity;
   }
 
+  Future<void> newgetUserAppLocation() async {
+    //broken
+    String url =
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${_userLocation?.latitude},${_userLocation?.longitude}&result_type=country&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+    url = Uri.parse(url).toString();
+
+    _dio.options.contentType = Headers.jsonContentType;
+    final responseData = await _dio.get(url);
+    String country = responseData.data['results'][0]['address_components'][0]
+            ['long_name']
+        .toString()
+        .toLowerCase();
+    curruserlocation = AppLocation(
+        address: "",
+        city: "",
+        country: country,
+        center: [_userLocation?.longitude, _userLocation?.latitude]);
+  }
+
   Future<void> appinit() async {
     try {
       setState(() {
@@ -97,27 +116,13 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
       });
       Stopwatch stopwatch = Stopwatch()..start();
       //await newgetUserAppLocation();
-      await getUserAppLocation();
-      if (curruserlocation.address != "" &&
-          curruserlocation.city != "" &&
-          curruserlocation.country != "" &&
-          !listEquals(curruserlocation.center, [0.0, 0.0])) {
-        //
-        String city =
-            await getcitywithoutnums(curruserlocation.city.toLowerCase());
-        //
-        curruserlocation.city = city;
+      await newgetUserAppLocation();
+      stopwatch.stop();
 
-        stopwatch.stop();
-
-        int diff = stopwatch.elapsed.inSeconds.ceil() > 2
-            ? stopwatch.elapsed.inSeconds.ceil()
-            : 2 - stopwatch.elapsed.inSeconds.ceil();
-        Timer(Duration(seconds: diff), () => doneLoading());
-      } else {
-        stopwatch.stop();
-        throw Exception();
-      }
+      int diff = stopwatch.elapsed.inSeconds.ceil() > 2
+          ? stopwatch.elapsed.inSeconds.ceil()
+          : 2 - stopwatch.elapsed.inSeconds.ceil();
+      Timer(Duration(seconds: diff), () => doneLoading());
     } catch (e) {
       setState(() {
         error = true;

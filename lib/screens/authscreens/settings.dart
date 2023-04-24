@@ -4,6 +4,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/screens/authscreens/blockedusersscreen.dart';
+import 'package:clout/screens/authscreens/linkphoneauth.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -308,221 +309,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           GestureDetector(
             onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return StatefulBuilder(builder: ((context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                          height: screenheight * 0.4,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Column(children: [
-                            const Text(
-                              "Change Email",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25),
-                              textScaleFactor: 1.0,
-                            ),
-                            SizedBox(
-                              height: screenheight * 0.02,
-                            ),
-                            const Text(
-                              "In order to change email address,\nenter new address and re-enter password",
-                              style: TextStyle(
-                                fontSize: 15,
-                              ),
-                              textScaleFactor: 1.1,
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height: screenheight * 0.02,
-                            ),
-                            textdatafield(
-                                screenwidth * 0.4, "New Email", emailaddress),
-                            textdatafield(screenwidth * 0.4, "Password", psw),
-                            SizedBox(
-                              height: screenheight * 0.04,
-                            ),
-                            GestureDetector(
-                                onTap: updateemailbuttonpressed
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          updateemailbuttonpressed = true;
-                                        });
-                                        try {
-                                          await FirebaseAuth.instance
-                                              .signInWithEmailAndPassword(
-                                                  email: widget.curruser.email,
-                                                  password: psw.text.trim());
-                                          if (emailaddress.text
-                                              .trim()
-                                              .isEmpty) {
-                                            throw Exception(
-                                                "Please enter new email address");
-                                          }
-                                          await db.changeattribute(
-                                              'email',
-                                              emailaddress.text.trim(),
-                                              FirebaseAuth
-                                                  .instance.currentUser!.uid);
-                                          await FirebaseAuth
-                                              .instance.currentUser!
-                                              .updateEmail(
-                                                  emailaddress.text.trim());
-                                          emailaddress.clear();
-                                          psw.clear();
-                                          newpsw.clear();
-                                          goauthwrapper();
-                                        } catch (e) {
-                                          displayErrorSnackBar(
-                                              "Invalid Action, try again");
-                                        } finally {
-                                          updateemailbuttonpressed = false;
-                                        }
-                                      },
-                                child: PrimaryButton(
-                                    screenwidth: screenwidth,
-                                    buttonpressed: updateemailbuttonpressed,
-                                    text: "Update",
-                                    buttonwidth: screenwidth * 0.7,
-                                    bold: false)),
-                          ]),
-                        ),
-                      );
-                    }));
-                  });
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => LinkPhoneInputScreen(
+                    analytics: widget.analytics,
+                    updatephonenumber: true,
+                  ),
+                ),
+              );
             },
             child: Row(
               children: [
-                const Icon(Icons.email_outlined, size: 30),
+                const Icon(Icons.phone_iphone, size: 30),
                 const SizedBox(
                   width: 6,
                 ),
                 SizedBox(
                   width: screenwidth * 0.8,
                   child: const Text(
-                    "Update Email Address",
+                    "Update Phone Number",
                     style: TextStyle(fontSize: 20),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                 )
-              ],
-            ),
-          ),
-          SizedBox(
-            height: screenheight * 0.02,
-          ),
-          GestureDetector(
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return StatefulBuilder(builder: (context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                          height: screenheight * 0.4,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Column(children: [
-                            const Text(
-                              "Change Password",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                              ),
-                              textScaleFactor: 1.0,
-                            ),
-                            SizedBox(
-                              height: screenheight * 0.02,
-                            ),
-                            const Text(
-                              "In order to change password,\nenter old and new password",
-                              style: TextStyle(fontSize: 15),
-                              textScaleFactor: 1.1,
-                            ),
-                            SizedBox(
-                              height: screenheight * 0.02,
-                            ),
-                            textdatafield(
-                                screenwidth * 0.4, "Old Password", psw),
-                            textdatafield(
-                                screenwidth * 0.4, "New Password", newpsw),
-                            SizedBox(
-                              height: screenheight * 0.04,
-                            ),
-                            GestureDetector(
-                                onTap: updatepswbuttonpressed
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          updatepswbuttonpressed = true;
-                                        });
-                                        try {
-                                          await FirebaseAuth.instance
-                                              .signInWithEmailAndPassword(
-                                                  email: widget.curruser.email,
-                                                  password: psw.text.trim());
-                                          if (newpsw.text.trim().isEmpty) {
-                                            throw Exception(
-                                                "Please enter new password");
-                                          }
-                                          await FirebaseAuth
-                                              .instance.currentUser!
-                                              .updatePassword(
-                                                  newpsw.text.trim());
-                                          emailaddress.clear();
-                                          psw.clear();
-                                          newpsw.clear();
-                                          goauthwrapper();
-                                        } catch (e) {
-                                          displayErrorSnackBar(
-                                              "Invalid Action, try again");
-                                        } finally {
-                                          setState(() {
-                                            updatepswbuttonpressed = false;
-                                          });
-                                        }
-                                      },
-                                child: PrimaryButton(
-                                    screenwidth: screenwidth,
-                                    buttonpressed: updatepswbuttonpressed,
-                                    text: "Update",
-                                    buttonwidth: screenwidth * 0.7,
-                                    bold: false)),
-                          ]),
-                        ),
-                      );
-                    });
-                  });
-            },
-            child: Row(
-              children: const [
-                Icon(Icons.lock_outline, size: 30),
-                SizedBox(
-                  width: 6,
-                ),
-                Text(
-                  "Update Password",
-                  style: TextStyle(fontSize: 20),
-                ),
               ],
             ),
           ),
@@ -660,15 +471,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                                 true;
                                                           });
                                                           try {
-                                                            await FirebaseAuth
-                                                                .instance
-                                                                .signInWithEmailAndPassword(
-                                                                    email: widget
-                                                                        .curruser
-                                                                        .email,
-                                                                    password: psw
-                                                                        .text
-                                                                        .trim());
                                                             await db.deleteuser(
                                                                 widget
                                                                     .curruser);

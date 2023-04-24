@@ -41,6 +41,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  base58check:
+    dependency: transitive
+    description:
+      name: base58check
+      sha256: "6c300dfc33e598d2fe26319e13f6243fea81eaf8204cb4c6b69ef20a625319a5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  bech32:
+    dependency: transitive
+    description:
+      name: bech32
+      sha256: "156cbace936f7720c79a79d16a03efad343b1ef17106716e04b8b8e39f99f7f7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -209,6 +225,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.5"
   fake_async:
     dependency: transitive
     description:
@@ -542,6 +566,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  flutter_multi_formatter:
+    dependency: "direct main"
+    description:
+      name: flutter_multi_formatter
+      sha256: "287ebe691f39b2bc5062b065adb01220b44bbf2513571ebf280398c1d6da2aa5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.10.2"
+  flutter_otp_text_field:
+    dependency: "direct main"
+    description:
+      name: flutter_otp_text_field
+      sha256: c9164ba391071fb9783698256ddbb9efc960cfed056d843db164711c65b1b114
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -808,6 +848,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.0"
+  intl_phone_number_input:
+    dependency: "direct main"
+    description:
+      name: intl_phone_number_input
+      sha256: b812c6e3924e56e65b9684076ccd8eb24126abe0c84091d35d75a25e613a1793
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.3+1"
   js:
     dependency: transitive
     description:
@@ -840,6 +888,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  libphonenumber_platform_interface:
+    dependency: transitive
+    description:
+      name: libphonenumber_platform_interface
+      sha256: cdd1230aad1d8e12fb4d9752d67ed2361b1cbb26fc8d202a9990c218553b3963
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
+  libphonenumber_plugin:
+    dependency: transitive
+    description:
+      name: libphonenumber_plugin
+      sha256: "1be7c9de4beaed6dffdaf4a3d87758ef9b259c1111283736faef2179919e3ca2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
+  libphonenumber_web:
+    dependency: transitive
+    description:
+      name: libphonenumber_web
+      sha256: "35a106149d2f7a05a670d02be2f4ea288258d7bca2f8bdda8a96617151dfa5b9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   lints:
     dependency: transitive
     description:

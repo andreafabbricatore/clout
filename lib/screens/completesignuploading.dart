@@ -29,7 +29,6 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
     interests: [],
     gender: "",
     fullname: "",
-    email: "",
     birthday: DateTime(0, 0, 0, 0),
     followers: [],
     following: [],

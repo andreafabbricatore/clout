@@ -286,3 +286,14 @@ exports.forceallEmailVerifications = functions.firestore.document('/all_emails_v
         admin.auth().updateUser(data['uid'], {emailVerified: true});
     })
 });
+
+exports.checkIfPhoneExists = functions.https.onCall((data, context) => {
+    const phone = data.phone
+    return admin.auth().getUserByPhoneNumber(phone)
+     .then(function(userRecord){
+         return true;
+     })
+     .catch(function(error) {
+         return false;
+     });
+ });

@@ -82,16 +82,9 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: ((context, snapshot) {
           if (snapshot.hasData) {
-            //print(FirebaseAuth.instance.currentUser!);
-            if (FirebaseAuth.instance.currentUser!.emailVerified) {
-              return LoadingScreen(
-                  uid: FirebaseAuth.instance.currentUser!.uid,
-                  analytics: widget.analytics);
-            } else {
-              return CompleteSignUpLoading(
-                  uid: FirebaseAuth.instance.currentUser!.uid,
-                  analytics: widget.analytics);
-            }
+            return LoadingScreen(
+                uid: FirebaseAuth.instance.currentUser!.uid,
+                analytics: widget.analytics);
           } else {
             return PreAuthScreen(analytics: widget.analytics);
           }

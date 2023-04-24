@@ -1,3 +1,4 @@
+import 'package:clout/screens/authentication/phoneauth.dart';
 import 'package:clout/screens/authentication/signinscreen.dart';
 import 'package:clout/screens/authentication/signupscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthloadingscreen.dart';
@@ -27,8 +28,8 @@ class _AuthScreenState extends State<AuthScreen> {
       body: GestureDetector(
         onLongPress: () {},
         child: Padding(
-            padding: EdgeInsets.fromLTRB(screenwidth * 0.05, screenheight * 0.1,
-                screenwidth * 0.05, screenheight * 0.1),
+            padding: EdgeInsets.fromLTRB(
+                screenwidth * 0.05, screenheight * 0.1, screenwidth * 0.05, 0),
             child: Stack(children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -75,7 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SignUpScreen(
+                                builder: (context) => PhoneInputScreen(
                                       analytics: widget.analytics,
                                     ),
                                 settings: RouteSettings(name: "SignUpScreen")),
@@ -91,7 +92,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                       Radius.circular(20))),
                               child: const Center(
                                   child: Text(
-                                "Sign Up",
+                                "Continue",
                                 style: TextStyle(
                                     fontSize: 20,
                                     color: Colors.white,
@@ -103,29 +104,6 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   SizedBox(
                     height: screenheight * 0.02,
-                  ),
-                  Center(
-                      child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignInScreen(
-                                        analytics: widget.analytics,
-                                      ),
-                                  settings:
-                                      RouteSettings(name: "SignInScreen")),
-                            );
-                          },
-                          child: Text(
-                            "Already have an account?",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ))),
-                  SizedBox(
-                    height: screenheight * 0.04,
                   ),
                   Center(
                     child: GestureDetector(
@@ -148,7 +126,31 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       ),
                     ),
-                  )
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.1,
+                  ),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () async {
+                        await widget.analytics.logEvent(
+                            name: "continue_as_guest", parameters: {});
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BusinessSignInScreen(
+                                analytics: widget.analytics,
+                              ),
+                            ));
+                      },
+                      child: Text(
+                        "Are you a business? Press here.",
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 15),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ])),

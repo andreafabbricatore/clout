@@ -34,36 +34,48 @@
 				<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>ReCaptcha</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-755358505825-ios-26d50fa81c7775bd7e8320</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<true/>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://outwithclout.com/#/event/</string>
 		<string>https://outwithclout.com/#/user/</string>
 		<string>https://outwithclout.com/#/referral/</string>
 	</array>
-	<key>FirebaseAutomaticScreenReportingEnabled</key>
-	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>itms-beta</string>
+		<string>itms</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MBXAccessToken</key>
 	<string>pk.eyJ1IjoiYW5kcmVhZjExMDgiLCJhIjoiY2w0cjBxamlzMGFwZjNqcGRodm9nczA5biJ9.qXRB_MLgHmifo6DYtCYirw</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The app requires your location to find events nearby you</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>The app requires access to your photo library to setup a profile picture and allow choosing of potential event banners</string>
-	<key>io.flutter.embedded_views_preview</key>
-	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>The app requires access to your camera to setup a profile picture and scanning qr codes for events</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>The app requires access to your location in order to display events nearby you</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The app requires your location to find events nearby you</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The app requires access to your photo library to setup a profile picture and allow choosing of potential event banners</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -83,18 +95,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIBackgroundModes</key>
-    <array>
-        <string>remote-notification</string>
-    </array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-    	<string>comgooglemaps</string>	
-	</array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-        <string>itms-beta</string>
-        <string>itms</string>
-	</array>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
