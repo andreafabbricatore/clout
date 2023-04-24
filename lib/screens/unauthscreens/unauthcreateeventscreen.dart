@@ -7,7 +7,7 @@ import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/screens/authscreens/loading.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart' as dp;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -450,30 +450,24 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
             ),
           ),
           SizedBox(height: screenheight * 0.02),
-          InkWell(
+          GestureDetector(
             onTap: () {
-              showCupertinoModalPopup(
-                  context: context,
-                  builder: (_) => Container(
-                        height: screenheight * 0.4,
-                        color: Colors.white,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: screenheight * 0.4,
-                              child: CupertinoDatePicker(
-                                  mode: CupertinoDatePickerMode.dateAndTime,
-                                  minimumDate: DateTime.now(),
-                                  initialDateTime: DateTime.now(),
-                                  onDateTimeChanged: (val) {
-                                    setState(() {
-                                      eventdate = val;
-                                    });
-                                  }),
-                            ),
-                          ],
-                        ),
-                      ));
+              dp.DatePicker.showDateTimePicker(
+                context,
+                showTitleActions: true,
+                minTime: DateTime.now(),
+                onChanged: (date) {
+                  setState(() {
+                    eventdate = date;
+                  });
+                },
+                onConfirm: (date) {
+                  setState(() {
+                    eventdate = date;
+                  });
+                },
+                currentTime: DateTime.now(),
+              );
             },
             child: Container(
               height: screenwidth * 0.13,
