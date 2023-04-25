@@ -286,6 +286,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String nationality = "";
   String bio = "";
   List newinterests = [];
+  bool error = false;
 
   void displayErrorSnackBar(
     String error,
@@ -526,6 +527,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   : () async {
                       setState(() {
                         buttonpressed = true;
+                        error = false;
                       });
                       try {
                         if (imagepath != null) {
@@ -543,13 +545,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           await db.changeusername(
                               usernamecontroller.text.trim(),
                               widget.curruser.uid);
+                        } else {
+                          if (usernamecontroller.text.trim() !=
+                              widget.curruser.username) {
+                            displayErrorSnackBar("Invalid Username");
+                            setState(() {
+                              error = true;
+                            });
+                          }
                         }
                         if (fullnamecontroller.text.isNotEmpty) {
                           await db.changeattribute(
                               'fullname',
                               fullnamecontroller.text.trim(),
                               widget.curruser.uid);
+                        } else {
+                          displayErrorSnackBar(
+                              "Please do not leave fields empty");
+                          setState(() {
+                            error = true;
+                          });
                         }
+
                         await db.changeattribute(
                             'gender', gender, widget.curruser.uid);
                         await db.changeattribute(
@@ -558,6 +575,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             'interests', newinterests, widget.curruser.uid);
                         await db.changeattribute('bio',
                             biocontroller.text.trim(), widget.curruser.uid);
+
                         await widget.analytics
                             .logEvent(name: "edited_profile", parameters: {});
                       } catch (e) {
@@ -566,7 +584,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         setState(() {
                           buttonpressed = false;
                         });
-                        Navigator.pop(context);
+                        if (!error) {
+                          displayErrorSnackBar("Updated Profile!");
+                          Navigator.pop(context);
+                        }
                       }
                     },
               child: PrimaryButton(

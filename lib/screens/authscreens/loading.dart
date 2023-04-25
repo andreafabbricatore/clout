@@ -65,47 +65,54 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
-  Future<void> finishsignup(AppUser curruser) async {
-    if (curruser.setnameandpfp == false) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => PicandNameScreen(
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "PicandNameScreen"),
-            fullscreenDialog: true),
-      );
-    } else if (curruser.setusername == false) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => UsernameScreen(
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "UsernameScreen"),
-            fullscreenDialog: true),
-      );
-    } else if (curruser.setmisc == false) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => MiscScreen(
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "MiscScreen"),
-            fullscreenDialog: true),
-      );
-    } else if (curruser.setinterests == false) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => InterestScreen(
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "InterestScreen"),
-            fullscreenDialog: true),
-      );
+  Future<void> finishloading(AppUser curruser) async {
+    try {
+      if (curruser.setnameandpfp == false) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => PicandNameScreen(
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "PicandNameScreen"),
+              fullscreenDialog: true),
+        );
+      } else if (curruser.setusername == false) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => UsernameScreen(
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "UsernameScreen"),
+              fullscreenDialog: true),
+        );
+      } else if (curruser.setmisc == false) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => MiscScreen(
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "MiscScreen"),
+              fullscreenDialog: true),
+        );
+      } else if (curruser.setinterests == false) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => InterestScreen(
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "InterestScreen"),
+              fullscreenDialog: true),
+        );
+      } else {
+        await newgetUserAppLocation();
+        doneLoading(curruser);
+      }
+    } catch (e) {
+      throw Exception();
     }
   }
 
@@ -148,20 +155,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
         error = false;
       });
       linkauth();
-      Stopwatch stopwatch = Stopwatch()..start();
       //await newgetUserAppLocation();
       await widget.analytics.setUserId(id: widget.uid);
       await db.updatelastuserlocandusage(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
       AppUser curruser = await db.getUserFromUID(widget.uid);
-      await finishsignup(curruser);
-      await newgetUserAppLocation();
-      stopwatch.stop();
-
-      int diff = stopwatch.elapsed.inSeconds.ceil() > 2
-          ? stopwatch.elapsed.inSeconds.ceil()
-          : 2 - stopwatch.elapsed.inSeconds.ceil();
-      Timer(Duration(seconds: diff), () => doneLoading(curruser));
+      await finishloading(curruser);
     } catch (e) {
       setState(() {
         error = true;

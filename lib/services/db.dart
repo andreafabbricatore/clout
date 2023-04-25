@@ -662,25 +662,19 @@ class db_conn {
   }
 
   Future changeattribute(String attribute, String value, String uid) async {
-    String id = "";
-    await getUserDocID(uid).then((value) => id = value);
-    return users.doc(id).update({attribute: value}).catchError((error) {
+    return users.doc(uid).update({attribute: value}).catchError((error) {
       throw Exception("Could not change $attribute");
     });
   }
 
   Future changeattributebool(String attribute, bool value, String uid) async {
-    String id = "";
-    await getUserDocID(uid).then((value) => id = value);
-    return users.doc(id).update({attribute: value}).catchError((error) {
+    return users.doc(uid).update({attribute: value}).catchError((error) {
       throw Exception("Could not change $attribute");
     });
   }
 
   Future changebirthday(DateTime value, String uid) async {
-    String id = "";
-    await getUserDocID(uid).then((value) => id = value);
-    return users.doc(id).update({'birthday': value}).catchError((error) {
+    return users.doc(uid).update({'birthday': value}).catchError((error) {
       throw Exception("Could not change birthday");
     });
   }
@@ -692,18 +686,14 @@ class db_conn {
       temp = temp + username[i];
       searchfield.add(temp.toLowerCase());
     }
-    String id = "";
-    await getUserDocID(uid).then((value) => id = value);
-    return users.doc(id).update(
+    return users.doc(uid).update(
         {'username': username, 'searchfield': searchfield}).catchError((error) {
       throw Exception("Could not change username");
     });
   }
 
   Future changeinterests(String attribute, List interests, String uid) async {
-    String id = "";
-    await getUserDocID(uid).then((value) => id = value);
-    return users.doc(id).update({attribute: interests}).catchError((error) {
+    return users.doc(uid).update({attribute: interests}).catchError((error) {
       throw Exception("Could not change $attribute");
     });
   }
@@ -747,26 +737,6 @@ class db_conn {
       return downloadUrl;
     } catch (e) {
       throw Exception("Could not get download url");
-    }
-  }
-
-  Future<String> getUserDocID(String uid) async {
-    String docID = "";
-    try {
-      await users.get().then((QuerySnapshot querySnapshot) => {
-            querySnapshot.docs.forEach((doc) {
-              if (doc["uid"] == uid) {
-                docID = doc.id;
-              }
-            })
-          });
-    } catch (e) {
-      throw Exception("Error with userdocid");
-    }
-    if (docID != "") {
-      return docID;
-    } else {
-      throw Exception("Error with userdocid");
     }
   }
 
@@ -865,16 +835,11 @@ class db_conn {
   }
 
   Future<bool> usernameUnique(String username) async {
-    bool unique = true;
     try {
-      await users.get().then((QuerySnapshot querySnapshot) => {
-            querySnapshot.docs.forEach((doc) {
-              if (doc["username"] == username) {
-                unique = false;
-              }
-            })
-          });
-      return unique;
+      QuerySnapshot querySnapshot =
+          await users.where("username", isEqualTo: username).get();
+
+      return querySnapshot.docs.length == 0;
     } catch (e) {
       throw Exception("Could not connect");
     }

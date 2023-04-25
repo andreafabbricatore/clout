@@ -79,7 +79,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 builder: (context) => PhoneInputScreen(
                                       analytics: widget.analytics,
                                     ),
-                                settings: RouteSettings(name: "SignUpScreen")),
+                                settings:
+                                    RouteSettings(name: "SignUpSignInScreen")),
                           );
                         },
                         child: SizedBox(

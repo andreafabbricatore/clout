@@ -1,6 +1,7 @@
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
+import 'package:clout/screens/authentication/signupscreen.dart';
 
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -135,22 +136,29 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                       setState(() {
                         sendcodebuttonpressed = true;
                       });
-                      if (userNumber!.nsn.isNotEmpty) {
-                        await FirebaseAuth.instance.verifyPhoneNumber(
-                          phoneNumber:
-                              "+" + userNumber!.countryCode + userNumber!.nsn,
-                          verificationCompleted:
-                              (PhoneAuthCredential credential) {},
-                          verificationFailed: (FirebaseAuthException e) {
-                            displayErrorSnackBar(
-                                "Could not verify phone number");
-                          },
-                          codeSent: (String verificationId, int? resendToken) {
-                            verifycode(verificationId);
-                          },
-                          codeAutoRetrievalTimeout: (String verificationId) {},
-                        );
-                        //final credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode)
+                      try {
+                        if (userNumber!.nsn.isNotEmpty) {
+                          await FirebaseAuth.instance.verifyPhoneNumber(
+                            phoneNumber:
+                                "+" + userNumber!.countryCode + userNumber!.nsn,
+                            verificationCompleted:
+                                (PhoneAuthCredential credential) {},
+                            verificationFailed: (FirebaseAuthException e) {
+                              displayErrorSnackBar(
+                                  "Could not verify phone number");
+                            },
+                            codeSent:
+                                (String verificationId, int? resendToken) {
+                              verifycode(verificationId);
+                            },
+                            codeAutoRetrievalTimeout:
+                                (String verificationId) {},
+                          );
+                          //final credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode)
+                        }
+                      } catch (e) {
+                        displayErrorSnackBar(
+                            "Please try again. Make sure everything was filled correctly.");
                       }
                       setState(() {
                         sendcodebuttonpressed = false;
@@ -290,7 +298,7 @@ class OTPInputScreen extends StatefulWidget {
 class _OTPInputScreenState extends State<OTPInputScreen> {
   db_conn db = db_conn();
 
-  void done() {
+  void donesignin() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -299,6 +307,18 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
               ),
           fullscreenDialog: true,
           settings: RouteSettings(name: "AuthenticationWrapper")),
+    );
+  }
+
+  void donesignup() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => PicandNameScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "PicAndNameScreen")),
     );
   }
 
@@ -399,16 +419,16 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
                           await db.referralcloutinc(
                               usercredential.user!.uid, shareruid);
                           displayErrorSnackBar("Successfully referred!");
-                          done();
+                          donesignup();
                         } catch (e) {
                           displayErrorSnackBar(
                               "Invalid code, change it or remove it.");
                         }
                       } else {
-                        done();
+                        donesignup();
                       }
                     } else {
-                      done();
+                      donesignin();
                     }
                   } catch (e) {
                     displayErrorSnackBar(

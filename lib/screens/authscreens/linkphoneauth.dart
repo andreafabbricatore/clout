@@ -3,7 +3,6 @@ import 'package:clout/screens/authscreens/loading.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:phone_form_field/phone_form_field.dart' as pf;
 import 'package:pinput/pinput.dart';
 
@@ -55,6 +54,7 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -84,7 +84,22 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            height: screenheight * 0.2,
+            height: screenheight * 0.05,
+          ),
+          !widget.updatephonenumber
+              ? const Center(
+                  child: Text(
+                    "We are switching out emails\nfor phone numbers.",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    textScaleFactor: 1.0,
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : Container(),
+          SizedBox(
+            height: screenheight * 0.1,
           ),
           Center(
             child: SizedBox(
@@ -135,27 +150,32 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                     setState(() {
                       sendcodebuttonpressed = true;
                     });
-                    if (userNumber!.nsn.isNotEmpty) {
-                      await FirebaseAuth.instance.verifyPhoneNumber(
-                        phoneNumber:
-                            "+" + userNumber!.countryCode + userNumber!.nsn,
-                        verificationCompleted:
-                            (PhoneAuthCredential credential) {},
-                        verificationFailed: (FirebaseAuthException e) {
-                          displayErrorSnackBar("Could not verify phone number");
-                        },
-                        codeSent: (String verificationId, int? resendToken) {
-                          try {
-                            verifycode(verificationId);
-                          } catch (e) {
+                    try {
+                      if (userNumber!.nsn.isNotEmpty) {
+                        await FirebaseAuth.instance.verifyPhoneNumber(
+                          phoneNumber:
+                              "+" + userNumber!.countryCode + userNumber!.nsn,
+                          verificationCompleted:
+                              (PhoneAuthCredential credential) {},
+                          verificationFailed: (FirebaseAuthException e) {
                             displayErrorSnackBar(
                                 "Could not verify phone number");
-                          }
-                        },
-                        codeAutoRetrievalTimeout: (String verificationId) {},
-                      );
+                          },
+                          codeSent: (String verificationId, int? resendToken) {
+                            try {
+                              verifycode(verificationId);
+                            } catch (e) {
+                              displayErrorSnackBar(
+                                  "Could not verify phone number");
+                            }
+                          },
+                          codeAutoRetrievalTimeout: (String verificationId) {},
+                        );
+                      }
+                    } catch (e) {
+                      displayErrorSnackBar(
+                          "Please try again. Make sure everything was filled correctly.");
                     }
-
                     setState(() {
                       sendcodebuttonpressed = false;
                     });
