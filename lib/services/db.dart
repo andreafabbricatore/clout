@@ -89,7 +89,7 @@ class db_conn {
         'notifications': [],
         'referred': [],
         'referredby': [],
-        'plan': 'free',
+        'plan': 'userfree',
         'setnameandpfp': false,
         'setusername': false,
         'setmisc': false,
@@ -1576,6 +1576,16 @@ class db_conn {
               await events
                   .doc(element.id)
                   .set({'showlocation': true}, SetOptions(merge: true));
+            },
+          ),
+        );
+
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              await users
+                  .doc(element.id)
+                  .set({'plan': 'userfree'}, SetOptions(merge: true));
             },
           ),
         );

@@ -20,6 +20,9 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
   bool sendcodebuttonpressed = false;
 
   void verifycode(String verificationId) {
+    setState(() {
+      sendcodebuttonpressed = false;
+    });
     Future.delayed(Duration.zero, () {
       Navigator.push(
           context,
@@ -160,6 +163,9 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                           verificationFailed: (FirebaseAuthException e) {
                             displayErrorSnackBar(
                                 "Could not verify phone number");
+                            setState(() {
+                              sendcodebuttonpressed = false;
+                            });
                           },
                           codeSent: (String verificationId, int? resendToken) {
                             try {
@@ -167,18 +173,21 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                             } catch (e) {
                               displayErrorSnackBar(
                                   "Could not verify phone number");
+                              setState(() {
+                                sendcodebuttonpressed = false;
+                              });
                             }
                           },
                           codeAutoRetrievalTimeout: (String verificationId) {},
                         );
                       }
                     } catch (e) {
+                      setState(() {
+                        sendcodebuttonpressed = false;
+                      });
                       displayErrorSnackBar(
                           "Please try again. Make sure everything was filled correctly.");
                     }
-                    setState(() {
-                      sendcodebuttonpressed = false;
-                    });
                   },
             child: PrimaryButton(
                 screenwidth: screenwidth,

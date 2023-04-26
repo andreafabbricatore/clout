@@ -848,16 +848,27 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           child: SizedBox(
                             height: screenheight * 0.4,
                             width: screenwidth,
-                            child: UserListView(
-                              userres: chatusers,
-                              onTap: selectuser,
-                              curruser: widget.curruser,
-                              screenwidth: screenwidth,
-                              showcloutscore: false,
-                              showrembutton: false,
-                              showsendbutton: true,
-                              selectedsenders: selectedsenders,
-                            ),
+                            child: widget.curruser.following.isEmpty
+                                ? const Center(
+                                    child: Text(
+                                      "The people you follow\nwill show up here.",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                      textScaleFactor: 1.0,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  )
+                                : UserListView(
+                                    userres: chatusers,
+                                    onTap: selectuser,
+                                    curruser: widget.curruser,
+                                    screenwidth: screenwidth,
+                                    showcloutscore: false,
+                                    showrembutton: false,
+                                    showsendbutton: true,
+                                    selectedsenders: selectedsenders,
+                                  ),
                           ),
                         ),
                         SizedBox(height: screenheight * 0.03),

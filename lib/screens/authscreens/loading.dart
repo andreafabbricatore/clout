@@ -154,12 +154,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         error = false;
       });
-      linkauth();
+
       //await newgetUserAppLocation();
       await widget.analytics.setUserId(id: widget.uid);
       await db.updatelastuserlocandusage(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
       AppUser curruser = await db.getUserFromUID(widget.uid);
+      if (curruser.plan != "business") {
+        await linkauth();
+      }
       await finishloading(curruser);
     } catch (e) {
       setState(() {

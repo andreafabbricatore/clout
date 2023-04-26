@@ -43,6 +43,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   }
 
   void verifycode(String verificationId) {
+    setState(() {
+      sendcodebuttonpressed = false;
+    });
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -146,23 +149,33 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                             verificationFailed: (FirebaseAuthException e) {
                               displayErrorSnackBar(
                                   "Could not verify phone number");
+                              setState(() {
+                                sendcodebuttonpressed = false;
+                              });
                             },
                             codeSent:
                                 (String verificationId, int? resendToken) {
-                              verifycode(verificationId);
+                              try {
+                                verifycode(verificationId);
+                              } catch (e) {
+                                displayErrorSnackBar(
+                                    "Could not verify phone number");
+                                setState(() {
+                                  sendcodebuttonpressed = false;
+                                });
+                              }
                             },
                             codeAutoRetrievalTimeout:
                                 (String verificationId) {},
                           );
-                          //final credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode)
                         }
                       } catch (e) {
+                        setState(() {
+                          sendcodebuttonpressed = false;
+                        });
                         displayErrorSnackBar(
                             "Please try again. Make sure everything was filled correctly.");
                       }
-                      setState(() {
-                        sendcodebuttonpressed = false;
-                      });
                     },
               child: PrimaryButton(
                   screenwidth: screenwidth,
