@@ -57,7 +57,6 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

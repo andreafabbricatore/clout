@@ -192,24 +192,28 @@ class _SearchBarListViewState extends State<SearchBarListView> {
     }
 
     return widget.searchevents
-        ? EventListView(
-            eventList: widget.eventres,
-            onTap: eventnavigate,
-            scrollable: true,
-            leftpadding: 8.0,
-            curruser: widget.curruser,
-            interactfav: interactfav,
-            screenheight: screenheight,
-            screenwidth: screenwidth,
+        ? Expanded(
+            child: EventListView(
+              eventList: widget.eventres,
+              onTap: eventnavigate,
+              scrollable: true,
+              leftpadding: 8.0,
+              curruser: widget.curruser,
+              interactfav: interactfav,
+              screenheight: screenheight,
+              screenwidth: screenwidth,
+            ),
           )
-        : UserListView(
-            userres: widget.userres,
-            onTap: usernavigate,
-            curruser: widget.curruser,
-            screenwidth: screenwidth,
-            showcloutscore: false,
-            showrembutton: false,
-            showsendbutton: false,
+        : Expanded(
+            child: UserListView(
+              userres: widget.userres,
+              onTap: usernavigate,
+              curruser: widget.curruser,
+              screenwidth: screenwidth,
+              showcloutscore: false,
+              showrembutton: false,
+              showsendbutton: false,
+            ),
           );
   }
 }

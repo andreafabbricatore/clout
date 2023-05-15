@@ -87,22 +87,20 @@ class _UnAuthUserListViewState extends State<UnAuthUserListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-          physics: widget.physics,
-          padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
-          shrinkWrap: true,
-          itemCount: widget.userres.length,
-          itemBuilder: (_, index) {
-            return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                child: _listviewitem(
-                    widget.userres[index],
-                    index,
-                    widget.screenwidth,
-                    widget.presentparticipants,
-                    widget.onTap));
-          }),
-    );
+    return ListView.builder(
+        physics: widget.physics,
+        padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
+        shrinkWrap: true,
+        itemCount: widget.userres.length,
+        itemBuilder: (_, index) {
+          return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+              child: _listviewitem(
+                  widget.userres[index],
+                  index,
+                  widget.screenwidth,
+                  widget.presentparticipants,
+                  widget.onTap));
+        });
   }
 }

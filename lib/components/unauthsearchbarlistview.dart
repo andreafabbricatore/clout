@@ -123,17 +123,21 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
     }
 
     return widget.searchevents
-        ? UnAuthEventListView(
-            eventList: widget.eventres,
-            onTap: eventnavigate,
-            scrollable: true,
-            leftpadding: 8.0,
-            screenheight: screenheight,
-            screenwidth: screenwidth,
+        ? Expanded(
+            child: UnAuthEventListView(
+              eventList: widget.eventres,
+              onTap: eventnavigate,
+              scrollable: true,
+              leftpadding: 8.0,
+              screenheight: screenheight,
+              screenwidth: screenwidth,
+            ),
           )
-        : UnAuthUserListView(
-            userres: widget.userres,
-            screenwidth: screenwidth,
-            onTap: usernavigate);
+        : Expanded(
+            child: UnAuthUserListView(
+                userres: widget.userres,
+                screenwidth: screenwidth,
+                onTap: usernavigate),
+          );
   }
 }

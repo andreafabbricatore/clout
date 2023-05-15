@@ -119,7 +119,9 @@ class UnAuthEventListView extends StatelessWidget {
           SizedBox(
             width: screenwidth * 0.9,
             child: Text(
-              "${event.address}, ${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}",
+              event.showlocation
+                  ? "${event.address}, ${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}"
+                  : "Secret location, ${DateFormat.MMMd().format(event.datetime)} @ ${DateFormat('hh:mm a').format(event.datetime)}",
               style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,

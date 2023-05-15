@@ -161,9 +161,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
       AppUser curruser = await db.getUserFromUID(widget.uid);
       if (curruser.plan != "business") {
-        await linkauth();
+        await linkauth(curruser);
+      } else {
+        await finishloading(curruser);
       }
-      await finishloading(curruser);
     } catch (e) {
       setState(() {
         error = true;
@@ -221,7 +222,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
-  Future<void> linkauth() async {
+  Future<void> linkauth(AppUser curruser) async {
     List<UserInfo>? providersdata =
         FirebaseAuth.instance.currentUser?.providerData;
     List providers = [];
@@ -239,6 +240,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
           fullscreenDialog: true,
         ),
       );
+    } else {
+      await finishloading(curruser);
     }
   }
 

@@ -140,15 +140,7 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
         }
     }
     else {
-        const chatid = context.params.chatid;
-        const messageid = context.params.id;
-        const chatdataSnapshot = await db.collection("chats").doc(chatid).get();
-        const chatdata = chatdataSnapshot.data();
-        chatstorem = ['PXY0yZQQcaRWSSghlZdL','2oVeIsn9PDGTdpHvTov0'];
-        if (chatstorem.includes(chatid)) {
-            await db.collection("chats").doc(chatid).collection("messages").doc(messageid).delete();
-            await db.collection("chats").doc(chatid).update({"mostrecentmessage": chatdata.chatname[0] + " was just created!"});
-        }
+    
     }
 });
 
