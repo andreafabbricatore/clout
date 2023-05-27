@@ -67,17 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void getEventsList(interests) async {
-    try {
-      List<Event> events = await db.getEvents(interests);
-      setState(() {
-        generaleventlist = events;
-      });
-    } catch (e) {
-      displayErrorSnackBar("Could not retrieve events");
-    }
-  }
-
   void getSortedCurrLocEventsList() async {
     try {
       interesteventlist = [];
@@ -120,12 +109,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> refreshevents() async {
     try {
-      //List<Event> events = await db.getEvents(userinterests);
-      //List<Event> interestevents = await db.getInterestEvents(userinterests);
-      //setState(() {
-      //  generaleventlist = events;
-      //  interesteventlist = interestevents;
-      //});
       getSortedCurrLocEventsList();
     } catch (e) {
       displayErrorSnackBar("Could not refresh events");

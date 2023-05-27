@@ -1100,7 +1100,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           GestureDetector(
             onTap: () async {
               List<AppUser> chatusers =
-                  await db.getfollowinglist(widget.curruser);
+                  await db.getfriendslist(widget.curruser);
               showsharebottomsheet(
                   context, screenheight, screenwidth, chatusers, shareevent);
             },
@@ -1184,9 +1184,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               InkWell(
                 onTap: () async {
                   try {
-                    String hostdocid =
-                        await db.getUserUIDfromUsername(widget.event.host);
-                    AppUser eventhost = await db.getUserFromUID(hostdocid);
+                    AppUser eventhost =
+                        await db.getUserFromUID(widget.event.hostdocid);
                     usernavigate(eventhost, 0);
                   } catch (e) {
                     displayErrorSnackBar("Could not retrieve host information");

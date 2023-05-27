@@ -7,32 +7,27 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class FollowerFollowingScreen extends StatefulWidget {
-  FollowerFollowingScreen(
+class FriendsScreen extends StatefulWidget {
+  FriendsScreen(
       {Key? key,
       required this.user,
       required this.iscurruser,
       required this.curruser,
-      required this.onfollowers,
       required this.curruserlocation,
       required this.analytics,
-      required this.followers,
-      required this.following})
+      required this.friends})
       : super(key: key);
   AppUser user;
   AppUser curruser;
   bool iscurruser;
-  bool onfollowers;
   AppLocation curruserlocation;
   FirebaseAnalytics analytics;
-  List<AppUser> followers;
-  List<AppUser> following;
+  List<AppUser> friends;
   @override
-  State<FollowerFollowingScreen> createState() =>
-      _FollowerFollowingScreenState();
+  State<FriendsScreen> createState() => _FriendsScreenState();
 }
 
-class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
+class _FriendsScreenState extends State<FriendsScreen> {
   db_conn db = db_conn();
 
   void displayErrorSnackBar(
@@ -100,79 +95,17 @@ class _FollowerFollowingScreenState extends State<FollowerFollowingScreen> {
       ),
       body: SingleChildScrollView(
         child: SizedBox(
-          height: widget.onfollowers
-              ? widget.followers.length * 60.0 + 16.0 + screenheight * 0.1
-              : widget.following.length * 60.0 + 16.0 + screenheight * 0.1,
-          child: Column(children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      widget.onfollowers = true;
-                    });
-                  },
-                  child: Container(
-                    height: screenheight * 0.045,
-                    width: screenwidth * 0.5,
-                    decoration: BoxDecoration(
-                        border: Border(
-                            bottom: BorderSide(
-                                color: widget.onfollowers
-                                    ? Colors.black
-                                    : const Color.fromARGB(55, 158, 158, 158)),
-                            right: const BorderSide(
-                                color: Color.fromARGB(55, 158, 158, 158)))),
-                    child: Center(
-                        child: Text(
-                      "Followers",
-                      style: TextStyle(
-                          fontWeight: widget.onfollowers
-                              ? FontWeight.bold
-                              : FontWeight.normal),
-                    )),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      widget.onfollowers = false;
-                    });
-                  },
-                  child: Container(
-                    height: screenheight * 0.045,
-                    width: screenwidth * 0.5,
-                    decoration: BoxDecoration(
-                        border: Border(
-                            bottom: BorderSide(
-                                color: widget.onfollowers
-                                    ? const Color.fromARGB(55, 158, 158, 158)
-                                    : Colors.black),
-                            left: const BorderSide(color: Colors.white))),
-                    child: Center(
-                        child: Text(
-                      "Following",
-                      style: TextStyle(
-                          fontWeight: widget.onfollowers
-                              ? FontWeight.normal
-                              : FontWeight.bold),
-                    )),
-                  ),
-                )
-              ],
-            ),
-            UserListView(
-              userres: widget.onfollowers ? widget.followers : widget.following,
-              onTap: usernavigate,
-              curruser: widget.curruser,
-              screenwidth: screenwidth,
-              showcloutscore: false,
-              showrembutton: false,
-              showsendbutton: false,
-              physics: NeverScrollableScrollPhysics(),
-            ),
-          ]),
+          height: widget.friends.length * 60.0 + 16.0 + screenheight * 0.1,
+          child: UserListView(
+            userres: widget.friends,
+            onTap: usernavigate,
+            curruser: widget.curruser,
+            screenwidth: screenwidth,
+            showcloutscore: false,
+            showrembutton: false,
+            showsendbutton: false,
+            physics: NeverScrollableScrollPhysics(),
+          ),
         ),
       ),
     );

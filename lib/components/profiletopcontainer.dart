@@ -7,20 +7,18 @@ class ProfileTopContainer extends StatefulWidget {
       required this.user,
       required this.curruser,
       required this.iscurruser,
-      required this.follow,
+      required this.friend,
       required this.editprofile,
-      required this.followerscreen,
-      required this.followingscreen,
+      required this.friendsscreen,
       required this.cloutscreen,
       required this.refer})
       : super(key: key);
   AppUser user;
   AppUser curruser;
   bool iscurruser;
-  final Function() follow;
+  final Function() friend;
   final VoidCallback editprofile;
-  final VoidCallback followerscreen;
-  final VoidCallback followingscreen;
+  final VoidCallback friendsscreen;
   final VoidCallback cloutscreen;
   final VoidCallback refer;
 
@@ -134,23 +132,10 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    widget.followerscreen();
+                    widget.friendsscreen();
                   },
                   child: Text(
-                    "${widget.user.followers.length}\nFollowers",
-                    textAlign: TextAlign.center,
-                    textScaleFactor: 1.0,
-                  ),
-                ),
-                SizedBox(
-                  width: screenwidth * 0.05,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    widget.followingscreen();
-                  },
-                  child: Text(
-                    "${widget.user.following.length}\nFollowing",
+                    "${widget.user.followers.length}\nFriends",
                     textAlign: TextAlign.center,
                     textScaleFactor: 1.0,
                   ),
@@ -207,17 +192,14 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                   setState(() {
                                     buttonpressed = true;
                                   });
-                                  await widget.follow();
+                                  await widget.friend();
                                   setState(() {
                                     buttonpressed = false;
                                   });
                                 },
                           child: Container(
                             height: screenheight * 0.03,
-                            width: widget.curruser.following
-                                    .contains(widget.user.uid)
-                                ? screenwidth * 0.3
-                                : screenwidth * 0.2,
+                            width: screenwidth * 0.3,
                             decoration: BoxDecoration(
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(5)),
@@ -228,8 +210,8 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                 child: Text(
                               widget.curruser.following
                                       .contains(widget.user.uid)
-                                  ? "Stop Following"
-                                  : "Follow",
+                                  ? "Remove Friend"
+                                  : "Add Friend",
                               style: const TextStyle(fontSize: 15),
                               textScaleFactor: 1.0,
                             )),

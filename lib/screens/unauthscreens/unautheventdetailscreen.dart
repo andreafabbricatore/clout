@@ -294,9 +294,8 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
               InkWell(
                 onTap: () async {
                   try {
-                    String hostdocid =
-                        await db.getUserUIDfromUsername(widget.event.host);
-                    AppUser eventhost = await db.getUserFromUID(hostdocid);
+                    AppUser eventhost =
+                        await db.getUserFromUID(widget.event.hostdocid);
                     usernavigate(eventhost, 0);
                   } catch (e) {
                     displayErrorSnackBar("Could not retrieve host information");

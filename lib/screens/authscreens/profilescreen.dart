@@ -180,53 +180,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     refresh();
   }
 
-  void followerscreen() async {
+  void friendsscreen() async {
     try {
-      List<AppUser> followers = await db.getfollowerslist(widget.user);
-      List<AppUser> following = await db.getfollowinglist(widget.user);
+      List<AppUser> friends = await db.getfriendslist(widget.user);
       await Future.delayed(Duration(milliseconds: 50));
       await Navigator.push(
           context,
           CupertinoPageRoute(
-              builder: (_) => FollowerFollowingScreen(
-                    user: widget.user,
-                    curruser: widget.curruser,
-                    iscurruser: widget.iscurruser,
-                    onfollowers: true,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                    followers: followers,
-                    following: following,
-                  ),
+              builder: (_) => FriendsScreen(
+                  user: widget.user,
+                  curruser: widget.curruser,
+                  iscurruser: widget.iscurruser,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                  friends: friends),
               settings: RouteSettings(name: "FollowerFollowingScreen")));
       refresh();
     } catch (e) {
       displayErrorSnackBar("Could not display followers");
-    }
-  }
-
-  void followingscreen() async {
-    try {
-      List<AppUser> followers = await db.getfollowerslist(widget.user);
-      List<AppUser> following = await db.getfollowinglist(widget.user);
-      await Future.delayed(Duration(milliseconds: 50));
-      await Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (_) => FollowerFollowingScreen(
-                    user: widget.user,
-                    curruser: widget.curruser,
-                    iscurruser: widget.iscurruser,
-                    onfollowers: false,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                    followers: followers,
-                    following: following,
-                  ),
-              settings: RouteSettings(name: "FollowerFollowingScreen")));
-      refresh();
-    } catch (e) {
-      displayErrorSnackBar("Could not display following");
     }
   }
 
@@ -243,13 +214,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             settings: RouteSettings(name: "CloutScoreScreen")));
   }
 
-  Future<void> followunfollow() async {
+  Future<void> friendunfriend() async {
     try {
       //await updatecurruser();
       if (widget.curruser.following.contains(widget.user.uid)) {
-        await db.unFollow(widget.curruser.uid, widget.user.uid);
+        await db.removefriend(widget.curruser.uid, widget.user.uid);
       } else {
-        await db.follow(widget.curruser.uid, widget.user.uid);
+        await db.addfriend(widget.curruser.uid, widget.user.uid);
       }
     } catch (e) {
       displayErrorSnackBar("Could not complete action");
@@ -597,10 +568,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 iscurruser: widget.iscurruser,
                 curruser: widget.curruser,
                 editprofile: editprofile,
-                followerscreen: followerscreen,
-                followingscreen: followingscreen,
+                friendsscreen: friendsscreen,
                 cloutscreen: cloutscreen,
-                follow: followunfollow,
+                friend: friendunfriend,
                 refer: refer,
               ),
               Row(

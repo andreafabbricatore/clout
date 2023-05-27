@@ -77,8 +77,7 @@ class db_conn {
         'joined_events': [],
         'clout': 0,
         'searchfield': [],
-        'followers': [],
-        'following': [],
+        'friends': [],
         'favorites': [],
         'bio': '',
         'blocked_users': [],
@@ -130,7 +129,6 @@ class db_conn {
       await batch.commit();
       await users.doc(curruser.uid).update({"tokens": []});
     } catch (e) {
-      print(e);
       throw Exception();
     }
   }
@@ -140,8 +138,7 @@ class db_conn {
       DocumentSnapshot userSnapshot = await users.doc(curruser.uid).get();
       List joinedEvents = userSnapshot['joined_events'];
       List hostedEvents = userSnapshot['hosted_events'];
-      List followers = userSnapshot['followers'];
-      List following = userSnapshot['following'];
+      List friends = userSnapshot['friends'];
       for (String eventid in joinedEvents) {
         Event i = await getEventfromDocId(eventid);
         await leaveevent(curruser, i);
@@ -152,12 +149,8 @@ class db_conn {
         await deleteevent(i, curruser);
       }
       //print("deleted events");
-      for (String userid in following) {
-        await unFollow(curruser.uid, userid);
-      }
-      //print("removed following");
-      for (String userid in followers) {
-        await unFollow(userid, curruser.uid);
+      for (String userid in friends) {
+        await removefriend(curruser.uid, userid);
       }
       //print("removed followers");
       await FirebaseStorage.instance
@@ -740,100 +733,6 @@ class db_conn {
     }
   }
 
-  bool checkitemslistcontainedinothersamelengthlist(List list1, List list2) {
-    for (int i = 0; i < list1.length; i++) {
-      if (!list2.contains(list1[i])) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool checkeventparticipantsequality(
-      List docparticipants, List eventparticipants) {
-    if (docparticipants.length == eventparticipants.length) {
-      if (checkitemslistcontainedinothersamelengthlist(
-          docparticipants, eventparticipants)) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  Future<String> getEventDocID(Event event) async {
-    String docID = "";
-    try {
-      await events.get().then((QuerySnapshot querySnapshot) => {
-            querySnapshot.docs.forEach((doc) {
-              if (doc["title"] == event.title &&
-                  doc['description'] == event.description &&
-                  doc['interest'] == event.interest &&
-                  doc['address'] == event.address &&
-                  doc['city'] == event.city &&
-                  doc['host'] == event.host &&
-                  doc['maxparticipants'] == event.maxparticipants &&
-                  listEquals(doc['participants'], event.participants) &&
-                  doc['time'].toDate() == event.datetime) {
-                docID = doc.id;
-              }
-            })
-          });
-    } catch (e) {
-      throw Exception("Error with eventdocid");
-    }
-    if (docID != "") {
-      return docID;
-    } else {
-      throw Exception("Error with eventdocid");
-    }
-  }
-
-  Future<String> getUserUIDfromUsername(String username) async {
-    String docID = "";
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .get()
-          .then((QuerySnapshot querySnapshot) => {
-                querySnapshot.docs.forEach((doc) {
-                  if (doc["username"] == username) {
-                    docID = doc.id;
-                  }
-                })
-              });
-    } catch (e) {
-      throw Exception("Error with userdocid");
-    }
-    if (docID != "") {
-      return docID;
-    } else {
-      throw Exception("Error with userdocid");
-    }
-  }
-
-  Future<String> getUserPFPfromUsername(String username) async {
-    String pfpUrl = "";
-    try {
-      await users.getSavy().then((QuerySnapshot querySnapshot) => {
-            querySnapshot.docs.forEach((doc) {
-              if (doc["username"] == username) {
-                pfpUrl = doc["pfp_url"];
-              }
-            })
-          });
-    } catch (e) {
-      throw Exception("Error with user pfp");
-    }
-    if (pfpUrl != "") {
-      return pfpUrl;
-    } else {
-      throw Exception("Error with user pfp");
-    }
-  }
-
   Future<bool> usernameUnique(String username) async {
     try {
       QuerySnapshot querySnapshot =
@@ -892,30 +791,6 @@ class db_conn {
       } else {
         return false;
       }
-    } catch (e) {
-      throw Exception("Could not connect");
-    }
-  }
-
-  Future<List> getUserInterests(String id) async {
-    try {
-      DocumentSnapshot documentSnapshot = await users.doc(id).get();
-      List interests = documentSnapshot['interests'];
-      return interests;
-    } catch (e) {
-      throw Exception("Could not retrieve user interests");
-    }
-  }
-
-  Future<List<Event>> getEvents(List interests) async {
-    try {
-      QuerySnapshot querySnapshot =
-          await events.where('interest', whereNotIn: interests).get();
-      List<Event> eventlist = [];
-      querySnapshot.docs.forEach((element) {
-        eventlist.add(Event.fromJson(element.data(), element.id));
-      });
-      return eventlist;
     } catch (e) {
       throw Exception("Could not connect");
     }
@@ -1037,48 +912,25 @@ class db_conn {
     }
   }
 
-  Future<List<AppUser>> getfollowinglist(AppUser user) async {
+  Future<List<AppUser>> getfriendslist(AppUser user) async {
     try {
-      List<AppUser> following = [];
+      List<AppUser> friends = [];
       List<List<dynamic>> subList = [];
-      for (var i = 0; i < user.following.length; i += 10) {
-        subList.add(user.following.sublist(i,
-            i + 10 > user.following.length ? user.following.length : i + 10));
+      for (var i = 0; i < user.friends.length; i += 10) {
+        subList.add(user.friends.sublist(
+            i, i + 10 > user.friends.length ? user.friends.length : i + 10));
       }
 
       for (int i = 0; i < subList.length; i++) {
         QuerySnapshot temp =
             await users.where("uid", whereIn: subList[i]).get();
         for (int j = 0; j < temp.docs.length; j++) {
-          following.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
-        }
-      }
-      await Future.delayed(Duration(milliseconds: 50));
-      return following;
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
-
-  Future<List<AppUser>> getfollowerslist(AppUser user) async {
-    try {
-      List<AppUser> followers = [];
-      List<List<dynamic>> subList = [];
-      for (var i = 0; i < user.followers.length; i += 10) {
-        subList.add(user.followers.sublist(i,
-            i + 10 > user.followers.length ? user.followers.length : i + 10));
-      }
-
-      for (int i = 0; i < subList.length; i++) {
-        QuerySnapshot temp =
-            await users.where("uid", whereIn: subList[i]).get();
-        for (int j = 0; j < temp.docs.length; j++) {
-          followers.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+          friends.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
         }
       }
 
       await Future.delayed(Duration(milliseconds: 50));
-      return followers;
+      return friends;
     } catch (e) {
       throw Exception(e);
     }
@@ -1367,30 +1219,20 @@ class db_conn {
     }
   }
 
-  Future<AppUser> getUserFromUIDSavy(String docid) async {
-    try {
-      DocumentSnapshot documentSnapshot = await users.doc(docid).getSavy();
-      return AppUser.fromJson(documentSnapshot.data(), docid);
-    } catch (e) {
-      throw Exception("Could not retrieve user");
-    }
-  }
-
-  Future<void> follow(String curruserdocid, String userdocid) async {
+  Future<void> addfriend(String curruserdocid, String userdocid) async {
     try {
       DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
-      DocumentSnapshot userdoc = await users.doc(userdocid).get();
-      List following = curruserdoc['following'];
-      List followers = userdoc['followers'];
-      following.add(userdocid);
-      followers.add(curruserdocid);
-      users.doc(curruserdocid).update({'following': following});
-      users.doc(userdocid).update({'followers': followers});
+      users.doc(curruserdocid).set({
+        'friends': FieldValue.arrayUnion([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'friends': FieldValue.arrayUnion([curruserdocid])
+      }, SetOptions(merge: true));
       try {
         updates.add({
           'target': [userdocid],
-          'description': "${curruserdoc['fullname']} started following you",
-          'notification': "@${curruserdoc['username']} started following you",
+          'description': "${curruserdoc['fullname']} befriended you.",
+          'notification': "@${curruserdoc['username']} befriended you.",
           'eventid': "",
           'userid': curruserdocid,
           'type': 'followed'
@@ -1403,16 +1245,14 @@ class db_conn {
     }
   }
 
-  Future<void> unFollow(String curruserdocid, String userdocid) async {
+  Future<void> removefriend(String curruserdocid, String userdocid) async {
     try {
-      DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
-      DocumentSnapshot userdoc = await users.doc(userdocid).get();
-      List following = curruserdoc['following'];
-      List followers = userdoc['followers'];
-      following.removeWhere((element) => element == userdocid);
-      followers.removeWhere((element) => element == curruserdocid);
-      users.doc(curruserdocid).update({'following': following});
-      users.doc(userdocid).update({'followers': followers});
+      users.doc(curruserdocid).set({
+        'friends': FieldValue.arrayRemove([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'friends': FieldValue.arrayRemove([curruserdocid])
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception("Could not unfollow");
     }
@@ -1541,13 +1381,11 @@ class db_conn {
       }
       users.doc(curruserdocid).set({
         'blocked_users': FieldValue.arrayUnion([userdocid]),
-        'followers': FieldValue.arrayRemove([userdocid]),
-        'following': FieldValue.arrayRemove([userdocid])
+        'friends': FieldValue.arrayRemove([userdocid]),
       }, SetOptions(merge: true));
       users.doc(userdocid).set({
         'blocked_by': FieldValue.arrayUnion([curruserdocid]),
-        'followers': FieldValue.arrayRemove([curruserdocid]),
-        'following': FieldValue.arrayRemove([curruserdocid])
+        'friends': FieldValue.arrayRemove([curruserdocid]),
       }, SetOptions(merge: true));
     } catch (e) {
       throw Exception();
@@ -1570,78 +1408,9 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await events.get().then(
-          (value) => value.docs.forEach(
-            (element) async {
-              await events
-                  .doc(element.id)
-                  .set({'showlocation': true}, SetOptions(merge: true));
-            },
-          ),
-        );
-
     await users.get().then(
           (value) => value.docs.forEach(
-            (element) async {
-              await users
-                  .doc(element.id)
-                  .set({'plan': 'userfree'}, SetOptions(merge: true));
-            },
-          ),
-        );
-  }
-
-  Future<void> editalldocids() async {
-    await users.get().then(
-          (value) => value.docs.forEach(
-            (element) async {
-              DocumentSnapshot doc = await users.doc(element.id).get();
-              AppUser user = AppUser.fromJson(doc.data(), doc.id);
-              List searchfield = [];
-              String temp = "";
-              for (int i = 0; i < user.username.length; i++) {
-                temp = temp + user.username[i];
-                searchfield.add(temp.toLowerCase());
-              }
-              QuerySnapshot query =
-                  await users.doc(element.id).collection("tokens").get();
-              List tokens = [];
-              query.docs.forEach((element) {
-                tokens.add(element.id);
-              });
-              users.doc(user.uid).set({
-                'fullname': user.fullname,
-                'username': user.username,
-                'uid': user.uid,
-                'gender': user.gender,
-                'nationality': user.nationality,
-                'pfp_url': user.pfpurl,
-                'birthday': user.birthday,
-                'interests': user.interests,
-                'hosted_events': user.hostedEvents,
-                'joined_events': user.joinedEvents,
-                'clout': user.clout,
-                'searchfield': searchfield,
-                'followers': user.followers,
-                'following': user.following,
-                'favorites': user.favorites,
-                'bio': user.bio,
-                'blocked_users': user.blockedusers,
-                'blocked_by': user.blockedby,
-                'chats': user.chats,
-                'tokens': tokens
-              });
-              query.docs.forEach((token) async {
-                dynamic data = token.data();
-                var tokenRef =
-                    users.doc(element.id).collection('tokens').doc(token.id);
-                await tokenRef.set({
-                  'token': token.id,
-                  'createdAt': data['createdAt'],
-                  'platform': data['platform']
-                });
-              });
-            },
+            (element) async {},
           ),
         );
   }
@@ -1712,12 +1481,6 @@ class db_conn {
     return chats.doc(chatid).set({
       'readby': FieldValue.arrayUnion([readerid])
     }, SetOptions(merge: true));
-  }
-
-  Future<void> clearnotis(String docid) async {
-    return users.doc(docid).update({"notifications": []}).catchError((error) {
-      throw Exception();
-    });
   }
 
   Future<void> createuserchat(AppUser curruser, String otheruserdocid) async {
