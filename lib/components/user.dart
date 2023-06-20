@@ -11,6 +11,8 @@ class AppUser {
   DateTime birthday;
   DateTime donesignuptime;
   List friends;
+  List requested;
+  List requestedby;
   List favorites;
   int clout;
   String bio;
@@ -42,6 +44,8 @@ class AppUser {
       required this.fullname,
       required this.birthday,
       required this.friends,
+      required this.requested,
+      required this.requestedby,
       required this.clout,
       required this.favorites,
       required this.bio,
@@ -76,6 +80,8 @@ class AppUser {
         birthday: json['birthday'].toDate(),
         donesignuptime: json['donesignuptime'].toDate(),
         friends: json['friends'] as List,
+        requested: json['requested'] as List,
+        requestedby: json['requestedby'] as List,
         clout: json['clout'] as int,
         favorites: json['favorites'] as List,
         bio: json['bio'],

@@ -868,6 +868,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     showrembutton: false,
                                     showsendbutton: true,
                                     selectedsenders: selectedsenders,
+                                    showfriendbutton: false,
                                   ),
                           ),
                         ),
@@ -1428,6 +1429,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 widget.event.presentparticipants,
                             physics: NeverScrollableScrollPhysics(),
                             showsendbutton: false,
+                            showfriendbutton: false,
                           ),
                         ],
                       ),
@@ -1457,6 +1459,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 physics: NeverScrollableScrollPhysics(),
                                 toppadding: false,
                                 showsendbutton: false,
+                                showfriendbutton: false,
                               )
                             : Container(),
                         widget.event.participants.contains(widget.curruser.uid)

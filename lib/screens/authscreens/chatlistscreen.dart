@@ -254,6 +254,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     showcloutscore: false,
                     showrembutton: false,
                     showsendbutton: false,
+                    showfriendbutton: false,
                   )
           ]),
         ));

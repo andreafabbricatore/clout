@@ -11,7 +11,9 @@ class UserListView extends StatefulWidget {
       required this.showcloutscore,
       required this.showrembutton,
       required this.showsendbutton,
+      required this.showfriendbutton,
       this.removeUser,
+      this.acceptRequest,
       this.removebuttonblack = false,
       this.physics = const AlwaysScrollableScrollPhysics(),
       this.presentparticipants = const [],
@@ -23,6 +25,7 @@ class UserListView extends StatefulWidget {
   double screenwidth;
   bool showcloutscore;
   bool showrembutton;
+  bool showfriendbutton;
   bool removebuttonblack;
   List presentparticipants;
   List selectedsenders;
@@ -32,6 +35,7 @@ class UserListView extends StatefulWidget {
 
   final Function(AppUser user, int index)? onTap;
   final Function(AppUser user, int index)? removeUser;
+  final Function(AppUser user, int index)? acceptRequest;
 
   @override
   State<UserListView> createState() => _UserListViewState();
@@ -40,6 +44,7 @@ class UserListView extends StatefulWidget {
 class _UserListViewState extends State<UserListView> {
   bool ontappressed = false;
   bool removeuserpressed = false;
+  bool addfriendbuttonpressed = false;
 
   Widget _listviewitem(
       AppUser user,
@@ -50,8 +55,10 @@ class _UserListViewState extends State<UserListView> {
       bool showrembutton,
       bool removebuttonblack,
       bool showsendbutton,
+      bool showfriendbutton,
       Function(AppUser user, int index)? removeUser,
       Function(AppUser user, int index)? onTap,
+      Function(AppUser user, int index)? acceptRequest,
       List presentparticipants,
       List selectedsenders) {
     return GestureDetector(
@@ -150,6 +157,25 @@ class _UserListViewState extends State<UserListView> {
                       ? Color.fromARGB(255, 255, 48, 117)
                       : Colors.black,
                 )
+              : Container(),
+          showfriendbutton
+              ? GestureDetector(
+                  onTap: addfriendbuttonpressed
+                      ? null
+                      : () {
+                          setState(() {
+                            addfriendbuttonpressed = true;
+                          });
+                          acceptRequest?.call(user, index);
+                          setState(() {
+                            addfriendbuttonpressed = false;
+                          });
+                        },
+                  child: const Icon(
+                    Icons.person_add,
+                    color: Colors.black,
+                  ),
+                )
               : Container()
         ],
       ),
@@ -175,8 +201,10 @@ class _UserListViewState extends State<UserListView> {
                   widget.showrembutton,
                   widget.removebuttonblack,
                   widget.showsendbutton,
+                  widget.showfriendbutton,
                   widget.removeUser,
                   widget.onTap,
+                  widget.acceptRequest,
                   widget.presentparticipants,
                   widget.selectedsenders));
         });

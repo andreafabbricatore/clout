@@ -105,6 +105,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
             showrembutton: false,
             showsendbutton: false,
             physics: NeverScrollableScrollPhysics(),
+            showfriendbutton: false,
           ),
         ),
       ),

@@ -31,6 +31,8 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       fullname: "",
       birthday: DateTime(0, 0, 0, 0),
       friends: [],
+      requested: [],
+      requestedby: [],
       clout: 0,
       favorites: [],
       bio: "",

@@ -224,6 +224,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                 showrembutton: false,
                 physics: const NeverScrollableScrollPhysics(),
                 showsendbutton: false,
+                showfriendbutton: false,
               ),
               SizedBox(
                 height: screenheight * 0.02,

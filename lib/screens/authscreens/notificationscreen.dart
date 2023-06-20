@@ -6,6 +6,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/components/notification.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
+import 'package:clout/screens/authscreens/requestscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -78,6 +79,26 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   analytics: widget.analytics,
                 ),
             settings: RouteSettings(name: "ProfileScreen")));
+  }
+
+  Future<void> gotorequestscreen() async {
+    try {
+      await updatecurruser();
+      List<AppUser> requestedby = await db.getrequestbylist(widget.curruser);
+      await Future.delayed(const Duration(milliseconds: 50));
+      await Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => RequestScreen(
+                    curruser: widget.curruser,
+                    analytics: widget.analytics,
+                    requestedby: requestedby,
+                    curruserlocation: widget.curruserlocation,
+                  ),
+              settings: const RouteSettings(name: "RequestScreen")));
+    } catch (e) {
+      displayErrorSnackBar("Could not see friend requests. Please try again.");
+    }
   }
 
   Future<void> updatecurruser() async {
@@ -199,6 +220,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             screenwidth: screenwidth,
             onTapUsername: usernavigate,
             onTapEvent: eventnavigate,
+            gotoRequestScreen: gotorequestscreen,
           )
         ]),
       ),

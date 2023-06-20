@@ -208,6 +208,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
               showcloutscore: false,
               showrembutton: false,
               showsendbutton: false,
+              showfriendbutton: false,
             ),
           );
   }

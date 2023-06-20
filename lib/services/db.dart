@@ -78,6 +78,8 @@ class db_conn {
         'clout': 0,
         'searchfield': [],
         'friends': [],
+        'requested': [],
+        'requestedby': [],
         'favorites': [],
         'bio': '',
         'blocked_users': [],
@@ -936,6 +938,34 @@ class db_conn {
     }
   }
 
+  Future<List<AppUser>> getrequestbylist(AppUser user) async {
+    try {
+      List<AppUser> requestedby = [];
+      List<List<dynamic>> subList = [];
+      for (var i = 0; i < user.requestedby.length; i += 10) {
+        subList.add(user.requestedby.sublist(
+            i,
+            i + 10 > user.requestedby.length
+                ? user.requestedby.length
+                : i + 10));
+      }
+
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("uid", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          requestedby
+              .add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+
+      await Future.delayed(Duration(milliseconds: 50));
+      return requestedby;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<AppUser>> geteventparticipantslist(Event event) async {
     try {
       List<AppUser> participants = [];
@@ -1219,29 +1249,89 @@ class db_conn {
     }
   }
 
-  Future<void> addfriend(String curruserdocid, String userdocid) async {
+  Future<void> sendfriendrequest(String curruserdocid, String userdocid) async {
     try {
       DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
       users.doc(curruserdocid).set({
-        'friends': FieldValue.arrayUnion([userdocid])
+        'requested': FieldValue.arrayUnion([userdocid])
       }, SetOptions(merge: true));
       users.doc(userdocid).set({
-        'friends': FieldValue.arrayUnion([curruserdocid])
+        'requestedby': FieldValue.arrayUnion([curruserdocid])
       }, SetOptions(merge: true));
       try {
         updates.add({
           'target': [userdocid],
-          'description': "${curruserdoc['fullname']} befriended you.",
-          'notification': "@${curruserdoc['username']} befriended you.",
+          'description':
+              "${curruserdoc['fullname']} sent you a friend request.",
+          'notification':
+              "@${curruserdoc['username']} sent you a friend request.",
           'eventid': "",
           'userid': curruserdocid,
-          'type': 'followed'
+          'type': 'friend_request'
+        });
+      } catch (e) {
+        throw Exception();
+      }
+    } catch (e) {
+      throw Exception("Could not send friend request.");
+    }
+  }
+
+  Future<void> removefriendrequest(
+      String curruserdocid, String userdocid) async {
+    try {
+      users.doc(curruserdocid).set({
+        'requested': FieldValue.arrayRemove([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'requestedby': FieldValue.arrayRemove([curruserdocid])
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception("Could not remove friend request.");
+    }
+  }
+
+  Future<void> acceptfriendrequest(
+      String curruserdocid, String userdocid) async {
+    try {
+      DocumentSnapshot curruserdoc = await users.doc(curruserdocid).get();
+      users.doc(curruserdocid).set({
+        'friends': FieldValue.arrayUnion([userdocid]),
+        'requestedby': FieldValue.arrayRemove([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'friends': FieldValue.arrayUnion([curruserdocid]),
+        'requested': FieldValue.arrayRemove([curruserdocid])
+      }, SetOptions(merge: true));
+      try {
+        updates.add({
+          'target': [userdocid],
+          'description':
+              "${curruserdoc['fullname']} accepted your friend request.",
+          'notification':
+              "@${curruserdoc['username']} accepted your friend request.",
+          'eventid': "",
+          'userid': curruserdocid,
+          'type': 'accept_friend_request'
         });
       } catch (e) {
         throw Exception();
       }
     } catch (e) {
       throw Exception("Could not follow");
+    }
+  }
+
+  Future<void> denyfriendrequest(String curruserdocid, String userdocid) async {
+    try {
+      users.doc(curruserdocid).set({
+        'requestedby': FieldValue.arrayRemove([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'requested': FieldValue.arrayRemove([curruserdocid])
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception("Could not deny friend request.");
     }
   }
 
@@ -1410,7 +1500,11 @@ class db_conn {
   Future<void> addAttributetoAllDocuments() async {
     await users.get().then(
           (value) => value.docs.forEach(
-            (element) async {},
+            (element) async {
+              await users.doc(element.id).set(
+                  {'requested': [], 'requestedby': []},
+                  SetOptions(merge: true));
+            },
           ),
         );
   }

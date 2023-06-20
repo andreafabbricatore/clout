@@ -126,6 +126,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                 removeUser: unblockUser,
                 removebuttonblack: true,
                 showsendbutton: false,
+                showfriendbutton: false,
               ),
               SizedBox(
                 height: screenheight * 0.02,

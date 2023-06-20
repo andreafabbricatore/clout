@@ -183,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void friendsscreen() async {
     try {
       List<AppUser> friends = await db.getfriendslist(widget.user);
-      await Future.delayed(Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 50));
       await Navigator.push(
           context,
           CupertinoPageRoute(
@@ -217,10 +217,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> friendunfriend() async {
     try {
       //await updatecurruser();
+
       if (widget.curruser.friends.contains(widget.user.uid)) {
         await db.removefriend(widget.curruser.uid, widget.user.uid);
-      } else {
-        await db.addfriend(widget.curruser.uid, widget.user.uid);
+      } else if (widget.curruser.requested.contains(widget.user.uid)) {
+        await db.removefriendrequest(widget.curruser.uid, widget.user.uid);
+      } else if (!widget.curruser.requested.contains(widget.user.uid)) {
+        await db.sendfriendrequest(widget.curruser.uid, widget.user.uid);
       }
     } catch (e) {
       displayErrorSnackBar("Could not complete action");

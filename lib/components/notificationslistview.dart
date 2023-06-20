@@ -1,4 +1,5 @@
 import 'package:clout/components/notification.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -8,13 +9,55 @@ class NotificationsListView extends StatelessWidget {
       required this.notificationlist,
       required this.screenwidth,
       required this.onTapUsername,
-      required,
+      required this.gotoRequestScreen,
       required this.onTapEvent})
       : super(key: key);
   List<NotificationElement> notificationlist;
   double screenwidth;
   final Function(String uid, int index) onTapUsername;
   final Function(String eventid, int index) onTapEvent;
+  final Function() gotoRequestScreen;
+
+  Widget friendrequestitem() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () {
+              gotoRequestScreen.call();
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.person_add,
+                  size: 30,
+                ),
+                SizedBox(
+                  width: screenwidth * 0.03,
+                ),
+                const Text(
+                  "Friend Requests",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                  textScaleFactor: 1.0,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Container(
+            height: 1,
+            width: screenwidth * 0.9,
+            color: Colors.black,
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _listviewitem(
     NotificationElement notification,
@@ -146,11 +189,13 @@ class NotificationsListView extends StatelessWidget {
       child: ListView.builder(
           padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
           shrinkWrap: true,
-          itemCount: notificationlist.length,
+          itemCount: notificationlist.length + 1,
           itemBuilder: (_, index) {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                child: _listviewitem(notificationlist[index], index));
+                child: index == 0
+                    ? friendrequestitem()
+                    : _listviewitem(notificationlist[index - 1], index - 1));
           }),
     );
   }

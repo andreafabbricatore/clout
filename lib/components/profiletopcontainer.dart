@@ -28,6 +28,7 @@ class ProfileTopContainer extends StatefulWidget {
 
 class _ProfileTopContainerState extends State<ProfileTopContainer> {
   bool buttonpressed = false;
+  String friendval = "";
 
   calculateAge(DateTime birthDate) {
     DateTime currentDate = DateTime.now();
@@ -44,6 +45,29 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
       }
     }
     return age;
+  }
+
+  void setfriendval() {
+    if (widget.curruser.friends.contains(widget.user.uid)) {
+      setState(() {
+        friendval = "Remove Friend";
+      });
+    } else if (widget.curruser.requested.contains(widget.user.uid)) {
+      setState(() {
+        friendval = "Request Sent";
+      });
+    } else if (!widget.curruser.requested.contains(widget.user.uid)) {
+      setState(() {
+        friendval = "Add Friend";
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    setfriendval();
+    super.initState();
   }
 
   @override
@@ -88,11 +112,9 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                   ),
                 )
               : Container(),
-          widget.iscurruser
-              ? SizedBox(
-                  height: screenheight * 0.02,
-                )
-              : Container(),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
             child: Row(
@@ -123,7 +145,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                         "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
                         textAlign: TextAlign.start,
                         style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
+                            fontSize: 18, fontWeight: FontWeight.w500),
                         textScaleFactor: 1.0,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -209,6 +231,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                     setState(() {
                                       buttonpressed = false;
                                     });
+                                    setfriendval();
                                   },
                             child: Container(
                               height: screenheight * 0.03,
@@ -221,10 +244,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                           161, 158, 158, 158))),
                               child: Center(
                                   child: Text(
-                                widget.curruser.friends
-                                        .contains(widget.user.uid)
-                                    ? "Remove Friend"
-                                    : "Add Friend",
+                                friendval,
                                 textScaleFactor: 1.0,
                               )),
                             ),

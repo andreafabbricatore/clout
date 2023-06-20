@@ -156,6 +156,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       });
 
       //await newgetUserAppLocation();
+      await db.addAttributetoAllDocuments();
       await widget.analytics.setUserId(id: widget.uid);
       await db.updatelastuserlocandusage(
           widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
