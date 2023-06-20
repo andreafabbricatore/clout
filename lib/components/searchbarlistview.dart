@@ -144,10 +144,8 @@ class _SearchBarListViewState extends State<SearchBarListView> {
               ? widget.eventres.length
               : widget.userres.length,
           "eventinterest": event.interest,
-          "hostinfollowing":
-              widget.curruser.following.contains(event.hostdocid).toString(),
-          "hostinfollowers":
-              widget.curruser.followers.contains(event.hostdocid).toString()
+          "hostinfriends":
+              widget.curruser.friends.contains(event.hostdocid).toString(),
         });
         await Navigator.push(
             context,
@@ -173,10 +171,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
         "searchreslength": widget.searchevents
             ? widget.eventres.length
             : widget.userres.length,
-        "userinfollowing":
-            widget.curruser.following.contains(user.uid).toString(),
-        "userinfollowers":
-            widget.curruser.followers.contains(user.uid).toString()
+        "userinfriends": widget.curruser.friends.contains(user.uid).toString(),
       });
       Navigator.push(
           context,

@@ -109,7 +109,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
         widget.curruserlocation.country,
         widget.curruser);
     for (int i = 0; i < res.length; i++) {
-      if (widget.curruser.following.contains(res[i].hostdocid)) {
+      if (widget.curruser.friends.contains(res[i].hostdocid)) {
         filteredEventList.insert(0, res[i]);
       } else {
         filteredEventList.add(res[i]);

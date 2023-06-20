@@ -217,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> friendunfriend() async {
     try {
       //await updatecurruser();
-      if (widget.curruser.following.contains(widget.user.uid)) {
+      if (widget.curruser.friends.contains(widget.user.uid)) {
         await db.removefriend(widget.curruser.uid, widget.user.uid);
       } else {
         await db.addfriend(widget.curruser.uid, widget.user.uid);
@@ -269,10 +269,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final box = context.findRenderObject() as RenderBox?;
     await widget.analytics.logEvent(name: "shared_user", parameters: {
       "iscurruser": widget.iscurruser.toString(),
-      "isfollowinguser":
-          widget.curruser.following.contains(widget.user.uid).toString(),
-      "isuserfollower":
-          widget.curruser.followers.contains(widget.user.uid).toString(),
+      "isfrienduser":
+          widget.curruser.friends.contains(widget.user.uid).toString(),
       "shared_user_gender": widget.user.gender,
       "sharer_user_gender": widget.curruser.gender
     });

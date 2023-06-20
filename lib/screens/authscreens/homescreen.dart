@@ -79,15 +79,13 @@ class _HomeScreenState extends State<HomeScreen> {
           widget.curruser);
       for (int i = 0; i < currloceventlist.length; i++) {
         if (widget.curruser.interests.contains(currloceventlist[i].interest)) {
-          if (widget.curruser.following
-              .contains(currloceventlist[i].hostdocid)) {
+          if (widget.curruser.friends.contains(currloceventlist[i].hostdocid)) {
             interesteventlist.insert(0, currloceventlist[i]);
           } else {
             interesteventlist.add(currloceventlist[i]);
           }
         } else {
-          if (widget.curruser.following
-              .contains(currloceventlist[i].hostdocid)) {
+          if (widget.curruser.friends.contains(currloceventlist[i].hostdocid)) {
             interesteventlist.insert(0, currloceventlist[i]);
           } else {
             generaleventlist.add(currloceventlist[i]);

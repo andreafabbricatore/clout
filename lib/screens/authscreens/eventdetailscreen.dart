@@ -848,10 +848,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           child: SizedBox(
                             height: screenheight * 0.4,
                             width: screenwidth,
-                            child: widget.curruser.following.isEmpty
+                            child: widget.curruser.friends.isEmpty
                                 ? const Center(
                                     child: Text(
-                                      "The people you follow\nwill show up here.",
+                                      "Your friends will\nshow up here.",
                                       style: TextStyle(
                                         fontSize: 20,
                                       ),
@@ -1012,10 +1012,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "userbio": user.bio,
           "username": user.username,
           "userclout": user.clout,
-          "userfollowers": user.followers.length,
-          "userfollowing": user.following.length,
-          "userfollowersgtfollowing":
-              (user.followers.length >= user.following.length).toString()
         });
         updatescreen(widget.event.docid);
       } catch (e) {
@@ -1031,9 +1027,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         "maxparticipants": widget.event.maxparticipants,
         "participants": widget.event.participants.length,
         "ishost": (widget.curruser.uid == widget.event.hostdocid).toString(),
-        "isfollowinghost": widget.curruser.following
-            .contains(widget.event.hostdocid)
-            .toString()
+        "isfriendshost":
+            widget.curruser.friends.contains(widget.event.hostdocid).toString()
       });
       await Share.share(
         text,
