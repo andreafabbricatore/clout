@@ -3,6 +3,7 @@ import 'package:clout/components/eventlistview.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
@@ -27,24 +28,7 @@ class _FavScreenState extends State<FavScreen> {
   List<Event> favorites = [];
   db_conn db = db_conn();
   Color loadedcolor = Colors.white;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   Future<void> updatefavevents() async {
     List<Event> updatedfavevents = await db.getFavEvents(widget.curruser);
@@ -73,7 +57,7 @@ class _FavScreenState extends State<FavScreen> {
         });
       }
     } catch (e) {
-      displayErrorSnackBar("Could not update favorites");
+      logic.displayErrorSnackBar("Could not update favorites", context);
     } finally {
       refresh();
     }
@@ -86,7 +70,7 @@ class _FavScreenState extends State<FavScreen> {
         widget.curruser = updateduser;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh user");
+      logic.displayErrorSnackBar("Could not refresh user", context);
     }
   }
 
@@ -95,7 +79,7 @@ class _FavScreenState extends State<FavScreen> {
       await updatecurruser();
       await updatefavevents();
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
   }
 
@@ -135,7 +119,7 @@ class _FavScreenState extends State<FavScreen> {
                     ),
                 settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
       refresh();
     }

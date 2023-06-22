@@ -1,5 +1,6 @@
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/screens/authscreens/loading.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class LinkPhoneInputScreen extends StatefulWidget {
 class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
   pf.PhoneNumber? userNumber;
   bool sendcodebuttonpressed = false;
+  applogic logic = applogic();
 
   void verifycode(String verificationId) {
     setState(() {
@@ -33,24 +35,6 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                     updatephonenumber: widget.updatephonenumber,
                   )));
     });
-  }
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -160,8 +144,8 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                           verificationCompleted:
                               (PhoneAuthCredential credential) {},
                           verificationFailed: (FirebaseAuthException e) {
-                            displayErrorSnackBar(
-                                "Could not verify phone number");
+                            logic.displayErrorSnackBar(
+                                "Could not verify phone number", context);
                             setState(() {
                               sendcodebuttonpressed = false;
                             });
@@ -170,8 +154,8 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                             try {
                               verifycode(verificationId);
                             } catch (e) {
-                              displayErrorSnackBar(
-                                  "Could not verify phone number");
+                              logic.displayErrorSnackBar(
+                                  "Could not verify phone number", context);
                               setState(() {
                                 sendcodebuttonpressed = false;
                               });
@@ -184,8 +168,9 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                       setState(() {
                         sendcodebuttonpressed = false;
                       });
-                      displayErrorSnackBar(
-                          "Please try again. Make sure everything was filled correctly.");
+                      logic.displayErrorSnackBar(
+                          "Please try again. Make sure everything was filled correctly.",
+                          context);
                     }
                   },
             child: PrimaryButton(
@@ -215,6 +200,8 @@ class LinkOTPInputScreen extends StatefulWidget {
 }
 
 class _LinkOTPInputScreenState extends State<LinkOTPInputScreen> {
+  applogic logic = applogic();
+
   void donechange() {
     Navigator.push(
         context,
@@ -222,24 +209,6 @@ class _LinkOTPInputScreenState extends State<LinkOTPInputScreen> {
             builder: (_) => LoadingScreen(
                 uid: FirebaseAuth.instance.currentUser!.uid,
                 analytics: widget.analytics)));
-  }
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -316,11 +285,12 @@ class _LinkOTPInputScreenState extends State<LinkOTPInputScreen> {
                     }
                     donechange();
                   } catch (e) {
-                    displayErrorSnackBar("Could not verify phone number.");
+                    logic.displayErrorSnackBar(
+                        "Could not verify phone number.", context);
                   }
                 } catch (e) {
-                  displayErrorSnackBar(
-                      "Make sure OTP code was inserted correctly.");
+                  logic.displayErrorSnackBar(
+                      "Make sure OTP code was inserted correctly.", context);
                 }
               },
             ),

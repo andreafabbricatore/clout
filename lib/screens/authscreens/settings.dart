@@ -6,6 +6,7 @@ import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/screens/authscreens/blockedusersscreen.dart';
 import 'package:clout/screens/authscreens/linkphoneauth.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   db_conn db = db_conn();
+  applogic logic = applogic();
 
   TextEditingController psw = TextEditingController();
 
@@ -36,24 +38,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool updatepswbuttonpressed = false;
   bool updateemailbuttonpressed = false;
   bool bugbuttonpressed = false;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   void goauthscreen() {
     Navigator.pushReplacement(
@@ -153,8 +137,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       await FirebaseAuth.instance
                                           .signInWithCredential(credential);
                                 } catch (e) {
-                                  displayErrorSnackBar(
-                                      "Make sure OTP code was inserted correctly.");
+                                  logic.displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.",
+                                      context);
                                 }
                               },
                             ),
@@ -179,8 +164,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       newpsw.clear();
                                       goauthwrapper();
                                     } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Invalid Action, try again");
+                                      logic.displayErrorSnackBar(
+                                          "Invalid Action, try again", context);
                                     } finally {
                                       setState(() {
                                         deletebuttonpressed = false;
@@ -387,8 +372,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           bugcontroller.clear();
                                           Navigator.pop(context);
                                         } catch (e) {
-                                          displayErrorSnackBar(
-                                              "Invalid Action, try again");
+                                          logic.displayErrorSnackBar(
+                                              "Invalid Action, try again",
+                                              context);
                                         } finally {
                                           bugbuttonpressed = false;
                                         }
@@ -406,8 +392,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }));
                   });
             },
-            child: Row(
-              children: const [
+            child: const Row(
+              children: [
                 Icon(Icons.bug_report_outlined, size: 30),
                 SizedBox(
                   width: 6,
@@ -474,8 +460,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     settings: RouteSettings(name: "BlockedUsersScreen")),
               );
             },
-            child: Row(
-              children: const [
+            child: const Row(
+              children: [
                 Icon(Icons.block, size: 30),
                 SizedBox(
                   width: 6,
@@ -550,8 +536,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 verificationCompleted:
                                     (PhoneAuthCredential credential) {},
                                 verificationFailed: (FirebaseAuthException e) {
-                                  displayErrorSnackBar(
-                                      "Could not verify phone number");
+                                  logic.displayErrorSnackBar(
+                                      "Could not verify phone number", context);
                                 },
                                 codeSent:
                                     (String verificationId, int? resendToken) {

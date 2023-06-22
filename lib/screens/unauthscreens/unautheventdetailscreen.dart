@@ -8,6 +8,7 @@ import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthprofilescreen.dart';
 
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class UnAuthEventDetailScreen extends StatefulWidget {
 
 class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
   db_conn db = db_conn();
+  applogic logic = applogic();
   bool joined = false;
   String joinedval = "Join";
   bool buttonpressed = false;
@@ -46,24 +48,6 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
   bool showqrmessage = false;
   bool authbuttonpressed = false;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -95,7 +79,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
         widget.participants = temp;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
   }
 
@@ -298,7 +282,8 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                         await db.getUserFromUID(widget.event.hostdocid);
                     usernavigate(eventhost, 0);
                   } catch (e) {
-                    displayErrorSnackBar("Could not retrieve host information");
+                    logic.displayErrorSnackBar(
+                        "Could not retrieve host information", context);
                   }
                 },
                 child: Text(

@@ -5,6 +5,7 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/updateinterests.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -22,6 +23,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   db_conn db = db_conn();
+  applogic logic = applogic();
   ImagePicker picker = ImagePicker();
   var imagepath;
   var compressedimgpath;
@@ -288,24 +290,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   List newinterests = [];
   bool error = false;
 
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
   Future<XFile> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
@@ -376,7 +360,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     //print(imagepath);
                   }
                 } catch (e) {
-                  displayErrorSnackBar("Error with profile picture");
+                  logic.displayErrorSnackBar(
+                      "Error with profile picture", context);
                 }
               },
               child: ClipRRect(
@@ -548,7 +533,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         } else {
                           if (usernamecontroller.text.trim() !=
                               widget.curruser.username) {
-                            displayErrorSnackBar("Invalid Username");
+                            logic.displayErrorSnackBar(
+                                "Invalid Username", context);
                             setState(() {
                               error = true;
                             });
@@ -560,8 +546,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               fullnamecontroller.text.trim(),
                               widget.curruser.uid);
                         } else {
-                          displayErrorSnackBar(
-                              "Please do not leave fields empty");
+                          logic.displayErrorSnackBar(
+                              "Please do not leave fields empty", context);
                           setState(() {
                             error = true;
                           });
@@ -579,13 +565,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         await widget.analytics
                             .logEvent(name: "edited_profile", parameters: {});
                       } catch (e) {
-                        displayErrorSnackBar("Could not update profile");
+                        logic.displayErrorSnackBar(
+                            "Could not update profile", context);
                       } finally {
                         setState(() {
                           buttonpressed = false;
                         });
                         if (!error) {
-                          displayErrorSnackBar("Updated Profile!");
+                          logic.displayErrorSnackBar(
+                              "Updated Profile!", context);
                           Navigator.pop(context);
                         }
                       }

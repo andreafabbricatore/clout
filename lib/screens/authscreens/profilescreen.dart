@@ -10,6 +10,7 @@ import 'package:clout/screens/authscreens/favscreen.dart';
 import 'package:clout/screens/authscreens/followerfollowingscreen.dart';
 import 'package:clout/screens/authscreens/settings.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -42,48 +43,33 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   db_conn db = db_conn();
+  applogic logic = applogic();
 
   bool joinedevents = true;
   List<Event> joinedEvents = [];
   List<Event> hostedEvents = [];
   List<AppUser> globalrankedusers = [];
 
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
   Future<void> reportuser() async {
     try {
       await db.reportUser(widget.user);
-      displayErrorSnackBar("Reported @${widget.user.username}");
+      logic.displayErrorSnackBar("Reported @${widget.user.username}", context);
       Navigator.pop(context);
     } catch (e) {
-      displayErrorSnackBar("Could not report, please try again");
+      logic.displayErrorSnackBar("Could not report, please try again", context);
     }
   }
 
   Future<void> blockuser() async {
     try {
       await db.blockUser(widget.curruser.uid, widget.user.uid);
-      displayErrorSnackBar("Blocked User! To unblock, please visit Settings.");
+      logic.displayErrorSnackBar(
+          "Blocked User! To unblock, please visit Settings.", context);
       Navigator.pop(context);
       Navigator.pop(context);
     } catch (e) {
-      displayErrorSnackBar("Could not block user, please try again");
+      logic.displayErrorSnackBar(
+          "Could not block user, please try again", context);
     }
   }
 
@@ -95,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       //geteventlist(widget.user.hostedEvents, false);
       await getevents();
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
   }
 
@@ -106,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         widget.user = updateduser;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh user");
+      logic.displayErrorSnackBar("Could not refresh user", context);
     }
   }
 
@@ -117,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         widget.curruser = updateduser;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh user");
+      logic.displayErrorSnackBar("Could not refresh user", context);
     }
   }
 
@@ -197,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               settings: RouteSettings(name: "FollowerFollowingScreen")));
       refresh();
     } catch (e) {
-      displayErrorSnackBar("Could not display followers");
+      logic.displayErrorSnackBar("Could not display followers", context);
     }
   }
 
@@ -226,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await db.sendfriendrequest(widget.curruser.uid, widget.user.uid);
       }
     } catch (e) {
-      displayErrorSnackBar("Could not complete action");
+      logic.displayErrorSnackBar("Could not complete action", context);
     } finally {
       refresh();
     }
@@ -252,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await db.addToFav(widget.curruser.uid, event.docid);
       }
     } catch (e) {
-      displayErrorSnackBar("Could not update favorites");
+      logic.displayErrorSnackBar("Could not update favorites", context);
     } finally {
       updatecurruser();
     }
@@ -331,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                 settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
       refresh();
     }

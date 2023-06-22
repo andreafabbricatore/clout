@@ -4,6 +4,7 @@ import 'package:clout/components/unauthsearchbarlistview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/unauthscreens/unauthinterestsearchscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:clout/components/event.dart';
@@ -19,6 +20,7 @@ class UnAuthSearchScreen extends StatefulWidget {
 
 class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
   db_conn db = db_conn();
+  applogic logic = applogic();
   List interests = [
     "Sports",
     "Nature",
@@ -47,24 +49,6 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
   bool searchevents = true;
   FocusNode focusNode = FocusNode();
   Color suffixiconcolor = Colors.white;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   void gotointerestsearchscreen(
       String interest, List<Event> interesteventlist) {
@@ -105,7 +89,7 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
         gotointerestsearchscreen(interest, interesteventlist);
         //print(interesteventlist);
       } catch (e) {
-        displayErrorSnackBar("Could not display events");
+        logic.displayErrorSnackBar("Could not display events", context);
       }
     }
 
@@ -138,7 +122,8 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
                             searchedevents = res;
                           });
                         } catch (e) {
-                          displayErrorSnackBar("Could not search events");
+                          logic.displayErrorSnackBar(
+                              "Could not search events", context);
                         }
                       } else {
                         try {
@@ -148,7 +133,8 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
                             searchedusers = res;
                           });
                         } catch (e) {
-                          displayErrorSnackBar("Could not search users");
+                          logic.displayErrorSnackBar(
+                              "Could not search users", context);
                         }
                       }
                     },
@@ -211,7 +197,8 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
                             searchedevents = res;
                           });
                         } catch (e) {
-                          displayErrorSnackBar("Could not search events");
+                          logic.displayErrorSnackBar(
+                              "Could not search events", context);
                         }
                       },
                       child: SizedBox(
@@ -244,7 +231,8 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
                             searchedusers = res;
                           });
                         } catch (e) {
-                          displayErrorSnackBar("Could not search users");
+                          logic.displayErrorSnackBar(
+                              "Could not search users", context);
                         }
                       },
                       child: SizedBox(

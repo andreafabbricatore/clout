@@ -15,6 +15,7 @@ import 'package:clout/screens/authscreens/homescreenholder.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
@@ -47,6 +48,7 @@ class _MainScreenState extends State<MainScreen> {
   StreamSubscription<Uri>? _linkSubscription;
   String deeplink = "";
   db_conn db = db_conn();
+  applogic logic = applogic();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   late bool canvibrate;
 
@@ -97,24 +99,6 @@ class _MainScreenState extends State<MainScreen> {
         analytics: widget.analytics,
       )
     ];
-  }
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future<void> initDeepLinks() async {
@@ -199,8 +183,9 @@ class _MainScreenState extends State<MainScreen> {
             await db.referralcloutinc(widget.curruser.uid, id).catchError((e) {
               throw Exception();
             });
-            displayErrorSnackBar(
-                "Succesfully referred! Clout score has been increased!");
+            logic.displayErrorSnackBar(
+                "Succesfully referred! Clout score has been increased!",
+                context);
           }
         } catch (e) {}
       }
@@ -230,7 +215,7 @@ class _MainScreenState extends State<MainScreen> {
         Chat chat = await db.getChatfromDocId(message.data['chatid']);
         gochatroomscreen(chat);
       } catch (e) {
-        displayErrorSnackBar("Could not display chat");
+        logic.displayErrorSnackBar("Could not display chat", context);
       }
     } else if (message.data["type"] == "eventcreated") {
       try {
@@ -238,7 +223,7 @@ class _MainScreenState extends State<MainScreen> {
         List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
     } else if (message.data["type"] == "joined") {
       try {
@@ -247,7 +232,7 @@ class _MainScreenState extends State<MainScreen> {
         await Future.delayed(const Duration(milliseconds: 50));
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
     } else if (message.data["type"] == "modified") {
       try {
@@ -255,14 +240,21 @@ class _MainScreenState extends State<MainScreen> {
         List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
-    } else if (message.data["type"] == "followed") {
+    } else if (message.data["type"] == "friend_request") {
       try {
         AppUser user = await db.getUserFromUID(message.data["userid"]);
         gotoprofilescreen(user);
       } catch (e) {
-        displayErrorSnackBar("Could not display user");
+        logic.displayErrorSnackBar("Could not display user", context);
+      }
+    } else if (message.data["type"] == "accept_friend_request") {
+      try {
+        AppUser user = await db.getUserFromUID(message.data["userid"]);
+        gotoprofilescreen(user);
+      } catch (e) {
+        logic.displayErrorSnackBar("Could not display user", context);
       }
     } else if (message.data["type"] == "kicked") {
       try {
@@ -270,7 +262,7 @@ class _MainScreenState extends State<MainScreen> {
         List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
     } else if (message.data["type"] == "reminder") {
       try {
@@ -278,7 +270,7 @@ class _MainScreenState extends State<MainScreen> {
         List<AppUser> participants = await db.geteventparticipantslist(event);
         godeeplinkeventdetailscreen(event, participants);
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
     }
   }

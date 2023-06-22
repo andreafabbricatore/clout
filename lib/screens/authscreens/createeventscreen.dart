@@ -5,6 +5,7 @@ import 'package:clout/components/searchlocation.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/loading.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -79,6 +80,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   ];
 
   db_conn db = db_conn();
+  applogic logic = applogic();
   late String selectedinterest;
   ImagePicker picker = ImagePicker();
   var imagepath;
@@ -137,24 +139,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     } catch (e) {
       throw Exception();
     }
-  }
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void checklocationempty() {
@@ -247,8 +231,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   //print(imagepath);
                 }
               } catch (e) {
-                displayErrorSnackBar(
-                    "Could not load. Make sure photo permissions are granted.");
+                logic.displayErrorSnackBar(
+                    "Could not load. Make sure photo permissions are granted.",
+                    context);
               }
             },
             child: ClipRRect(
@@ -676,23 +661,26 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         buttonpressed = true;
                       });
                       if (titlecontroller.text.trim().isEmpty) {
-                        displayErrorSnackBar(
-                            "Please enter a name for your event");
+                        logic.displayErrorSnackBar(
+                            "Please enter a name for your event", context);
                       } else if (desccontroller.text.trim().isEmpty) {
-                        displayErrorSnackBar("Please enter a description");
+                        logic.displayErrorSnackBar(
+                            "Please enter a description", context);
                       } else if (maxpartcontroller.text.isEmpty) {
-                        displayErrorSnackBar(
-                            "Please enter a max number of participants");
+                        logic.displayErrorSnackBar(
+                            "Please enter a max number of participants",
+                            context);
                       } else if (int.parse(maxpartcontroller.text.trim()) < 2) {
-                        displayErrorSnackBar(
-                            "Max number of participants has to be at least 2");
+                        logic.displayErrorSnackBar(
+                            "Max number of participants has to be at least 2",
+                            context);
                       } else if (eventdate
                           .isAtSameMomentAs(DateTime(0, 0, 0))) {
-                        displayErrorSnackBar(
-                            "Please choose a date for your event");
+                        logic.displayErrorSnackBar(
+                            "Please choose a date for your event", context);
                       } else if (emptylocation) {
-                        displayErrorSnackBar(
-                            "Please choose a location for your event");
+                        logic.displayErrorSnackBar(
+                            "Please choose a location for your event", context);
                       } else {
                         setState(() {
                           event.title = titlecontroller.text.trim();
@@ -726,7 +714,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
                           goloadingscreen();
                         } catch (e) {
-                          displayErrorSnackBar("Could not create event");
+                          logic.displayErrorSnackBar(
+                              "Could not create event", context);
                         }
                       }
                       setState(() {

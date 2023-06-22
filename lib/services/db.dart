@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 extension FirestoreDocumentExtension on DocumentReference {
@@ -60,10 +61,12 @@ class db_conn {
       FirebaseFirestore.instance.collection('appupdate');
   CollectionReference emailverification =
       FirebaseFirestore.instance.collection('email_verification');
+  final geo = GeoFlutterFire();
 
   Future createuserinstance(String uid) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      GeoFirePoint loc = geo.point(latitude: 0, longitude: 0);
       await users.doc(uid).set({
         'fullname': '',
         'username': '',
@@ -95,8 +98,7 @@ class db_conn {
         'setusername': false,
         'setmisc': false,
         'setinterests': false,
-        'lastknownlat': 0.0,
-        'lastknownlng': 0.0,
+        'lastknowloc': loc.data,
         'notificationcounter': 0,
         'chatnotificationcounter': 0,
         'appversion': packageInfo.version,
@@ -1701,7 +1703,9 @@ class db_conn {
   Future<void> updatelastuserlocandusage(
       String uid, double lat, double lng) async {
     try {
+      GeoFirePoint lastknownloc = geo.point(latitude: lat, longitude: lng);
       await users.doc(uid).set({
+        'lastknownloc': lastknownloc.data,
         'lastknownlat': lat,
         'lastknownlng': lng,
         'lastusagetime': FieldValue.serverTimestamp()

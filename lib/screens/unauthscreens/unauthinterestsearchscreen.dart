@@ -5,6 +5,7 @@ import 'package:clout/components/unauthnoeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
@@ -31,24 +32,7 @@ class UnAuthInterestSearchScreen extends StatefulWidget {
 class _UnAuthInterestSearchScreenState
     extends State<UnAuthInterestSearchScreen> {
   db_conn db = db_conn();
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   Future<void> refreshevents() async {
     try {
@@ -64,7 +48,7 @@ class _UnAuthInterestSearchScreenState
         widget.events = interesteventlist;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh events");
+      logic.displayErrorSnackBar("Could not refresh events", context);
     }
   }
 
@@ -72,7 +56,7 @@ class _UnAuthInterestSearchScreenState
     try {
       await refreshevents();
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
   }
 
@@ -97,7 +81,7 @@ class _UnAuthInterestSearchScreenState
                     ),
                 settings: RouteSettings(name: "UnAuthEventDetailScreen")));
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
       refresh();
     }
