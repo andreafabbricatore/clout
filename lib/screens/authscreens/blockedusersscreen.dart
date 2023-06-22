@@ -1,6 +1,7 @@
 import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:flutter/material.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
@@ -13,24 +14,7 @@ class BlockedUsersScreen extends StatefulWidget {
 class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
   db_conn db = db_conn();
   List<AppUser> blockedusers = [];
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   Future<void> getUserList() async {
     try {
@@ -43,7 +27,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         blockedusers = temp;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not get user rankings");
+      logic.displayErrorSnackBar("Could not get user rankings", context);
     }
   }
 
@@ -54,7 +38,8 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         widget.curruser = updateduser;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh blocked users list");
+      logic.displayErrorSnackBar(
+          "Could not refresh blocked users list", context);
     }
   }
 
@@ -77,10 +62,12 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     Future<void> unblockUser(AppUser user, int index) async {
       try {
         await db.unblockUser(widget.curruser.uid, user.uid);
-        displayErrorSnackBar("Unblocked user! We love friendship :)");
+        logic.displayErrorSnackBar(
+            "Unblocked user! We love friendship :)", context);
         refresh();
       } catch (e) {
-        displayErrorSnackBar("Could not remove participant, please try again");
+        logic.displayErrorSnackBar(
+            "Could not remove participant, please try again", context);
       }
     }
 

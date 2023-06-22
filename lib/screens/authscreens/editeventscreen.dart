@@ -116,7 +116,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     mapController?.animateCamera(CameraUpdate.newLatLngZoom(latlang, 17.0));
   }
 
-  Future<File> CompressAndGetFile(File file) async {
+  Future<XFile> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
       final lastIndex = filePath.lastIndexOf(".");

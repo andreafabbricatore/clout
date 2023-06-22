@@ -306,7 +306,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Future<File> CompressAndGetFile(File file) async {
+  Future<XFile> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
       final lastIndex = filePath.lastIndexOf(".");

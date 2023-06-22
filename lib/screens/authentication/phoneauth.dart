@@ -4,6 +4,7 @@ import 'package:clout/main.dart';
 import 'package:clout/screens/authentication/signupscreen.dart';
 
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -24,23 +25,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   final referralController = TextEditingController();
   bool referralbuttonpressed = false;
   pf.PhoneNumber? userNumber;
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   void verifycode(String verificationId) {
     setState(() {
@@ -147,8 +132,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                             verificationCompleted:
                                 (PhoneAuthCredential credential) {},
                             verificationFailed: (FirebaseAuthException e) {
-                              displayErrorSnackBar(
-                                  "Could not verify phone number");
+                              logic.displayErrorSnackBar(
+                                  "Could not verify phone number", context);
                               setState(() {
                                 sendcodebuttonpressed = false;
                               });
@@ -158,8 +143,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                               try {
                                 verifycode(verificationId);
                               } catch (e) {
-                                displayErrorSnackBar(
-                                    "Could not verify phone number");
+                                logic.displayErrorSnackBar(
+                                    "Could not verify phone number", context);
                                 setState(() {
                                   sendcodebuttonpressed = false;
                                 });
@@ -173,8 +158,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         setState(() {
                           sendcodebuttonpressed = false;
                         });
-                        displayErrorSnackBar(
-                            "Please try again. Make sure everything was filled correctly.");
+                        logic.displayErrorSnackBar(
+                            "Please try again. Make sure everything was filled correctly.",
+                            context);
                       }
                     },
               child: PrimaryButton(
@@ -310,6 +296,7 @@ class OTPInputScreen extends StatefulWidget {
 
 class _OTPInputScreenState extends State<OTPInputScreen> {
   db_conn db = db_conn();
+  applogic logic = applogic();
 
   void donesignin() {
     Navigator.pushReplacement(
@@ -333,24 +320,6 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
           fullscreenDialog: true,
           settings: RouteSettings(name: "PicAndNameScreen")),
     );
-  }
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -431,11 +400,12 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
                           String shareruid = widget.referral.split("/").last;
                           await db.referralcloutinc(
                               usercredential.user!.uid, shareruid);
-                          displayErrorSnackBar("Successfully referred!");
+                          logic.displayErrorSnackBar(
+                              "Successfully referred!", context);
                           donesignup();
                         } catch (e) {
-                          displayErrorSnackBar(
-                              "Invalid code, change it or remove it.");
+                          logic.displayErrorSnackBar(
+                              "Invalid code, change it or remove it.", context);
                         }
                       } else {
                         donesignup();
@@ -444,8 +414,8 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
                       donesignin();
                     }
                   } catch (e) {
-                    displayErrorSnackBar(
-                        "Make sure OTP code was inserted correctly.");
+                    logic.displayErrorSnackBar(
+                        "Make sure OTP code was inserted correctly.", context);
                   }
                 },
               ),

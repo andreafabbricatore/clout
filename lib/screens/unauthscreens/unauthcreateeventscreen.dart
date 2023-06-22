@@ -121,7 +121,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
     //This is optional, it will zoom when the marker has been created
   }
 
-  Future<File> CompressAndGetFile(File file) async {
+  Future<XFile> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
       final lastIndex = filePath.lastIndexOf(".");

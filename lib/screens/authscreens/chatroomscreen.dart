@@ -7,6 +7,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -33,24 +34,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   db_conn db = db_conn();
   late Stream<QuerySnapshot> chatmessages;
   String chatname = "";
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   Future<void> updatecurruser() async {
     try {
@@ -59,7 +43,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         widget.curruser = updateduser;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh user");
+      logic.displayErrorSnackBar("Could not refresh user", context);
     }
   }
 

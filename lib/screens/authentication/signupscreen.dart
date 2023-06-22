@@ -4,6 +4,7 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart' as dp;
@@ -31,24 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   db_conn db = db_conn();
   bool signupbuttonpressed = false;
   bool referralbuttonpressed = false;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   void gopicandnamescreen() {
     Navigator.pushReplacement(
@@ -183,30 +167,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     .split("/")
                                     .last;
                                 await db.referralcloutinc(uid, shareruid);
-                                displayErrorSnackBar("Successfully referred!");
+                                logic.displayErrorSnackBar(
+                                    "Successfully referred!", context);
                                 gopicandnamescreen();
                               } catch (e) {
-                                displayErrorSnackBar(
-                                    "Invalid code, change it or remove it.");
+                                logic.displayErrorSnackBar(
+                                    "Invalid code, change it or remove it.",
+                                    context);
                               }
                             } else {
                               gopicandnamescreen();
                             }
                           } catch (e) {
-                            displayErrorSnackBar(
-                                "Could not Sign Up, please try again");
+                            logic.displayErrorSnackBar(
+                                "Could not Sign Up, please try again", context);
                           }
                         } else {
                           if (emailController.text.isEmpty ||
                               !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                   .hasMatch(emailController.text.trim())) {
-                            displayErrorSnackBar("Invalid email address");
+                            logic.displayErrorSnackBar(
+                                "Invalid email address", context);
                           } else if (!emailunique) {
-                            displayErrorSnackBar(
-                                "An account is already associated with this email");
+                            logic.displayErrorSnackBar(
+                                "An account is already associated with this email",
+                                context);
                           } else if (pswController.text.length < 8) {
-                            displayErrorSnackBar(
-                                "Password has to be at least 8 characters");
+                            logic.displayErrorSnackBar(
+                                "Password has to be at least 8 characters",
+                                context);
                           }
                         }
                         setState(() {
@@ -343,28 +332,11 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
   bool continuebuttonpressed = false;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   var compressedimgpath;
 
-  Future<File> CompressAndGetFile(File file) async {
+  Future<XFile> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
       final lastIndex = filePath.lastIndexOf(".");
@@ -483,8 +455,9 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                                       await FirebaseAuth.instance
                                           .signInWithCredential(credential);
                                 } catch (e) {
-                                  displayErrorSnackBar(
-                                      "Make sure OTP code was inserted correctly.");
+                                  logic.displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.",
+                                      context);
                                 }
                               },
                             ),
@@ -507,8 +480,8 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                                           .delete();
                                       goauthscreen();
                                     } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Could not cancel signup");
+                                      logic.displayErrorSnackBar(
+                                          "Could not cancel signup", context);
                                     } finally {
                                       setState(() {
                                         cancelbuttonpressed = false;
@@ -544,7 +517,8 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
               phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
               verificationCompleted: (PhoneAuthCredential credential) {},
               verificationFailed: (FirebaseAuthException e) {
-                displayErrorSnackBar("Could not verify phone number");
+                logic.displayErrorSnackBar(
+                    "Could not verify phone number", context);
               },
               codeSent: (String verificationId, int? resendToken) {
                 cancelsignupdialog(screenheight, screenwidth, verificationId);
@@ -659,8 +633,9 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                           compressedimgpathgood = true;
                         });
                       } catch (e) {
-                        displayErrorSnackBar(
-                            "Error with profile picture, might be an invalid format");
+                        logic.displayErrorSnackBar(
+                            "Error with profile picture, might be an invalid format",
+                            context);
                       }
                       if (compressedimgpathgood) {
                         try {
@@ -674,17 +649,20 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                               FirebaseAuth.instance.currentUser!.uid);
                           gousernamescreen();
                         } catch (e) {
-                          displayErrorSnackBar(
-                              "Could not proceed with signup, please check internet connection and try again");
+                          logic.displayErrorSnackBar(
+                              "Could not proceed with signup, please check internet connection and try again",
+                              context);
                         }
                       }
                     } else if (imagepath == null) {
-                      displayErrorSnackBar("Please upload Profile Picture");
+                      logic.displayErrorSnackBar(
+                          "Please upload Profile Picture", context);
                     } else if (fullnamecontroller.text.trim().isEmpty) {
-                      displayErrorSnackBar("Please enter your full name");
+                      logic.displayErrorSnackBar(
+                          "Please enter your full name", context);
                     } else {
-                      displayErrorSnackBar(
-                          "Error with full name or profile picture");
+                      logic.displayErrorSnackBar(
+                          "Error with full name or profile picture", context);
                     }
 
                     setState(() {
@@ -720,24 +698,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
   bool continuebuttonpressed = false;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   void goauthscreen() {
     Navigator.pushReplacement(
@@ -836,8 +797,9 @@ class _UsernameScreenState extends State<UsernameScreen> {
                                       await FirebaseAuth.instance
                                           .signInWithCredential(credential);
                                 } catch (e) {
-                                  displayErrorSnackBar(
-                                      "Make sure OTP code was inserted correctly.");
+                                  logic.displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.",
+                                      context);
                                 }
                               },
                             ),
@@ -861,8 +823,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
 
                                       goauthscreen();
                                     } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Could not cancel signup");
+                                      logic.displayErrorSnackBar(
+                                          "Could not cancel signup", context);
                                     } finally {
                                       setState(() {
                                         cancelbuttonpressed = false;
@@ -897,7 +859,8 @@ class _UsernameScreenState extends State<UsernameScreen> {
               phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
               verificationCompleted: (PhoneAuthCredential credential) {},
               verificationFailed: (FirebaseAuthException e) {
-                displayErrorSnackBar("Could not verify phone number");
+                logic.displayErrorSnackBar(
+                    "Could not verify phone number", context);
               },
               codeSent: (String verificationId, int? resendToken) {
                 cancelsignupdialog(screenheight, screenwidth, verificationId);
@@ -961,14 +924,15 @@ class _UsernameScreenState extends State<UsernameScreen> {
                         await db.usernameUnique(usernamecontroller.text);
                     if (!uniqueness && usernamecontroller.text.isNotEmpty) {
                       setState(() {
-                        displayErrorSnackBar("Username already taken");
+                        logic.displayErrorSnackBar(
+                            "Username already taken", context);
                       });
                     } else if (usernamecontroller.text.isEmpty) {
-                      displayErrorSnackBar("Invalid Username");
+                      logic.displayErrorSnackBar("Invalid Username", context);
                     } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
                         .hasMatch(usernamecontroller.text.trim())) {
-                      displayErrorSnackBar(
-                          "Please only enter alphanumeric characters");
+                      logic.displayErrorSnackBar(
+                          "Please only enter alphanumeric characters", context);
                     } else {
                       try {
                         await db.changeusername(
@@ -978,8 +942,9 @@ class _UsernameScreenState extends State<UsernameScreen> {
                             FirebaseAuth.instance.currentUser!.uid);
                         gotomiscscreen();
                       } catch (e) {
-                        displayErrorSnackBar(
-                            "Could not proceed with signup, please check internet connection and try again");
+                        logic.displayErrorSnackBar(
+                            "Could not proceed with signup, please check internet connection and try again",
+                            context);
                       }
                     }
                     setState(() {
@@ -1013,23 +978,7 @@ class _MiscScreenState extends State<MiscScreen> {
   db_conn db = db_conn();
   bool cancelbuttonpressed = false;
   bool continuebuttonpressed = false;
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   var maskFormatter = MaskTextInputFormatter(
       mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
@@ -1383,8 +1332,9 @@ class _MiscScreenState extends State<MiscScreen> {
                                       await FirebaseAuth.instance
                                           .signInWithCredential(credential);
                                 } catch (e) {
-                                  displayErrorSnackBar(
-                                      "Make sure OTP code was inserted correctly.");
+                                  logic.displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.",
+                                      context);
                                 }
                               },
                             ),
@@ -1408,8 +1358,8 @@ class _MiscScreenState extends State<MiscScreen> {
 
                                       goauthscreen();
                                     } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Could not cancel signup");
+                                      logic.displayErrorSnackBar(
+                                          "Could not cancel signup", context);
                                     } finally {
                                       setState(() {
                                         cancelbuttonpressed = false;
@@ -1449,7 +1399,8 @@ class _MiscScreenState extends State<MiscScreen> {
               phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
               verificationCompleted: (PhoneAuthCredential credential) {},
               verificationFailed: (FirebaseAuthException e) {
-                displayErrorSnackBar("Could not verify phone number");
+                logic.displayErrorSnackBar(
+                    "Could not verify phone number", context);
               },
               codeSent: (String verificationId, int? resendToken) {
                 cancelsignupdialog(screenheight, screenwidth, verificationId);
@@ -1625,12 +1576,14 @@ class _MiscScreenState extends State<MiscScreen> {
                               FirebaseAuth.instance.currentUser!.uid);
                           gointerestscreen();
                         } catch (e) {
-                          displayErrorSnackBar(
-                              "Could not proceed with signup, please check internet connection and try again");
+                          logic.displayErrorSnackBar(
+                              "Could not proceed with signup, please check internet connection and try again",
+                              context);
                         }
                       } else {
-                        displayErrorSnackBar(
-                            "Please try again and make sure all fields are filled correctly");
+                        logic.displayErrorSnackBar(
+                            "Please try again and make sure all fields are filled correctly",
+                            context);
                       }
                       setState(() {
                         continuebuttonpressed = false;
@@ -1686,24 +1639,7 @@ class _InterestScreenState extends State<InterestScreen> {
   db_conn db = db_conn();
   bool buttonpressed = false;
   bool cancelbuttonpressed = false;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   void goauthscreen() {
     Navigator.pushReplacement(
@@ -1804,8 +1740,9 @@ class _InterestScreenState extends State<InterestScreen> {
                                       await FirebaseAuth.instance
                                           .signInWithCredential(credential);
                                 } catch (e) {
-                                  displayErrorSnackBar(
-                                      "Make sure OTP code was inserted correctly.");
+                                  logic.displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.",
+                                      context);
                                 }
                               },
                             ),
@@ -1829,8 +1766,8 @@ class _InterestScreenState extends State<InterestScreen> {
 
                                       goauthscreen();
                                     } catch (e) {
-                                      displayErrorSnackBar(
-                                          "Could not cancel signup");
+                                      logic.displayErrorSnackBar(
+                                          "Could not cancel signup", context);
                                     } finally {
                                       setState(() {
                                         cancelbuttonpressed = false;
@@ -1908,7 +1845,8 @@ class _InterestScreenState extends State<InterestScreen> {
               phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
               verificationCompleted: (PhoneAuthCredential credential) {},
               verificationFailed: (FirebaseAuthException e) {
-                displayErrorSnackBar("Could not verify phone number");
+                logic.displayErrorSnackBar(
+                    "Could not verify phone number", context);
               },
               codeSent: (String verificationId, int? resendToken) {
                 cancelsignupdialog(screenheight, screenwidth, verificationId);
@@ -1993,13 +1931,15 @@ class _InterestScreenState extends State<InterestScreen> {
                       await widget.analytics.logSignUp(signUpMethod: "email");
                       donesignup();
                     } else {
-                      displayErrorSnackBar("Choose at least 3 interests");
+                      logic.displayErrorSnackBar(
+                          "Choose at least 3 interests", context);
                       setState(() {
                         buttonpressed = false;
                       });
                     }
                   } catch (e) {
-                    displayErrorSnackBar("Could not create user");
+                    logic.displayErrorSnackBar(
+                        "Could not create user", context);
                     setState(() {
                       buttonpressed = false;
                     });

@@ -1,4 +1,5 @@
 import 'package:clout/components/location.dart';
+import 'package:clout/services/logic.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,26 +27,8 @@ class _SearchLocationState extends State<SearchLocation> {
   late AppLocation chosenLocation;
   List LatLngs = [];
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-
+  applogic logic = applogic();
   GoogleMapController? mapController;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -237,7 +220,7 @@ class _SearchLocationState extends State<SearchLocation> {
                           res = response;
                         });
                       } catch (e) {
-                        displayErrorSnackBar("Could not search");
+                        logic.displayErrorSnackBar("Could not search", context);
                       }
                     },
                     decoration: InputDecoration(

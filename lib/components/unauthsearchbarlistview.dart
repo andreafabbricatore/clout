@@ -6,6 +6,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthprofilescreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
@@ -32,30 +33,12 @@ class UnAuthSearchBarListView extends StatefulWidget {
 
 class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
   db_conn db = db_conn();
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
+  applogic logic = applogic();
   Future<void> refresh() async {
     try {
       await refreshsearch();
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
   }
 
@@ -73,7 +56,7 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
         });
       }
     } catch (e) {
-      displayErrorSnackBar("Could not refresh events");
+      logic.displayErrorSnackBar("Could not refresh events", context);
     }
   }
 
@@ -104,7 +87,7 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
                     ),
                 settings: RouteSettings(name: "UnAuthEventDetailScreen")));
       } catch (e) {
-        displayErrorSnackBar("Could not refresh");
+        logic.displayErrorSnackBar("Could not refresh", context);
       }
       refresh();
     }

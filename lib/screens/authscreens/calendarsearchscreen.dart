@@ -5,6 +5,7 @@ import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -32,6 +33,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
   bool displaycalendar = true;
   DateTime initialDate = DateTime.now();
   Color loadedcolor = Colors.black;
+  applogic logic = applogic();
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) async {
     setState(() {
@@ -44,24 +46,6 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
     });
   }
 
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
   Future<void> updatecurruser() async {
     try {
       AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
@@ -69,7 +53,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
         widget.curruser = updateduser;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh user");
+      logic.displayErrorSnackBar("Could not refresh user", context);
     }
   }
 
@@ -93,7 +77,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
         });
       }
     } catch (e) {
-      displayErrorSnackBar("Could not update favorites");
+      logic.displayErrorSnackBar("Could not update favorites", context);
     } finally {
       updatecurruser();
     }
@@ -123,7 +107,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
       await getEventList();
       await updatecurruser();
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
   }
 
@@ -156,7 +140,7 @@ class _CalendarSearchScreenState extends State<CalendarSearchScreen> {
                     ),
                 settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
       refresh();
     }

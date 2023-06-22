@@ -1243,6 +1243,7 @@ class db_conn {
   Future<AppUser> getUserFromUID(String docid) async {
     try {
       DocumentSnapshot documentSnapshot = await users.doc(docid).get();
+      await Future.delayed(const Duration(milliseconds: 50));
       return AppUser.fromJson(documentSnapshot.data(), docid);
     } catch (e) {
       throw Exception("Could not retrieve user");

@@ -5,6 +5,7 @@ import 'package:clout/components/user.dart';
 import 'package:clout/components/userlistview.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,24 +33,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   bool searching = false;
   Color suffixiconcolor = Colors.white;
   List<AppUser> searchedusers = [];
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   Future<void> getchatlist() async {
     List<Chat> chats = [];
@@ -59,7 +43,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         chatlist = chats.reversed.toList();
       });
     } catch (e) {
-      displayErrorSnackBar("Could not retrieve chats");
+      logic.displayErrorSnackBar("Could not retrieve chats", context);
     }
   }
 
@@ -71,7 +55,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       });
       db.resetchatnotificationcounter(widget.curruser.uid);
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
     await getchatlist();
   }
@@ -197,7 +181,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           searchedusers = res;
                         });
                       } catch (e) {
-                        displayErrorSnackBar("Could not search users");
+                        logic.displayErrorSnackBar(
+                            "Could not search users", context);
                       }
                     },
                     decoration: InputDecoration(

@@ -45,17 +45,40 @@ class _RequestScreenState extends State<RequestScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Future<void> refresh() async {
+  Future<void> updatecurruser() async {
     try {
       AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
-      List<AppUser> requestedby = await db.getrequestbylist(widget.curruser);
       setState(() {
         widget.curruser = updateduser;
+      });
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> updaterequests() async {
+    try {
+      List<AppUser> requestedby = await db.getrequestbylist(widget.curruser);
+      setState(() {
         widget.requestedby = requestedby;
       });
     } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> refresh() async {
+    try {
+      await updatecurruser();
+      await updaterequests();
+    } catch (e) {
       displayErrorSnackBar("Could not refresh.");
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -112,26 +135,67 @@ class _RequestScreenState extends State<RequestScreen> {
           ),
         ),
         body: CustomRefreshIndicator(
-          onRefresh: refresh,
-          builder: (context, child, controller) {
-            return LoadingWidget(
-              screenheight: screenheight,
-              screenwidth: screenwidth,
-              controller: controller,
-              child: child,
-            );
-          },
-          child: UserListView(
-            userres: widget.requestedby,
-            onTap: usernavigate,
-            curruser: widget.curruser,
-            screenwidth: screenwidth,
-            showcloutscore: false,
-            showrembutton: false,
-            showsendbutton: false,
-            showfriendbutton: true,
-            acceptRequest: acceptfriendrequest,
-          ),
-        ));
+            onRefresh: refresh,
+            builder: (context, child, controller) {
+              return LoadingWidget(
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+                controller: controller,
+                child: child,
+              );
+            },
+            child: SingleChildScrollView(
+              child: SizedBox(
+                height: widget.requestedby.length * 60.0 +
+                            16.0 +
+                            screenheight * 0.1 >=
+                        screenheight
+                    ? widget.requestedby.length * 60.0 +
+                        16.0 +
+                        screenheight * 0.1
+                    : screenheight,
+                child: widget.requestedby.isNotEmpty
+                    ? UserListView(
+                        userres: widget.requestedby,
+                        onTap: usernavigate,
+                        curruser: widget.curruser,
+                        screenwidth: screenwidth,
+                        showcloutscore: false,
+                        showrembutton: false,
+                        showsendbutton: false,
+                        showfriendbutton: true,
+                        acceptRequest: acceptfriendrequest,
+                        physics: const NeverScrollableScrollPhysics(),
+                      )
+                    : Center(
+                        child: Column(
+                        children: [
+                          SizedBox(
+                            height: screenheight * 0.2,
+                          ),
+                          const Text(
+                            "No Friend Requests Yet",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 23),
+                            textScaleFactor: 1.0,
+                          ),
+                          SizedBox(
+                            height: screenheight * 0.02,
+                          ),
+                          const Text(
+                            "Join Events Around You\nMake New Friends",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 20),
+                            textScaleFactor: 1.0,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      )),
+              ),
+            )));
   }
 }

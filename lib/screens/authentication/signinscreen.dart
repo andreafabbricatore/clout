@@ -2,6 +2,7 @@ import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authentication/pswresetscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,24 +18,7 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
   db_conn db = db_conn();
   final emailController = TextEditingController();
   final pswController = TextEditingController();
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  applogic logic = applogic();
 
   void donesignin() {
     Navigator.pushReplacement(
@@ -159,7 +143,8 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
                           await widget.analytics.logLogin(loginMethod: "email");
                           donesignin();
                         } catch (e) {
-                          displayErrorSnackBar("Could not Sign in");
+                          logic.displayErrorSnackBar(
+                              "Could not Sign in", context);
                         } finally {
                           setState(() {
                             signinbuttonpressed = false;

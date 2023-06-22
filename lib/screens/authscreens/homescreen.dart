@@ -11,6 +11,7 @@ import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/notificationscreen.dart';
 import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,29 +39,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   db_conn db = db_conn();
+  applogic logic = applogic();
   List<Event> generaleventlist = [];
   List<Event> interesteventlist = [];
   List<Event> totaleventlist = [];
   final double _offsetToArmed = 200;
   bool blank = true;
-
-  void displayErrorSnackBar(
-    String error,
-  ) {
-    final snackBar = SnackBar(
-      content: Text(
-        error,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      backgroundColor: const Color.fromARGB(230, 255, 48, 117),
-      behavior: SnackBarBehavior.floating,
-      showCloseIcon: false,
-      closeIconColor: Colors.white,
-    );
-    Future.delayed(const Duration(milliseconds: 400));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   @override
   void dispose() {
@@ -101,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       });
     } catch (e) {
-      displayErrorSnackBar("Could not get events around you");
+      logic.displayErrorSnackBar("Could not get events around you", context);
     }
   }
 
@@ -109,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       getSortedCurrLocEventsList();
     } catch (e) {
-      displayErrorSnackBar("Could not refresh events");
+      logic.displayErrorSnackBar("Could not refresh events", context);
     }
   }
 
@@ -120,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
         widget.curruser = updateduser;
       });
     } catch (e) {
-      displayErrorSnackBar("Could not refresh user");
+      logic.displayErrorSnackBar("Could not refresh user", context);
     }
   }
 
@@ -144,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      displayErrorSnackBar("Could not update favorites");
+      logic.displayErrorSnackBar("Could not update favorites", context);
     } finally {
       updatecurruser();
     }
@@ -155,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await updatecurruser();
       await refreshevents();
     } catch (e) {
-      displayErrorSnackBar("Could not refresh");
+      logic.displayErrorSnackBar("Could not refresh", context);
     }
   }
 
@@ -198,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                 settings: RouteSettings(name: "EventDetailScreen")));
       } catch (e) {
-        displayErrorSnackBar("Could not display event");
+        logic.displayErrorSnackBar("Could not display event", context);
       }
       refresh();
     }

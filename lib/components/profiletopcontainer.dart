@@ -232,6 +232,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                       buttonpressed = false;
                                     });
                                     setfriendval();
+                                    print(friendval);
                                   },
                             child: Container(
                               height: screenheight * 0.03,
