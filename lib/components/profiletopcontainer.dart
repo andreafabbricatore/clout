@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
@@ -122,8 +123,9 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(100),
-                  child: Image.network(
-                    widget.user.pfpurl,
+                  child: CachedNetworkImage(
+                    fadeInDuration: const Duration(milliseconds: 10),
+                    imageUrl: widget.user.pfpurl,
                     height: screenheight * 0.15,
                     width: screenheight * 0.15,
                     fit: BoxFit.cover,

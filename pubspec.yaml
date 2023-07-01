@@ -36,7 +36,7 @@ dependencies:
   firebase_core: ^2.9.0
   cloud_firestore: ^4.5.0
   firebase_storage: ^11.0.10
-  firebase_auth: ^4.2.2
+  firebase_auth: ^4.6.3
   provider: ^6.0.3
   mask_text_input_formatter: ^2.3.0
   image_picker: ^0.8.5+3
@@ -44,7 +44,6 @@ dependencies:
   flutter_spinkit: ^5.1.0
   cached_network_image: ^3.2.1
   getwidget: ^3.0.1
-  mapbox_gl: ^0.16.0
   flutter_dotenv: ^5.0.2
   mapbox_search: ^3.0.1+2
   url_launcher: ^6.1.4
@@ -85,6 +84,7 @@ dependencies:
   pinput: ^2.2.31
   phone_form_field: ^7.1.0
   geoflutterfire2: ^2.3.15
+  sliding_up_panel: ^2.0.0+1
 
 flutter_icons:
   #  image_path: "assets/images/icon-128x128.png"

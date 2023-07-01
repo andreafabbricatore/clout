@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
@@ -252,11 +253,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: imagepath == null
-                  ? Image.network(
-                      widget.event.image,
+                  ? CachedNetworkImage(
+                      imageUrl: widget.event.image,
                       height: 200,
                       width: screenwidth * 0.9,
                       fit: BoxFit.cover,
+                      fadeInDuration: const Duration(milliseconds: 10),
                     )
                   : Image.file(
                       imagepath,

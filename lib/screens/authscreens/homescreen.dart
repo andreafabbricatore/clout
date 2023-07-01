@@ -190,29 +190,23 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text(
-            "Clout.",
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.w900,
-              fontSize: 50,
+          title: GestureDetector(
+            onTap: () {},
+            child: Text(
+              "Clout.",
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.w900,
+                fontSize: 50,
+              ),
+              textScaleFactor: 1.0,
             ),
-            textScaleFactor: 1.0,
           ),
           backgroundColor: Colors.white,
           shadowColor: Colors.white,
           elevation: 0.0,
           centerTitle: true,
-          leading: GestureDetector(
-            onTap: () {
-              widget.changePage.call(0);
-            },
-            child: Icon(
-              Icons.search,
-              color: Colors.black,
-              size: 30,
-            ),
-          ),
+          automaticallyImplyLeading: false,
           actions: [
             GestureDetector(
               onTap: () async {
@@ -269,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             GestureDetector(
               onTap: () {
-                widget.changePage.call(2);
+                widget.changePage.call(1);
               },
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 9, 0),

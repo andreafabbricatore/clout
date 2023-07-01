@@ -8,6 +8,7 @@ import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 
 class CompleteSignUpLoading extends StatefulWidget {
   CompleteSignUpLoading({Key? key, required this.uid, required this.analytics})

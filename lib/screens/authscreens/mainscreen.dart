@@ -12,6 +12,7 @@ import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/favscreen.dart';
 import 'package:clout/screens/authscreens/homescreen.dart';
 import 'package:clout/screens/authscreens/homescreenholder.dart';
+import 'package:clout/screens/authscreens/mapscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
@@ -75,11 +76,10 @@ class _MainScreenState extends State<MainScreen> {
         justloaded: widget.justloaded,
         analytics: widget.analytics,
       ),
-      CloutScoreScreen(
-        curruser: widget.curruser,
+      MapScreen(
         curruserlocation: widget.curruserlocation,
         analytics: widget.analytics,
-        showleading: false,
+        curruser: widget.curruser,
       ),
       CreateEventScreen(
         curruser: widget.curruser,
@@ -337,10 +337,10 @@ class _MainScreenState extends State<MainScreen> {
             ),
             BottomNavyBarItem(
               icon: const Icon(
-                Icons.people_outline_sharp,
+                Icons.search_rounded,
               ),
               title: const Text(
-                "Score",
+                "Explore",
                 textScaleFactor: 1.0,
               ),
               activeColor: Theme.of(context).primaryColor,

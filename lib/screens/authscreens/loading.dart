@@ -57,7 +57,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
       }
 
       final _locationData = await Geolocator.getCurrentPosition();
-
       _userLocation = _locationData;
       return true;
     } catch (e) {
@@ -108,7 +107,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
               fullscreenDialog: true),
         );
       } else {
+        print("start");
         await newgetUserAppLocation();
+        await db.updatelastuserlocandusage(
+            widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
+        print("end");
         doneLoading(curruser);
       }
     } catch (e) {
@@ -154,13 +157,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         error = false;
       });
-
-      //await newgetUserAppLocation();
-      await db.addAttributetoAllDocuments();
       await widget.analytics.setUserId(id: widget.uid);
-      await db.updatelastuserlocandusage(
-          widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
       AppUser curruser = await db.getUserFromUID(widget.uid);
+      print("got user");
       if (curruser.plan != "business") {
         await linkauth(curruser);
       } else {
@@ -249,9 +248,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void loadinglogic() async {
     try {
       await ensurelocation();
+      print("location");
       await undermaintenance();
+      print("maint");
       if (!maintenance) {
         await needupdate();
+        print("update");
         if (!update) {
           await appinit();
         }

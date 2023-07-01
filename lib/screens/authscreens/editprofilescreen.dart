@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/components/updateinterests.dart';
@@ -367,11 +368,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
                 child: imagepath == null
-                    ? Image.network(
-                        widget.curruser.pfpurl,
+                    ? CachedNetworkImage(
+                        imageUrl: widget.curruser.pfpurl,
                         height: screenheight * 0.2,
                         width: screenheight * 0.2,
                         fit: BoxFit.cover,
+                        fadeInDuration: const Duration(milliseconds: 10),
                       )
                     : Image.file(
                         imagepath,

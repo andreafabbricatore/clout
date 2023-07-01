@@ -23,7 +23,7 @@ class HomeScreenHolder extends StatefulWidget {
 }
 
 class _HomeScreenHolderState extends State<HomeScreenHolder> {
-  final controller = PageController(initialPage: 1);
+  final controller = PageController(initialPage: 0);
 
   bool showleading = false;
   void changePage(int index) {
@@ -32,7 +32,7 @@ class _HomeScreenHolderState extends State<HomeScreenHolder> {
   }
 
   void returnhome() {
-    controller.animateToPage(1,
+    controller.animateToPage(0,
         duration: const Duration(milliseconds: 250), curve: Curves.linear);
   }
 
@@ -44,10 +44,6 @@ class _HomeScreenHolderState extends State<HomeScreenHolder> {
         onPageChanged: (index) {},
         controller: controller,
         children: [
-          SearchScreen(
-              curruser: widget.curruser,
-              curruserlocation: widget.curruserlocation,
-              analytics: widget.analytics),
           HomeScreen(
             justloaded: widget.justloaded,
             curruser: widget.curruser,

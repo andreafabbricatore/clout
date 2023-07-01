@@ -103,7 +103,7 @@ class db_conn {
         'chatnotificationcounter': 0,
         'appversion': packageInfo.version,
         'donesignuptime': DateTime(1900, 1, 1, 0, 0),
-        'lastusagetime': FieldValue.serverTimestamp()
+        'lastusagetime': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -219,6 +219,8 @@ class db_conn {
       if (!unique) {
         throw Exception("Event already exists");
       } else {
+        GeoFirePoint loc =
+            geo.point(latitude: newevent.lat, longitude: newevent.lng);
         await events.add({
           'title': newevent.title,
           'description': newevent.description,
@@ -241,7 +243,8 @@ class db_conn {
           'presentparticipants': newevent.presentparticipants,
           'favoritedby': [],
           'showparticipants': newevent.showparticipants,
-          'showlocation': newevent.showlocation
+          'showlocation': newevent.showlocation,
+          'loc': loc.data
         }).then((value) {
           eventid = value.id;
         });
@@ -1501,12 +1504,14 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await users.get().then(
+    await events.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users.doc(element.id).set(
-                  {'requested': [], 'requestedby': []},
-                  SetOptions(merge: true));
+              GeoFirePoint lastknownloc = geo.point(
+                  latitude: element['lat'], longitude: element['lng']);
+              await events.doc(element.id).set({
+                'loc': lastknownloc.data,
+              }, SetOptions(merge: true));
             },
           ),
         );

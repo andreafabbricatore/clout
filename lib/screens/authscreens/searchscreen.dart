@@ -115,7 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.fromLTRB(10, screenheight * 0.1, 10, 10),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           Focus(
             onFocusChange: (hasfocus) {

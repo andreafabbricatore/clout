@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/services/db.dart';
@@ -52,9 +53,10 @@ class _ChatListViewState extends State<ChatListView> {
                 width: 50,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100.0),
-                  child: Image.network(
-                    iconurl,
+                  child: CachedNetworkImage(
+                    imageUrl: iconurl,
                     fit: BoxFit.cover,
+                    fadeInDuration: const Duration(milliseconds: 10),
                   ),
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
@@ -28,11 +29,12 @@ class UnAuthEventListView extends StatelessWidget {
       child: Stack(children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(15.0),
-          child: Image.network(
-            image,
+          child: CachedNetworkImage(
+            imageUrl: image,
             fit: BoxFit.cover,
             height: 200,
             width: screenwidth * 0.9,
+            fadeInDuration: const Duration(milliseconds: 10),
           ),
         ),
         Align(

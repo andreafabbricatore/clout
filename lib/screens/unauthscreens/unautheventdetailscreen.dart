@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
 import 'package:clout/components/primarybutton.dart';
@@ -244,9 +245,10 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15.0),
-                child: Image.network(
-                  widget.event.image,
+                child: CachedNetworkImage(
+                  imageUrl: widget.event.image,
                   fit: BoxFit.cover,
+                  fadeInDuration: const Duration(milliseconds: 10),
                 ),
               ),
             ),

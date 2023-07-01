@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_emoji/dart_emoji.dart' as dart_emoji;
 import 'package:flutter_emoji/flutter_emoji.dart' as flutter_emoji;
@@ -107,11 +108,12 @@ Widget eventchatbubble(String sender, String eventtitle, String bannerurl,
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15.0),
-                    child: Image.network(
-                      bannerurl,
+                    child: CachedNetworkImage(
+                      imageUrl: bannerurl,
                       fit: BoxFit.cover,
                       height: screenheight * 0.37,
                       width: screenwidth * 0.7,
+                      fadeInDuration: const Duration(milliseconds: 10),
                     ),
                   ),
                   SizedBox(

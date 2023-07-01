@@ -1,3 +1,5 @@
+import 'package:geoflutterfire2/geoflutterfire2.dart';
+
 class AppUser {
   String username;
   String uid;

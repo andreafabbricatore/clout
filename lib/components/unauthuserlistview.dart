@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/user.dart';
 import 'package:flutter/material.dart';
 
@@ -38,9 +39,10 @@ class _UnAuthUserListViewState extends State<UnAuthUserListView> {
             width: 50,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100.0),
-              child: Image.network(
-                user.pfpurl,
+              child: CachedNetworkImage(
+                imageUrl: user.pfpurl,
                 fit: BoxFit.cover,
+                fadeInDuration: const Duration(milliseconds: 10),
               ),
             ),
           ),

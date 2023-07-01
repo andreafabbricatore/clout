@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
@@ -1132,9 +1133,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15.0),
-                child: Image.network(
-                  widget.event.image,
+                child: CachedNetworkImage(
+                  imageUrl: widget.event.image,
                   fit: BoxFit.cover,
+                  fadeInDuration: const Duration(milliseconds: 10),
                 ),
               ),
             ),
