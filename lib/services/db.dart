@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clout/components/chat.dart';
 import 'package:clout/components/event.dart';
+import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:io';
@@ -1577,6 +1578,40 @@ class db_conn {
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots();
+  }
+
+  Future<List<AppUser>> retrievefriendsformap(
+      AppUser curruser, double lat, double lng) async {
+    GeoFirePoint center = GeoFirePoint(lat, lng);
+    Stream<List<DocumentSnapshot>> stream = geo
+        .collection(
+            collectionRef: users.where('uid', whereIn: curruser.friends))
+        .within(center: center, radius: 10, field: 'lastknownloc');
+    List<AppUser> res = [];
+    stream.listen((List<DocumentSnapshot> documentList) {
+      for (int i = 0; i < documentList.length; i++) {
+        res.add(AppUser.fromJson(documentList[i], documentList[i].id));
+      }
+    });
+    await Future.delayed(const Duration(milliseconds: 50));
+    return res;
+  }
+
+  Future<List<Event>> retrieveeventsformap(double lat, double lng) async {
+    GeoFirePoint center = GeoFirePoint(lat, lng);
+    Stream<List<DocumentSnapshot>> stream = geo
+        .collection(
+            collectionRef:
+                events.orderBy('time').where('isinviteonly', isEqualTo: false))
+        .within(center: center, radius: 10, field: 'loc');
+    List<Event> res = [];
+    stream.listen((List<DocumentSnapshot> documentList) {
+      for (int i = 0; i < documentList.length; i++) {
+        res.add(Event.fromJson(documentList[i], documentList[i].id));
+      }
+    });
+    await Future.delayed(const Duration(milliseconds: 50));
+    return res;
   }
 
   Future<void> setReadReceipt(String chatid, String readerid) {
