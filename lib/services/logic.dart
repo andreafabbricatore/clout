@@ -1,3 +1,8 @@
+import 'package:clout/components/location.dart';
+import 'package:clout/components/user.dart';
+import 'package:clout/screens/authscreens/profilescreen.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class applogic {
@@ -15,5 +20,25 @@ class applogic {
     );
     Future.delayed(const Duration(milliseconds: 400));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<void> usernavigate(
+      FirebaseAnalytics analytics,
+      AppLocation curruserlocation,
+      AppUser curruser,
+      AppUser user,
+      int index,
+      BuildContext context) async {
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ProfileScreen(
+                  user: user,
+                  curruser: curruser,
+                  visit: true,
+                  curruserlocation: curruserlocation,
+                  analytics: analytics,
+                ),
+            settings: RouteSettings(name: "ProfileScreen")));
   }
 }

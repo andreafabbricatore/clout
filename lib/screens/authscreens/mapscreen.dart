@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
@@ -74,34 +74,76 @@ class _MapScreenState extends State<MapScreen> {
             settings: RouteSettings(name: "InterestSearchScreen")));
   }
 
+  Future<BitmapDescriptor> convertImageFileToCustomBitmapDescriptor(
+    File imageFile, {
+    int size = 150,
+    bool addBorder = true,
+    Color borderColor = const Color.fromARGB(255, 255, 48, 117),
+    double borderSize = 10,
+  }) async {
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+    final Paint paint = Paint()..color;
+    final double radius = size / 2;
+
+    //make canvas clip path to prevent image drawing over the circle
+    final Path clipPath = Path();
+    clipPath.addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
+        Radius.circular(200)));
+
+    canvas.clipPath(clipPath);
+
+    //paintImage
+    final Uint8List imageUint8List = await imageFile.readAsBytes();
+    final ui.Codec codec = await ui.instantiateImageCodec(imageUint8List);
+    final ui.FrameInfo imageFI = await codec.getNextFrame();
+    paintImage(
+        canvas: canvas,
+        rect: Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
+        image: imageFI.image,
+        fit: BoxFit.cover);
+
+    if (addBorder) {
+      //draw Border
+      paint.color = borderColor;
+      paint.style = PaintingStyle.stroke;
+      paint.strokeWidth = borderSize;
+      canvas.drawCircle(Offset(radius, radius), radius, paint);
+    }
+
+    //convert canvas as PNG bytes
+    final _image = await pictureRecorder
+        .endRecording()
+        .toImage(size.toInt(), size.toInt());
+    final data = await _image.toByteData(format: ui.ImageByteFormat.png);
+
+    //convert PNG bytes as BitmapDescriptor
+    return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
+  }
+
   void setusermarkers(List<AppUser> users) async {
     Map<MarkerId, Marker> markerdict = {};
     for (int i = 0; i < users.length; i++) {
       final File markerImageFile =
           await DefaultCacheManager().getSingleFile(users[i].pfpurl);
-      final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
-      final Codec markerImageCodec = await instantiateImageCodec(
-        markerImageBytes,
-        targetWidth: 50,
-      );
-      final FrameInfo frameInfo = await markerImageCodec.getNextFrame();
-      final ByteData? byteData = await frameInfo.image.toByteData(
-        format: ImageByteFormat.png,
-      );
-      final Uint8List resizedMarkerImageBytes = byteData!.buffer.asUint8List();
+      BitmapDescriptor bmd =
+          await convertImageFileToCustomBitmapDescriptor(markerImageFile);
 
       Marker marker = Marker(
-        markerId: MarkerId(users[i].uid),
-        draggable: true,
-        position: LatLng(
-            users[i].lastknownlat,
-            users[i]
-                .lastknownlng), //With this parameter you automatically obtain latitude and longitude
-        infoWindow: InfoWindow(
-          title: users[i].username,
-        ),
-        icon: BitmapDescriptor.fromBytes(resizedMarkerImageBytes),
-      );
+          markerId: MarkerId(users[i].uid),
+          draggable: true,
+          position: LatLng(
+              users[i].lastknownlat,
+              users[i]
+                  .lastknownlng), //With this parameter you automatically obtain latitude and longitude
+          icon: bmd,
+          infoWindow: InfoWindow.noText,
+          onTap: () async {
+            AppUser user = await db.getUserFromUID(users[i].uid);
+            logic.usernavigate(widget.analytics, widget.curruserlocation,
+                widget.curruser, user, 0, context);
+          });
       markerdict[MarkerId(users[i].uid)] = marker;
     }
 
@@ -116,13 +158,13 @@ class _MapScreenState extends State<MapScreen> {
       final File markerImageFile =
           await DefaultCacheManager().getSingleFile(events[i].image);
       final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
-      final Codec markerImageCodec = await instantiateImageCodec(
+      final ui.Codec markerImageCodec = await ui.instantiateImageCodec(
         markerImageBytes,
         targetWidth: 50,
       );
-      final FrameInfo frameInfo = await markerImageCodec.getNextFrame();
+      final ui.FrameInfo frameInfo = await markerImageCodec.getNextFrame();
       final ByteData? byteData = await frameInfo.image.toByteData(
-        format: ImageByteFormat.png,
+        format: ui.ImageByteFormat.png,
       );
       final Uint8List resizedMarkerImageBytes = byteData!.buffer.asUint8List();
 
@@ -229,11 +271,7 @@ class _MapScreenState extends State<MapScreen> {
                       widget.curruser,
                       widget.curruserlocation.center[1],
                       widget.curruserlocation.center[0]);
-                  List<Event> events = await db.retrieveeventsformap(
-                      widget.curruserlocation.center[1],
-                      widget.curruserlocation.center[0]);
                   setusermarkers(users);
-                  seteventmarkers(events);
                   setState(() {
                     mapController = controller;
                     showbutton = false;
@@ -255,14 +293,11 @@ class _MapScreenState extends State<MapScreen> {
                           onTap: () async {
                             List<AppUser> users =
                                 await db.retrievefriendsformap(
-                                    widget.curruser,
-                                    cameraposition!.target.latitude,
-                                    cameraposition!.target.longitude);
-                            List<Event> events = await db.retrieveeventsformap(
-                                cameraposition!.target.latitude,
-                                cameraposition!.target.longitude);
+                              widget.curruser,
+                              cameraposition!.target.latitude,
+                              cameraposition!.target.longitude,
+                            );
                             setusermarkers(users);
-                            seteventmarkers(events);
                             setState(() {
                               showbutton = false;
                             });
