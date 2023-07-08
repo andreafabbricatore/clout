@@ -816,7 +816,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         builder: (BuildContext context) {
           return StatefulBuilder(
             builder: (BuildContext context, setState) {
-              Future<void> selectuser(AppUser user, int index) async {
+              Future<void> selectuser(AppUser user) async {
                 if (selectedsenders.contains(user.uid)) {
                   setState(() {
                     selectedsenders.remove(user.uid);
@@ -977,7 +977,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user) async {
       await widget.analytics.logEvent(
           name: "visited_profile_screen_from_event_screen",
           parameters: {
@@ -1002,7 +1002,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               settings: RouteSettings(name: "ProfileScreen")));
     }
 
-    Future<void> remuser(AppUser user, int index) async {
+    Future<void> remuser(AppUser user) async {
       try {
         await db.removeparticipant(user, widget.event);
         await widget.analytics.logEvent(name: "rem_participant", parameters: {
@@ -1163,7 +1163,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         widget.curruserlocation.center[0],
                         widget.curruserlocation.center[1],
                         widget.event.interest,
-                        widget.curruserlocation.country,
                         widget.curruser);
                     gotointerestsearchscreen(
                         widget.event.interest, interesteventlist);
@@ -1184,7 +1183,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   try {
                     AppUser eventhost =
                         await db.getUserFromUID(widget.event.hostdocid);
-                    usernavigate(eventhost, 0);
+                    usernavigate(eventhost);
                   } catch (e) {
                     displayErrorSnackBar("Could not retrieve host information");
                   }

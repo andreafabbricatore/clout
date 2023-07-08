@@ -148,7 +148,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
       refresh();
     }
 
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user) async {
       await widget.analytics
           .logEvent(name: "user_navigate_from_search", parameters: {
         "searchterm": widget.query,

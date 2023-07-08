@@ -78,7 +78,6 @@ class _InterestSearchScreenState extends State<InterestSearchScreen> {
           widget.curruserlocation.center[0],
           widget.curruserlocation.center[1],
           widget.interest,
-          widget.curruserlocation.country,
           widget.curruser);
 
       setState(() {

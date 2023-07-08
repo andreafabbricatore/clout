@@ -80,17 +80,20 @@ class _MapScreenState extends State<MapScreen> {
     bool addBorder = true,
     Color borderColor = const Color.fromARGB(255, 255, 48, 117),
     double borderSize = 10,
+    bool event = false,
   }) async {
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
     final Paint paint = Paint()..color;
     final double radius = size / 2;
-
+    event ? size = 200 : null;
+    event ? borderSize = 20 : null;
     //make canvas clip path to prevent image drawing over the circle
     final Path clipPath = Path();
+
     clipPath.addRRect(RRect.fromRectAndRadius(
         Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
-        Radius.circular(200)));
+        event ? const Radius.circular(10) : const Radius.circular(200)));
 
     canvas.clipPath(clipPath);
 
@@ -106,10 +109,16 @@ class _MapScreenState extends State<MapScreen> {
 
     if (addBorder) {
       //draw Border
-      paint.color = borderColor;
+      paint.color = event ? Colors.white : borderColor;
       paint.style = PaintingStyle.stroke;
       paint.strokeWidth = borderSize;
-      canvas.drawCircle(Offset(radius, radius), radius, paint);
+      event
+          ? canvas.drawRRect(
+              RRect.fromRectAndRadius(
+                  Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
+                  const Radius.circular(10)),
+              paint)
+          : canvas.drawCircle(Offset(radius, radius), radius, paint);
     }
 
     //convert canvas as PNG bytes
@@ -122,7 +131,7 @@ class _MapScreenState extends State<MapScreen> {
     return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
   }
 
-  void setusermarkers(List<AppUser> users) async {
+  void setmarkers(List<AppUser> users, List<Event> events) async {
     Map<MarkerId, Marker> markerdict = {};
     for (int i = 0; i < users.length; i++) {
       final File markerImageFile =
@@ -142,31 +151,17 @@ class _MapScreenState extends State<MapScreen> {
           onTap: () async {
             AppUser user = await db.getUserFromUID(users[i].uid);
             logic.usernavigate(widget.analytics, widget.curruserlocation,
-                widget.curruser, user, 0, context);
+                widget.curruser, user, context);
           });
       markerdict[MarkerId(users[i].uid)] = marker;
     }
 
-    setState(() {
-      markers = markerdict;
-    });
-  }
-
-  void seteventmarkers(List<Event> events) async {
-    Map<MarkerId, Marker> markerdict = {};
     for (int i = 0; i < events.length; i++) {
       final File markerImageFile =
           await DefaultCacheManager().getSingleFile(events[i].image);
-      final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
-      final ui.Codec markerImageCodec = await ui.instantiateImageCodec(
-        markerImageBytes,
-        targetWidth: 50,
-      );
-      final ui.FrameInfo frameInfo = await markerImageCodec.getNextFrame();
-      final ByteData? byteData = await frameInfo.image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-      final Uint8List resizedMarkerImageBytes = byteData!.buffer.asUint8List();
+      BitmapDescriptor bmd = await convertImageFileToCustomBitmapDescriptor(
+          markerImageFile,
+          event: true);
 
       Marker marker = Marker(
         markerId: MarkerId(events[i].docid),
@@ -175,10 +170,14 @@ class _MapScreenState extends State<MapScreen> {
             events[i].lat,
             events[i]
                 .lng), //With this parameter you automatically obtain latitude and longitude
-        infoWindow: InfoWindow(
-          title: events[i].title,
-        ),
-        icon: BitmapDescriptor.fromBytes(resizedMarkerImageBytes),
+        infoWindow: InfoWindow.noText,
+        onTap: () async {
+          Event event = await db.getEventfromDocId(events[i].docid);
+          List<AppUser> participants = await db.geteventparticipantslist(event);
+          logic.goeventdetailscreen(widget.analytics, widget.curruserlocation,
+              widget.curruser, events[i], participants, context);
+        },
+        icon: bmd,
       );
       markerdict[MarkerId(events[i].docid)] = marker;
     }
@@ -200,7 +199,6 @@ class _MapScreenState extends State<MapScreen> {
             widget.curruserlocation.center[0],
             widget.curruserlocation.center[1],
             interest,
-            widget.curruserlocation.country,
             widget.curruser);
         await widget.analytics
             .logEvent(name: "go_to_interest_search_screen", parameters: {
@@ -271,7 +269,11 @@ class _MapScreenState extends State<MapScreen> {
                       widget.curruser,
                       widget.curruserlocation.center[1],
                       widget.curruserlocation.center[0]);
-                  setusermarkers(users);
+                  List<Event> events = await db.retrieveeventsformap(
+                    cameraposition!.target.latitude,
+                    cameraposition!.target.longitude,
+                  );
+                  setmarkers(users, events);
                   setState(() {
                     mapController = controller;
                     showbutton = false;
@@ -297,7 +299,11 @@ class _MapScreenState extends State<MapScreen> {
                               cameraposition!.target.latitude,
                               cameraposition!.target.longitude,
                             );
-                            setusermarkers(users);
+                            List<Event> events = await db.retrieveeventsformap(
+                              cameraposition!.target.latitude,
+                              cameraposition!.target.longitude,
+                            );
+                            setmarkers(users, events);
                             setState(() {
                               showbutton = false;
                             });

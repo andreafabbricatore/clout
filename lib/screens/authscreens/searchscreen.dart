@@ -97,7 +97,6 @@ class _SearchScreenState extends State<SearchScreen> {
             widget.curruserlocation.center[0],
             widget.curruserlocation.center[1],
             interest,
-            widget.curruserlocation.country,
             widget.curruser);
         await widget.analytics
             .logEvent(name: "go_to_interest_search_screen", parameters: {

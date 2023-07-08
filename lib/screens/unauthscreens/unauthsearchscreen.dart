@@ -84,7 +84,6 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
           widget.curruserlocation.center[0],
           widget.curruserlocation.center[1],
           interest,
-          widget.curruserlocation.country,
         );
         gotointerestsearchscreen(interest, interesteventlist);
         //print(interesteventlist);

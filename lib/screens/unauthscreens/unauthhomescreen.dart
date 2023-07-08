@@ -43,9 +43,9 @@ class _UnAuthHomeScreenState extends State<UnAuthHomeScreen> {
       generaleventlist = [];
       List<Event> currloceventlist = [];
       currloceventlist = await db.UnAuthgetLngLatEvents(
-          widget.curruserlocation.center[0],
-          widget.curruserlocation.center[1],
-          widget.curruserlocation.country);
+        widget.curruserlocation.center[0],
+        widget.curruserlocation.center[1],
+      );
       for (int i = 0; i < currloceventlist.length; i++) {
         generaleventlist.add(currloceventlist[i]);
       }

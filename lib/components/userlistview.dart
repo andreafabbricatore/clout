@@ -34,9 +34,9 @@ class UserListView extends StatefulWidget {
   bool showsendbutton;
   var physics;
 
-  final Function(AppUser user, int index)? onTap;
-  final Function(AppUser user, int index)? removeUser;
-  final Function(AppUser user, int index)? acceptRequest;
+  final Function(AppUser user)? onTap;
+  final Function(AppUser user)? removeUser;
+  final Function(AppUser user)? acceptRequest;
 
   @override
   State<UserListView> createState() => _UserListViewState();
@@ -49,7 +49,6 @@ class _UserListViewState extends State<UserListView> {
 
   Widget _listviewitem(
       AppUser user,
-      int index,
       double screenwidth,
       AppUser curruser,
       bool showcloutscore,
@@ -57,9 +56,9 @@ class _UserListViewState extends State<UserListView> {
       bool removebuttonblack,
       bool showsendbutton,
       bool showfriendbutton,
-      Function(AppUser user, int index)? removeUser,
-      Function(AppUser user, int index)? onTap,
-      Function(AppUser user, int index)? acceptRequest,
+      Function(AppUser user)? removeUser,
+      Function(AppUser user)? onTap,
+      Function(AppUser user)? acceptRequest,
       List presentparticipants,
       List selectedsenders) {
     return GestureDetector(
@@ -69,7 +68,7 @@ class _UserListViewState extends State<UserListView> {
               setState(() {
                 ontappressed = true;
               });
-              await onTap?.call(user, index);
+              await onTap?.call(user);
               setState(() {
                 ontappressed = false;
               });
@@ -132,7 +131,7 @@ class _UserListViewState extends State<UserListView> {
                           setState(() {
                             removeuserpressed = true;
                           });
-                          removeUser?.call(user, index);
+                          removeUser?.call(user);
                           setState(() {
                             removeuserpressed = false;
                           });
@@ -168,7 +167,7 @@ class _UserListViewState extends State<UserListView> {
                           setState(() {
                             addfriendbuttonpressed = true;
                           });
-                          acceptRequest?.call(user, index);
+                          acceptRequest?.call(user);
                           setState(() {
                             addfriendbuttonpressed = false;
                           });
@@ -196,7 +195,6 @@ class _UserListViewState extends State<UserListView> {
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
               child: _listviewitem(
                   widget.userres[index],
-                  index,
                   widget.screenwidth,
                   widget.curruser,
                   widget.showcloutscore,

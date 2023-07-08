@@ -69,7 +69,7 @@ class _RequestScreenState extends State<RequestScreen> {
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.of(context).size.width;
     double screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user) async {
       Navigator.push(
           context,
           CupertinoPageRoute(
@@ -83,7 +83,7 @@ class _RequestScreenState extends State<RequestScreen> {
               settings: RouteSettings(name: "ProfileScreen")));
     }
 
-    Future<void> acceptfriendrequest(AppUser user, int index) async {
+    Future<void> acceptfriendrequest(AppUser user) async {
       try {
         await db.acceptfriendrequest(widget.curruser.uid, user.uid);
         refresh();

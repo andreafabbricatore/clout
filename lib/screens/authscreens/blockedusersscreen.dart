@@ -59,7 +59,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
-    Future<void> unblockUser(AppUser user, int index) async {
+    Future<void> unblockUser(AppUser user) async {
       try {
         await db.unblockUser(widget.curruser.uid, user.uid);
         logic.displayErrorSnackBar(
