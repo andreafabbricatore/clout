@@ -188,125 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: GestureDetector(
-            onTap: () {},
-            child: Text(
-              "Clout.",
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.w900,
-                fontSize: 50,
-              ),
-              textScaleFactor: 1.0,
-            ),
-          ),
-          backgroundColor: Colors.white,
-          shadowColor: Colors.white,
-          elevation: 0.0,
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          actions: [
-            GestureDetector(
-              onTap: () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => NotificationScreen(
-                              curruser: widget.curruser,
-                              curruserlocation: widget.curruserlocation,
-                              analytics: widget.analytics,
-                            ),
-                        settings: RouteSettings(name: "NotificationScreen")));
-                refresh();
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                child: Center(
-                  child: SizedBox(
-                    height: 30,
-                    width: 32,
-                    child: Stack(children: [
-                      const Icon(
-                        CupertinoIcons.heart,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                      widget.curruser.notificationcounter != 0
-                          ? Align(
-                              alignment: Alignment.topRight,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(100.0),
-                                child: Container(
-                                  height: 15,
-                                  width: 15,
-                                  color:
-                                      const Color.fromARGB(255, 255, 48, 117),
-                                  child: Text(
-                                    widget.curruser.notificationcounter > 9
-                                        ? ""
-                                        : widget.curruser.notificationcounter
-                                            .toString(),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 14),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Container(),
-                    ]),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                widget.changePage.call(1);
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 9, 0),
-                child: Center(
-                  child: SizedBox(
-                    height: 30,
-                    width: 30,
-                    child: Stack(children: [
-                      const Icon(
-                        Icons.chat_bubble_outline_rounded,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                      widget.curruser.chatnotificationcounter != 0
-                          ? Align(
-                              alignment: Alignment.topRight,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(100.0),
-                                child: Container(
-                                  height: 15,
-                                  width: 15,
-                                  color:
-                                      const Color.fromARGB(255, 255, 48, 117),
-                                  child: Text(
-                                    widget.curruser.chatnotificationcounter > 9
-                                        ? ""
-                                        : widget
-                                            .curruser.chatnotificationcounter
-                                            .toString(),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 14),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Container(),
-                    ]),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        appBar: homescreenappbar(context),
         body: CustomRefreshIndicator(
           onRefresh: refresh,
           builder: (context, child, controller) {
@@ -351,5 +233,124 @@ class _HomeScreenState extends State<HomeScreen> {
                       )),
           ),
         ));
+  }
+
+  AppBar homescreenappbar(BuildContext context) {
+    return AppBar(
+      title: GestureDetector(
+        onTap: () {},
+        child: Text(
+          "Clout.",
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.w900,
+            fontSize: 50,
+          ),
+          textScaleFactor: 1.0,
+        ),
+      ),
+      backgroundColor: Colors.white,
+      shadowColor: Colors.white,
+      elevation: 0.0,
+      centerTitle: true,
+      automaticallyImplyLeading: false,
+      actions: [
+        GestureDetector(
+          onTap: () async {
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => NotificationScreen(
+                          curruser: widget.curruser,
+                          curruserlocation: widget.curruserlocation,
+                          analytics: widget.analytics,
+                        ),
+                    settings: RouteSettings(name: "NotificationScreen")));
+            refresh();
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+            child: Center(
+              child: SizedBox(
+                height: 30,
+                width: 32,
+                child: Stack(children: [
+                  const Icon(
+                    CupertinoIcons.heart,
+                    color: Colors.black,
+                    size: 30,
+                  ),
+                  widget.curruser.notificationcounter != 0
+                      ? Align(
+                          alignment: Alignment.topRight,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100.0),
+                            child: Container(
+                              height: 15,
+                              width: 15,
+                              color: const Color.fromARGB(255, 255, 48, 117),
+                              child: Text(
+                                widget.curruser.notificationcounter > 9
+                                    ? ""
+                                    : widget.curruser.notificationcounter
+                                        .toString(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ]),
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            widget.changePage.call(1);
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 9, 0),
+            child: Center(
+              child: SizedBox(
+                height: 30,
+                width: 30,
+                child: Stack(children: [
+                  const Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    color: Colors.black,
+                    size: 30,
+                  ),
+                  widget.curruser.chatnotificationcounter != 0
+                      ? Align(
+                          alignment: Alignment.topRight,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100.0),
+                            child: Container(
+                              height: 15,
+                              width: 15,
+                              color: const Color.fromARGB(255, 255, 48, 117),
+                              child: Text(
+                                widget.curruser.chatnotificationcounter > 9
+                                    ? ""
+                                    : widget.curruser.chatnotificationcounter
+                                        .toString(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

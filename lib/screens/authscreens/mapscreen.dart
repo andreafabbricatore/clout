@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:clout/components/event.dart';
 import 'package:clout/components/location.dart';
+import 'package:clout/components/searchbarlistview.dart';
 import 'package:clout/components/searchgridview.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/interestsearchscreen.dart';
@@ -36,6 +37,14 @@ class _MapScreenState extends State<MapScreen> {
   applogic logic = applogic();
   bool showbutton = false;
   CameraPosition? cameraposition;
+  FocusNode focusNode = FocusNode();
+  TextEditingController searchcontroller = TextEditingController();
+  bool searching = false;
+  bool showsearchscreen = false;
+  bool searchevents = true;
+  Color suffixiconcolor = Colors.white;
+  List<Event> searchedevents = [];
+  List<AppUser> searchedusers = [];
   List interests = [
     "Sports",
     "Nature",
@@ -72,6 +81,12 @@ class _MapScreenState extends State<MapScreen> {
                   analytics: widget.analytics,
                 ),
             settings: RouteSettings(name: "InterestSearchScreen")));
+  }
+
+  void goback() {
+    setState(() {
+      showsearchscreen = false;
+    });
   }
 
   Future<BitmapDescriptor> convertImageFileToCustomBitmapDescriptor(
@@ -187,6 +202,13 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+  Future<void> updatecurruser() async {
+    AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
+    setState(() {
+      widget.curruser = updateduser;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenheight = MediaQuery.of(context).size.height;
@@ -215,121 +237,159 @@ class _MapScreenState extends State<MapScreen> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        body: SlidingUpPanel(
-          minHeight: 40,
-          maxHeight: screenheight * 0.6,
-          defaultPanelState: PanelState.OPEN,
-          backdropColor: Theme.of(context).primaryColor,
-          parallaxEnabled: true,
-          parallaxOffset: 0.2,
-          borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-          panel: Column(
-            children: [
-              const SizedBox(
-                height: 15,
-              ),
-              Container(
-                width: 40,
-                height: 8,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.transparent),
-                  borderRadius: BorderRadius.circular(10),
-                  color: const Color.fromARGB(60, 0, 0, 0),
+        body: showsearchscreen
+            ? SearchScreen(
+                curruser: widget.curruser,
+                curruserlocation: widget.curruserlocation,
+                analytics: widget.analytics,
+                goback: goback,
+              )
+            : SlidingUpPanel(
+                minHeight: 40,
+                maxHeight: screenheight * 0.6,
+                defaultPanelState: PanelState.OPEN,
+                backdropColor: Theme.of(context).primaryColor,
+                parallaxEnabled: true,
+                parallaxOffset: 0.2,
+                borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20)),
+                panel: Column(
+                  children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      width: 40,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.transparent),
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(60, 0, 0, 0),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    SearchGridView(
+                      interests: interests,
+                      onTap: searchnav,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              SearchGridView(
-                interests: interests,
-                onTap: searchnav,
-              ),
-            ],
-          ),
-          body: Stack(
-            children: [
-              GoogleMap(
-                //Map widget from google_maps_flutter package
-                myLocationButtonEnabled: false,
-                markers: Set<Marker>.of(markers.values),
-                zoomGesturesEnabled: true, //enable Zoom in, out on map
-                initialCameraPosition: CameraPosition(
-                  //innital position in map
-                  target: LatLng(widget.curruserlocation.center[1],
-                      widget.curruserlocation.center[0]), //initial position
-                  zoom: 12.0, //initial zoom level
-                ),
+                body: Stack(
+                  children: [
+                    GoogleMap(
+                      //Map widget from google_maps_flutter package
+                      myLocationButtonEnabled: false,
+                      markers: Set<Marker>.of(markers.values),
+                      zoomGesturesEnabled: true, //enable Zoom in, out on map
+                      initialCameraPosition: CameraPosition(
+                        //innital position in map
+                        target: LatLng(
+                            widget.curruserlocation.center[1],
+                            widget
+                                .curruserlocation.center[0]), //initial position
+                        zoom: 12.0, //initial zoom level
+                      ),
 
-                mapType: MapType.normal, //map type
+                      mapType: MapType.normal, //map type
 
-                onMapCreated: (controller) async {
-                  //method called when map is created
-                  List<AppUser> users = await db.retrievefriendsformap(
-                      widget.curruser,
-                      widget.curruserlocation.center[1],
-                      widget.curruserlocation.center[0]);
-                  List<Event> events = await db.retrieveeventsformap(
-                    cameraposition!.target.latitude,
-                    cameraposition!.target.longitude,
-                  );
-                  setmarkers(users, events);
-                  setState(() {
-                    mapController = controller;
-                    showbutton = false;
-                  });
-                },
-                onCameraMove: (position) {
-                  setState(() {
-                    cameraposition = position;
-                    showbutton = true;
-                  });
-                },
-              ),
-              showbutton
-                  ? Align(
-                      alignment: Alignment.bottomCenter,
+                      onMapCreated: (controller) async {
+                        //method called when map is created
+                        List<AppUser> users = await db.retrievefriendsformap(
+                            widget.curruser,
+                            widget.curruserlocation.center[1],
+                            widget.curruserlocation.center[0]);
+                        List<Event> events = await db.retrieveeventsformap(
+                            widget.curruserlocation.center[1],
+                            widget.curruserlocation.center[0]);
+                        setmarkers(users, events);
+                        setState(() {
+                          mapController = controller;
+                          showbutton = false;
+                        });
+                      },
+                      onCameraMove: (position) {
+                        setState(() {
+                          cameraposition = position;
+                          showbutton = true;
+                        });
+                      },
+                    ),
+                    showbutton
+                        ? Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 150),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  List<AppUser> users =
+                                      await db.retrievefriendsformap(
+                                    widget.curruser,
+                                    cameraposition!.target.latitude,
+                                    cameraposition!.target.longitude,
+                                  );
+                                  List<Event> events =
+                                      await db.retrieveeventsformap(
+                                    cameraposition!.target.latitude,
+                                    cameraposition!.target.longitude,
+                                  );
+                                  setmarkers(users, events);
+                                  setState(() {
+                                    showbutton = false;
+                                  });
+                                },
+                                child: Container(
+                                  width: screenwidth * 0.4,
+                                  height: screenheight * 0.05,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "Search Area",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(),
+                    Align(
+                      alignment: Alignment.topRight,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 150),
+                        padding:
+                            EdgeInsets.fromLTRB(0, screenheight * 0.08, 20, 0),
                         child: GestureDetector(
-                          onTap: () async {
-                            List<AppUser> users =
-                                await db.retrievefriendsformap(
-                              widget.curruser,
-                              cameraposition!.target.latitude,
-                              cameraposition!.target.longitude,
-                            );
-                            List<Event> events = await db.retrieveeventsformap(
-                              cameraposition!.target.latitude,
-                              cameraposition!.target.longitude,
-                            );
-                            setmarkers(users, events);
+                          onTap: () {
                             setState(() {
-                              showbutton = false;
+                              showsearchscreen = true;
                             });
                           },
                           child: Container(
-                            width: screenwidth * 0.4,
-                            height: screenheight * 0.05,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Theme.of(context).primaryColor,
-                            ),
+                                borderRadius: BorderRadius.circular(100),
+                                color: Colors.white),
+                            width: 50,
+                            height: 50,
                             child: const Center(
-                              child: Text(
-                                "Search Area",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
+                              child: Icon(
+                                Icons.search_rounded,
+                                color: Colors.black,
+                                size: 30,
                               ),
                             ),
                           ),
                         ),
                       ),
                     )
-                  : Container(),
-            ],
-          ),
-        ));
+                  ],
+                ),
+              ));
   }
 }

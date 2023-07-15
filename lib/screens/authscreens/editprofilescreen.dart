@@ -508,7 +508,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          InkWell(
+          GestureDetector(
               onTap: buttonpressed
                   ? null
                   : () async {

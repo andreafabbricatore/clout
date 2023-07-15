@@ -3,6 +3,7 @@ import 'package:clout/components/location.dart';
 import 'package:clout/components/user.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
+import 'package:clout/screens/unauthscreens/unauthprofilescreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +25,12 @@ class applogic {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  void usernavigate(FirebaseAnalytics analytics, AppLocation curruserlocation,
-      AppUser curruser, AppUser user, BuildContext context) {
+  Future<void> usernavigate(
+      FirebaseAnalytics analytics,
+      AppLocation curruserlocation,
+      AppUser curruser,
+      AppUser user,
+      BuildContext context) async {
     Navigator.push(
         context,
         CupertinoPageRoute(
@@ -36,7 +41,7 @@ class applogic {
                   curruserlocation: curruserlocation,
                   analytics: analytics,
                 ),
-            settings: RouteSettings(name: "ProfileScreen")));
+            settings: const RouteSettings(name: "ProfileScreen")));
   }
 
   void goeventdetailscreen(
@@ -56,6 +61,6 @@ class applogic {
                   curruserlocation: curruserlocation,
                   analytics: analytics,
                 ),
-            settings: RouteSettings(name: "EventDetailScreen")));
+            settings: const RouteSettings(name: "EventDetailScreen")));
   }
 }

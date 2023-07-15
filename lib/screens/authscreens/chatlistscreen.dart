@@ -159,69 +159,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             );
           },
           child: Column(children: [
-            Center(
-              child: Focus(
-                onFocusChange: (hasfocus) {
-                  if (hasfocus) {
-                    setState(() {
-                      searching = hasfocus;
-                      suffixiconcolor = Colors.grey;
-                    });
-                  }
-                },
-                child: SizedBox(
-                  width: screenwidth * 0.9,
-                  child: TextField(
-                    controller: searchcontroller,
-                    onChanged: (String searchquery) async {
-                      try {
-                        List<AppUser> res = await db.searchUsers(
-                            searchquery.trim(), widget.curruser);
-                        setState(() {
-                          searchedusers = res;
-                        });
-                      } catch (e) {
-                        logic.displayErrorSnackBar(
-                            "Could not search users", context);
-                      }
-                    },
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Search',
-                        prefixIcon:
-                            const Icon(Icons.search, color: Colors.grey),
-                        suffixIcon: GestureDetector(
-                            onTap: searching
-                                ? () {
-                                    if (searchcontroller.text.isNotEmpty) {
-                                      searchcontroller.clear();
-                                    } else {
-                                      setState(() {
-                                        searching = false;
-                                        suffixiconcolor = Colors.white;
-                                        searchedusers = [];
-                                      });
-                                      FocusScope.of(context).unfocus();
-                                    }
-                                  }
-                                : null,
-                            child: Icon(Icons.close, color: suffixiconcolor)),
-                        contentPadding: const EdgeInsets.all(10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1.0),
-                        )),
-                  ),
-                ),
-              ),
-            ),
+            chatlistsearchbar(screenwidth, context),
             !searching
                 ? chatlist.isNotEmpty
                     ? ChatListView(
@@ -243,5 +181,67 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   )
           ]),
         ));
+  }
+
+  Center chatlistsearchbar(double screenwidth, BuildContext context) {
+    return Center(
+      child: Focus(
+        onFocusChange: (hasfocus) {
+          if (hasfocus) {
+            setState(() {
+              searching = hasfocus;
+              suffixiconcolor = Colors.grey;
+            });
+          }
+        },
+        child: SizedBox(
+          width: screenwidth * 0.9,
+          child: TextField(
+            controller: searchcontroller,
+            onChanged: (String searchquery) async {
+              try {
+                List<AppUser> res =
+                    await db.searchUsers(searchquery.trim(), widget.curruser);
+                setState(() {
+                  searchedusers = res;
+                });
+              } catch (e) {
+                logic.displayErrorSnackBar("Could not search users", context);
+              }
+            },
+            decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                hintText: 'Search',
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                suffixIcon: GestureDetector(
+                    onTap: searching
+                        ? () {
+                            if (searchcontroller.text.isNotEmpty) {
+                              searchcontroller.clear();
+                            } else {
+                              setState(() {
+                                searching = false;
+                                suffixiconcolor = Colors.white;
+                                searchedusers = [];
+                              });
+                              FocusScope.of(context).unfocus();
+                            }
+                          }
+                        : null,
+                    child: Icon(Icons.close, color: suffixiconcolor)),
+                contentPadding: const EdgeInsets.all(10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                )),
+          ),
+        ),
+      ),
+    );
   }
 }

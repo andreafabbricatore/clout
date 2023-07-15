@@ -7,7 +7,7 @@ import 'package:clout/screens/authscreens/cloutscorescreen.dart';
 import 'package:clout/screens/authscreens/editprofilescreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/favscreen.dart';
-import 'package:clout/screens/authscreens/followerfollowingscreen.dart';
+import 'package:clout/screens/authscreens/friendsscreen.dart';
 import 'package:clout/screens/authscreens/settings.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
@@ -324,203 +324,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: widget.visit
-            ? GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              )
-            : const SizedBox(
-                width: 0,
-                height: 0,
-              ),
-        centerTitle: true,
-        title: Text(
-          widget.user.username,
-          textScaleFactor: 1.0,
-          style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: widget.iscurruser ? 30 : 20),
-        ),
-        backgroundColor: Colors.white,
-        shadowColor: Colors.white,
-        elevation: 0.0,
-        automaticallyImplyLeading: widget.visit ? true : false,
-        actions: widget.iscurruser
-            ? [
-                GestureDetector(
-                    onTap: () async {
-                      String link = await createShareLink();
-                      String text =
-                          "Follow @${widget.user.username} on Clout\n\n$link";
-                      shareuser(text);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                      child: const Icon(Icons.ios_share, color: Colors.black),
-                    )),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        backgroundColor: Colors.white,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SizedBox(
-                            height: screenheight * 0.1,
-                            width: screenwidth,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                  16.0, 8.0, 0.0, 0.0),
-                              child: Column(children: [
-                                Container(
-                                  width: 40,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.transparent),
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: const Color.fromARGB(60, 0, 0, 0),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: screenheight * 0.01,
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    settings();
-                                  },
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.settings, size: 30),
-                                      SizedBox(
-                                        width: 6,
-                                      ),
-                                      Text(
-                                        "Settings",
-                                        style: TextStyle(fontSize: 20),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: screenheight * 0.02,
-                                ),
-                              ]),
-                            ),
-                          );
-                        });
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                    child: Icon(
-                      Icons.more_vert_outlined,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ]
-            : [
-                GestureDetector(
-                    onTap: () async {
-                      String link = await createShareLink();
-                      String text =
-                          "Follow @${widget.user.username} on Clout\n\n$link";
-                      shareuser(text);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
-                      child: const Icon(Icons.ios_share, color: Colors.black),
-                    )),
-                GestureDetector(
-                  onTap: () async {
-                    showModalBottomSheet(
-                        backgroundColor: Colors.white,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SizedBox(
-                            height: screenheight * 0.16,
-                            width: screenwidth,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                  16.0, 8.0, 0.0, 0.0),
-                              child: Column(children: [
-                                Container(
-                                  width: 40,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.transparent),
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: const Color.fromARGB(60, 0, 0, 0),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: screenheight * 0.01,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    await reportuser();
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.flag_circle, size: 30),
-                                      SizedBox(
-                                        width: 6,
-                                      ),
-                                      Text(
-                                        "Report ${widget.user.fullname}",
-                                        style: TextStyle(fontSize: 20),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: screenheight * 0.02,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    await blockuser();
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.block, size: 30),
-                                      SizedBox(
-                                        width: 6,
-                                      ),
-                                      Text(
-                                        "Block ${widget.user.fullname}",
-                                        style: TextStyle(fontSize: 20),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ]),
-                            ),
-                          );
-                        });
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                    child: Icon(
-                      Icons.flag_outlined,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
-        shape: const Border(
-            bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
-      ),
+      appBar: profilescreenappbar(context, screenheight, screenwidth),
       body: CustomRefreshIndicator(
         onRefresh: refresh,
         builder: (context, child, controller) {
@@ -591,7 +395,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       )),
                     ),
                   ),
-                  InkWell(
+                  GestureDetector(
                     onTap: () {
                       setState(() {
                         joinedevents = false;
@@ -633,6 +437,205 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  AppBar profilescreenappbar(
+      BuildContext context, double screenheight, double screenwidth) {
+    return AppBar(
+      leading: widget.visit
+          ? GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            )
+          : const SizedBox(
+              width: 0,
+              height: 0,
+            ),
+      centerTitle: true,
+      title: Text(
+        widget.user.username,
+        textScaleFactor: 1.0,
+        style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: widget.iscurruser ? 30 : 20),
+      ),
+      backgroundColor: Colors.white,
+      shadowColor: Colors.white,
+      elevation: 0.0,
+      automaticallyImplyLeading: widget.visit ? true : false,
+      actions: widget.iscurruser
+          ? [
+              GestureDetector(
+                  onTap: () async {
+                    String link = await createShareLink();
+                    String text =
+                        "Follow @${widget.user.username} on Clout\n\n$link";
+                    shareuser(text);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                    child: const Icon(Icons.ios_share, color: Colors.black),
+                  )),
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                      backgroundColor: Colors.white,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SizedBox(
+                          height: screenheight * 0.1,
+                          width: screenwidth,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.fromLTRB(16.0, 8.0, 0.0, 0.0),
+                            child: Column(children: [
+                              Container(
+                                width: 40,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.transparent),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: const Color.fromARGB(60, 0, 0, 0),
+                                ),
+                              ),
+                              SizedBox(
+                                height: screenheight * 0.01,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  settings();
+                                },
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.settings, size: 30),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    Text(
+                                      "Settings",
+                                      style: TextStyle(fontSize: 20),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: screenheight * 0.02,
+                              ),
+                            ]),
+                          ),
+                        );
+                      });
+                },
+                child: const Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                  child: Icon(
+                    Icons.more_vert_outlined,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ]
+          : [
+              GestureDetector(
+                  onTap: () async {
+                    String link = await createShareLink();
+                    String text =
+                        "Follow @${widget.user.username} on Clout\n\n$link";
+                    shareuser(text);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+                    child: const Icon(Icons.ios_share, color: Colors.black),
+                  )),
+              GestureDetector(
+                onTap: () async {
+                  showModalBottomSheet(
+                      backgroundColor: Colors.white,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SizedBox(
+                          height: screenheight * 0.16,
+                          width: screenwidth,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.fromLTRB(16.0, 8.0, 0.0, 0.0),
+                            child: Column(children: [
+                              Container(
+                                width: 40,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.transparent),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: const Color.fromARGB(60, 0, 0, 0),
+                                ),
+                              ),
+                              SizedBox(
+                                height: screenheight * 0.01,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  await reportuser();
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.flag_circle, size: 30),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    Text(
+                                      "Report ${widget.user.fullname}",
+                                      style: TextStyle(fontSize: 20),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: screenheight * 0.02,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  await blockuser();
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.block, size: 30),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    Text(
+                                      "Block ${widget.user.fullname}",
+                                      style: TextStyle(fontSize: 20),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ]),
+                          ),
+                        );
+                      });
+                },
+                child: const Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                  child: Icon(
+                    Icons.flag_outlined,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+      shape: const Border(
+          bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
     );
   }
 }

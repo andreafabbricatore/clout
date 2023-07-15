@@ -41,9 +41,9 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   int _index = 0;
-  List page = [];
+  List<Widget> page = [];
   PendingDynamicLinkData? initialLink;
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
@@ -52,6 +52,7 @@ class _MainScreenState extends State<MainScreen> {
   applogic logic = applogic();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   late bool canvibrate;
+  TabController? _controller;
 
   Future<void> requestNotisPermission() async {
     NotificationSettings settings = await messaging.requestPermission(
@@ -303,6 +304,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
+    _controller = TabController(length: 5, vsync: this);
     requestNotisPermission();
     initMessaging();
     setupInteractedMessage();
@@ -321,76 +323,41 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: page[_index],
-        bottomNavigationBar: BottomNavyBar(
-          items: [
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.home,
-              ),
-              title: const Text(
-                "Home",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.search_rounded,
-              ),
-              title: const Text(
-                "Explore",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.add,
-              ),
-              title: const Text(
-                "Create",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.bookmark_outlined,
-              ),
-              title: const Text(
-                "Favorites",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(CupertinoIcons.person_crop_circle),
-              title: const Text(
-                "Profile",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            )
-          ],
-          onItemSelected: (newIndex) {
-            if (newIndex == 0) {
-              setState(() {
-                widget.justloaded = false;
-              });
-              parampasser();
-            }
-            setState(() => _index = newIndex);
-          },
-          selectedIndex: _index,
-          showElevation: false,
-          iconSize: 33,
-          containerHeight: 60,
+        extendBody: true,
+        body: TabBarView(
+          controller: _controller,
+          children: page,
+        ),
+        bottomNavigationBar: Container(
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+          height: 50,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Theme.of(context).primaryColor,
+          ),
+          child: TabBar(
+            enableFeedback: true,
+            indicatorColor: Colors.transparent,
+            controller: _controller,
+            onTap: (newIndex) {
+              if (newIndex == 0) {
+                setState(() {
+                  widget.justloaded = false;
+                });
+                parampasser();
+              }
+              setState(() => _index = newIndex);
+            },
+            tabs: const [
+              Tab(icon: Icon(Icons.home)),
+              Tab(icon: Icon(Icons.search_rounded)),
+              Tab(icon: Icon(Icons.add)),
+              Tab(icon: Icon(Icons.bookmark_outlined)),
+              Tab(
+                icon: Icon(CupertinoIcons.person_crop_circle),
+              )
+            ],
+          ),
         ));
   }
 }

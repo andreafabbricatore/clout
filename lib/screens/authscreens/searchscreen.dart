@@ -1,8 +1,6 @@
 import 'package:clout/components/location.dart';
 import 'package:clout/components/searchbarlistview.dart';
-import 'package:clout/components/searchgridview.dart';
 import 'package:clout/components/user.dart';
-import 'package:clout/screens/authscreens/calendarsearchscreen.dart';
 import 'package:clout/screens/authscreens/interestsearchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
@@ -15,10 +13,12 @@ class SearchScreen extends StatefulWidget {
       {super.key,
       required this.curruser,
       required this.curruserlocation,
-      required this.analytics});
+      required this.analytics,
+      required this.goback});
   AppUser curruser;
   AppLocation curruserlocation;
   FirebaseAnalytics analytics;
+  final Function() goback;
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
@@ -26,26 +26,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   db_conn db = db_conn();
   applogic logic = applogic();
-  List interests = [
-    "Sports",
-    "Nature",
-    "Music",
-    "Dance",
-    "Movies",
-    "Acting",
-    "Singing",
-    "Drinking",
-    "Food",
-    "Art",
-    "Animals",
-    "Fashion",
-    "Cooking",
-    "Culture",
-    "Travel",
-    "Games",
-    "Studying",
-    "Chilling"
-  ];
+  FocusNode focusNode = FocusNode();
 
   Future<void> updatecurruser() async {
     AppUser updateduser = await db.getUserFromUID(widget.curruser.uid);
@@ -54,12 +35,11 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
+  bool searching = false;
   List<Event> searchedevents = [];
   List<AppUser> searchedusers = [];
   TextEditingController searchcontroller = TextEditingController();
-  bool searching = false;
   bool searchevents = true;
-  FocusNode focusNode = FocusNode();
   Color suffixiconcolor = Colors.white;
 
   void gotointerestsearchscreen(
@@ -90,32 +70,14 @@ class _SearchScreenState extends State<SearchScreen> {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
 
-    Future<void> searchnav(String interest) async {
-      try {
-        List<Event> interesteventlist = [];
-        interesteventlist = await db.getLngLatEventsByInterest(
-            widget.curruserlocation.center[0],
-            widget.curruserlocation.center[1],
-            interest,
-            widget.curruser);
-        await widget.analytics
-            .logEvent(name: "go_to_interest_search_screen", parameters: {
-          "interest": interest,
-          "inuserinterests":
-              (widget.curruser.interests.contains(interest)).toString(),
-          "userclout": widget.curruser.clout
-        });
-        gotointerestsearchscreen(interest, interesteventlist);
-      } catch (e) {
-        logic.displayErrorSnackBar("Could not display events", context);
-      }
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+          SizedBox(
+            height: screenheight * 0.05,
+          ),
           Focus(
             onFocusChange: (hasfocus) {
               if (hasfocus) {
@@ -126,85 +88,27 @@ class _SearchScreenState extends State<SearchScreen> {
               }
             },
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(
-                  width: screenwidth * 0.945,
-                  child: TextField(
-                    controller: searchcontroller,
-                    onChanged: (String searchquery) async {
-                      if (searchevents) {
-                        try {
-                          List<Event> res = await db.searchEvents(
-                              searchquery.trim(), widget.curruser);
-                          setState(() {
-                            searchedevents = res;
-                          });
-                          updatecurruser();
-                        } catch (e) {
-                          logic.displayErrorSnackBar(
-                              "Could not search events", context);
-                        }
-                      } else {
-                        try {
-                          List<AppUser> res = await db.searchUsers(
-                              searchquery.trim(), widget.curruser);
-                          setState(() {
-                            searchedusers = res;
-                          });
-                          updatecurruser();
-                        } catch (e) {
-                          logic.displayErrorSnackBar(
-                              "Could not search users", context);
-                        }
-                      }
-                    },
-                    decoration: InputDecoration(
-                        hintText: 'Search',
-                        prefixIcon:
-                            const Icon(Icons.search, color: Colors.grey),
-                        suffixIcon: GestureDetector(
-                            onTap: searching
-                                ? () {
-                                    if (searchcontroller.text.isNotEmpty) {
-                                      searchcontroller.clear();
-                                    } else {
-                                      setState(() {
-                                        searching = false;
-                                        suffixiconcolor = Colors.white;
-                                        searchedusers = [];
-                                        searchedevents = [];
-                                      });
-                                      FocusScope.of(context).unfocus();
-                                    }
-                                  }
-                                : null,
-                            child: Icon(Icons.close, color: suffixiconcolor)),
-                        contentPadding: const EdgeInsets.all(20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1.0),
-                        )),
-                  ),
-                ),
+                searchscreensearchbar(screenwidth, context),
+                searching
+                    ? Container()
+                    : GestureDetector(
+                        onTap: () {
+                          widget.goback.call();
+                        },
+                        child: const Icon(Icons.close, color: Colors.grey))
               ],
             ),
           ),
-          searching
-              ? SizedBox(
-                  height: screenheight * 0.02,
-                )
-              : Container(),
+          SizedBox(
+            height: screenheight * 0.02,
+          ),
           searching
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    InkWell(
+                    GestureDetector(
                       onTap: () async {
                         setState(() {
                           searchedusers = [];
@@ -239,7 +143,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ),
                     ),
-                    InkWell(
+                    GestureDetector(
                       onTap: () async {
                         setState(() {
                           searchedevents = [];
@@ -278,7 +182,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 )
               : Container(),
           SizedBox(
-            height: searching ? screenheight * 0.01 : screenheight * 0.005,
+            height: screenheight * 0.01,
           ),
           searching
               ? SearchBarListView(
@@ -290,11 +194,78 @@ class _SearchScreenState extends State<SearchScreen> {
                   curruserlocation: widget.curruserlocation,
                   analytics: widget.analytics,
                 )
-              : SearchGridView(
-                  interests: interests,
-                  onTap: searchnav,
-                )
+              : SizedBox(
+                  height: screenheight * 0.3,
+                  child: const Center(
+                      child: Text(
+                    "Search Users and Events\nOn Clout",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    textAlign: TextAlign.center,
+                  )))
         ]),
+      ),
+    );
+  }
+
+  SizedBox searchscreensearchbar(double screenwidth, BuildContext context) {
+    return SizedBox(
+      width: searching ? screenwidth * 0.9 : screenwidth * 0.8,
+      child: TextField(
+        controller: searchcontroller,
+        onChanged: (String searchquery) async {
+          if (searchevents) {
+            try {
+              List<Event> res =
+                  await db.searchEvents(searchquery.trim(), widget.curruser);
+              setState(() {
+                searchedevents = res;
+              });
+              updatecurruser();
+            } catch (e) {
+              logic.displayErrorSnackBar("Could not search events", context);
+            }
+          } else {
+            try {
+              List<AppUser> res =
+                  await db.searchUsers(searchquery.trim(), widget.curruser);
+              setState(() {
+                searchedusers = res;
+              });
+              updatecurruser();
+            } catch (e) {
+              logic.displayErrorSnackBar("Could not search users", context);
+            }
+          }
+        },
+        decoration: InputDecoration(
+            hintText: 'Search',
+            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            suffixIcon: GestureDetector(
+                onTap: searching
+                    ? () {
+                        if (searchcontroller.text.isNotEmpty) {
+                          searchcontroller.clear();
+                        } else {
+                          setState(() {
+                            searching = false;
+                            suffixiconcolor = Colors.white;
+                            searchedusers = [];
+                            searchedevents = [];
+                          });
+                          FocusScope.of(context).unfocus();
+                        }
+                      }
+                    : null,
+                child: Icon(Icons.close, color: suffixiconcolor)),
+            contentPadding: const EdgeInsets.all(20),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+            )),
       ),
     );
   }
