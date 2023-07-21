@@ -1,8 +1,8 @@
-import 'package:clout/components/event.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/unautheventlistview.dart';
-import 'package:clout/components/unauthuserlistview.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/event.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/models/unautheventlistview.dart';
+import 'package:clout/models/unauthuserlistview.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthprofilescreen.dart';
 import 'package:clout/services/db.dart';

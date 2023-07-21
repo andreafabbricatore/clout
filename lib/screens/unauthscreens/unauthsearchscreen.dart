@@ -1,13 +1,13 @@
-import 'package:clout/components/location.dart';
-import 'package:clout/components/searchgridview.dart';
-import 'package:clout/components/unauthsearchbarlistview.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/models/searchgridview.dart';
+import 'package:clout/models/unauthsearchbarlistview.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/unauthscreens/unauthinterestsearchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:clout/components/event.dart';
+import 'package:clout/defs/event.dart';
 
 class UnAuthSearchScreen extends StatefulWidget {
   UnAuthSearchScreen(

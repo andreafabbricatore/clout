@@ -1,10 +1,8 @@
-import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/authscreens/chatlistscreen.dart';
 import 'package:clout/screens/authscreens/homescreen.dart';
-import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreenHolder extends StatefulWidget {

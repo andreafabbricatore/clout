@@ -1,6 +1,5 @@
-import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/primarybutton.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/screens/authscreens/blockedusersscreen.dart';

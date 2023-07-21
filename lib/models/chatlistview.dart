@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:clout/components/chat.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/chat.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 

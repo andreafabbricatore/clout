@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'package:clout/components/event.dart';
+import 'package:clout/defs/event.dart';
 import 'package:clout/components/loadingwidget.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/noeventsbox.dart';
-import 'package:clout/components/unautheventlistview.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/models/unautheventlistview.dart';
 import 'package:clout/components/unauthnoeventsbox.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';

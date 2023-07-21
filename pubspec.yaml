@@ -87,6 +87,8 @@ dependencies:
   sliding_up_panel: ^2.0.0+1
   image: ^3.0.2
   floating_navbar: ^2.0.2
+  flutter_cache_manager: ^3.3.1
+  flutter_stripe: ^9.3.0
 
 flutter_icons:
   #  image_path: "assets/images/icon-128x128.png"

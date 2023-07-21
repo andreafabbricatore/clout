@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/authentication/emailverificationscreen.dart';
 import 'package:clout/screens/preauthscreen.dart';
-import 'package:clout/screens/authentication/signupscreen.dart';
+import 'package:clout/screens/authentication/signupflowscreens.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geoflutterfire2/geoflutterfire2.dart';
 
 class CompleteSignUpLoading extends StatefulWidget {
   CompleteSignUpLoading({Key? key, required this.uid, required this.analytics})
@@ -90,6 +89,7 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
         MaterialPageRoute(
             builder: (BuildContext context) => PicandNameScreen(
                   analytics: widget.analytics,
+                  business: curruser.plan == "business",
                 ),
             settings: RouteSettings(name: "PicandNameScreen"),
             fullscreenDialog: true),
@@ -99,8 +99,8 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => UsernameScreen(
-                  analytics: widget.analytics,
-                ),
+                analytics: widget.analytics,
+                business: curruser.plan == "business"),
             settings: RouteSettings(name: "UsernameScreen"),
             fullscreenDialog: true),
       );

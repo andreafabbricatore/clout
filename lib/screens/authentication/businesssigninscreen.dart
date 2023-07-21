@@ -1,6 +1,7 @@
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
 import 'package:clout/screens/authentication/pswresetscreen.dart';
+import 'package:clout/screens/authentication/signupflowscreens.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -28,8 +29,20 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
                 analytics: widget.analytics,
               ),
           fullscreenDialog: true,
-          settings: RouteSettings(name: "AuthenticationWrapper")),
+          settings: const RouteSettings(name: "AuthenticationWrapper")),
     );
+  }
+
+  void donesignup() {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => PicandNameScreen(
+                  analytics: widget.analytics,
+                  business: true,
+                ),
+            fullscreenDialog: true,
+            settings: const RouteSettings(name: "PicAndNameScreen")));
   }
 
   bool signinbuttonpressed = false;
@@ -43,12 +56,12 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Clout.",
+          "Clout Business.",
           style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontFamily: "Archivo",
-              fontWeight: FontWeight.w800,
-              fontSize: 50),
+              fontWeight: FontWeight.w900,
+              fontSize: 30),
           textScaleFactor: 1.0,
         ),
         backgroundColor: Colors.white,
@@ -134,17 +147,42 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
                           setState(() {
                             signinbuttonpressed = true;
                           });
-                          await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
-                                  email: emailController.text.trim(),
-                                  password: pswController.text.trim());
-                          await widget.analytics.setUserId(
-                              id: FirebaseAuth.instance.currentUser!.uid);
-                          await widget.analytics.logLogin(loginMethod: "email");
-                          donesignin();
+                          List<String> res = await FirebaseAuth.instance
+                              .fetchSignInMethodsForEmail(
+                                  emailController.text.trim());
+                          if (res.isEmpty) {
+                            try {
+                              await FirebaseAuth.instance
+                                  .createUserWithEmailAndPassword(
+                                      email: emailController.text.trim(),
+                                      password: pswController.text.trim());
+                              await db.createbusinessinstance(
+                                  FirebaseAuth.instance.currentUser!.uid);
+                              await widget.analytics.setUserId(
+                                  id: FirebaseAuth.instance.currentUser!.uid);
+                              await widget.analytics
+                                  .logLogin(loginMethod: "email");
+                              donesignup();
+                            } catch (e) {
+                              throw Exception("Could not sign up");
+                            }
+                          } else {
+                            try {
+                              await FirebaseAuth.instance
+                                  .signInWithEmailAndPassword(
+                                      email: emailController.text.trim(),
+                                      password: pswController.text.trim());
+                              await widget.analytics.setUserId(
+                                  id: FirebaseAuth.instance.currentUser!.uid);
+                              await widget.analytics
+                                  .logLogin(loginMethod: "email");
+                              donesignin();
+                            } catch (e) {
+                              throw Exception("Could not sign in");
+                            }
+                          }
                         } catch (e) {
-                          logic.displayErrorSnackBar(
-                              "Could not Sign in", context);
+                          logic.displayErrorSnackBar(e.toString(), context);
                         } finally {
                           setState(() {
                             signinbuttonpressed = false;
@@ -155,7 +193,7 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
                   screenwidth: screenwidth,
                   buttonwidth: screenwidth * 0.5,
                   buttonpressed: signinbuttonpressed,
-                  text: "Sign In",
+                  text: "Sign On",
                   bold: true,
                 )),
             SizedBox(height: screenheight * 0.02),

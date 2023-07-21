@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/user.dart';
 import 'package:flutter/material.dart';
 
 class UnAuthUserListView extends StatefulWidget {

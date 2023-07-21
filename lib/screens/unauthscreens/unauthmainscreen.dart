@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
-import 'package:clout/components/location.dart';
+import 'package:clout/defs/location.dart';
 import 'package:clout/screens/unauthscreens/unauthcreateeventscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthfavscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthhomescreen.dart';

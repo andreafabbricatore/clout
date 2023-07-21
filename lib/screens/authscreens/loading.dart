@@ -1,17 +1,15 @@
 import 'dart:async';
 
-import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
-import 'package:clout/screens/authentication/signupscreen.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
+import 'package:clout/screens/authentication/signupflowscreens.dart';
 import 'package:clout/screens/authscreens/linkphoneauth.dart';
 import 'package:clout/screens/authscreens/mainscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:launch_review/launch_review.dart';
 
@@ -72,8 +70,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
           MaterialPageRoute(
               builder: (BuildContext context) => PicandNameScreen(
                     analytics: widget.analytics,
+                    business: curruser.plan == "business",
                   ),
-              settings: RouteSettings(name: "PicandNameScreen"),
+              settings: const RouteSettings(name: "PicandNameScreen"),
               fullscreenDialog: true),
         );
       } else if (curruser.setusername == false) {
@@ -82,8 +81,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
           MaterialPageRoute(
               builder: (BuildContext context) => UsernameScreen(
                     analytics: widget.analytics,
+                    business: curruser.plan == "business",
                   ),
-              settings: RouteSettings(name: "UsernameScreen"),
+              settings: const RouteSettings(name: "UsernameScreen"),
               fullscreenDialog: true),
         );
       } else if (curruser.setmisc == false) {
@@ -93,25 +93,24 @@ class _LoadingScreenState extends State<LoadingScreen> {
               builder: (BuildContext context) => MiscScreen(
                     analytics: widget.analytics,
                   ),
-              settings: RouteSettings(name: "MiscScreen"),
+              settings: const RouteSettings(name: "MiscScreen"),
               fullscreenDialog: true),
         );
-      } else if (curruser.setinterests == false) {
+      } else if (curruser.plan != "business" &&
+          curruser.setinterests == false) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => InterestScreen(
                     analytics: widget.analytics,
                   ),
-              settings: RouteSettings(name: "InterestScreen"),
+              settings: const RouteSettings(name: "InterestScreen"),
               fullscreenDialog: true),
         );
       } else {
-        print("start");
         await newgetUserAppLocation();
         await db.updatelastuserlocandusage(
             widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
-        print("end");
         doneLoading(curruser);
       }
     } catch (e) {
@@ -248,12 +247,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void loadinglogic() async {
     try {
       await ensurelocation();
-      print("location");
+      print("done");
       await undermaintenance();
-      print("maint");
+      print("done");
       if (!maintenance) {
         await needupdate();
-        print("update");
+        print("done");
         if (!update) {
           await appinit();
         }

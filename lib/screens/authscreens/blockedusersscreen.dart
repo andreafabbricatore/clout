@@ -1,5 +1,5 @@
-import 'package:clout/components/user.dart';
-import 'package:clout/components/userlistview.dart';
+import 'package:clout/defs/user.dart';
+import 'package:clout/models/userlistview.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:flutter/material.dart';

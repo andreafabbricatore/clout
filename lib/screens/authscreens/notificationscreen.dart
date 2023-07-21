@@ -1,9 +1,9 @@
-import 'package:clout/components/event.dart';
+import 'package:clout/defs/event.dart';
 import 'package:clout/components/loadingwidget.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/notificationslistview.dart';
-import 'package:clout/components/user.dart';
-import 'package:clout/components/notification.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/models/notificationslistview.dart';
+import 'package:clout/defs/user.dart';
+import 'package:clout/defs/notification.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/screens/authscreens/requestscreen.dart';

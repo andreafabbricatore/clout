@@ -1,5 +1,4 @@
-import 'package:clout/components/notification.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:clout/defs/notification.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 

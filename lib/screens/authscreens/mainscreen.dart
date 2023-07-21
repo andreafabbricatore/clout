@@ -1,25 +1,22 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
-import 'package:clout/components/chat.dart';
-import 'package:clout/components/event.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/chat.dart';
+import 'package:clout/defs/event.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
-import 'package:clout/screens/authscreens/cloutscorescreen.dart';
 import 'package:clout/screens/authscreens/createeventscreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/favscreen.dart';
-import 'package:clout/screens/authscreens/homescreen.dart';
 import 'package:clout/screens/authscreens/homescreenholder.dart';
 import 'package:clout/screens/authscreens/mapscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
-import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -326,6 +323,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         extendBody: true,
         body: TabBarView(
           controller: _controller,
+          physics: const NeverScrollableScrollPhysics(),
           children: page,
         ),
         bottomNavigationBar: Container(
@@ -333,7 +331,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           height: 50,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: Theme.of(context).primaryColor,
+            color: const Color.fromARGB(245, 255, 48, 117),
           ),
           child: TabBar(
             enableFeedback: true,

@@ -2,20 +2,19 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:clout/components/event.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/searchbarlistview.dart';
-import 'package:clout/components/searchgridview.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/event.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/models/searchgridview.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/authscreens/interestsearchscreen.dart';
 import 'package:clout/screens/authscreens/searchscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class MapScreen extends StatefulWidget {
   MapScreen(
@@ -245,7 +244,7 @@ class _MapScreenState extends State<MapScreen> {
                 goback: goback,
               )
             : SlidingUpPanel(
-                minHeight: 40,
+                minHeight: 130,
                 maxHeight: screenheight * 0.6,
                 defaultPanelState: PanelState.OPEN,
                 backdropColor: Theme.of(context).primaryColor,

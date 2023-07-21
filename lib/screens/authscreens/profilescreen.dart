@@ -1,8 +1,8 @@
-import 'package:clout/components/eventlistview.dart';
+import 'package:clout/models/eventlistview.dart';
 import 'package:clout/components/loadingwidget.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/profiletopcontainer.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/models/profiletopcontainer.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/authscreens/cloutscorescreen.dart';
 import 'package:clout/screens/authscreens/editprofilescreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
@@ -18,7 +18,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:clout/components/event.dart';
+import 'package:clout/defs/event.dart';
 
 class ProfileScreen extends StatefulWidget {
   AppUser user;

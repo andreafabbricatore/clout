@@ -1,6 +1,5 @@
 import 'package:clout/screens/authentication/phoneauth.dart';
-import 'package:clout/screens/authentication/signinscreen.dart';
-import 'package:clout/screens/authentication/signupscreen.dart';
+import 'package:clout/screens/authentication/businesssigninscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthloadingscreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';

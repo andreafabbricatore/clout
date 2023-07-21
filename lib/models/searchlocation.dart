@@ -1,4 +1,4 @@
-import 'package:clout/components/location.dart';
+import 'package:clout/defs/location.dart';
 import 'package:clout/services/logic.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';

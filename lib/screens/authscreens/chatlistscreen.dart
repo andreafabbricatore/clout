@@ -1,8 +1,8 @@
-import 'package:clout/components/chat.dart';
-import 'package:clout/components/chatlistview.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
-import 'package:clout/components/userlistview.dart';
+import 'package:clout/defs/chat.dart';
+import 'package:clout/models/chatlistview.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
+import 'package:clout/models/userlistview.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';

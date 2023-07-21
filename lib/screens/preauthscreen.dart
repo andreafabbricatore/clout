@@ -25,7 +25,7 @@ class _PreAuthScreenState extends State<PreAuthScreen> {
           builder: (context) => AuthScreen(
                 analytics: widget.analytics,
               ),
-          settings: RouteSettings(name: "AuthScreen"),
+          settings: const RouteSettings(name: "AuthScreen"),
           fullscreenDialog: true),
     );
   }

@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:clout/components/chat.dart';
-import 'package:clout/components/event.dart';
-import 'package:clout/components/location.dart';
+import 'package:clout/defs/chat.dart';
+import 'package:clout/defs/event.dart';
+import 'package:clout/defs/location.dart';
 import 'package:clout/components/primarybutton.dart';
-import 'package:clout/components/user.dart';
-import 'package:clout/components/userlistview.dart';
+import 'package:clout/defs/user.dart';
+import 'package:clout/models/userlistview.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/screens/authscreens/editeventscreen.dart';
 import 'package:clout/screens/authscreens/interestsearchscreen.dart';
@@ -1041,88 +1041,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        centerTitle: true,
-        title: widget.event.isinviteonly
-            ? const Text(
-                "Invite Only",
-                style: TextStyle(color: Colors.black),
-                textScaleFactor: 1.0,
-              )
-            : null,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-        actions: [
-          GestureDetector(
-            onTap: gotochatbuttonpressed
-                ? null
-                : () async {
-                    setState(() {
-                      gotochatbuttonpressed = true;
-                    });
-                    try {
-                      if (widget.event.participants
-                          .contains(widget.curruser.uid)) {
-                        Chat chat =
-                            await db.getChatfromDocId(widget.event.chatid);
-                        chatnavigate(chat);
-                      } else {
-                        Navigator.pop(context);
-                        displayErrorSnackBar("Please join the event first");
-                      }
-                    } catch (e) {
-                      displayErrorSnackBar("Could not display chat");
-                    }
-                    setState(() {
-                      gotochatbuttonpressed = false;
-                    });
-                  },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
-              child: Icon(
-                Icons.chat_bubble_outline_rounded,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () async {
-              List<AppUser> chatusers =
-                  await db.getfriendslist(widget.curruser);
-              showsharebottomsheet(
-                  context, screenheight, screenwidth, chatusers, shareevent);
-            },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 3.0, 8),
-              child: Icon(
-                Icons.ios_share,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              showthreedotbottomsheet(context, screenheight, screenwidth);
-            },
-            child: const Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 16.0, 4),
-              child: Icon(
-                Icons.more_vert_outlined,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: eventscreenappbar(context, screenheight, screenwidth, shareevent),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView(children: [
@@ -1178,7 +1097,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       fontWeight: FontWeight.bold),
                 ),
               ),
-              InkWell(
+              GestureDetector(
                 onTap: () async {
                   try {
                     AppUser eventhost =
@@ -1212,152 +1131,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          SizedBox(
-            width: screenwidth,
-            height: screenheight * 0.2,
-            child: Stack(
-              alignment: AlignmentDirectional.bottomEnd,
-              children: [
-                widget.event.showlocation
-                    ? GoogleMap(
-                        markers: Set<Marker>.of(markers.values),
-                        myLocationButtonEnabled: false,
-                        zoomGesturesEnabled: true,
-                        initialCameraPosition: CameraPosition(
-                            target: LatLng(widget.event.lat, widget.event.lng),
-                            zoom: 15))
-                    : Container(),
-                GestureDetector(
-                  onTap: !widget.event.showlocation
-                      ? null
-                      : () {
-                          showModalBottomSheet(
-                              backgroundColor: Colors.white,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return SizedBox(
-                                  height: screenheight * 0.18,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () async {
-                                              await Maps.MapLauncher.showMarker(
-                                                  mapType: Maps.MapType.apple,
-                                                  coords: Maps.Coords(
-                                                      widget.event.lat,
-                                                      widget.event.lng),
-                                                  title: widget.event.address);
-                                            },
-                                            child: RichText(
-                                              text: const TextSpan(
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w300),
-                                                  children: [
-                                                    TextSpan(text: "Open in "),
-                                                    TextSpan(
-                                                        text: "Apple Maps",
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    255,
-                                                                    48,
-                                                                    117),
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w300)),
-                                                  ]),
-                                            ),
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                border:
-                                                    Border.all(width: 0.05)),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              await Maps.MapLauncher.showMarker(
-                                                  mapType: Maps.MapType.google,
-                                                  coords: Maps.Coords(
-                                                      widget.event.lat,
-                                                      widget.event.lng),
-                                                  title: widget.event.address);
-                                            },
-                                            child: RichText(
-                                              text: const TextSpan(
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w300),
-                                                  children: [
-                                                    TextSpan(text: "Open in "),
-                                                    TextSpan(
-                                                        text: "Google Maps",
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    255,
-                                                                    48,
-                                                                    117),
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w300)),
-                                                  ]),
-                                            ),
-                                          ),
-                                        ]),
-                                  ),
-                                );
-                              });
-                        },
-                  child: Container(
-                    width: screenwidth,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: widget.event.showlocation
-                          ? Colors.transparent
-                          : Color.fromARGB(240, 255, 48, 117),
-                    ),
-                    child: widget.event.showlocation
-                        ? Container()
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                                const Icon(
-                                  Icons.lock,
-                                  color: Colors.black,
-                                  size: 60,
-                                ),
-                                SizedBox(height: screenheight * 0.02),
-                                const Text(
-                                  "Secret location.\nWill be revealed one hour before.",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w200),
-                                  textScaleFactor: 1.0,
-                                  overflow: TextOverflow.visible,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ]),
-                  ),
-                )
-              ],
-            ),
-          ),
+          eventscreenmapsection(screenwidth, screenheight, context),
           SizedBox(
             height: screenheight * 0.02,
           ),
@@ -1398,8 +1172,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         });
                       },
                       child: Transform.flip(
-                        child: Icon(Icons.arrow_drop_down_outlined, size: 30),
                         flipY: expandparticipants,
+                        child: const Icon(Icons.arrow_drop_down_outlined,
+                            size: 30),
                       ))
                   : Container()
             ],
@@ -1428,14 +1203,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             removeUser: remuser,
                             presentparticipants:
                                 widget.event.presentparticipants,
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             showsendbutton: false,
                             showfriendbutton: false,
                           ),
                         ],
                       ),
                     )
-              : Container(
+              : SizedBox(
                   width: screenwidth * 0.8,
                   height:
                       widget.event.participants.contains(widget.curruser.uid)
@@ -1457,7 +1232,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 removeUser: remuser,
                                 presentparticipants:
                                     widget.event.presentparticipants,
-                                physics: NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 toppadding: false,
                                 showsendbutton: false,
                                 showfriendbutton: false,
@@ -1491,7 +1266,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          InkWell(
+          GestureDetector(
               onTap: () async {
                 buttonpressed ? null : interactevent(context);
               },
@@ -1518,6 +1293,227 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ))
         ]),
       ),
+    );
+  }
+
+  SizedBox eventscreenmapsection(
+      double screenwidth, double screenheight, BuildContext context) {
+    return SizedBox(
+      width: screenwidth,
+      height: screenheight * 0.2,
+      child: Stack(
+        alignment: AlignmentDirectional.bottomEnd,
+        children: [
+          widget.event.showlocation
+              ? GoogleMap(
+                  markers: Set<Marker>.of(markers.values),
+                  myLocationButtonEnabled: false,
+                  zoomGesturesEnabled: true,
+                  initialCameraPosition: CameraPosition(
+                      target: LatLng(widget.event.lat, widget.event.lng),
+                      zoom: 15))
+              : Container(),
+          GestureDetector(
+            onTap: !widget.event.showlocation
+                ? null
+                : () {
+                    showModalBottomSheet(
+                        backgroundColor: Colors.white,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SizedBox(
+                            height: screenheight * 0.18,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Maps.MapLauncher.showMarker(
+                                            mapType: Maps.MapType.apple,
+                                            coords: Maps.Coords(
+                                                widget.event.lat,
+                                                widget.event.lng),
+                                            title: widget.event.address);
+                                      },
+                                      child: RichText(
+                                        text: const TextSpan(
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w300),
+                                            children: [
+                                              TextSpan(text: "Open in "),
+                                              TextSpan(
+                                                  text: "Apple Maps",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Color.fromARGB(
+                                                          255, 255, 48, 117),
+                                                      fontWeight:
+                                                          FontWeight.w300)),
+                                            ]),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(width: 0.05)),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Maps.MapLauncher.showMarker(
+                                            mapType: Maps.MapType.google,
+                                            coords: Maps.Coords(
+                                                widget.event.lat,
+                                                widget.event.lng),
+                                            title: widget.event.address);
+                                      },
+                                      child: RichText(
+                                        text: const TextSpan(
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w300),
+                                            children: [
+                                              TextSpan(text: "Open in "),
+                                              TextSpan(
+                                                  text: "Google Maps",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Color.fromARGB(
+                                                          255, 255, 48, 117),
+                                                      fontWeight:
+                                                          FontWeight.w300)),
+                                            ]),
+                                      ),
+                                    ),
+                                  ]),
+                            ),
+                          );
+                        });
+                  },
+            child: Container(
+              width: screenwidth,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: widget.event.showlocation
+                    ? Colors.transparent
+                    : Color.fromARGB(240, 255, 48, 117),
+              ),
+              child: widget.event.showlocation
+                  ? Container()
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                          const Icon(
+                            Icons.lock,
+                            color: Colors.black,
+                            size: 60,
+                          ),
+                          SizedBox(height: screenheight * 0.02),
+                          const Text(
+                            "Secret location.\nWill be revealed one hour before.",
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w200),
+                            textScaleFactor: 1.0,
+                            overflow: TextOverflow.visible,
+                            textAlign: TextAlign.center,
+                          ),
+                        ]),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  AppBar eventscreenappbar(BuildContext context, double screenheight,
+      double screenwidth, void shareevent(String text)) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0.0,
+      centerTitle: true,
+      title: widget.event.isinviteonly
+          ? const Text(
+              "Invite Only",
+              style: TextStyle(color: Colors.black),
+              textScaleFactor: 1.0,
+            )
+          : null,
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Icon(
+          Icons.arrow_back_ios,
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+      actions: [
+        GestureDetector(
+          onTap: gotochatbuttonpressed
+              ? null
+              : () async {
+                  setState(() {
+                    gotochatbuttonpressed = true;
+                  });
+                  try {
+                    if (widget.event.participants
+                        .contains(widget.curruser.uid)) {
+                      Chat chat =
+                          await db.getChatfromDocId(widget.event.chatid);
+                      chatnavigate(chat);
+                    } else {
+                      Navigator.pop(context);
+                      displayErrorSnackBar("Please join the event first");
+                    }
+                  } catch (e) {
+                    displayErrorSnackBar("Could not display chat");
+                  }
+                  setState(() {
+                    gotochatbuttonpressed = false;
+                  });
+                },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
+            child: Icon(
+              Icons.chat_bubble_outline_rounded,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () async {
+            List<AppUser> chatusers = await db.getfriendslist(widget.curruser);
+            showsharebottomsheet(
+                context, screenheight, screenwidth, chatusers, shareevent);
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 3.0, 8),
+            child: Icon(
+              Icons.ios_share,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            showthreedotbottomsheet(context, screenheight, screenwidth);
+          },
+          child: const Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 16.0, 4),
+            child: Icon(
+              Icons.more_vert_outlined,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

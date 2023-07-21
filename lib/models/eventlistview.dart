@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:clout/components/event.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/event.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/services/db.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -102,7 +102,7 @@ class EventListView extends StatelessWidget {
     int index,
   ) {
     Widget widget;
-    widget = Container(
+    widget = SizedBox(
       width: screenwidth * 0.8,
       height: screenheight * 0.1 + 200,
       child: Column(
@@ -112,12 +112,12 @@ class EventListView extends StatelessWidget {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          Container(
+          SizedBox(
             width: screenwidth * 0.85,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
+                SizedBox(
                   width: screenwidth * 0.6,
                   child: Text(
                     event.title,

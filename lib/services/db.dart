@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:clout/components/chat.dart';
-import 'package:clout/components/event.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/chat.dart';
+import 'package:clout/defs/event.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -99,7 +99,58 @@ class db_conn {
         'setusername': false,
         'setmisc': false,
         'setinterests': false,
-        'lastknowloc': loc.data,
+        'lastknownloc': loc.data,
+        'lastknownlat': 0.1,
+        'lastknownlng': 0.1,
+        'notificationcounter': 0,
+        'chatnotificationcounter': 0,
+        'appversion': packageInfo.version,
+        'donesignuptime': DateTime(1900, 1, 1, 0, 0),
+        'lastusagetime': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception("Could not create user");
+    }
+  }
+
+  Future createbusinessinstance(String uid) async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      GeoFirePoint loc = geo.point(latitude: 0, longitude: 0);
+      await users.doc(uid).set({
+        'fullname': '',
+        'username': '',
+        'uid': uid,
+        'gender': '',
+        'nationality': '',
+        'pfp_url': '',
+        'birthday': DateTime(1900, 1, 1, 0, 0),
+        'interests': [],
+        'hosted_events': [],
+        'joined_events': [],
+        'clout': 0,
+        'searchfield': [],
+        'friends': [],
+        'requested': [],
+        'requestedby': [],
+        'favorites': [],
+        'bio': '',
+        'blocked_users': [],
+        'blocked_by': [],
+        'chats': [],
+        'visiblechats': [],
+        'tokens': [],
+        'notifications': [],
+        'referred': [],
+        'referredby': [],
+        'plan': 'business',
+        'setnameandpfp': false,
+        'setusername': false,
+        'setmisc': false,
+        'setinterests': false,
+        'lastknownloc': loc.data,
+        'lastknownlat': 0.1,
+        'lastknownlng': 0.1,
         'notificationcounter': 0,
         'chatnotificationcounter': 0,
         'appversion': packageInfo.version,

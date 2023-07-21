@@ -1,7 +1,7 @@
 import 'package:clout/components/loadingwidget.dart';
-import 'package:clout/components/location.dart';
-import 'package:clout/components/user.dart';
-import 'package:clout/components/userlistview.dart';
+import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
+import 'package:clout/models/userlistview.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';

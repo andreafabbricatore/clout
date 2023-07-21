@@ -1,4 +1,4 @@
-import 'package:clout/components/user.dart';
+import 'package:clout/defs/user.dart';
 import 'package:flutter/material.dart';
 
 class UpdateInterests extends StatefulWidget {

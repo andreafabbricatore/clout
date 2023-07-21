@@ -1,8 +1,7 @@
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/main.dart';
-import 'package:clout/screens/authentication/signupscreen.dart';
-
+import 'package:clout/screens/authentication/signupflowscreens.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -316,6 +315,7 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
       MaterialPageRoute(
           builder: (BuildContext context) => PicandNameScreen(
                 analytics: widget.analytics,
+                business: false,
               ),
           fullscreenDialog: true,
           settings: RouteSettings(name: "PicAndNameScreen")),

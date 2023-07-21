@@ -13,7 +13,7 @@ class UnAuthFavScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "Favorites",
           textScaleFactor: 1.0,
           style: TextStyle(
@@ -26,7 +26,7 @@ class UnAuthFavScreen extends StatelessWidget {
             bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
       ),
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Center(
+        const Center(
           child: Text(
             "Login or Signup to continue",
             style: TextStyle(fontSize: 20),
