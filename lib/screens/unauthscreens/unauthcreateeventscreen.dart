@@ -479,7 +479,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
             ),
           ),
           SizedBox(height: screenheight * 0.02),
-          InkWell(
+          GestureDetector(
             onTap: () async {
               Position _locationData = await Geolocator.getCurrentPosition();
               setState(() {

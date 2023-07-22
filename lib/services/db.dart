@@ -1735,18 +1735,22 @@ class db_conn {
   Future<List<AppUser>> retrievefriendsformap(
       AppUser curruser, double lat, double lng) async {
     GeoFirePoint center = GeoFirePoint(lat, lng);
-    Stream<List<DocumentSnapshot>> stream = geo
-        .collection(
-            collectionRef: users.where('uid', whereIn: curruser.friends))
-        .within(center: center, radius: 10, field: 'lastknownloc');
-    List<AppUser> res = [];
-    stream.listen((List<DocumentSnapshot> documentList) {
-      for (int i = 0; i < documentList.length; i++) {
-        res.add(AppUser.fromJson(documentList[i], documentList[i].id));
-      }
-    });
-    await Future.delayed(const Duration(milliseconds: 50));
-    return res;
+    if (curruser.friends.isEmpty) {
+      return <AppUser>[];
+    } else {
+      Stream<List<DocumentSnapshot>> stream = geo
+          .collection(
+              collectionRef: users.where('uid', whereIn: curruser.friends))
+          .within(center: center, radius: 10, field: 'lastknownloc');
+      List<AppUser> res = [];
+      stream.listen((List<DocumentSnapshot> documentList) {
+        for (int i = 0; i < documentList.length; i++) {
+          res.add(AppUser.fromJson(documentList[i], documentList[i].id));
+        }
+      });
+      await Future.delayed(const Duration(milliseconds: 50));
+      return res;
+    }
   }
 
   Future<List<Event>> retrieveeventsformap(double lat, double lng) async {
@@ -1894,14 +1898,34 @@ class db_conn {
   }
 
   Future<void> updatelastuserlocandusage(
-      String uid, double lat, double lng) async {
+      String uid, double lat, double lng, AppUser curruser) async {
     try {
       GeoFirePoint lastknownloc = geo.point(latitude: lat, longitude: lng);
+      curruser.plan == "business"
+          ? await users.doc(uid).set(
+              {'lastusagetime': FieldValue.serverTimestamp()},
+              SetOptions(merge: true))
+          : await users.doc(uid).set({
+              'lastknownloc': lastknownloc.data,
+              'lastknownlat': lat,
+              'lastknownlng': lng,
+              'lastusagetime': FieldValue.serverTimestamp()
+            }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<void> businesssetloc(String uid, AppLocation businesslocation) async {
+    try {
+      GeoFirePoint businessloc = geo.point(
+          latitude: businesslocation.center[0],
+          longitude: businesslocation.center[1]);
       await users.doc(uid).set({
-        'lastknownloc': lastknownloc.data,
-        'lastknownlat': lat,
-        'lastknownlng': lng,
-        'lastusagetime': FieldValue.serverTimestamp()
+        'lastknownloc': businessloc.data,
+        'lastknownlat': businesslocation.center[0],
+        'lastknownlng': businesslocation.center[1],
+        'bio': businesslocation.address
       }, SetOptions(merge: true));
     } catch (e) {
       throw Exception();

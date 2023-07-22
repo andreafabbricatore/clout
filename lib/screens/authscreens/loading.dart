@@ -109,8 +109,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
         );
       } else {
         await newgetUserAppLocation();
-        await db.updatelastuserlocandusage(
-            widget.uid, curruserlocation.center[1], curruserlocation.center[0]);
+        await db.updatelastuserlocandusage(widget.uid,
+            curruserlocation.center[1], curruserlocation.center[0], curruser);
         doneLoading(curruser);
       }
     } catch (e) {

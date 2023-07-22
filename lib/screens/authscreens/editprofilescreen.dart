@@ -291,7 +291,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   List newinterests = [];
   bool error = false;
 
-  Future<XFile> CompressAndGetFile(File file) async {
+  Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
       final lastIndex = filePath.lastIndexOf(".");
@@ -306,7 +306,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       //print(file.lengthSync());
       //print(result!.lengthSync());
 
-      return result!;
+      return File(result!.path);
     } catch (e) {
       throw Exception();
     }

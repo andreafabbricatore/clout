@@ -120,7 +120,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     //This is optional, it will zoom when the marker has been created
   }
 
-  Future<XFile> CompressAndGetFile(File file) async {
+  Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
       final lastIndex = filePath.lastIndexOf(".");
@@ -135,7 +135,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       //print(file.lengthSync());
       //print(result!.lengthSync());
 
-      return result!;
+      return File(result!.path);
     } catch (e) {
       throw Exception();
     }

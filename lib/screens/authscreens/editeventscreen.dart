@@ -117,7 +117,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     mapController?.animateCamera(CameraUpdate.newLatLngZoom(latlang, 17.0));
   }
 
-  Future<XFile> CompressAndGetFile(File file) async {
+  Future<File> CompressAndGetFile(File file) async {
     try {
       final filePath = file.absolute.path;
       final lastIndex = filePath.lastIndexOf(".");
@@ -132,7 +132,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
       //print(file.lengthSync());
       //print(result!.lengthSync());
 
-      return result!;
+      return File(result!.path);
     } catch (e) {
       throw Exception();
     }
