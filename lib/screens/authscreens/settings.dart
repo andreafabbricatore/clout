@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/defs/user.dart';
 import 'package:clout/main.dart';
@@ -11,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({Key? key, required this.curruser, required this.analytics})
@@ -37,6 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool updatepswbuttonpressed = false;
   bool updateemailbuttonpressed = false;
   bool bugbuttonpressed = false;
+  bool businessbuttonpressed = false;
 
   void goauthscreen() {
     Navigator.pushReplacement(
@@ -60,6 +64,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
           fullscreenDialog: true,
           settings: RouteSettings(name: "AuthenticationWrapper")),
     );
+  }
+
+  void StripeSellerOnboarding() async {
+    try {
+      setState(() {
+        businessbuttonpressed = true;
+      });
+      var response = await http.get(Uri.parse(
+          'https://us-central1-clout-1108.cloudfunctions.net/stripeAccount/account?mobile=true'));
+      Map<String, dynamic> body = jsonDecode(response.body);
+      launchUrl(Uri.parse(body['url']));
+    } catch (e) {
+      logic.displayErrorSnackBar(
+          "Could not initialise registration as seller", context);
+    }
+    setState(() {
+      businessbuttonpressed = false;
+    });
   }
 
   void deleteaccountdialog(
@@ -472,6 +494,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
+          widget.curruser.plan == "business"
+              ? SizedBox(
+                  height: screenheight * 0.02,
+                )
+              : Container(),
+          widget.curruser.plan == "business"
+              ? GestureDetector(
+                  onTap: businessbuttonpressed
+                      ? null
+                      : () {
+                          StripeSellerOnboarding();
+                        },
+                  child: const Row(
+                    children: [
+                      Icon(Icons.payment, size: 30),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "Become a Seller",
+                        style: TextStyle(fontSize: 20),
+                      )
+                    ],
+                  ),
+                )
+              : Container(),
           SizedBox(
             height: screenheight * 0.05,
           ),

@@ -4,6 +4,7 @@ import 'package:clout/defs/location.dart';
 import 'package:clout/models/notificationslistview.dart';
 import 'package:clout/defs/user.dart';
 import 'package:clout/defs/notification.dart';
+import 'package:clout/screens/authscreens/businessprofilescreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/screens/authscreens/requestscreen.dart';
@@ -52,17 +53,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   void gotoprofilescreen(AppUser user) {
-    Navigator.push(
-        context,
-        CupertinoPageRoute(
-            builder: (_) => ProfileScreen(
-                  user: user,
-                  curruser: widget.curruser,
-                  visit: true,
-                  curruserlocation: widget.curruserlocation,
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "ProfileScreen")));
+    if (user.plan == "business") {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => BusinessProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "BusinessProfileScreen")));
+    } else {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => ProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
+    }
   }
 
   Future<void> gotorequestscreen() async {

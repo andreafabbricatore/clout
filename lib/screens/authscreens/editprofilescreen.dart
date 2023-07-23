@@ -569,6 +569,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       } catch (e) {
                         logic.displayErrorSnackBar(
                             "Could not update profile", context);
+                        setState(() {
+                          error = true;
+                        });
                       } finally {
                         setState(() {
                           buttonpressed = false;

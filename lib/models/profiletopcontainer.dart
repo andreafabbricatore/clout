@@ -49,24 +49,35 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
   }
 
   void setfriendval() {
-    if (widget.curruser.friends.contains(widget.user.uid)) {
-      setState(() {
-        friendval = "Remove Friend";
-      });
-    } else if (widget.curruser.requested.contains(widget.user.uid)) {
-      setState(() {
-        friendval = "Request Sent";
-      });
-    } else if (!widget.curruser.requested.contains(widget.user.uid)) {
-      setState(() {
-        friendval = "Add Friend";
-      });
+    if (widget.user.plan == "business") {
+      if (widget.curruser.followedbusinesses.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Unfollow";
+        });
+      } else {
+        setState(() {
+          friendval = "Follow";
+        });
+      }
+    } else {
+      if (widget.curruser.friends.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Remove Friend";
+        });
+      } else if (widget.curruser.requested.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Request Sent";
+        });
+      } else if (!widget.curruser.requested.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Add Friend";
+        });
+      }
     }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     setfriendval();
     super.initState();
   }
@@ -190,7 +201,9 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                             widget.friendsscreen();
                           },
                           child: Text(
-                            "${widget.user.friends.length} Friends",
+                            widget.curruser.plan == "business"
+                                ? "${widget.user.friends.length} Followers"
+                                : "${widget.user.friends.length} Friends",
                             textAlign: TextAlign.center,
                             textScaleFactor: 1.0,
                             style: const TextStyle(fontSize: 15),
@@ -222,36 +235,37 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                               )),
                             ),
                           )
-                        : GestureDetector(
-                            onTap: buttonpressed
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      buttonpressed = true;
-                                    });
-                                    await widget.friend();
-                                    setState(() {
-                                      buttonpressed = false;
-                                    });
-                                    setfriendval();
-                                    print(friendval);
-                                  },
-                            child: Container(
-                              height: screenheight * 0.03,
-                              width: screenwidth * 0.4,
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  border: Border.all(
-                                      color: const Color.fromARGB(
-                                          161, 158, 158, 158))),
-                              child: Center(
-                                  child: Text(
-                                friendval,
-                                textScaleFactor: 1.0,
-                              )),
-                            ),
-                          )
+                        : widget.curruser.plan == "business"
+                            ? Container()
+                            : GestureDetector(
+                                onTap: buttonpressed
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          buttonpressed = true;
+                                        });
+                                        await widget.friend();
+                                        setState(() {
+                                          buttonpressed = false;
+                                        });
+                                        setfriendval();
+                                      },
+                                child: Container(
+                                  height: screenheight * 0.03,
+                                  width: screenwidth * 0.4,
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      border: Border.all(
+                                          color: const Color.fromARGB(
+                                              161, 158, 158, 158))),
+                                  child: Center(
+                                      child: Text(
+                                    friendval,
+                                    textScaleFactor: 1.0,
+                                  )),
+                                ),
+                              )
                   ],
                 ),
               ],

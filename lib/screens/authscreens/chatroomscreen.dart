@@ -4,6 +4,7 @@ import 'package:clout/components/chatbubble.dart';
 import 'package:clout/defs/event.dart';
 import 'package:clout/defs/location.dart';
 import 'package:clout/defs/user.dart';
+import 'package:clout/screens/authscreens/businessprofilescreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/services/db.dart';
@@ -65,17 +66,31 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   void gotoprofilescreen(AppUser otheruser) {
-    Navigator.push(
-        context,
-        CupertinoPageRoute(
-            builder: (_) => ProfileScreen(
-                  user: otheruser,
-                  curruser: widget.curruser,
-                  visit: true,
-                  curruserlocation: widget.curruserlocation,
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "ProfileScreen")));
+    if (otheruser.plan == "business") {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => BusinessProfileScreen(
+                    user: otheruser,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "BusinessProfileScreen")));
+    } else {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => ProfileScreen(
+                    user: otheruser,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
+    }
   }
 
   void gotoeventscreen(Event chosenEvent, List<AppUser> participants) async {

@@ -33,6 +33,7 @@ class AppUser {
   int chatnotificationcounter;
   List referred;
   String plan;
+  List followedbusinesses;
 
   AppUser(
       {required this.username,
@@ -66,7 +67,8 @@ class AppUser {
       required this.chatnotificationcounter,
       required this.referred,
       required this.donesignuptime,
-      required this.plan});
+      required this.plan,
+      required this.followedbusinesses});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -101,6 +103,7 @@ class AppUser {
         notificationcounter: json['notificationcounter'],
         chatnotificationcounter: json['chatnotificationcounter'],
         referred: json['referred'] as List,
-        plan: json['plan']);
+        plan: json['plan'],
+        followedbusinesses: json['followed_businesses'] as List);
   }
 }

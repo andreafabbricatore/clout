@@ -51,7 +51,8 @@ class _CompleteSignUpLoadingState extends State<CompleteSignUpLoading> {
       chatnotificationcounter: 0,
       referred: [],
       donesignuptime: DateTime(0, 0, 0, 0),
-      plan: 'userfree');
+      plan: 'userfree',
+      followedbusinesses: []);
 
   db_conn db = db_conn();
 

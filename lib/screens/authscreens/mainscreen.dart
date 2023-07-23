@@ -4,6 +4,7 @@ import 'package:clout/defs/chat.dart';
 import 'package:clout/defs/event.dart';
 import 'package:clout/defs/location.dart';
 import 'package:clout/defs/user.dart';
+import 'package:clout/screens/authscreens/businessprofilescreen.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/screens/authscreens/createeventscreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
@@ -89,13 +90,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           curruser: widget.curruser,
           curruserlocation: widget.curruserlocation,
           analytics: widget.analytics),
-      ProfileScreen(
-        user: widget.curruser,
-        curruser: widget.curruser,
-        visit: false,
-        curruserlocation: widget.curruserlocation,
-        analytics: widget.analytics,
-      )
+      widget.curruser.plan == "business"
+          ? BusinessProfileScreen(
+              user: widget.curruser,
+              curruser: widget.curruser,
+              visit: false,
+              curruserlocation: widget.curruserlocation,
+              analytics: widget.analytics,
+            )
+          : ProfileScreen(
+              user: widget.curruser,
+              curruser: widget.curruser,
+              visit: false,
+              curruserlocation: widget.curruserlocation,
+              analytics: widget.analytics,
+            )
     ];
   }
 
@@ -148,17 +157,31 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void gotoprofilescreen(AppUser user) {
-    Navigator.push(
-        context,
-        CupertinoPageRoute(
-            builder: (_) => ProfileScreen(
-                  user: user,
-                  curruser: widget.curruser,
-                  visit: true,
-                  curruserlocation: widget.curruserlocation,
-                  analytics: widget.analytics,
-                ),
-            settings: RouteSettings(name: "ProfileScreen")));
+    if (user.plan == "business") {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => BusinessProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "BusinessProfileScreen")));
+    } else {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => ProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
+    }
   }
 
   void openAppLink(Uri uri) async {

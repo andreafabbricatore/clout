@@ -5,6 +5,7 @@ import 'package:clout/defs/location.dart';
 import 'package:clout/main.dart';
 import 'package:clout/models/searchlocation.dart';
 import 'package:clout/screens/authentication/authscreen.dart';
+import 'package:clout/screens/authentication/emailverificationscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -1572,11 +1573,11 @@ class _BusinessMiscScreenState extends State<BusinessMiscScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthenticationWrapper(
+          builder: (BuildContext context) => EmailVerificationScreen(
                 analytics: widget.analytics,
               ),
-          fullscreenDialog: true,
-          settings: RouteSettings(name: "AuthenticationWrapper")),
+          settings: const RouteSettings(name: "EmailVerificationScreen"),
+          fullscreenDialog: true),
     );
   }
 

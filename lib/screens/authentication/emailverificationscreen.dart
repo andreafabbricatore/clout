@@ -281,15 +281,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                                                             true;
                                                                       });
                                                                       try {
-                                                                        String
-                                                                            email =
-                                                                            FirebaseAuth.instance.currentUser!.email ??
-                                                                                "";
                                                                         await FirebaseAuth.instance.signInWithEmailAndPassword(
                                                                             email:
-                                                                                email,
-                                                                            password:
-                                                                                psw.text.trim());
+                                                                                FirebaseAuth.instance.currentUser!.email!,
+                                                                            password: psw.text.trim());
                                                                         await db.cancelsignup(FirebaseAuth
                                                                             .instance
                                                                             .currentUser!

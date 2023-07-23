@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:clout/defs/location.dart';
 import 'package:clout/defs/user.dart';
+import 'package:clout/screens/authentication/emailverificationscreen.dart';
 import 'package:clout/screens/authentication/signupflowscreens.dart';
 import 'package:clout/screens/authscreens/linkphoneauth.dart';
 import 'package:clout/screens/authscreens/mainscreen.dart';
@@ -107,6 +108,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
               settings: const RouteSettings(name: "InterestScreen"),
               fullscreenDialog: true),
         );
+      } else if (curruser.plan == "business" &&
+          !FirebaseAuth.instance.currentUser!.emailVerified) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => EmailVerificationScreen(
+                    analytics: widget.analytics,
+                  ),
+              settings: const RouteSettings(name: "EmailVerificationScreen"),
+              fullscreenDialog: true),
+        );
       } else {
         await newgetUserAppLocation();
         await db.updatelastuserlocandusage(widget.uid,
@@ -158,7 +170,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
       });
       await widget.analytics.setUserId(id: widget.uid);
       AppUser curruser = await db.getUserFromUID(widget.uid);
-      print("got user");
       if (curruser.plan != "business") {
         await linkauth(curruser);
       } else {
@@ -247,12 +258,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void loadinglogic() async {
     try {
       await ensurelocation();
-      print("done");
       await undermaintenance();
-      print("done");
       if (!maintenance) {
         await needupdate();
-        print("done");
         if (!update) {
           await appinit();
         }

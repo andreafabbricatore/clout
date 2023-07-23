@@ -8,6 +8,7 @@ import 'package:clout/defs/location.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/defs/user.dart';
 import 'package:clout/models/userlistview.dart';
+import 'package:clout/screens/authscreens/businessprofilescreen.dart';
 import 'package:clout/screens/authscreens/chatroomscreen.dart';
 import 'package:clout/screens/authscreens/editeventscreen.dart';
 import 'package:clout/screens/authscreens/interestsearchscreen.dart';
@@ -989,17 +990,31 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 (widget.event.hostdocid == widget.curruser.uid).toString(),
             "visitinghost": (widget.event.hostdocid == user.uid).toString()
           });
-      Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (_) => ProfileScreen(
-                    user: user,
-                    curruser: widget.curruser,
-                    visit: true,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                  ),
-              settings: RouteSettings(name: "ProfileScreen")));
+      if (user.plan == "business") {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (_) => BusinessProfileScreen(
+                      user: user,
+                      curruser: widget.curruser,
+                      visit: true,
+                      curruserlocation: widget.curruserlocation,
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "BusinessProfileScreen")));
+      } else {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (_) => ProfileScreen(
+                      user: user,
+                      curruser: widget.curruser,
+                      visit: true,
+                      curruserlocation: widget.curruserlocation,
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "ProfileScreen")));
+      }
     }
 
     Future<void> remuser(AppUser user) async {

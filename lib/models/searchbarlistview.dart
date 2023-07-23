@@ -3,6 +3,7 @@ import 'package:clout/models/eventlistview.dart';
 import 'package:clout/defs/location.dart';
 import 'package:clout/defs/user.dart';
 import 'package:clout/models/userlistview.dart';
+import 'package:clout/screens/authscreens/businessprofilescreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
 import 'package:clout/services/db.dart';
@@ -157,17 +158,31 @@ class _SearchBarListViewState extends State<SearchBarListView> {
             : widget.userres.length,
         "userinfriends": widget.curruser.friends.contains(user.uid).toString(),
       });
-      Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (_) => ProfileScreen(
-                    user: user,
-                    curruser: widget.curruser,
-                    visit: true,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                  ),
-              settings: RouteSettings(name: "ProfileScreen")));
+      if (user.plan == "business") {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (_) => BusinessProfileScreen(
+                      user: user,
+                      curruser: widget.curruser,
+                      visit: true,
+                      curruserlocation: widget.curruserlocation,
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "BusinessProfileScreen")));
+      } else {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (_) => ProfileScreen(
+                      user: user,
+                      curruser: widget.curruser,
+                      visit: true,
+                      curruserlocation: widget.curruserlocation,
+                      analytics: widget.analytics,
+                    ),
+                settings: RouteSettings(name: "ProfileScreen")));
+      }
     }
 
     return widget.searchevents

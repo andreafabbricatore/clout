@@ -107,6 +107,7 @@ class db_conn {
         'appversion': packageInfo.version,
         'donesignuptime': DateTime(1900, 1, 1, 0, 0),
         'lastusagetime': FieldValue.serverTimestamp(),
+        'followed_businesses': []
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -1338,7 +1339,7 @@ class db_conn {
     try {
       QuerySnapshot querySnapshot = await users
           .where('searchfield', arrayContains: searchquery.toLowerCase())
-          .getSavy();
+          .get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
         if (!curruser.blockedusers.contains(element.id)) {
@@ -1348,6 +1349,7 @@ class db_conn {
 
       return usersearches;
     } catch (e) {
+      print(e);
       throw Exception("Could not search for users");
     }
   }
@@ -1356,7 +1358,7 @@ class db_conn {
     try {
       QuerySnapshot querySnapshot = await users
           .where('searchfield', arrayContains: searchquery.toLowerCase())
-          .getSavy();
+          .get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
         usersearches.add(AppUser.fromJson(element.data(), element.id));
@@ -1378,7 +1380,9 @@ class db_conn {
           .get();
       List<AppUser> usersearches = [];
       querySnapshot.docs.forEach((element) {
-        usersearches.add(AppUser.fromJson(element.data(), element.id));
+        if (element['plan'] != "business") {
+          usersearches.add(AppUser.fromJson(element.data(), element.id));
+        }
       });
 
       return usersearches;
@@ -1503,7 +1507,33 @@ class db_conn {
         'friends': FieldValue.arrayRemove([curruserdocid])
       }, SetOptions(merge: true));
     } catch (e) {
-      throw Exception("Could not unfollow");
+      throw Exception("Could not remove friend.");
+    }
+  }
+
+  Future<void> unfollowbusiness(String curruserdocid, String userdocid) async {
+    try {
+      users.doc(curruserdocid).set({
+        'followed_businesses': FieldValue.arrayRemove([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'friends': FieldValue.arrayRemove([curruserdocid])
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception("Could not unfollow.");
+    }
+  }
+
+  Future<void> followbusiness(String curruserdocid, String userdocid) async {
+    try {
+      users.doc(curruserdocid).set({
+        'followed_businesses': FieldValue.arrayUnion([userdocid])
+      }, SetOptions(merge: true));
+      users.doc(userdocid).set({
+        'friends': FieldValue.arrayUnion([curruserdocid])
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception("Could not follow.");
     }
   }
 
@@ -1657,14 +1687,12 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await events.get().then(
+    await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              GeoFirePoint lastknownloc = geo.point(
-                  latitude: element['lat'], longitude: element['lng']);
-              await events.doc(element.id).set({
-                'loc': lastknownloc.data,
-              }, SetOptions(merge: true));
+              await users
+                  .doc(element.id)
+                  .set({'followed_businesses': []}, SetOptions(merge: true));
             },
           ),
         );
