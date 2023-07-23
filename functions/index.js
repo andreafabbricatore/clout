@@ -1,14 +1,8 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const axios = require('axios')
+const stripe = require("stripe")(functions.config().stripe.testkey)
 admin.initializeApp();
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
 const db = admin.firestore();
 const fcm = admin.messaging();
 
@@ -177,18 +171,18 @@ exports.eventNotify = functions.firestore.document("events/{id}").onCreate(async
     }});
     await db.collection("events").doc(snapshot.id).set({ "cronjobid": response.data.jobId}, { merge: true });
     if (event.isinviteonly == false) {
-        var followersQuerySnapshot;
+        var friendsQuerySnapshot;
         var hostdataSnapshot;
         if (event.hostdocid == "jR3G8sihlnXHt2nAEaB1sgI5Fog1") {
             hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
-            followersQuerySnapshot = await db.collection("users").get();
+            friendsQuerySnapshot = await db.collection("users").where("plan", "!=", "business").get();
         } else {
             hostdataSnapshot = await db.collection("users").doc(event.hostdocid).get();
-            const followers = (_a = hostdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.followers;
-            followersQuerySnapshot = await db.collection("users").where("uid", "in", followers).get();
+            const friends = (_a = hostdataSnapshot.data()) === null || _a === void 0 ? void 0 : _a.friends;
+            friendsQuerySnapshot = await db.collection("users").where("uid", "in", friends).get();
         }
         let finaltokens = [];
-        followersQuerySnapshot.docs.forEach((doc) => {
+        friendsQuerySnapshot.docs.forEach((doc) => {
             var _a, _b, _c;
             const userlat = (_a = doc.data()) === null || _a === void 0 ? void 0 : _a.lastknownlat;
             const userlng = (_b = doc.data()) === null || _b === void 0 ? void 0 : _b.lastknownlng;
@@ -289,3 +283,81 @@ exports.checkIfPhoneExists = functions.https.onCall((data, context) => {
          return false;
      });
  });
+
+ exports.stripeAccount = functions.https.onRequest(async (req, res) => {
+    const { method } = req
+    
+    // CREATE CONNECTED ACCOUNT
+    if (method == "GET") {
+        const { mobile } = req.query
+        const account = await stripe.accounts.create({
+            type: 'express',
+        })
+        const accountLinks = await stripe.accountLinks.create({
+            account: account.id,
+            refresh_url: 'https://us-central1-clout-1108.cloudfunctions.net/stripeAccount',
+            return_url: 'https://outwithclout.com/',
+            type: "account_onboarding",
+        })
+        if (mobile) {
+            // In case of request generated from the flutter app, return a json response
+            res.status(200).json({ success: true, url: accountLinks.url })
+        } else {
+            // In case of request generated from the web app, redirect
+            res.redirect(accountLinks.url)
+        }
+    }
+  });
+
+  exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) => {
+    try {
+        let customerId;
+
+        //Gets the customer who's email id matches the one sent by the client
+        const customerList = await stripe.customers.list({
+            email: req.body.email,
+            limit: 1
+        });
+                
+        //Checks the if the customer exists, if not creates a new customer
+        if (customerList.data.length !== 0) {
+            customerId = customerList.data[0].id;
+        }
+        else {
+            const customer = await stripe.customers.create({
+                email: req.body.email,
+                name: req.body.name,
+                description: "Clout UID: " + req.body.uid
+            });
+            customerId = customer.data.id;
+        }
+
+        //Creates a temporary secret key linked with the customer 
+        const ephemeralKey = await stripe.ephemeralKeys.create(
+            { customer: customerId },
+            { apiVersion: '2020-08-27' }
+        );
+
+        //Creates a new payment intent with amount passed in from the client
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: parseInt(req.body.amount),
+            currency: req.body.currency,
+            customer: customerId,
+            automatic_payment_methods: {enabled: true},
+            application_fee_amount: req.body.cloutfee,
+            transfer_data: {
+                destination: req.body.sellerstripebusinessid,
+              },
+        })
+
+        res.status(200).send({
+            paymentIntent: paymentIntent.client_secret,
+            ephemeralKey: ephemeralKey.secret,
+            customer: customerId,
+            success: true,
+        })
+        
+    } catch (error) {
+        res.status(404).send({ success: false, error: error.message })
+    }
+});
