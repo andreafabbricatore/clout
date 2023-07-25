@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:http/http.dart' as http;
 
 class MainScreen extends StatefulWidget {
   AppUser curruser;
@@ -209,6 +210,19 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 context);
           }
         } catch (e) {}
+      } else if (splitlink[splitlink.length - 2] == "seller_onboarding") {
+        final response = await http.post(
+            Uri.parse(
+                'https://us-central1-clout-1108.cloudfunctions.net/checkconnectedaccount'),
+            body: {'email': widget.curruser.email, 'uid': widget.curruser.uid});
+        if (response.statusCode == 200) {
+          logic.displayErrorSnackBar(
+              "Seller registration was successful!", context);
+        } else {
+          logic.displayErrorSnackBar(
+              "There was an error with the seller registration, try again or contact us",
+              context);
+        }
       }
     } catch (e) {}
   }

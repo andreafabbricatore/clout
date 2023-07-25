@@ -78,47 +78,29 @@ class _PrimaryButtonState extends State<PrimaryButton>
                             end: _bottomAlignmentAnimation.value),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(20))),
-                    child: widget.buttonpressed
-                        ? Align(
-                            alignment: Alignment.centerLeft,
-                            child: SpinKitThreeInOut(
-                              color: Colors.white,
-                              size: widget.screenwidth * 0.04,
-                            ),
-                          )
-                        : Center(
-                            child: Text(
-                              widget.text,
-                              style: const TextStyle(
-                                  fontSize: 20, color: Colors.white),
-                              textScaleFactor: 1.1,
-                            ),
-                          ));
-              })
-          : Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(20))),
-              child: widget.buttonpressed
-                  ? Align(
+                    child: Align(
                       alignment: Alignment.centerLeft,
                       child: SpinKitThreeInOut(
                         color: Colors.white,
                         size: widget.screenwidth * 0.04,
                       ),
-                    )
-                  : Center(
-                      child: Text(
-                        widget.text,
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: widget.bold
-                                ? FontWeight.bold
-                                : FontWeight.normal),
-                        textScaleFactor: 1.1,
-                      ),
-                    )),
+                    ));
+              })
+          : Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(20))),
+              child: Center(
+                child: Text(
+                  widget.text,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight:
+                          widget.bold ? FontWeight.bold : FontWeight.normal),
+                  textScaleFactor: 1.1,
+                ),
+              )),
     );
   }
 }

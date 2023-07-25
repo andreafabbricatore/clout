@@ -296,25 +296,31 @@ class _MapScreenState extends State<MapScreen> {
 
                       onMapCreated: (controller) async {
                         //method called when map is created
-                        if (widget.curruser.plan != "business") {
-                          List<AppUser> users = await db.retrievefriendsformap(
-                              widget.curruser,
-                              widget.curruserlocation.center[1],
-                              widget.curruserlocation.center[0]);
-                          List<Event> events = await db.retrieveeventsformap(
-                              widget.curruserlocation.center[1],
-                              widget.curruserlocation.center[0]);
-                          setmarkers(users, events);
-                        } else {
-                          List<Event> events = await db.retrieveeventsformap(
-                              widget.curruserlocation.center[1],
-                              widget.curruserlocation.center[0]);
-                          setmarkers(<AppUser>[], events);
+                        try {
+                          if (widget.curruser.plan != "business") {
+                            List<AppUser> users =
+                                await db.retrievefriendsformap(
+                                    widget.curruser,
+                                    widget.curruserlocation.center[1],
+                                    widget.curruserlocation.center[0]);
+                            List<Event> events = await db.retrieveeventsformap(
+                                widget.curruserlocation.center[1],
+                                widget.curruserlocation.center[0]);
+                            setmarkers(users, events);
+                          } else {
+                            List<Event> events = await db.retrieveeventsformap(
+                                widget.curruserlocation.center[1],
+                                widget.curruserlocation.center[0]);
+                            setmarkers(<AppUser>[], events);
+                          }
+                          setState(() {
+                            mapController = controller;
+                            showbutton = false;
+                          });
+                        } catch (e) {
+                          logic.displayErrorSnackBar(
+                              "Error loading map", context);
                         }
-                        setState(() {
-                          mapController = controller;
-                          showbutton = false;
-                        });
                       },
                       onCameraMove: (position) {
                         setState(() {
@@ -330,30 +336,35 @@ class _MapScreenState extends State<MapScreen> {
                               padding: const EdgeInsets.fromLTRB(0, 0, 0, 150),
                               child: GestureDetector(
                                 onTap: () async {
-                                  if (widget.curruser.plan != "business") {
-                                    List<AppUser> users =
-                                        await db.retrievefriendsformap(
-                                      widget.curruser,
-                                      cameraposition!.target.latitude,
-                                      cameraposition!.target.longitude,
-                                    );
-                                    List<Event> events =
-                                        await db.retrieveeventsformap(
-                                      cameraposition!.target.latitude,
-                                      cameraposition!.target.longitude,
-                                    );
-                                    setmarkers(users, events);
-                                  } else {
-                                    List<Event> events =
-                                        await db.retrieveeventsformap(
-                                      cameraposition!.target.latitude,
-                                      cameraposition!.target.longitude,
-                                    );
-                                    setmarkers(<AppUser>[], events);
+                                  try {
+                                    if (widget.curruser.plan != "business") {
+                                      List<AppUser> users =
+                                          await db.retrievefriendsformap(
+                                        widget.curruser,
+                                        cameraposition!.target.latitude,
+                                        cameraposition!.target.longitude,
+                                      );
+                                      List<Event> events =
+                                          await db.retrieveeventsformap(
+                                        cameraposition!.target.latitude,
+                                        cameraposition!.target.longitude,
+                                      );
+                                      setmarkers(users, events);
+                                    } else {
+                                      List<Event> events =
+                                          await db.retrieveeventsformap(
+                                        cameraposition!.target.latitude,
+                                        cameraposition!.target.longitude,
+                                      );
+                                      setmarkers(<AppUser>[], events);
+                                    }
+                                    setState(() {
+                                      showbutton = false;
+                                    });
+                                  } catch (e) {
+                                    logic.displayErrorSnackBar(
+                                        "Error loading map", context);
                                   }
-                                  setState(() {
-                                    showbutton = false;
-                                  });
                                 },
                                 child: Container(
                                   width: screenwidth * 0.4,

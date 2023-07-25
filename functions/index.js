@@ -23,6 +23,7 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
             eventid: noti.eventid,
             userid: noti.userid,
         },
+        tokens: finaltokens
     };
     if (noti.type != 'deleted') {
         try {
@@ -64,7 +65,7 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
     }
     await db.collection("updates").doc(snapshot.id).delete();
     try {
-        return fcm.sendToDevice(finaltokens, payload);
+        return fcm.sendEachForMulticast(payload);
     } catch(e) {}
 });
 
@@ -78,9 +79,10 @@ exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onC
         notification: {
             title: "Admin Message",
             body: user.email + " just signed up to Clout.",
-        }
+        },
+        tokens: finaltokens
     };
-    fcm.sendToDevice(finaltokens, payload);
+    fcm.sendEachForMulticast(payload);
 });
 
 exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/messages/{id}").onCreate(async (snapshot, context) => {
@@ -105,6 +107,7 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
                     type: "chat",
                     chatid: chatid,
                 },
+                tokens: finaltokens
             };
             querySnapshot.docs.forEach(async (element) => {
                 await db.collection("users").doc(element.id).set({ "chatnotificationcounter": admin.firestore.FieldValue.increment(1) }, { merge: true });
@@ -114,7 +117,7 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
             } else {
                 await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + "shared an event."});
             }
-            return fcm.sendToDevice(finaltokens, payload);
+            return fcm.sendEachForMulticast(payload);
         }
         else {
             const payload = {
@@ -125,12 +128,13 @@ exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/message
                     type: "chat",
                     chatid: chatid,
                 },
+                tokens: finaltokens
             };
             querySnapshot.docs.forEach(async (element) => {
                 await db.collection("users").doc(element.id).set({ "chatnotificationcounter": admin.firestore.FieldValue.increment(1) }, { merge: true });
             });
             await db.collection("chats").doc(chatid).update({ "mostrecentmessage": chat.sender + ": " + chat.content });
-            return fcm.sendToDevice(finaltokens, payload);
+            return fcm.sendEachForMulticast(payload);
         }
     }
     else {
@@ -201,10 +205,11 @@ exports.eventNotify = functions.firestore.document("events/{id}").onCreate(async
                 type: "eventcreated",
                 eventid: snapshot.id,
             },
+            tokens: finaltokens
         };
 
         if (finaltokens.length != 0) {
-            return fcm.sendToDevice(finaltokens, payload);
+            return fcm.sendEachForMulticast(payload);
         }
         else {
             return;
@@ -232,12 +237,13 @@ exports.eventCronJobUpdates = functions.https.onRequest(async (req, res) => {
                 eventid: eventid,
                 userid: "",
             },
+            tokens: finaltokens
         };
         const eventdata = eventSnapshot.data();
         if (eventdata['showlocation'] == false) {
             await db.collection("events").doc(eventid).update({'showlocation': true});
         };
-        fcm.sendToDevice(finaltokens, payload);
+        fcm.sendEachForMulticast(payload);
         res.status(200).send();
     } catch (error) {
         res.status(404).send();
@@ -284,7 +290,7 @@ exports.checkIfPhoneExists = functions.https.onCall((data, context) => {
      });
  });
 
- exports.stripeAccount = functions.https.onRequest(async (req, res) => {
+exports.stripeAccount = functions.https.onRequest(async (req, res) => {
     const { method } = req
     
     // CREATE CONNECTED ACCOUNT
@@ -296,7 +302,7 @@ exports.checkIfPhoneExists = functions.https.onCall((data, context) => {
         const accountLinks = await stripe.accountLinks.create({
             account: account.id,
             refresh_url: 'https://us-central1-clout-1108.cloudfunctions.net/stripeAccount',
-            return_url: 'https://outwithclout.com/',
+            return_url: 'https://outwithclout.com/#/seller_onboarding/',
             type: "account_onboarding",
         })
         if (mobile) {
@@ -307,9 +313,26 @@ exports.checkIfPhoneExists = functions.https.onCall((data, context) => {
             res.redirect(accountLinks.url)
         }
     }
-  });
+});
 
-  exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) => {
+exports.checkconnectedaccount = functions.https.onRequest(async (req, res) => {
+    const { method } = req
+    
+    const accounts = await stripe.accounts.list({});
+    const data = accounts.data;
+    console.log(data.length);
+    for (let i = 0; i<data.length; i++) {
+        console.log(data[i].email);
+        if (data[i].email == req.body.email) {
+            await db.collection("users").doc(req.body.uid).set({'stripe_account_id':data[i].id}, { merge: true });
+            res.status(200).send({
+               accountId: data[i].id
+            });
+    }}
+    res.sendStatus(404);
+});
+
+exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) => {
     try {
         let customerId;
 

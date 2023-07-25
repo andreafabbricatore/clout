@@ -107,14 +107,15 @@ class db_conn {
         'appversion': packageInfo.version,
         'donesignuptime': DateTime(1900, 1, 1, 0, 0),
         'lastusagetime': FieldValue.serverTimestamp(),
-        'followed_businesses': []
+        'followed_businesses': [],
+        'email': ''
       });
     } catch (e) {
       throw Exception("Could not create user");
     }
   }
 
-  Future createbusinessinstance(String uid) async {
+  Future createbusinessinstance(String uid, String email) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       GeoFirePoint loc = geo.point(latitude: 0, longitude: 0);
@@ -157,6 +158,7 @@ class db_conn {
         'appversion': packageInfo.version,
         'donesignuptime': DateTime(1900, 1, 1, 0, 0),
         'lastusagetime': FieldValue.serverTimestamp(),
+        'email': email
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -1016,7 +1018,6 @@ class db_conn {
       });
       return hostedEvents;
     } catch (e) {
-      print(e);
       throw Exception(e);
     }
   }
@@ -1690,9 +1691,9 @@ class db_conn {
     await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users
-                  .doc(element.id)
-                  .set({'followed_businesses': []}, SetOptions(merge: true));
+              await users.doc(element.id).set(
+                  {'requested': [], 'requestedby': []},
+                  SetOptions(merge: true));
             },
           ),
         );
@@ -1763,40 +1764,60 @@ class db_conn {
   Future<List<AppUser>> retrievefriendsformap(
       AppUser curruser, double lat, double lng) async {
     GeoFirePoint center = GeoFirePoint(lat, lng);
-    if (curruser.friends.isEmpty) {
-      return <AppUser>[];
-    } else {
-      Stream<List<DocumentSnapshot>> stream = geo
-          .collection(
-              collectionRef: users.where('uid', whereIn: curruser.friends))
-          .within(center: center, radius: 10, field: 'lastknownloc');
-      List<AppUser> res = [];
-      stream.listen((List<DocumentSnapshot> documentList) {
-        for (int i = 0; i < documentList.length; i++) {
-          res.add(AppUser.fromJson(documentList[i], documentList[i].id));
+    try {
+      if (curruser.friends.isEmpty) {
+        return <AppUser>[];
+      } else {
+        List<AppUser> res = [];
+        List<List<dynamic>> subList = [];
+        for (var i = 0; i < curruser.friends.length; i += 10) {
+          subList.add(curruser.friends.sublist(
+              i,
+              i + 10 > curruser.friends.length
+                  ? curruser.friends.length
+                  : i + 10));
         }
-      });
-      await Future.delayed(const Duration(milliseconds: 50));
-      return res;
+
+        for (int i = 0; i < subList.length; i++) {
+          Stream<List<DocumentSnapshot>> stream = geo
+              .collection(
+                  collectionRef: users.where('uid', whereIn: subList[i]))
+              .within(center: center, radius: 10, field: 'lastknownloc');
+
+          stream.listen((List<DocumentSnapshot> documentList) {
+            for (int i = 0; i < documentList.length; i++) {
+              res.add(AppUser.fromJson(documentList[i], documentList[i].id));
+            }
+          });
+        }
+        await Future.delayed(const Duration(milliseconds: 50));
+        return res;
+      }
+    } catch (e) {
+      throw Exception();
     }
   }
 
   Future<List<Event>> retrieveeventsformap(double lat, double lng) async {
-    GeoFirePoint center = GeoFirePoint(lat, lng);
-    Stream<List<DocumentSnapshot>> stream = geo
-        .collection(
-            collectionRef: events.where('isinviteonly', isEqualTo: false))
-        .within(center: center, radius: 10, field: 'loc');
-    List<Event> res = [];
-    stream.listen((List<DocumentSnapshot> documentList) {
-      for (int i = 0; i < documentList.length; i++) {
-        if (DateTime.now().isBefore(documentList[i]['time'].toDate())) {
-          res.add(Event.fromJson(documentList[i], documentList[i].id));
+    try {
+      GeoFirePoint center = GeoFirePoint(lat, lng);
+      Stream<List<DocumentSnapshot>> stream = geo
+          .collection(
+              collectionRef: events.where('isinviteonly', isEqualTo: false))
+          .within(center: center, radius: 10, field: 'loc');
+      List<Event> res = [];
+      stream.listen((List<DocumentSnapshot> documentList) {
+        for (int i = 0; i < documentList.length; i++) {
+          if (DateTime.now().isBefore(documentList[i]['time'].toDate())) {
+            res.add(Event.fromJson(documentList[i], documentList[i].id));
+          }
         }
-      }
-    });
-    await Future.delayed(const Duration(milliseconds: 50));
-    return res;
+      });
+      await Future.delayed(const Duration(milliseconds: 50));
+      return res;
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   Future<void> setReadReceipt(String chatid, String readerid) {

@@ -47,6 +47,35 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
 
   List<Event> hostedEvents = [];
   List<AppUser> globalrankedusers = [];
+  String friendval = "";
+
+  Future<void> setfriendval() async {
+    if (widget.user.plan == "business") {
+      if (widget.curruser.followedbusinesses.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Unfollow";
+        });
+      } else {
+        setState(() {
+          friendval = "Follow";
+        });
+      }
+    } else {
+      if (widget.curruser.friends.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Remove Friend";
+        });
+      } else if (widget.curruser.requested.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Request Sent";
+        });
+      } else if (!widget.curruser.requested.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Add Friend";
+        });
+      }
+    }
+  }
 
   Future<void> reportuser() async {
     try {
@@ -75,6 +104,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     try {
       await updateuser();
       await updatecurruser();
+      await setfriendval();
       await getevents();
     } catch (e) {
       logic.displayErrorSnackBar("Could not refresh", context);
@@ -340,6 +370,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
                 cloutscreen: cloutscreen,
                 friend: friendunfriend,
                 refer: refer,
+                friendval: friendval,
               ),
               EventListView(
                 eventList: hostedEvents,

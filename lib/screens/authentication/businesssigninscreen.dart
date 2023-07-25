@@ -7,6 +7,7 @@ import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/utils.dart';
 
 class BusinessSignInScreen extends StatefulWidget {
   BusinessSignInScreen({Key? key, required this.analytics}) : super(key: key);
@@ -157,7 +158,8 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
                                       email: emailController.text.trim(),
                                       password: pswController.text.trim());
                               await db.createbusinessinstance(
-                                  FirebaseAuth.instance.currentUser!.uid);
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                  emailController.text.trim());
                               await widget.analytics.setUserId(
                                   id: FirebaseAuth.instance.currentUser!.uid);
                               await widget.analytics

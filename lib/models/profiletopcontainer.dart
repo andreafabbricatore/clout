@@ -12,11 +12,13 @@ class ProfileTopContainer extends StatefulWidget {
       required this.editprofile,
       required this.friendsscreen,
       required this.cloutscreen,
-      required this.refer})
+      required this.refer,
+      required this.friendval})
       : super(key: key);
   AppUser user;
   AppUser curruser;
   bool iscurruser;
+  String friendval;
   final Function() friend;
   final VoidCallback editprofile;
   final VoidCallback friendsscreen;
@@ -29,7 +31,6 @@ class ProfileTopContainer extends StatefulWidget {
 
 class _ProfileTopContainerState extends State<ProfileTopContainer> {
   bool buttonpressed = false;
-  String friendval = "";
 
   calculateAge(DateTime birthDate) {
     DateTime currentDate = DateTime.now();
@@ -48,37 +49,8 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
     return age;
   }
 
-  void setfriendval() {
-    if (widget.user.plan == "business") {
-      if (widget.curruser.followedbusinesses.contains(widget.user.uid)) {
-        setState(() {
-          friendval = "Unfollow";
-        });
-      } else {
-        setState(() {
-          friendval = "Follow";
-        });
-      }
-    } else {
-      if (widget.curruser.friends.contains(widget.user.uid)) {
-        setState(() {
-          friendval = "Remove Friend";
-        });
-      } else if (widget.curruser.requested.contains(widget.user.uid)) {
-        setState(() {
-          friendval = "Request Sent";
-        });
-      } else if (!widget.curruser.requested.contains(widget.user.uid)) {
-        setState(() {
-          friendval = "Add Friend";
-        });
-      }
-    }
-  }
-
   @override
   void initState() {
-    setfriendval();
     super.initState();
   }
 
@@ -155,7 +127,9 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                     SizedBox(
                       width: screenwidth * 0.5,
                       child: Text(
-                        "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
+                        widget.curruser.plan == "business"
+                            ? widget.user.fullname
+                            : "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
                         textAlign: TextAlign.start,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w500),
@@ -248,7 +222,6 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                         setState(() {
                                           buttonpressed = false;
                                         });
-                                        setfriendval();
                                       },
                                 child: Container(
                                   height: screenheight * 0.03,
@@ -261,7 +234,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                               161, 158, 158, 158))),
                                   child: Center(
                                       child: Text(
-                                    friendval,
+                                    widget.friendval,
                                     textScaleFactor: 1.0,
                                   )),
                                 ),

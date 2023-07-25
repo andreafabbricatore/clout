@@ -66,11 +66,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void StripeSellerOnboarding() async {
+  Future<void> StripeSellerOnboarding() async {
     try {
-      setState(() {
-        businessbuttonpressed = true;
-      });
       var response = await http.get(Uri.parse(
           'https://us-central1-clout-1108.cloudfunctions.net/stripeAccount/account?mobile=true'));
       Map<String, dynamic> body = jsonDecode(response.body);
@@ -79,9 +76,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       logic.displayErrorSnackBar(
           "Could not initialise registration as seller", context);
     }
-    setState(() {
-      businessbuttonpressed = false;
-    });
   }
 
   void deleteaccountdialog(
@@ -197,6 +191,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 screenwidth: screenwidth,
                                 buttonpressed: deletebuttonpressed,
                                 text: "Delete Account :(",
+                                buttonwidth: screenwidth * 0.5,
+                                bold: false)),
+                      ]),
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  void sellerdialog(double screenheight, double screenwidth) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  height: screenheight * 0.25,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        const Center(
+                            child: Text(
+                          "Please use the same\nemail as with your\nClout account!",
+                          style: TextStyle(fontSize: 23),
+                          textAlign: TextAlign.center,
+                        )),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        GestureDetector(
+                            onTap: businessbuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      businessbuttonpressed = true;
+                                    });
+                                    await StripeSellerOnboarding();
+                                    setState(() {
+                                      businessbuttonpressed = false;
+                                    });
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: businessbuttonpressed,
+                                text: "Continue",
                                 buttonwidth: screenwidth * 0.5,
                                 bold: false)),
                       ]),
@@ -501,11 +552,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               : Container(),
           widget.curruser.plan == "business"
               ? GestureDetector(
-                  onTap: businessbuttonpressed
-                      ? null
-                      : () {
-                          StripeSellerOnboarding();
-                        },
+                  onTap: () {
+                    sellerdialog(screenheight, screenwidth);
+                  },
                   child: const Row(
                     children: [
                       Icon(Icons.payment, size: 30),

@@ -13,6 +13,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   bool justloaded;
@@ -233,7 +234,6 @@ class _HomeScreenState extends State<HomeScreen> {
   AppBar homescreenappbar(BuildContext context) {
     return AppBar(
       title: GestureDetector(
-        onTap: () {},
         child: Text(
           "Clout.",
           style: TextStyle(

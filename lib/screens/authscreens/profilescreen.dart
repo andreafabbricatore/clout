@@ -49,6 +49,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<Event> joinedEvents = [];
   List<Event> hostedEvents = [];
   List<AppUser> globalrankedusers = [];
+  String friendval = "";
+
+  Future<void> setfriendval() async {
+    if (widget.user.plan == "business") {
+      if (widget.curruser.followedbusinesses.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Unfollow";
+        });
+      } else {
+        setState(() {
+          friendval = "Follow";
+        });
+      }
+    } else {
+      if (widget.curruser.friends.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Remove Friend";
+        });
+      } else if (widget.curruser.requested.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Request Sent";
+        });
+      } else if (!widget.curruser.requested.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Add Friend";
+        });
+      }
+    }
+  }
 
   Future<void> reportuser() async {
     try {
@@ -77,8 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await updateuser();
       await updatecurruser();
-      //geteventlist(widget.user.joinedEvents, true);
-      //geteventlist(widget.user.hostedEvents, false);
+      await setfriendval();
       await getevents();
     } catch (e) {
       logic.displayErrorSnackBar("Could not refresh", context);
@@ -202,8 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> friendunfriend() async {
     try {
-      //await updatecurruser();
-
+      await updatecurruser();
       if (widget.curruser.friends.contains(widget.user.uid)) {
         await db.removefriend(widget.curruser.uid, widget.user.uid);
       } else if (widget.curruser.requested.contains(widget.user.uid)) {
@@ -363,6 +390,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 cloutscreen: cloutscreen,
                 friend: friendunfriend,
                 refer: refer,
+                friendval: friendval,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
