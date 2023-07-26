@@ -359,16 +359,16 @@ exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) 
         const ephemeralKey = await stripe.ephemeralKeys.create(
             { customer: customerId },
             { apiVersion: '2020-08-27' }
-        );
+        )
 
         //Creates a new payment intent with amount passed in from the client
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: parseInt(req.body.amount),
+            amount: parseInt(req.body.finalamount),
             currency: req.body.currency,
             customer: customerId,
             automatic_payment_methods: {enabled: true},
-            application_fee_amount: req.body.cloutfee,
             transfer_data: {
+                amount: parseInt(req.body.businessamount),
                 destination: req.body.sellerstripebusinessid,
               },
         })

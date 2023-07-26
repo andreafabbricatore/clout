@@ -299,7 +299,10 @@ class db_conn {
           'favoritedby': [],
           'showparticipants': newevent.showparticipants,
           'showlocation': newevent.showlocation,
-          'loc': loc.data
+          'loc': loc.data,
+          'paid': newevent.paid,
+          'fee': newevent.fee,
+          'currency': newevent.currency,
         }).then((value) {
           eventid = value.id;
         });
@@ -367,6 +370,7 @@ class db_conn {
       if (event.maxparticipants < participants.length) {
         throw Exception();
       }
+      GeoFirePoint loc = geo.point(latitude: event.lat, longitude: event.lng);
       events.doc(event.docid).update({
         'title': event.title,
         'description': event.description,
@@ -383,7 +387,8 @@ class db_conn {
         'searchfield': searchfield,
         'isinviteonly': event.isinviteonly,
         'showparticipants': event.showparticipants,
-        'showlocation': event.showlocation
+        'showlocation': event.showlocation,
+        'loc': loc.data,
       });
       chats.doc(event.chatid).update({
         "chatname": [event.title]
@@ -1688,12 +1693,12 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await users.get().then(
+    await events.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users.doc(element.id).set(
-                  {'requested': [], 'requestedby': []},
-                  SetOptions(merge: true));
+              await events
+                  .doc(element.id)
+                  .set({'currency': '', 'fee': 0}, SetOptions(merge: true));
             },
           ),
         );

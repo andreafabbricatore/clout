@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:clout/defs/event.dart';
 import 'package:clout/defs/location.dart';
 import 'package:clout/components/primarybutton.dart';
@@ -56,7 +58,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       presentparticipants: [],
       customimage: false,
       showparticipants: true,
-      showlocation: true);
+      showlocation: true,
+      paid: false,
+      fee: 0,
+      currency: '');
 
   List<String> allinterests = [
     "Sports",
@@ -82,12 +87,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   db_conn db = db_conn();
   applogic logic = applogic();
   late String selectedinterest;
+  String currency = 'EUR';
   ImagePicker picker = ImagePicker();
   var imagepath;
   var compressedimgpath;
   TextEditingController titlecontroller = TextEditingController();
   TextEditingController desccontroller = TextEditingController();
   TextEditingController maxpartcontroller = TextEditingController();
+  TextEditingController feecontroller = TextEditingController();
   DateTime eventdate = DateTime(0, 0, 0);
   AppLocation chosenLocation =
       AppLocation(address: "", city: "", country: "", center: [0.0, 0.0]);
@@ -99,6 +106,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   List LatLngs = [];
   bool hideparticipants = false;
   bool secretlocation = false;
+  bool paidevent = false;
 
   Future _addMarker(LatLng latlang) async {
     setState(() {
@@ -650,6 +658,97 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
             ],
           ),
+          widget.curruser.plan == "business"
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        activeColor: Theme.of(context).primaryColor,
+                        value: paidevent,
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              paidevent = value;
+                            });
+                          }
+                        }),
+                    Text(
+                      "Add fee to event.",
+                      style: TextStyle(
+                          color: !paidevent
+                              ? Colors.grey
+                              : Theme.of(context).primaryColor),
+                      textScaleFactor: 1.0,
+                    ),
+                  ],
+                )
+              : Container(),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
+            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              Expanded(
+                flex: 2,
+                child: TextFormField(
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300,
+                    fontSize: 15,
+                  ),
+                  decoration: InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor)),
+                    hintText: "Price to join",
+                    hintStyle: const TextStyle(
+                      color: Color.fromARGB(39, 0, 0, 0),
+                      fontSize: 15,
+                    ),
+                  ),
+                  textAlign: TextAlign.start,
+                  enableSuggestions: true,
+                  autocorrect: true,
+                  controller: feecontroller,
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: DropdownButtonFormField(
+                  borderRadius: BorderRadius.circular(20),
+                  decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                  )),
+                  value: currency,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      currency = newValue!;
+                    });
+                  },
+                  onSaved: (String? newValue) {
+                    setState(() {
+                      currency = newValue!;
+                    });
+                  },
+                  items:
+                      ['EUR', 'USD', 'GBP', 'AUD', 'MXN'].map((String items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(
+                        items,
+                        style: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w300),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ]),
+          ),
+          //currency box
           SizedBox(
             height: screenheight * 0.03,
           ),
@@ -681,6 +780,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       } else if (emptylocation) {
                         logic.displayErrorSnackBar(
                             "Please choose a location for your event", context);
+                      } else if (paidevent &&
+                          feecontroller.text.trim().isEmpty) {
+                        logic.displayErrorSnackBar(
+                            "Please enter a valid fee, or remove the fee if you made a mistake",
+                            context);
                       } else {
                         setState(() {
                           event.title = titlecontroller.text.trim();
@@ -701,6 +805,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.presentparticipants = [widget.curruser.uid];
                           event.showparticipants = !hideparticipants;
                           event.showlocation = !secretlocation;
+                          event.paid = paidevent;
+                          event.fee = int.parse(feecontroller.text.trim());
+                          event.currency = currency;
                         });
                         try {
                           if (imagepath == null) {
@@ -729,8 +836,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 buttonwidth: screenwidth * 0.6,
                 bold: false,
               )),
-          SizedBox(
-            height: screenheight * 0.04,
+          const SizedBox(
+            height: 150,
           ),
         ]),
       ),

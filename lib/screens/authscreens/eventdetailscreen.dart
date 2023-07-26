@@ -176,9 +176,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           joinedval = "Full";
         });
       } else {
-        setState(() {
-          joinedval = "Join";
-        });
+        if (widget.event.paid) {
+          setState(() {
+            joinedval = "Join - ${widget.event.fee} ${widget.event.currency}";
+          });
+        } else {
+          setState(() {
+            joinedval = "Join";
+          });
+        }
       }
     }
 
@@ -207,25 +213,28 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   void interactevent(context) async {
-    if (!joined && joinedval == "Join") {
-      try {
-        setState(() {
-          buttonpressed = true;
-        });
-        await db.joinevent(widget.event, widget.curruser, widget.event.docid);
-        await widget.analytics.logEvent(name: "joined_event", parameters: {
-          "interest": widget.event.interest,
-          "inviteonly": widget.event.isinviteonly.toString(),
-          "maxparticipants": widget.event.maxparticipants,
-          "currentparticipants": widget.event.participants.length
-        });
-      } catch (e) {
-        displayErrorSnackBar("Could not join event");
-      } finally {
-        setState(() {
-          buttonpressed = false;
-        });
-        updatescreen(widget.event.docid);
+    if (!joined && joinedval.startsWith("Join")) {
+      if (widget.event.paid) {
+      } else {
+        try {
+          setState(() {
+            buttonpressed = true;
+          });
+          await db.joinevent(widget.event, widget.curruser, widget.event.docid);
+          await widget.analytics.logEvent(name: "joined_event", parameters: {
+            "interest": widget.event.interest,
+            "inviteonly": widget.event.isinviteonly.toString(),
+            "maxparticipants": widget.event.maxparticipants,
+            "currentparticipants": widget.event.participants.length
+          });
+        } catch (e) {
+          displayErrorSnackBar("Could not join event");
+        } finally {
+          setState(() {
+            buttonpressed = false;
+          });
+          updatescreen(widget.event.docid);
+        }
       }
     } else if ((!joined && joinedval == "Full") || joinedval == "Finished") {
       //print(joinedval);

@@ -57,7 +57,10 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
       presentparticipants: [],
       customimage: false,
       showparticipants: true,
-      showlocation: true);
+      showlocation: true,
+      fee: 0,
+      paid: false,
+      currency: '');
 
   List<String> allinterests = [
     "Sports",

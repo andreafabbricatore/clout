@@ -127,7 +127,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                     SizedBox(
                       width: screenwidth * 0.5,
                       child: Text(
-                        widget.curruser.plan == "business"
+                        widget.user.plan == "business"
                             ? widget.user.fullname
                             : "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
                         textAlign: TextAlign.start,
@@ -175,7 +175,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                             widget.friendsscreen();
                           },
                           child: Text(
-                            widget.curruser.plan == "business"
+                            widget.user.plan == "business"
                                 ? "${widget.user.friends.length} Followers"
                                 : "${widget.user.friends.length} Friends",
                             textAlign: TextAlign.center,
