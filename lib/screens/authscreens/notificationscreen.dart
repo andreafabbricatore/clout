@@ -138,6 +138,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
+  Future<void> usernavigate(String uid, int index) async {
+    try {
+      AppUser user = await db.getUserFromUID(uid);
+      gotoprofilescreen(user);
+    } catch (e) {
+      logic.displayErrorSnackBar("Could not display user", context);
+    }
+  }
+
+  Future<void> eventnavigate(String eventid, int index) async {
+    try {
+      Event event = await db.getEventfromDocId(eventid);
+      List<AppUser> participants = await db.geteventparticipantslist(event);
+      await Future.delayed(const Duration(milliseconds: 50));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => EventDetailScreen(
+                    event: event,
+                    curruser: widget.curruser,
+                    participants: participants,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "EventDetailScreen")));
+    } catch (e) {
+      logic.displayErrorSnackBar("Could not display event", context);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -148,35 +178,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(String uid, int index) async {
-      try {
-        AppUser user = await db.getUserFromUID(uid);
-        gotoprofilescreen(user);
-      } catch (e) {
-        logic.displayErrorSnackBar("Could not display user", context);
-      }
-    }
-
-    Future<void> eventnavigate(String eventid, int index) async {
-      try {
-        Event event = await db.getEventfromDocId(eventid);
-        List<AppUser> participants = await db.geteventparticipantslist(event);
-        await Future.delayed(const Duration(milliseconds: 50));
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => EventDetailScreen(
-                      event: event,
-                      curruser: widget.curruser,
-                      participants: participants,
-                      curruserlocation: widget.curruserlocation,
-                      analytics: widget.analytics,
-                    ),
-                settings: RouteSettings(name: "EventDetailScreen")));
-      } catch (e) {
-        logic.displayErrorSnackBar("Could not display event", context);
-      }
-    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -221,6 +222,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             onTapUsername: usernavigate,
             onTapEvent: eventnavigate,
             gotoRequestScreen: gotorequestscreen,
+            curruser: widget.curruser,
           )
         ]),
       ),

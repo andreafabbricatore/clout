@@ -35,6 +35,8 @@ class AppUser {
   String plan;
   List followedbusinesses;
   String email;
+  String stripeaccountid;
+  String stripesellercountry;
 
   AppUser(
       {required this.username,
@@ -70,7 +72,9 @@ class AppUser {
       required this.donesignuptime,
       required this.plan,
       required this.followedbusinesses,
-      required this.email});
+      required this.email,
+      required this.stripeaccountid,
+      required this.stripesellercountry});
 
   factory AppUser.fromJson(dynamic json, String docid) {
     return AppUser(
@@ -107,6 +111,8 @@ class AppUser {
         referred: json['referred'] as List,
         plan: json['plan'],
         followedbusinesses: json['followed_businesses'] as List,
-        email: json['email']);
+        email: json['email'],
+        stripeaccountid: json['stripe_account_id'],
+        stripesellercountry: json['stripe_seller_country']);
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/defs/user.dart';
 import 'package:clout/main.dart';
@@ -62,14 +63,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 analytics: widget.analytics,
               ),
           fullscreenDialog: true,
-          settings: RouteSettings(name: "AuthenticationWrapper")),
+          settings: const RouteSettings(name: "AuthenticationWrapper")),
     );
   }
 
-  Future<void> StripeSellerOnboarding() async {
+  Future<void> stripeSellerOnboarding() async {
     try {
       var response = await http.get(Uri.parse(
-          'https://us-central1-clout-1108.cloudfunctions.net/stripeAccount/account?mobile=true'));
+          'https://us-central1-clout-1108.cloudfunctions.net/stripeAccount/account?mobile=true&uid=${widget.curruser.uid}'));
       Map<String, dynamic> body = jsonDecode(response.body);
       launchUrl(Uri.parse(body['url']));
     } catch (e) {
@@ -239,7 +240,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     setState(() {
                                       businessbuttonpressed = true;
                                     });
-                                    await StripeSellerOnboarding();
+                                    await stripeSellerOnboarding();
                                     setState(() {
                                       businessbuttonpressed = false;
                                     });
@@ -308,7 +309,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           GestureDetector(
             onTap: () {
-              launchUrl(Uri.parse("https://termify.io/eula/1664706776"));
+              launchUrl(Uri.parse("https://outwithclout.com/#/eula/"));
             },
             child: Row(
               children: [
@@ -334,10 +335,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           GestureDetector(
             onTap: () {
               launchUrl(
-                  Uri.parse("https://termify.io/privacy-policy/1664707655"));
+                  Uri.parse("https://outwithclout.com/#/privacy_policy/"));
             },
-            child: Row(
-              children: const [
+            child: const Row(
+              children: [
                 Icon(Icons.bookmark_outline, size: 30),
                 SizedBox(
                   width: 6,
@@ -362,107 +363,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           GestureDetector(
             onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return StatefulBuilder(builder: ((context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                          height: screenheight * 0.33,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Column(children: [
-                            const Text(
-                              "Report a Bug",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25),
-                              textScaleFactor: 1.0,
-                            ),
-                            SizedBox(
-                              height: screenheight * 0.02,
-                            ),
-                            const Text(
-                              "Please describe the bug",
-                              style: TextStyle(
-                                fontSize: 15,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height: screenheight * 0.02,
-                            ),
-                            SizedBox(
-                              width: screenwidth * 0.6,
-                              child: TextField(
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 15,
-                                ),
-                                decoration: InputDecoration(
-                                  focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Theme.of(context).primaryColor)),
-                                  hintText: "Bug Description",
-                                  hintStyle: const TextStyle(
-                                    color: Color.fromARGB(39, 0, 0, 0),
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                textAlign: TextAlign.start,
-                                enableSuggestions: true,
-                                autocorrect: true,
-                                controller: bugcontroller,
-                                keyboardType: TextInputType.text,
-                                minLines: 1,
-                                maxLines: 3,
-                              ),
-                            ),
-                            SizedBox(
-                              height: screenheight * 0.04,
-                            ),
-                            GestureDetector(
-                                onTap: bugbuttonpressed
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          bugbuttonpressed = true;
-                                        });
-                                        try {
-                                          await db.reportbug(
-                                              bugcontroller.text.trim(),
-                                              widget.curruser.uid);
-                                          bugcontroller.clear();
-                                          Navigator.pop(context);
-                                        } catch (e) {
-                                          logic.displayErrorSnackBar(
-                                              "Invalid Action, try again",
-                                              context);
-                                        } finally {
-                                          bugbuttonpressed = false;
-                                        }
-                                      },
-                                child: PrimaryButton(
-                                  bold: false,
-                                  buttonwidth: screenwidth * 0.6,
-                                  screenwidth: screenwidth,
-                                  buttonpressed: bugbuttonpressed,
-                                  text: "Report",
-                                )),
-                          ]),
-                        ),
-                      );
-                    }));
-                  });
+              showbugdialog(context, screenheight, screenwidth);
             },
             child: const Row(
               children: [
@@ -488,36 +389,86 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SizedBox(
             height: screenheight * 0.02,
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => LinkPhoneInputScreen(
-                    analytics: widget.analytics,
-                    updatephonenumber: true,
-                  ),
-                ),
-              );
-            },
-            child: Row(
-              children: [
-                const Icon(Icons.phone_iphone, size: 30),
-                const SizedBox(
-                  width: 6,
-                ),
-                SizedBox(
-                  width: screenwidth * 0.8,
-                  child: const Text(
-                    "Update Phone Number",
-                    style: TextStyle(fontSize: 20),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+          widget.curruser.plan != "business"
+              ? GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => LinkPhoneInputScreen(
+                          analytics: widget.analytics,
+                          updatephonenumber: true,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.phone_iphone, size: 30),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      SizedBox(
+                        width: screenwidth * 0.8,
+                        child: const Text(
+                          "Update Phone Number",
+                          style: TextStyle(fontSize: 20),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      )
+                    ],
                   ),
                 )
-              ],
-            ),
-          ),
+              : Container(),
+          widget.curruser.plan == "business"
+              ? GestureDetector(
+                  onTap: () {
+                    showchangeemaildialog(context, screenheight, screenwidth);
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.email_outlined, size: 30),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      SizedBox(
+                        width: screenwidth * 0.8,
+                        child: const Text(
+                          "Update Email Address",
+                          style: TextStyle(fontSize: 20),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Container(),
+          widget.curruser.plan == "business"
+              ? SizedBox(
+                  height: screenheight * 0.02,
+                )
+              : Container(),
+          widget.curruser.plan == "business"
+              ? GestureDetector(
+                  onTap: () {
+                    showchangepswdialog(context, screenheight, screenwidth);
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(Icons.lock_outline, size: 30),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "Update Password",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
           SizedBox(
             height: screenheight * 0.02,
           ),
@@ -529,7 +480,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     builder: (BuildContext context) => BlockedUsersScreen(
                           curruser: widget.curruser,
                         ),
-                    settings: RouteSettings(name: "BlockedUsersScreen")),
+                    settings: const RouteSettings(name: "BlockedUsersScreen")),
               );
             },
             child: const Row(
@@ -550,7 +501,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: screenheight * 0.02,
                 )
               : Container(),
-          widget.curruser.plan == "business"
+          widget.curruser.plan == "business" &&
+                  widget.curruser.stripeaccountid == ""
               ? GestureDetector(
                   onTap: () {
                     sellerdialog(screenheight, screenwidth);
@@ -676,5 +628,281 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ]),
       ),
     );
+  }
+
+  Future<dynamic> showchangepswdialog(
+      BuildContext context, double screenheight, double screenwidth) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              backgroundColor: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                height: screenheight * 0.4,
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Column(children: [
+                  const Text(
+                    "Change Password",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                    ),
+                    textScaleFactor: 1.0,
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.02,
+                  ),
+                  const Text(
+                    "In order to change password,\nenter old and new password",
+                    style: TextStyle(fontSize: 15),
+                    textScaleFactor: 1.1,
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.02,
+                  ),
+                  textdatafield(screenwidth * 0.4, "Old Password", psw),
+                  textdatafield(screenwidth * 0.4, "New Password", newpsw),
+                  SizedBox(
+                    height: screenheight * 0.04,
+                  ),
+                  GestureDetector(
+                      onTap: updatepswbuttonpressed
+                          ? null
+                          : () async {
+                              setState(() {
+                                updatepswbuttonpressed = true;
+                              });
+                              try {
+                                await FirebaseAuth.instance
+                                    .signInWithEmailAndPassword(
+                                        email: widget.curruser.email,
+                                        password: psw.text.trim());
+                                if (newpsw.text.trim().isEmpty) {
+                                  throw Exception("Please enter new password");
+                                }
+                                await FirebaseAuth.instance.currentUser!
+                                    .updatePassword(newpsw.text.trim());
+                                emailaddress.clear();
+                                psw.clear();
+                                newpsw.clear();
+                                goauthwrapper();
+                              } catch (e) {
+                                logic.displayErrorSnackBar(
+                                    "Invalid Action, try again", context);
+                              } finally {
+                                setState(() {
+                                  updatepswbuttonpressed = false;
+                                });
+                              }
+                            },
+                      child: PrimaryButton(
+                          screenwidth: screenwidth,
+                          buttonpressed: updatepswbuttonpressed,
+                          text: "Update",
+                          buttonwidth: screenwidth * 0.7,
+                          bold: false)),
+                ]),
+              ),
+            );
+          });
+        });
+  }
+
+  Future<dynamic> showchangeemaildialog(
+      BuildContext context, double screenheight, double screenwidth) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              backgroundColor: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                height: screenheight * 0.4,
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Column(children: [
+                  const Text(
+                    "Change Email",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25),
+                    textScaleFactor: 1.0,
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.02,
+                  ),
+                  const Text(
+                    "In order to change email address,\nenter new address and re-enter password",
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                    textScaleFactor: 1.1,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.02,
+                  ),
+                  textdatafield(screenwidth * 0.4, "New Email", emailaddress),
+                  textdatafield(screenwidth * 0.4, "Password", psw),
+                  SizedBox(
+                    height: screenheight * 0.04,
+                  ),
+                  GestureDetector(
+                      onTap: updateemailbuttonpressed
+                          ? null
+                          : () async {
+                              setState(() {
+                                updateemailbuttonpressed = true;
+                              });
+                              try {
+                                await FirebaseAuth.instance
+                                    .signInWithEmailAndPassword(
+                                        email: widget.curruser.email,
+                                        password: psw.text.trim());
+                                if (emailaddress.text.trim().isEmpty) {
+                                  throw Exception(
+                                      "Please enter new email address");
+                                }
+                                await db.changeattribute(
+                                    'email',
+                                    emailaddress.text.trim(),
+                                    FirebaseAuth.instance.currentUser!.uid);
+                                await FirebaseAuth.instance.currentUser!
+                                    .updateEmail(emailaddress.text.trim());
+                                emailaddress.clear();
+                                psw.clear();
+                                newpsw.clear();
+                                goauthwrapper();
+                              } catch (e) {
+                                logic.displayErrorSnackBar(
+                                    "Invalid Action, try again", context);
+                              } finally {
+                                updateemailbuttonpressed = false;
+                              }
+                            },
+                      child: PrimaryButton(
+                          screenwidth: screenwidth,
+                          buttonpressed: updateemailbuttonpressed,
+                          text: "Update",
+                          buttonwidth: screenwidth * 0.7,
+                          bold: false)),
+                ]),
+              ),
+            );
+          }));
+        });
+  }
+
+  Future<dynamic> showbugdialog(
+      BuildContext context, double screenheight, double screenwidth) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              backgroundColor: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                height: screenheight * 0.33,
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Column(children: [
+                  const Text(
+                    "Report a Bug",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25),
+                    textScaleFactor: 1.0,
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.02,
+                  ),
+                  const Text(
+                    "Please describe the bug",
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.02,
+                  ),
+                  SizedBox(
+                    width: screenwidth * 0.6,
+                    child: TextField(
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w300,
+                        fontSize: 15,
+                      ),
+                      decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor)),
+                        hintText: "Bug Description",
+                        hintStyle: const TextStyle(
+                          color: Color.fromARGB(39, 0, 0, 0),
+                          fontSize: 15,
+                        ),
+                      ),
+                      textAlign: TextAlign.start,
+                      enableSuggestions: true,
+                      autocorrect: true,
+                      controller: bugcontroller,
+                      keyboardType: TextInputType.text,
+                      minLines: 1,
+                      maxLines: 3,
+                    ),
+                  ),
+                  SizedBox(
+                    height: screenheight * 0.04,
+                  ),
+                  GestureDetector(
+                      onTap: bugbuttonpressed
+                          ? null
+                          : () async {
+                              setState(() {
+                                bugbuttonpressed = true;
+                              });
+                              try {
+                                await db.reportbug(bugcontroller.text.trim(),
+                                    widget.curruser.uid);
+                                bugcontroller.clear();
+                                Navigator.pop(context);
+                              } catch (e) {
+                                logic.displayErrorSnackBar(
+                                    "Invalid Action, try again", context);
+                              } finally {
+                                bugbuttonpressed = false;
+                              }
+                            },
+                      child: PrimaryButton(
+                        bold: false,
+                        buttonwidth: screenwidth * 0.6,
+                        screenwidth: screenwidth,
+                        buttonpressed: bugbuttonpressed,
+                        text: "Report",
+                      )),
+                ]),
+              ),
+            );
+          }));
+        });
   }
 }

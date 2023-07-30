@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const axios = require('axios')
+const axios = require('axios');
+const { FieldValue } = require("firebase-admin/firestore");
 const stripe = require("stripe")(functions.config().stripe.testkey)
 admin.initializeApp();
 const db = admin.firestore();
@@ -295,9 +296,10 @@ exports.stripeAccount = functions.https.onRequest(async (req, res) => {
     
     // CREATE CONNECTED ACCOUNT
     if (method == "GET") {
-        const { mobile } = req.query
+        const { mobile, uid } = req.query
         const account = await stripe.accounts.create({
             type: 'express',
+            metadata: {'uid': uid}
         })
         const accountLinks = await stripe.accountLinks.create({
             account: account.id,
@@ -315,42 +317,26 @@ exports.stripeAccount = functions.https.onRequest(async (req, res) => {
     }
 });
 
-exports.checkconnectedaccount = functions.https.onRequest(async (req, res) => {
-    const { method } = req
-    
-    const accounts = await stripe.accounts.list({});
-    const data = accounts.data;
-    console.log(data.length);
-    for (let i = 0; i<data.length; i++) {
-        console.log(data[i].email);
-        if (data[i].email == req.body.email) {
-            await db.collection("users").doc(req.body.uid).set({'stripe_account_id':data[i].id}, { merge: true });
-            res.status(200).send({
-               accountId: data[i].id
-            });
-    }}
-    res.sendStatus(404);
-});
-
 exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) => {
     try {
         let customerId;
+        let found = false;
 
         //Gets the customer who's email id matches the one sent by the client
-        const customerList = await stripe.customers.list({
-            email: req.body.email,
-            limit: 1
-        });
+        const customerList = await stripe.customers.list();
+
+        for (let i = 0; i<customerList.data.length; i++) {
+            if(customerList.data[i].metadata.uid == req.body.uid) {
+                customerId = customerList.data[i].id;
+                found = true;
+            }
+        }
                 
         //Checks the if the customer exists, if not creates a new customer
-        if (customerList.data.length !== 0) {
-            customerId = customerList.data[0].id;
-        }
-        else {
+        if (!found) {
             const customer = await stripe.customers.create({
-                email: req.body.email,
+                metadata: {'uid':req.body.uid},
                 name: req.body.name,
-                description: "Clout UID: " + req.body.uid
             });
             customerId = customer.data.id;
         }
@@ -371,6 +357,7 @@ exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) 
                 amount: parseInt(req.body.businessamount),
                 destination: req.body.sellerstripebusinessid,
               },
+            metadata: {'eventid': req.body.eventid, 'user_uid':req.body.uid, 'seller_uid': req.body.selleruid}
         })
 
         res.status(200).send({
@@ -383,4 +370,30 @@ exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) 
     } catch (error) {
         res.status(404).send({ success: false, error: error.message })
     }
+});
+
+exports.stripeUpdatedAccountWebHook = functions.https.onRequest(async (req, res) => {
+    let event;
+
+    try {
+    const whSec = functions.config().stripe.updatedaccountwebhooksecret;
+
+    event = stripe.webhooks.constructEvent(
+        req.rawBody,
+        req.headers['stripe-signature'],
+        whSec
+    );
+    } catch(e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+    try {
+    const dataObject = event.data.object;
+
+    await db.collection("users").doc(dataObject.metadata.uid).set({'stripe_account_id':dataObject.id, 'stripe_seller_country': dataObject.country}, { merge: true });
+    } catch(e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+    res.sendStatus(200);
 });

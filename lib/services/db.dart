@@ -1693,12 +1693,12 @@ class db_conn {
   }
 
   Future<void> addAttributetoAllDocuments() async {
-    await events.get().then(
+    await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await events
-                  .doc(element.id)
-                  .set({'currency': '', 'fee': 0}, SetOptions(merge: true));
+              await users.doc(element.id).set(
+                  {'stripe_account_id': '', 'stripe_seller_country': ''},
+                  SetOptions(merge: true));
             },
           ),
         );
@@ -2095,6 +2095,15 @@ class db_conn {
       await emailverification
           .doc(curruserid)
           .set({'time': FieldValue.serverTimestamp()});
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<List<String>> getsellerdetails(String uid) async {
+    try {
+      DocumentSnapshot user = await users.doc(uid).get();
+      return [user['stripe_account_id'], user['stripe_seller_country']];
     } catch (e) {
       throw Exception();
     }

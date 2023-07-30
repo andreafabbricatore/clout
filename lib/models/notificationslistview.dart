@@ -1,4 +1,5 @@
 import 'package:clout/defs/notification.dart';
+import 'package:clout/defs/user.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -9,10 +10,12 @@ class NotificationsListView extends StatelessWidget {
       required this.screenwidth,
       required this.onTapUsername,
       required this.gotoRequestScreen,
-      required this.onTapEvent})
+      required this.onTapEvent,
+      required this.curruser})
       : super(key: key);
   List<NotificationElement> notificationlist;
   double screenwidth;
+  AppUser curruser;
   final Function(String uid, int index) onTapUsername;
   final Function(String eventid, int index) onTapEvent;
   final Function() gotoRequestScreen;
@@ -193,7 +196,9 @@ class NotificationsListView extends StatelessWidget {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
                 child: index == 0
-                    ? friendrequestitem()
+                    ? curruser.plan == "business"
+                        ? Container()
+                        : friendrequestitem()
                     : _listviewitem(notificationlist[index - 1], index - 1));
           }),
     );

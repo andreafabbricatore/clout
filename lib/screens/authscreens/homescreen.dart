@@ -142,6 +142,29 @@ class _HomeScreenState extends State<HomeScreen> {
     await widget.analytics.logScreenView(screenName: "HomeScreen");
   }
 
+  Future<void> navigate(Event event) async {
+    try {
+      Event chosenEvent = await db.getEventfromDocId(event.docid);
+      List<AppUser> participants =
+          await db.geteventparticipantslist(chosenEvent);
+      await Future.delayed(const Duration(milliseconds: 50));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => EventDetailScreen(
+                    event: chosenEvent,
+                    curruser: widget.curruser,
+                    participants: participants,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "EventDetailScreen")));
+    } catch (e) {
+      logic.displayErrorSnackBar("Could not display event", context);
+    }
+    refresh();
+  }
+
   @override
   void initState() {
     screenview();
@@ -158,29 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-
-    Future<void> navigate(Event event, int index) async {
-      try {
-        Event chosenEvent = await db.getEventfromDocId(event.docid);
-        List<AppUser> participants =
-            await db.geteventparticipantslist(chosenEvent);
-        await Future.delayed(const Duration(milliseconds: 50));
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => EventDetailScreen(
-                      event: chosenEvent,
-                      curruser: widget.curruser,
-                      participants: participants,
-                      curruserlocation: widget.curruserlocation,
-                      analytics: widget.analytics,
-                    ),
-                settings: RouteSettings(name: "EventDetailScreen")));
-      } catch (e) {
-        logic.displayErrorSnackBar("Could not display event", context);
-      }
-      refresh();
-    }
 
     return Scaffold(
         backgroundColor: Colors.white,

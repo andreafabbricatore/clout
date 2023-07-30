@@ -166,6 +166,28 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
     super.initState();
   }
 
+  Future<void> usernavigate(AppUser user, int index) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => UnAuthProfileScreen(
+                analytics: widget.analytics,
+                visit: true,
+              ),
+          fullscreenDialog: true,
+          settings: const RouteSettings(name: "UnAuthProfileScreen")),
+    );
+  }
+
+  void shareevent(String text) async {
+    final box = context.findRenderObject() as RenderBox?;
+    await Share.share(
+      text,
+      subject: "Join ${widget.event.title} on Clout!",
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
   @override
   void reassemble() {
     // TODO: implement reassemble
@@ -176,27 +198,6 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user, int index) async {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => UnAuthProfileScreen(
-                  analytics: widget.analytics,
-                  visit: true,
-                ),
-            fullscreenDialog: true,
-            settings: const RouteSettings(name: "UnAuthProfileScreen")),
-      );
-    }
-
-    void shareevent(String text) async {
-      final box = context.findRenderObject() as RenderBox?;
-      await Share.share(
-        text,
-        subject: "Join ${widget.event.title} on Clout!",
-        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
-    }
 
     return Scaffold(
       backgroundColor: Colors.white,

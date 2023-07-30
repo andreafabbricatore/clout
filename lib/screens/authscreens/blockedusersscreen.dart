@@ -48,6 +48,18 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     getUserList();
   }
 
+  Future<void> unblockUser(AppUser user) async {
+    try {
+      await db.unblockUser(widget.curruser.uid, user.uid);
+      logic.displayErrorSnackBar(
+          "Unblocked user! We love friendship :)", context);
+      refresh();
+    } catch (e) {
+      logic.displayErrorSnackBar(
+          "Could not remove participant, please try again", context);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,18 +70,6 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-
-    Future<void> unblockUser(AppUser user) async {
-      try {
-        await db.unblockUser(widget.curruser.uid, user.uid);
-        logic.displayErrorSnackBar(
-            "Unblocked user! We love friendship :)", context);
-        refresh();
-      } catch (e) {
-        logic.displayErrorSnackBar(
-            "Could not remove participant, please try again", context);
-      }
-    }
 
     return Scaffold(
       backgroundColor: Colors.white,

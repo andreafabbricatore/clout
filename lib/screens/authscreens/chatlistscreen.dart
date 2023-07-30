@@ -60,6 +60,52 @@ class _ChatListScreenState extends State<ChatListScreen> {
     await getchatlist();
   }
 
+  Future<void> chatnavigate(Chat chat, int index) async {
+    await Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ChatRoomScreen(
+                  chatinfo: chat,
+                  curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ChatRoomScreen")));
+    refresh();
+  }
+
+  Future<void> userchatinteract(AppUser user) async {
+    bool userchatexists =
+        await db.checkuserchatexists(widget.curruser.uid, user.uid);
+
+    if (!userchatexists) {
+      await db.createuserchat(widget.curruser, user.uid);
+    }
+    Chat userchat =
+        await db.getUserChatFromParticipants(widget.curruser.uid, user.uid);
+
+    await Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ChatRoomScreen(
+                  chatinfo: userchat,
+                  curruser: widget.curruser,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ChatRoomScreen")));
+    setState(() {
+      searching = false;
+      suffixiconcolor = Colors.white;
+      searchedusers = [];
+    });
+    //error?
+    await db.setuserchatvisibility(widget.curruser, user.uid, userchat.chatid);
+    searchcontroller.clear();
+    FocusScope.of(context).unfocus();
+    refresh();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -70,52 +116,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> chatnavigate(Chat chat, int index) async {
-      await Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (_) => ChatRoomScreen(
-                    chatinfo: chat,
-                    curruser: widget.curruser,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                  ),
-              settings: RouteSettings(name: "ChatRoomScreen")));
-      refresh();
-    }
-
-    Future<void> userchatinteract(AppUser user) async {
-      bool userchatexists =
-          await db.checkuserchatexists(widget.curruser.uid, user.uid);
-
-      if (!userchatexists) {
-        await db.createuserchat(widget.curruser, user.uid);
-      }
-      Chat userchat =
-          await db.getUserChatFromParticipants(widget.curruser.uid, user.uid);
-
-      await Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (_) => ChatRoomScreen(
-                    chatinfo: userchat,
-                    curruser: widget.curruser,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                  ),
-              settings: RouteSettings(name: "ChatRoomScreen")));
-      setState(() {
-        searching = false;
-        suffixiconcolor = Colors.white;
-        searchedusers = [];
-      });
-      //error?
-      await db.setuserchatvisibility(
-          widget.curruser, user.uid, userchat.chatid);
-      searchcontroller.clear();
-      FocusScope.of(context).unfocus();
-      refresh();
-    }
 
     return Scaffold(
         backgroundColor: Colors.white,

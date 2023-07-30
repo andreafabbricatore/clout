@@ -53,6 +53,20 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
     );
   }
 
+  Future<void> usernavigate(AppUser user) async {
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ProfileScreen(
+                  user: user,
+                  curruser: widget.curruser,
+                  visit: true,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ProfileScreen")));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -63,19 +77,6 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user) async {
-      Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (_) => ProfileScreen(
-                    user: user,
-                    curruser: widget.curruser,
-                    visit: true,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                  ),
-              settings: RouteSettings(name: "ProfileScreen")));
-    }
 
     return Scaffold(
       backgroundColor: Colors.white,

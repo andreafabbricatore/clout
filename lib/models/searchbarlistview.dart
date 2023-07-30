@@ -116,7 +116,7 @@ class _SearchBarListViewState extends State<SearchBarListView> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-    Future<void> eventnavigate(Event event, int index) async {
+    Future<void> eventnavigate(Event event) async {
       try {
         Event chosenEvent = await db.getEventfromDocId(event.docid);
         List<AppUser> participants =

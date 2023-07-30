@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventListView extends StatelessWidget {
-  final Function(Event event, int index)? onTap;
+  final Function(Event event)? onTap;
   final List<Event> eventList;
   bool scrollable;
   double leftpadding;
@@ -97,10 +97,7 @@ class EventListView extends StatelessWidget {
     );
   }
 
-  Widget _listViewItem(
-    Event event,
-    int index,
-  ) {
+  Widget _listViewItem(Event event) {
     Widget widget;
     widget = SizedBox(
       width: screenwidth * 0.8,
@@ -157,7 +154,7 @@ class EventListView extends StatelessWidget {
     );
 
     return GestureDetector(
-      onTap: () => onTap?.call(event, index),
+      onTap: () => onTap?.call(event),
       child: widget,
     );
   }
@@ -175,7 +172,7 @@ class EventListView extends StatelessWidget {
         Event event = eventList.reversed.toList()[index];
         return Padding(
           padding: EdgeInsets.only(bottom: 0, top: 10, left: leftpadding),
-          child: _listViewItem(event, index),
+          child: _listViewItem(event),
         );
       },
     );

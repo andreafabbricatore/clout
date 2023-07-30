@@ -60,6 +60,30 @@ class _RequestScreenState extends State<RequestScreen> {
     }
   }
 
+  Future<void> usernavigate(AppUser user) async {
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (_) => ProfileScreen(
+                  user: user,
+                  curruser: widget.curruser,
+                  visit: true,
+                  curruserlocation: widget.curruserlocation,
+                  analytics: widget.analytics,
+                ),
+            settings: RouteSettings(name: "ProfileScreen")));
+  }
+
+  Future<void> acceptfriendrequest(AppUser user) async {
+    try {
+      await db.acceptfriendrequest(widget.curruser.uid, user.uid);
+      refresh();
+    } catch (e) {
+      logic.displayErrorSnackBar(
+          "Could not accept request, please try again.", context);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,29 +93,6 @@ class _RequestScreenState extends State<RequestScreen> {
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.of(context).size.width;
     double screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user) async {
-      Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (_) => ProfileScreen(
-                    user: user,
-                    curruser: widget.curruser,
-                    visit: true,
-                    curruserlocation: widget.curruserlocation,
-                    analytics: widget.analytics,
-                  ),
-              settings: RouteSettings(name: "ProfileScreen")));
-    }
-
-    Future<void> acceptfriendrequest(AppUser user) async {
-      try {
-        await db.acceptfriendrequest(widget.curruser.uid, user.uid);
-        refresh();
-      } catch (e) {
-        logic.displayErrorSnackBar(
-            "Could not accept request, please try again.", context);
-      }
-    }
 
     return Scaffold(
         backgroundColor: Colors.white,

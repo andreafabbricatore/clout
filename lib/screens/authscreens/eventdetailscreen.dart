@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -20,12 +21,14 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as Maps;
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 
 class EventDetailScreen extends StatefulWidget {
   EventDetailScreen(
@@ -212,9 +215,89 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  Future<void> initPaymentandJoin() async {
+    try {
+      setState(() {
+        buttonpressed = true;
+      });
+
+      var fees = {
+        'USD': {'Percent': 2.9, 'Fixed': 0.30},
+        'GBP': {'Percent': 2.4, 'Fixed': 0.20},
+        'EUR': {'Percent': 2.4, 'Fixed': 0.24},
+        'AUD': {'Percent': 2.9, 'Fixed': 0.30},
+        'MXN': {'Percent': 3.6, 'Fixed': 3}
+      };
+      String currency = widget.event.currency;
+      double constfee = fees[currency]!['Fixed']!.toDouble();
+      double perc = 0.96; //1 - (fees[currency]!['Percent']!.toDouble()/100);
+      double finalamount = (widget.event.fee + constfee) / perc;
+      List<String> sellerdetails =
+          await db.getsellerdetails(widget.event.hostdocid);
+      // 1. Create a payment intent on the server
+      final response = await http.post(
+          Uri.parse(
+              'https://us-central1-clout-1108.cloudfunctions.net/stripePaymentIntentRequest'),
+          body: {
+            'name': widget.curruser.fullname,
+            'uid': widget.curruser.uid,
+            'businessamount': (widget.event.fee * 100).toString(),
+            'finalamount': (finalamount * 100).toString(),
+            'currency': widget.event.currency.toLowerCase(),
+            'sellerstripebusinessid': sellerdetails[0],
+            'eventid': widget.event.docid,
+            'selleruid': widget.event.hostdocid
+          });
+
+      final jsonResponse = jsonDecode(response.body);
+      // 2. Initialize the payment sheet
+      await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+              customFlow: false,
+              appearance: const PaymentSheetAppearance(
+                  colors: PaymentSheetAppearanceColors(
+                      primary: Color.fromARGB(255, 255, 48, 117))),
+              paymentIntentClientSecret: jsonResponse['paymentIntent'],
+              merchantDisplayName: 'Clout.',
+              customerId: jsonResponse['customer'],
+              customerEphemeralKeySecret: jsonResponse['ephemeralKey'],
+              applePay: PaymentSheetApplePay(
+                merchantCountryCode: sellerdetails[1],
+              ),
+              googlePay:
+                  PaymentSheetGooglePay(merchantCountryCode: sellerdetails[1]),
+              style: ThemeMode.light));
+      await Stripe.instance
+          .presentPaymentSheet()
+          .then((value) => null)
+          .onError((error, stackTrace) {});
+      // need to do this in cloud function!!!
+      try {
+        await db.joinevent(widget.event, widget.curruser, widget.event.docid);
+        await widget.analytics.logEvent(name: "joined_event", parameters: {
+          "interest": widget.event.interest,
+          "inviteonly": widget.event.isinviteonly.toString(),
+          "maxparticipants": widget.event.maxparticipants,
+          "currentparticipants": widget.event.participants.length
+        });
+      } catch (e) {
+        displayErrorSnackBar("Could not join event");
+      }
+      displayErrorSnackBar("Payment was successful.");
+    } catch (error) {
+      displayErrorSnackBar(error.toString());
+    } finally {
+      updatescreen(widget.event.docid);
+      setState(() {
+        buttonpressed = false;
+      });
+    }
+  }
+
   void interactevent(context) async {
     if (!joined && joinedval.startsWith("Join")) {
       if (widget.event.paid) {
+        await initPaymentandJoin();
       } else {
         try {
           setState(() {
@@ -983,85 +1066,85 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     } catch (e) {}
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenwidth = MediaQuery.of(context).size.width;
-    final screenheight = MediaQuery.of(context).size.height;
-    Future<void> usernavigate(AppUser user) async {
-      await widget.analytics.logEvent(
-          name: "visited_profile_screen_from_event_screen",
-          parameters: {
-            "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly.toString(),
-            "maxparticipants": widget.event.maxparticipants,
-            "participants": widget.event.participants.length,
-            "ishost":
-                (widget.event.hostdocid == widget.curruser.uid).toString(),
-            "visitinghost": (widget.event.hostdocid == user.uid).toString()
-          });
-      if (user.plan == "business") {
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-                builder: (_) => BusinessProfileScreen(
-                      user: user,
-                      curruser: widget.curruser,
-                      visit: true,
-                      curruserlocation: widget.curruserlocation,
-                      analytics: widget.analytics,
-                    ),
-                settings: RouteSettings(name: "BusinessProfileScreen")));
-      } else {
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-                builder: (_) => ProfileScreen(
-                      user: user,
-                      curruser: widget.curruser,
-                      visit: true,
-                      curruserlocation: widget.curruserlocation,
-                      analytics: widget.analytics,
-                    ),
-                settings: RouteSettings(name: "ProfileScreen")));
-      }
-    }
-
-    Future<void> remuser(AppUser user) async {
-      try {
-        await db.removeparticipant(user, widget.event);
-        await widget.analytics.logEvent(name: "rem_participant", parameters: {
+  Future<void> usernavigate(AppUser user) async {
+    await widget.analytics.logEvent(
+        name: "visited_profile_screen_from_event_screen",
+        parameters: {
           "interest": widget.event.interest,
           "inviteonly": widget.event.isinviteonly.toString(),
           "maxparticipants": widget.event.maxparticipants,
           "participants": widget.event.participants.length,
-          "usernationality": user.nationality,
-          "userbio": user.bio,
-          "username": user.username,
-          "userclout": user.clout,
+          "ishost": (widget.event.hostdocid == widget.curruser.uid).toString(),
+          "visitinghost": (widget.event.hostdocid == user.uid).toString()
         });
-        updatescreen(widget.event.docid);
-      } catch (e) {
-        displayErrorSnackBar("Could not remove participant, please try again");
-      }
+    if (user.plan == "business") {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => BusinessProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "BusinessProfileScreen")));
+    } else {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (_) => ProfileScreen(
+                    user: user,
+                    curruser: widget.curruser,
+                    visit: true,
+                    curruserlocation: widget.curruserlocation,
+                    analytics: widget.analytics,
+                  ),
+              settings: RouteSettings(name: "ProfileScreen")));
     }
+  }
 
-    void shareevent(String text) async {
-      final box = context.findRenderObject() as RenderBox?;
-      await widget.analytics.logEvent(name: "shared_event", parameters: {
+  Future<void> remuser(AppUser user) async {
+    try {
+      await db.removeparticipant(user, widget.event);
+      await widget.analytics.logEvent(name: "rem_participant", parameters: {
         "interest": widget.event.interest,
         "inviteonly": widget.event.isinviteonly.toString(),
         "maxparticipants": widget.event.maxparticipants,
         "participants": widget.event.participants.length,
-        "ishost": (widget.curruser.uid == widget.event.hostdocid).toString(),
-        "isfriendshost":
-            widget.curruser.friends.contains(widget.event.hostdocid).toString()
+        "usernationality": user.nationality,
+        "userbio": user.bio,
+        "username": user.username,
+        "userclout": user.clout,
       });
-      await Share.share(
-        text,
-        subject: "Join ${widget.event.title} on Clout!",
-        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
+      updatescreen(widget.event.docid);
+    } catch (e) {
+      displayErrorSnackBar("Could not remove participant, please try again");
     }
+  }
+
+  void shareevent(String text) async {
+    final box = context.findRenderObject() as RenderBox?;
+    await widget.analytics.logEvent(name: "shared_event", parameters: {
+      "interest": widget.event.interest,
+      "inviteonly": widget.event.isinviteonly.toString(),
+      "maxparticipants": widget.event.maxparticipants,
+      "participants": widget.event.participants.length,
+      "ishost": (widget.curruser.uid == widget.event.hostdocid).toString(),
+      "isfriendshost":
+          widget.curruser.friends.contains(widget.event.hostdocid).toString()
+    });
+    await Share.share(
+      text,
+      subject: "Join ${widget.event.title} on Clout!",
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -1095,53 +1178,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           SizedBox(
             height: screenheight * 0.005,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  try {
-                    List<Event> interesteventlist = [];
-                    interesteventlist = await db.getLngLatEventsByInterest(
-                        widget.curruserlocation.center[0],
-                        widget.curruserlocation.center[1],
-                        widget.event.interest,
-                        widget.curruser);
-                    gotointerestsearchscreen(
-                        widget.event.interest, interesteventlist);
-                  } catch (e) {
-                    displayErrorSnackBar("Could not go to interest screen");
-                  }
-                },
-                child: Text(
-                  widget.event.interest,
-                  style: TextStyle(
-                      fontSize: 25,
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  try {
-                    AppUser eventhost =
-                        await db.getUserFromUID(widget.event.hostdocid);
-                    usernavigate(eventhost);
-                  } catch (e) {
-                    displayErrorSnackBar("Could not retrieve host information");
-                  }
-                },
-                child: Text(
-                  "@${widget.event.host}",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          interestandhostrow(context, usernavigate),
           SizedBox(
             height: screenheight * 0.02,
           ),
@@ -1317,6 +1354,57 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ))
         ]),
       ),
+    );
+  }
+
+  Row interestandhostrow(
+      BuildContext context, Future<void> usernavigate(AppUser user)) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        GestureDetector(
+          onTap: () async {
+            try {
+              List<Event> interesteventlist = [];
+              interesteventlist = await db.getLngLatEventsByInterest(
+                  widget.curruserlocation.center[0],
+                  widget.curruserlocation.center[1],
+                  widget.event.interest,
+                  widget.curruser);
+              gotointerestsearchscreen(
+                  widget.event.interest, interesteventlist);
+            } catch (e) {
+              displayErrorSnackBar("Could not go to interest screen");
+            }
+          },
+          child: Text(
+            widget.event.interest,
+            style: TextStyle(
+                fontSize: 25,
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold),
+          ),
+        ),
+        GestureDetector(
+          onTap: () async {
+            try {
+              AppUser eventhost =
+                  await db.getUserFromUID(widget.event.hostdocid);
+              usernavigate(eventhost);
+            } catch (e) {
+              displayErrorSnackBar("Could not retrieve host information");
+            }
+          },
+          child: Text(
+            "@${widget.event.host}",
+            style: TextStyle(
+              fontSize: 18,
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

@@ -64,6 +64,21 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
             settings: RouteSettings(name: "UnAuthInterestSearchScreen")));
   }
 
+  Future<void> searchnav(String interest) async {
+    try {
+      List<Event> interesteventlist = [];
+      interesteventlist = await db.UnAuthgetLngLatEventsByInterest(
+        widget.curruserlocation.center[0],
+        widget.curruserlocation.center[1],
+        interest,
+      );
+      gotointerestsearchscreen(interest, interesteventlist);
+      //print(interesteventlist);
+    } catch (e) {
+      logic.displayErrorSnackBar("Could not display events", context);
+    }
+  }
+
   @override
   void initState() {
     focusNode.addListener(() {
@@ -76,21 +91,6 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
-
-    Future<void> searchnav(String interest) async {
-      try {
-        List<Event> interesteventlist = [];
-        interesteventlist = await db.UnAuthgetLngLatEventsByInterest(
-          widget.curruserlocation.center[0],
-          widget.curruserlocation.center[1],
-          interest,
-        );
-        gotointerestsearchscreen(interest, interesteventlist);
-        //print(interesteventlist);
-      } catch (e) {
-        logic.displayErrorSnackBar("Could not display events", context);
-      }
-    }
 
     return Scaffold(
       backgroundColor: Colors.white,

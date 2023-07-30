@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:app_links/app_links.dart';
 import 'package:clout/defs/chat.dart';
 import 'package:clout/defs/event.dart';
@@ -210,19 +211,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 context);
           }
         } catch (e) {}
-      } else if (splitlink[splitlink.length - 2] == "seller_onboarding") {
-        final response = await http.post(
-            Uri.parse(
-                'https://us-central1-clout-1108.cloudfunctions.net/checkconnectedaccount'),
-            body: {'email': widget.curruser.email, 'uid': widget.curruser.uid});
-        if (response.statusCode == 200) {
-          logic.displayErrorSnackBar(
-              "Seller registration was successful!", context);
-        } else {
-          logic.displayErrorSnackBar(
-              "There was an error with the seller registration, try again or contact us",
-              context);
-        }
       }
     } catch (e) {}
   }

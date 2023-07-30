@@ -208,31 +208,31 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+  Future<void> searchnav(String interest) async {
+    try {
+      List<Event> interesteventlist = [];
+      interesteventlist = await db.getLngLatEventsByInterest(
+          widget.curruserlocation.center[0],
+          widget.curruserlocation.center[1],
+          interest,
+          widget.curruser);
+      await widget.analytics
+          .logEvent(name: "go_to_interest_search_screen", parameters: {
+        "interest": interest,
+        "inuserinterests":
+            (widget.curruser.interests.contains(interest)).toString(),
+        "userclout": widget.curruser.clout
+      });
+      gotointerestsearchscreen(interest, interesteventlist);
+    } catch (e) {
+      logic.displayErrorSnackBar("Could not display events", context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenheight = MediaQuery.of(context).size.height;
     double screenwidth = MediaQuery.of(context).size.width;
-
-    Future<void> searchnav(String interest) async {
-      try {
-        List<Event> interesteventlist = [];
-        interesteventlist = await db.getLngLatEventsByInterest(
-            widget.curruserlocation.center[0],
-            widget.curruserlocation.center[1],
-            interest,
-            widget.curruser);
-        await widget.analytics
-            .logEvent(name: "go_to_interest_search_screen", parameters: {
-          "interest": interest,
-          "inuserinterests":
-              (widget.curruser.interests.contains(interest)).toString(),
-          "userclout": widget.curruser.clout
-        });
-        gotointerestsearchscreen(interest, interesteventlist);
-      } catch (e) {
-        logic.displayErrorSnackBar("Could not display events", context);
-      }
-    }
 
     return Scaffold(
         backgroundColor: Colors.white,
