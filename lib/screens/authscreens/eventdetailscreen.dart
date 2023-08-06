@@ -152,16 +152,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   void checkifjoined() async {
     bool found = false;
-    for (int i = 0; i < widget.participants.length; i++) {
-      if (widget.participants[i].username == widget.curruser.username) {
-        setState(() {
-          found = true;
-          joined = true;
-        });
-      }
+    if (widget.event.participants.contains(widget.curruser.uid)) {
+      setState(() {
+        found = true;
+        joined = true;
+      });
     }
     if (found) {
-      if (widget.curruser.username == widget.event.host) {
+      if (widget.curruser.uid == widget.event.hostdocid) {
         setState(() {
           joinedval = "Delete Event";
         });
@@ -180,13 +178,25 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         });
       } else {
         if (widget.event.paid) {
-          setState(() {
-            joinedval = "Join - ${widget.event.fee} ${widget.event.currency}";
-          });
+          if (widget.curruser.plan == "business") {
+            setState(() {
+              joinedval = "Cannot Join";
+            });
+          } else {
+            setState(() {
+              joinedval = "Join - ${widget.event.fee} ${widget.event.currency}";
+            });
+          }
         } else {
-          setState(() {
-            joinedval = "Join";
-          });
+          if (widget.curruser.plan == "business") {
+            setState(() {
+              joinedval = "Cannot Join";
+            });
+          } else {
+            setState(() {
+              joinedval = "Join";
+            });
+          }
         }
       }
     }
@@ -201,12 +211,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void updatescreen(eventid) async {
     try {
       Event updatedevent = await db.getEventfromDocId(eventid);
+      List<AppUser> temp = await db.geteventparticipantslist(widget.event);
+      await Future.delayed(const Duration(milliseconds: 50));
       setState(() {
         widget.event = updatedevent;
-      });
-      List<AppUser> temp = await db.geteventparticipantslist(widget.event);
-      await Future.delayed(Duration(milliseconds: 50));
-      setState(() {
         widget.participants = temp;
       });
       checkifjoined();
@@ -296,27 +304,30 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   void interactevent(context) async {
     if (!joined && joinedval.startsWith("Join")) {
-      if (widget.event.paid) {
-        await initPaymentandJoin();
-      } else {
-        try {
-          setState(() {
-            buttonpressed = true;
-          });
-          await db.joinevent(widget.event, widget.curruser, widget.event.docid);
-          await widget.analytics.logEvent(name: "joined_event", parameters: {
-            "interest": widget.event.interest,
-            "inviteonly": widget.event.isinviteonly.toString(),
-            "maxparticipants": widget.event.maxparticipants,
-            "currentparticipants": widget.event.participants.length
-          });
-        } catch (e) {
-          displayErrorSnackBar("Could not join event");
-        } finally {
-          setState(() {
-            buttonpressed = false;
-          });
-          updatescreen(widget.event.docid);
+      if (widget.curruser.plan != "business") {
+        if (widget.event.paid) {
+          await initPaymentandJoin();
+        } else {
+          try {
+            setState(() {
+              buttonpressed = true;
+            });
+            await db.joinevent(
+                widget.event, widget.curruser, widget.event.docid);
+            await widget.analytics.logEvent(name: "joined_event", parameters: {
+              "interest": widget.event.interest,
+              "inviteonly": widget.event.isinviteonly.toString(),
+              "maxparticipants": widget.event.maxparticipants,
+              "currentparticipants": widget.event.participants.length
+            });
+          } catch (e) {
+            displayErrorSnackBar("Could not join event");
+          } finally {
+            setState(() {
+              buttonpressed = false;
+            });
+            updatescreen(widget.event.docid);
+          }
         }
       }
     } else if ((!joined && joinedval == "Full") || joinedval == "Finished") {
@@ -853,56 +864,56 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         });
   }
 
+  void shareeventfinal() async {
+    String link = await createShareLink();
+    shareevent("Join ${widget.event.title} on Clout!\n\n$link");
+  }
+
+  Future<bool> sendevent() async {
+    try {
+      for (int i = 0; i < selectedsenders.length; i++) {
+        bool userchatexists = await db.checkuserchatexists(
+            widget.curruser.uid, selectedsenders[i]);
+
+        if (!userchatexists) {
+          await db.createuserchat(widget.curruser, selectedsenders[i]);
+        }
+
+        Chat userchat = await db.getUserChatFromParticipants(
+            widget.curruser.uid, selectedsenders[i]);
+
+        List temp = userchat.chatname;
+        temp.removeWhere((element) => element == widget.curruser.username);
+        String chatname = temp[0];
+        db.sendmessage(
+            widget.event.docid,
+            widget.curruser,
+            userchat.chatid,
+            chatname,
+            userchat.type,
+            "event",
+            widget.event.image,
+            widget.event.title,
+            widget.event.datetime);
+      }
+      setState(() {
+        selectedsenders = [];
+      });
+      return true;
+    } catch (e) {
+      setState(() {
+        selectedsenders = [];
+      });
+      return false;
+    }
+  }
+
   Future<dynamic> showsharebottomsheet(
       BuildContext context,
       double screenheight,
       double screenwidth,
       List<AppUser> chatusers,
       shareevent) {
-    void shareeventfinal() async {
-      String link = await createShareLink();
-      shareevent("Join ${widget.event.title} on Clout!\n\n$link");
-    }
-
-    Future<bool> sendevent() async {
-      try {
-        for (int i = 0; i < selectedsenders.length; i++) {
-          bool userchatexists = await db.checkuserchatexists(
-              widget.curruser.uid, selectedsenders[i]);
-
-          if (!userchatexists) {
-            await db.createuserchat(widget.curruser, selectedsenders[i]);
-          }
-
-          Chat userchat = await db.getUserChatFromParticipants(
-              widget.curruser.uid, selectedsenders[i]);
-
-          List temp = userchat.chatname;
-          temp.removeWhere((element) => element == widget.curruser.username);
-          String chatname = temp[0];
-          db.sendmessage(
-              widget.event.docid,
-              widget.curruser,
-              userchat.chatid,
-              chatname,
-              userchat.type,
-              "event",
-              widget.event.image,
-              widget.event.title,
-              widget.event.datetime);
-        }
-        setState(() {
-          selectedsenders = [];
-        });
-        return true;
-      } catch (e) {
-        setState(() {
-          selectedsenders = [];
-        });
-        return false;
-      }
-    }
-
     return showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context,

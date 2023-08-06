@@ -1,7 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const axios = require('axios');
-const { FieldValue } = require("firebase-admin/firestore");
 const stripe = require("stripe")(functions.config().stripe.testkey)
 admin.initializeApp();
 const db = admin.firestore();
@@ -345,7 +344,7 @@ exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) 
         const ephemeralKey = await stripe.ephemeralKeys.create(
             { customer: customerId },
             { apiVersion: '2020-08-27' }
-        )
+        );
 
         //Creates a new payment intent with amount passed in from the client
         const paymentIntent = await stripe.paymentIntents.create({
@@ -358,17 +357,17 @@ exports.stripePaymentIntentRequest = functions.https.onRequest(async (req, res) 
                 destination: req.body.sellerstripebusinessid,
               },
             metadata: {'eventid': req.body.eventid, 'user_uid':req.body.uid, 'seller_uid': req.body.selleruid}
-        })
+        });
 
         res.status(200).send({
             paymentIntent: paymentIntent.client_secret,
             ephemeralKey: ephemeralKey.secret,
             customer: customerId,
             success: true,
-        })
+        });
         
     } catch (error) {
-        res.status(404).send({ success: false, error: error.message })
+        res.status(400).send({ success: false, error: error.message });
     }
 });
 
@@ -391,6 +390,127 @@ exports.stripeUpdatedAccountWebHook = functions.https.onRequest(async (req, res)
     const dataObject = event.data.object;
 
     await db.collection("users").doc(dataObject.metadata.uid).set({'stripe_account_id':dataObject.id, 'stripe_seller_country': dataObject.country}, { merge: true });
+    } catch(e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+    res.sendStatus(200);
+});
+
+exports.stripeCreateCheckoutSession = functions.https.onRequest(async (req, res) => {
+    const { method } = req
+    try {
+    let customerId;
+    let found = false;
+
+    //Gets the customer who's email id matches the one sent by the client
+    const customerList = await stripe.customers.list();
+
+    for (let i = 0; i<customerList.data.length; i++) {
+        if(customerList.data[i].metadata.uid == req.body.uid) {
+            customerId = customerList.data[i].id;
+            found = true;
+        }
+    }
+            
+    //Checks the if the customer exists, if not creates a new customer
+    if (!found) {
+        const customer = await stripe.customers.create({
+            metadata: {'uid':req.body.uid},
+            name: req.body.name,
+        });
+        customerId = customer.data.id;
+    }
+
+    //Creates a temporary secret key linked with the customer 
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+        { customer: customerId },
+        { apiVersion: '2020-08-27' }
+    );
+
+    const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        success_url: req.body.success_url,
+        cancel_url: req.body.success_url,
+        line_items: [
+            {price_data: {
+                currency: req.body.currency,
+                unit_amount: parseInt(req.body.finalamount),
+                product_data: {name: 'Event'}
+            },
+            quantity: 1,
+        }],
+        customer: customerId,
+        metadata:{'eventid': req.body.eventid, 'useruid':req.body.uid, 'selleruid': req.body.selleruid},
+        payment_intent_data: {
+            transfer_data: {
+                amount: parseInt(req.body.businessamount),
+                destination: req.body.sellerstripebusinessid,
+            }
+        }
+    });
+    res.status(200).send({url:session.url});
+    } catch(e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+});
+
+exports.stripeJoinEventWebHook = functions.https.onRequest(async (req, res) => {
+    let stripeevent;
+
+    try {
+    const whSec = functions.config().stripe.joineventwebhooksecret;
+
+    stripeevent = stripe.webhooks.constructEvent(
+        req.rawBody,
+        req.headers['stripe-signature'],
+        whSec
+    );
+    } catch(e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+    try {
+        const dataObject = stripeevent.data.object;
+        console.log(dataObject);
+        console.log(dataObject.metadata.useruid);
+        console.log(dataObject.metadata.eventid);
+        const eventSnapshot = await db.collection("events").doc(dataObject.metadata.eventid).get();
+        eventdata = eventSnapshot.data()
+
+        if (eventdata.participants.length + 1 > eventdata.maxparticipants) {
+            throw new Error('Too many participants');
+        } else {
+            const userSnapshot = await db.collection("users").doc(dataObject.metadata.useruid).get();
+            userdata = userSnapshot.data()
+            await db.collection("users").doc(dataObject.metadata.useruid).set({'joined_events': admin.firestore.FieldValue.arrayUnion(dataObject.metadata.eventid)}, {merge: true});
+            await db.collection("events").doc(dataObject.metadata.eventid).set({'participants': admin.firestore.FieldValue.arrayUnion(dataObject.metadata.useruid)}, {merge: true});
+            await db.collection("updates").add({
+                'target': [eventdata.hostdocid],
+                'description':
+                    userdata.fullname + ' joined your your event: ' + eventdata.title,
+                'notification':
+                    '@' + userdata.username +' joined your your event: ' + eventdata.title,
+                'eventid': dataObject.metadata.eventid,
+                'userid': dataObject.metadata.useruid,
+                'type': 'joined'
+              });
+              await db.collection("users").doc(dataObject.metadata.useruid).set({'chats': admin.firestore.FieldValue.arrayUnion(eventdata.chatid),'visiblechats': admin.firestore.FieldValue.arrayUnion(eventdata.chatid)}, {merge: true});
+              await db.collection("chats").doc(eventdata.chatid).set({'participants': admin.firestore.FieldValue.arrayUnion(dataObject.metadata.useruid)}, {merge: true});
+              if (eventdata.showparticipants) {
+                await db.collection("chats").doc(eventdata.chatid).collection('messages').add({
+                  'content': userdata.username + " joined the event",
+                  'sender': 'server',
+                  'timestamp': admin.firestore.Timestamp.now(),
+                  "type": "text"
+                });
+                await db.collection("chats").doc(eventdata.chatid).update({
+                  'mostrecentmessage': userdata.username + " joined the event",
+                  "lastmessagetime": admin.firestore.Timestamp.now()
+                });
+              }
+        }
     } catch(e) {
         console.log(e);
         res.sendStatus(400);

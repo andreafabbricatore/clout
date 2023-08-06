@@ -65,7 +65,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   Future<void> finishloading(AppUser curruser) async {
     try {
-      if (curruser.setnameandpfp == false) {
+      if (!curruser.setnameandpfp) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -76,7 +76,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
               settings: const RouteSettings(name: "PicandNameScreen"),
               fullscreenDialog: true),
         );
-      } else if (curruser.setusername == false) {
+      } else if (!curruser.setusername) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -87,7 +87,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
               settings: const RouteSettings(name: "UsernameScreen"),
               fullscreenDialog: true),
         );
-      } else if (curruser.setmisc == false) {
+      } else if (!curruser.setmisc) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -97,8 +97,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
               settings: const RouteSettings(name: "MiscScreen"),
               fullscreenDialog: true),
         );
-      } else if (curruser.plan != "business" &&
-          curruser.setinterests == false) {
+      } else if (curruser.incompletewebsignup) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => WebFinishScreen(
+                    analytics: widget.analytics,
+                  ),
+              settings: const RouteSettings(name: "WebFinishScreen"),
+              fullscreenDialog: true),
+        );
+      } else if (curruser.plan != "business" && !curruser.setinterests) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -131,7 +140,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<void> newgetUserAppLocation() async {
-    //broken
     String url =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=${_userLocation?.latitude},${_userLocation?.longitude}&result_type=country&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
     url = Uri.parse(url).toString();
@@ -259,6 +267,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     try {
       await ensurelocation();
       await undermaintenance();
+      await db.addAttributetoAllDocuments();
       if (!maintenance) {
         await needupdate();
         if (!update) {

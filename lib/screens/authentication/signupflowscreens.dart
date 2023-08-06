@@ -2288,3 +2288,674 @@ class _InterestScreenState extends State<InterestScreen> {
     );
   }
 }
+
+class WebFinishScreen extends StatefulWidget {
+  WebFinishScreen({super.key, required this.analytics});
+  FirebaseAnalytics analytics;
+  @override
+  State<WebFinishScreen> createState() => _WebFinishScreenState();
+}
+
+class _WebFinishScreenState extends State<WebFinishScreen> {
+  String gender = 'Male';
+  String nationality = 'Australia';
+  db_conn db = db_conn();
+  bool cancelbuttonpressed = false;
+  bool continuebuttonpressed = false;
+  applogic logic = applogic();
+  ImagePicker picker = ImagePicker();
+  var imagepath;
+  File? compressedimgfile;
+
+  var genders = ['Male', 'Female', 'Non-Binary'];
+  var nations = [
+    'Afghanistan',
+    'Aland Islands',
+    'Albania',
+    'Algeria',
+    'American Samoa',
+    'Andorra',
+    'Angola',
+    'Anguilla',
+    'Antarctica',
+    'Antigua and Barbuda',
+    'Argentina',
+    'Armenia',
+    'Aruba',
+    'Australia',
+    'Austria',
+    'Azerbaijan',
+    'Bahamas',
+    'Bahrain',
+    'Bangladesh',
+    'Barbados',
+    'Belarus',
+    'Belgium',
+    'Belize',
+    'Benin',
+    'Bermuda',
+    'Bhutan',
+    'Bolivia, Plurinational State of',
+    'Bonaire, Sint Eustatius and Saba',
+    'Bosnia and Herzegovina',
+    'Botswana',
+    'Bouvet Island',
+    'Brazil',
+    'British Indian Ocean Territory',
+    'Brunei Darussalam',
+    'Bulgaria',
+    'Burkina Faso',
+    'Burundi',
+    'Cambodia',
+    'Cameroon',
+    'Canada',
+    'Cape Verde',
+    'Cayman Islands',
+    'Central African Republic',
+    'Chad',
+    'Chile',
+    'China',
+    'Christmas Island',
+    'Cocos (Keeling) Islands',
+    'Colombia',
+    'Comoros',
+    'Congo',
+    'Congo, The Democratic Republic of the',
+    'Cook Islands',
+    'Costa Rica',
+    "Côte d'Ivoire",
+    'Croatia',
+    'Cuba',
+    'Curaçao',
+    'Cyprus',
+    'Czech Republic',
+    'Denmark',
+    'Djibouti',
+    'Dominica',
+    'Dominican Republic',
+    'Ecuador',
+    'Egypt',
+    'El Salvador',
+    'Equatorial Guinea',
+    'Eritrea',
+    'Estonia',
+    'Ethiopia',
+    'Falkland Islands (Malvinas)',
+    'Faroe Islands',
+    'Fiji',
+    'Finland',
+    'France',
+    'French Guiana',
+    'French Polynesia',
+    'French Southern Territories',
+    'Gabon',
+    'Gambia',
+    'Georgia',
+    'Germany',
+    'Ghana',
+    'Gibraltar',
+    'Greece',
+    'Greenland',
+    'Grenada',
+    'Guadeloupe',
+    'Guam',
+    'Guatemala',
+    'Guernsey',
+    'Guinea',
+    'Guinea-Bissau',
+    'Guyana',
+    'Haiti',
+    'Heard Island and McDonald Islands',
+    'Holy See (Vatican City State)',
+    'Honduras',
+    'Hong Kong',
+    'Hungary',
+    'Iceland',
+    'India',
+    'Indonesia',
+    'Iran, Islamic Republic of',
+    'Iraq',
+    'Ireland',
+    'Isle of Man',
+    'Israel',
+    'Italy',
+    'Jamaica',
+    'Japan',
+    'Jersey',
+    'Jordan',
+    'Kazakhstan',
+    'Kenya',
+    'Kiribati',
+    "Korea, Democratic People's Republic of",
+    'Korea, Republic of',
+    'Kuwait',
+    'Kyrgyzstan',
+    "Lao People's Democratic Republic",
+    'Latvia',
+    'Lebanon',
+    'Lesotho',
+    'Liberia',
+    'Libya',
+    'Liechtenstein',
+    'Lithuania',
+    'Luxembourg',
+    'Macao',
+    'Macedonia, Republic of',
+    'Madagascar',
+    'Malawi',
+    'Malaysia',
+    'Maldives',
+    'Mali',
+    'Malta',
+    'Marshall Islands',
+    'Martinique',
+    'Mauritania',
+    'Mauritius',
+    'Mayotte',
+    'Mexico',
+    'Micronesia, Federated States of',
+    'Moldova, Republic of',
+    'Monaco',
+    'Mongolia',
+    'Montenegro',
+    'Montserrat',
+    'Morocco',
+    'Mozambique',
+    'Myanmar',
+    'Namibia',
+    'Nauru',
+    'Nepal',
+    'Netherlands',
+    'New Caledonia',
+    'New Zealand',
+    'Nicaragua',
+    'Niger',
+    'Nigeria',
+    'Niue',
+    'Norfolk Island',
+    'Northern Mariana Islands',
+    'Norway',
+    'Oman',
+    'Pakistan',
+    'Palau',
+    'Palestinian Territory, Occupied',
+    'Panama',
+    'Papua New Guinea',
+    'Paraguay',
+    'Peru',
+    'Philippines',
+    'Pitcairn',
+    'Poland',
+    'Portugal',
+    'Puerto Rico',
+    'Qatar',
+    'Réunion',
+    'Romania',
+    'Russian Federation',
+    'Rwanda',
+    'Saint Barthélemy',
+    'Saint Helena, Ascension and Tristan da Cunha',
+    'Saint Kitts and Nevis',
+    'Saint Lucia',
+    'Saint Martin (French part)',
+    'Saint Pierre and Miquelon',
+    'Saint Vincent and the Grenadines',
+    'Samoa',
+    'San Marino',
+    'Sao Tome and Principe',
+    'Saudi Arabia',
+    'Senegal',
+    'Serbia',
+    'Seychelles',
+    'Sierra Leone',
+    'Singapore',
+    'Sint Maarten (Dutch part)',
+    'Slovakia',
+    'Slovenia',
+    'Solomon Islands',
+    'Somalia',
+    'South Africa',
+    'South Georgia and the South Sandwich Islands',
+    'Spain',
+    'Sri Lanka',
+    'Sudan',
+    'Suriname',
+    'South Sudan',
+    'Svalbard and Jan Mayen',
+    'Swaziland',
+    'Sweden',
+    'Switzerland',
+    'Syrian Arab Republic',
+    'Taiwan, Province of China',
+    'Tajikistan',
+    'Tanzania, United Republic of',
+    'Thailand',
+    'Timor-Leste',
+    'Togo',
+    'Tokelau',
+    'Tonga',
+    'Trinidad and Tobago',
+    'Tunisia',
+    'Turkey',
+    'Turkmenistan',
+    'Turks and Caicos Islands',
+    'Tuvalu',
+    'Uganda',
+    'Ukraine',
+    'United Arab Emirates',
+    'United Kingdom',
+    'United States',
+    'United States Minor Outlying Islands',
+    'Uruguay',
+    'Uzbekistan',
+    'Vanuatu',
+    'Venezuela, Bolivarian Republic of',
+    'Viet Nam',
+    'Virgin Islands, British',
+    'Virgin Islands, U.S.',
+    'Wallis and Futuna',
+    'Yemen',
+    'Zambia',
+    'Zimbabwe'
+  ];
+
+  Future<File> CompressAndGetFile(File file) async {
+    try {
+      final filePath = file.absolute.path;
+      final lastIndex = filePath.lastIndexOf(".");
+      final splitted = filePath.substring(0, (lastIndex));
+      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+      var result = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 5,
+      );
+
+      //print(file.lengthSync());
+      //print(result!.lengthSync());
+      return File(result!.path);
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  void goauthscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "AuthScreen")),
+    );
+  }
+
+  void gointerestscreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => InterestScreen(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: RouteSettings(name: "InterestScreen")),
+    );
+  }
+
+  void cancelsignupdialog(
+      double screenheight, double screenwidth, String verificationId) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  height: screenheight * 0.3,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter Code to Cancel",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.02,
+                        ),
+                        Center(
+                          child: SizedBox(
+                            width: screenwidth * 0.6,
+                            child: Pinput(
+                              length: 6,
+                              pinAnimationType: PinAnimationType.slide,
+                              showCursor: true,
+                              focusedPinTheme: PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(
+                                      fontSize: 25,
+                                      color: Theme.of(context).primaryColor)),
+                              defaultPinTheme: const PinTheme(
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5,
+                                          color: Color.fromARGB(
+                                              255, 151, 149, 149)),
+                                    ),
+                                  ),
+                                  textStyle: TextStyle(fontSize: 25)),
+                              onCompleted: (String verificationCode) async {
+                                try {
+                                  PhoneAuthCredential credential =
+                                      PhoneAuthProvider.credential(
+                                          verificationId: verificationId,
+                                          smsCode: verificationCode);
+                                  //link credential
+                                  UserCredential usercredential =
+                                      await FirebaseAuth.instance
+                                          .signInWithCredential(credential);
+                                } catch (e) {
+                                  logic.displayErrorSnackBar(
+                                      "Make sure OTP code was inserted correctly.",
+                                      context);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.05,
+                        ),
+                        GestureDetector(
+                            onTap: cancelbuttonpressed
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      cancelbuttonpressed = true;
+                                    });
+                                    try {
+                                      await db.cancelsignup(FirebaseAuth
+                                          .instance.currentUser!.uid);
+                                      await FirebaseAuth.instance.currentUser!
+                                          .delete();
+
+                                      goauthscreen();
+                                    } catch (e) {
+                                      logic.displayErrorSnackBar(
+                                          "Could not cancel signup", context);
+                                    } finally {
+                                      setState(() {
+                                        cancelbuttonpressed = false;
+                                      });
+                                    }
+                                  },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: cancelbuttonpressed,
+                                text: "Cancel Sign Up",
+                                buttonwidth: screenwidth * 0.5,
+                                bold: false)),
+                      ]),
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
+    final screenheight = MediaQuery.of(context).size.height;
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () async {
+            await FirebaseAuth.instance.verifyPhoneNumber(
+              phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber,
+              verificationCompleted: (PhoneAuthCredential credential) {},
+              verificationFailed: (FirebaseAuthException e) {
+                logic.displayErrorSnackBar(
+                    "Could not verify phone number", context);
+              },
+              codeSent: (String verificationId, int? resendToken) {
+                cancelsignupdialog(screenheight, screenwidth, verificationId);
+              },
+              codeAutoRetrievalTimeout: (String verificationId) {},
+            );
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        title: Text(
+          "Finish Signup",
+          style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 30),
+        ),
+        backgroundColor: Colors.white,
+        shadowColor: Colors.white,
+        elevation: 0.0,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: Row(
+              children: [
+                Container(
+                  width: screenwidth * 0.5,
+                  color: Theme.of(context).primaryColor,
+                  height: 4.0,
+                ),
+                SizedBox(
+                  width: screenwidth * 0.5,
+                  height: 4.0,
+                )
+              ],
+            )),
+      ),
+      body: SingleChildScrollView(
+          child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: screenheight * 0.1),
+            const Center(
+              child: Text(
+                "Upload Profile Picture",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
+                textScaleFactor: 1.0,
+              ),
+            ),
+            SizedBox(
+              height: screenheight * 0.03,
+            ),
+            Center(
+                child: GestureDetector(
+                    onTap: () async {
+                      XFile? image =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        setState(() {
+                          imagepath = File(image.path);
+                        });
+                      }
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: imagepath != null
+                          ? Image.file(
+                              imagepath,
+                              fit: BoxFit.cover,
+                              height: screenheight * 0.2,
+                              width: screenheight * 0.2,
+                            )
+                          : Container(
+                              color: Theme.of(context).primaryColor,
+                              height: screenheight * 0.2,
+                              width: screenheight * 0.2,
+                              child: Icon(
+                                Icons.upload_rounded,
+                                color: Colors.white,
+                                size: screenheight * 0.18,
+                              ),
+                            ),
+                    ))),
+            SizedBox(height: screenheight * 0.05),
+            SizedBox(
+              width: screenwidth * 0.6,
+              child: DropdownButtonFormField(
+                borderRadius: BorderRadius.circular(20),
+                decoration: InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor))),
+                value: gender,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    gender = newValue!;
+                  });
+                },
+                onSaved: (String? newValue) {
+                  setState(() {
+                    gender = newValue!;
+                  });
+                },
+                items: genders.map((String items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items),
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: screenheight * 0.02),
+            SizedBox(
+              width: screenwidth * 0.6,
+              child: DropdownButtonFormField(
+                borderRadius: BorderRadius.circular(20),
+                decoration: InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                )),
+                value: nationality,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    nationality = newValue!;
+                  });
+                },
+                onSaved: (String? newValue) {
+                  setState(() {
+                    nationality = newValue!;
+                  });
+                },
+                items: nations.map((String items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items),
+                  );
+                }).toList(),
+                isExpanded: true,
+              ),
+            ),
+            SizedBox(
+              height: screenheight * 0.1,
+            ),
+            GestureDetector(
+              onTap: continuebuttonpressed
+                  ? null
+                  : () async {
+                      setState(() {
+                        continuebuttonpressed = true;
+                      });
+                      bool compressedimgpathgood = false;
+                      if (imagepath != null) {
+                        try {
+                          compressedimgfile =
+                              await CompressAndGetFile(imagepath);
+                          setState(() {
+                            compressedimgpathgood = true;
+                          });
+                        } catch (e) {
+                          logic.displayErrorSnackBar(
+                              "Error with profile picture, might be an invalid format",
+                              context);
+                        }
+                        if (compressedimgpathgood) {
+                          try {
+                            await db.changepfp(compressedimgfile!,
+                                FirebaseAuth.instance.currentUser!.uid);
+                            await db.changeattribute('gender', gender,
+                                FirebaseAuth.instance.currentUser!.uid);
+                            await db.changeattribute('nationality', nationality,
+                                FirebaseAuth.instance.currentUser!.uid);
+                            await db.changeattributebool('incompletewebsignup',
+                                false, FirebaseAuth.instance.currentUser!.uid);
+                            gointerestscreen();
+                          } catch (e) {
+                            logic.displayErrorSnackBar(
+                                "Could not proceed with signup, please check internet connection and try again",
+                                context);
+                          }
+                        }
+                      } else {
+                        logic.displayErrorSnackBar(
+                            "Please upload Profile Picture", context);
+                      }
+                      setState(() {
+                        continuebuttonpressed = false;
+                      });
+                    },
+              child: PrimaryButton(
+                screenwidth: screenwidth,
+                buttonpressed: continuebuttonpressed,
+                text: "Continue",
+                buttonwidth: screenwidth * 0.6,
+                bold: false,
+              ),
+            )
+          ],
+        ),
+      )),
+    );
+  }
+}

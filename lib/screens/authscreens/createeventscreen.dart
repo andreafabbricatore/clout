@@ -658,7 +658,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
             ],
           ),
-          widget.curruser.plan == "business"
+          widget.curruser.plan == "business" &&
+                  widget.curruser.stripeaccountid != ""
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -685,69 +686,75 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   ],
                 )
               : Container(),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Expanded(
-                flex: 2,
-                child: TextFormField(
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 15,
-                  ),
-                  decoration: InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor)),
-                    hintText: "Price to join",
-                    hintStyle: const TextStyle(
-                      color: Color.fromARGB(39, 0, 0, 0),
-                      fontSize: 15,
-                    ),
-                  ),
-                  textAlign: TextAlign.start,
-                  enableSuggestions: true,
-                  autocorrect: true,
-                  controller: feecontroller,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: DropdownButtonFormField(
-                  borderRadius: BorderRadius.circular(20),
-                  decoration: InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor),
-                  )),
-                  value: currency,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      currency = newValue!;
-                    });
-                  },
-                  onSaved: (String? newValue) {
-                    setState(() {
-                      currency = newValue!;
-                    });
-                  },
-                  items:
-                      ['EUR', 'USD', 'GBP', 'AUD', 'MXN'].map((String items) {
-                    return DropdownMenuItem(
-                      value: items,
-                      child: Text(
-                        items,
-                        style: const TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.w300),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ]),
-          ),
+          widget.curruser.plan == "business" &&
+                  widget.curruser.stripeaccountid != ""
+              ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenwidth * 0.2),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextFormField(
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 15,
+                            ),
+                            decoration: InputDecoration(
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColor)),
+                              hintText: "Price to join",
+                              hintStyle: const TextStyle(
+                                color: Color.fromARGB(39, 0, 0, 0),
+                                fontSize: 15,
+                              ),
+                            ),
+                            textAlign: TextAlign.start,
+                            enableSuggestions: true,
+                            autocorrect: true,
+                            controller: feecontroller,
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: DropdownButtonFormField(
+                            borderRadius: BorderRadius.circular(20),
+                            decoration: InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).primaryColor),
+                            )),
+                            value: currency,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                currency = newValue!;
+                              });
+                            },
+                            onSaved: (String? newValue) {
+                              setState(() {
+                                currency = newValue!;
+                              });
+                            },
+                            items: ['EUR', 'USD', 'GBP', 'AUD', 'MXN']
+                                .map((String items) {
+                              return DropdownMenuItem(
+                                value: items,
+                                child: Text(
+                                  items,
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ]),
+                )
+              : Container(),
           //currency box
           SizedBox(
             height: screenheight * 0.03,
@@ -806,7 +813,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           event.showparticipants = !hideparticipants;
                           event.showlocation = !secretlocation;
                           event.paid = paidevent;
-                          event.fee = int.parse(feecontroller.text.trim());
+                          event.fee = paidevent
+                              ? int.parse(feecontroller.text.trim())
+                              : 0;
                           event.currency = currency;
                         });
                         try {

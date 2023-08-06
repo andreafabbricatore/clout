@@ -99,6 +99,7 @@ class db_conn {
         'setusername': false,
         'setmisc': false,
         'setinterests': false,
+        'incompletewebsignup': false,
         'lastknownloc': loc.data,
         'lastknownlat': 0.1,
         'lastknownlng': 0.1,
@@ -150,6 +151,7 @@ class db_conn {
         'setusername': false,
         'setmisc': false,
         'setinterests': false,
+        'incompletewebsignup': false,
         'lastknownloc': loc.data,
         'lastknownlat': 0.1,
         'lastknownlng': 0.1,
@@ -1696,9 +1698,9 @@ class db_conn {
     await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users.doc(element.id).set(
-                  {'stripe_account_id': '', 'stripe_seller_country': ''},
-                  SetOptions(merge: true));
+              await users
+                  .doc(element.id)
+                  .set({'incompletewebsignup': false}, SetOptions(merge: true));
             },
           ),
         );

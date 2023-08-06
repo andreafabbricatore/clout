@@ -27,6 +27,7 @@ class AppUser {
   bool setusername;
   bool setmisc;
   bool setinterests;
+  bool incompletewebsignup;
   double lastknownlat;
   double lastknownlng;
   int notificationcounter;
@@ -64,6 +65,7 @@ class AppUser {
       required this.setusername,
       required this.setmisc,
       required this.setinterests,
+      required this.incompletewebsignup,
       required this.lastknownlat,
       required this.lastknownlng,
       required this.notificationcounter,
@@ -103,6 +105,7 @@ class AppUser {
         setnameandpfp: json['setnameandpfp'] as bool,
         setusername: json['setusername'] as bool,
         setmisc: json['setmisc'] as bool,
+        incompletewebsignup: json['incompletewebsignup'] as bool,
         setinterests: json['setinterests'] as bool,
         lastknownlat: json['lastknownlat'],
         lastknownlng: json['lastknownlng'],

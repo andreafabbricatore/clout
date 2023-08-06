@@ -82,7 +82,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                       alignment: Alignment.centerLeft,
                       child: SpinKitThreeInOut(
                         color: Colors.white,
-                        size: widget.screenwidth * 0.04,
+                        size: widget.screenwidth * 0.04, //14?
                       ),
                     ));
               })
