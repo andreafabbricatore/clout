@@ -1706,6 +1706,46 @@ class db_conn {
         );
   }
 
+  Future<void> addeventAttributetoAllDocuments() async {
+    await events.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              await events.doc(element.id).set(
+                  {'paid': false, 'currency': '', 'fee': 0},
+                  SetOptions(merge: true));
+            },
+          ),
+        );
+  }
+
+  Future<void> addstripeAttributetoAllDocuments() async {
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              await users.doc(element.id).set({
+                'stripe_account_id': '',
+                'stripe_seller_country': '',
+              }, SetOptions(merge: true));
+            },
+          ),
+        );
+  }
+
+  Future<void> addlocAttributetoAllDocuments() async {
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              GeoFirePoint lastknownloc = geo.point(
+                  latitude: element['lastknownlat'],
+                  longitude: element['lastknownlng']);
+              await users.doc(element.id).set({
+                'lastknownloc': lastknownloc.data,
+              }, SetOptions(merge: true));
+            },
+          ),
+        );
+  }
+
   Future sendmessage(
       String content,
       AppUser sender,

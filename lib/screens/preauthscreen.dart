@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/screens/authentication/authscreen.dart';
+import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -15,6 +16,7 @@ class PreAuthScreen extends StatefulWidget {
 
 class _PreAuthScreenState extends State<PreAuthScreen> {
   //PreAuthScreen({super.key});
+  db_conn db = db_conn();
   final controller = PageController(initialPage: 0);
   bool buttonpressed = false;
   int currpage = 1;
