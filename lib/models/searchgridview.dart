@@ -36,7 +36,7 @@ class SearchGridView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: GridView.builder(
-        padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+        padding: const EdgeInsets.fromLTRB(0, 16, 0, 80),
         gridDelegate:
             const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         shrinkWrap: true,

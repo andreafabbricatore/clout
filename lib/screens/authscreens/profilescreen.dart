@@ -370,14 +370,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 (screenheight * 0.1 + 210.0)) >
                         screenheight
                     ? screenheight * 0.4 +
-                        (joinedEvents.length * (screenheight * 0.1 + 210.0))
+                        (joinedEvents.length * (screenheight * 0.1 + 210.0)) +
+                        50
                     : screenheight
                 : screenheight * 0.4 +
                             (hostedEvents.length *
                                 (screenheight * 0.1 + 210.0)) >
                         screenheight
                     ? screenheight * 0.4 +
-                        (hostedEvents.length * (screenheight * 0.1 + 210.0))
+                        (hostedEvents.length * (screenheight * 0.1 + 210.0)) +
+                        50
                     : screenheight,
             width: screenwidth,
             child: Column(children: [

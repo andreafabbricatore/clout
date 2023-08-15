@@ -243,179 +243,188 @@ class _MapScreenState extends State<MapScreen> {
                 analytics: widget.analytics,
                 goback: goback,
               )
-            : SlidingUpPanel(
-                minHeight: 130,
-                maxHeight: screenheight * 0.6,
-                defaultPanelState: PanelState.OPEN,
-                backdropColor: Theme.of(context).primaryColor,
-                parallaxEnabled: true,
-                parallaxOffset: 0.2,
-                borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    topLeft: Radius.circular(20)),
-                panel: Column(
-                  children: [
-                    const SizedBox(
-                      height: 15,
+            : Stack(
+                children: [
+                  SlidingUpPanel(
+                    minHeight: 130,
+                    maxHeight: screenheight * 0.6,
+                    defaultPanelState: PanelState.OPEN,
+                    backdropColor: Theme.of(context).primaryColor,
+                    parallaxEnabled: true,
+                    parallaxOffset: 0.2,
+                    borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(20)),
+                    panel: Column(
+                      children: [
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Container(
+                          width: 40,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(10),
+                            color: const Color.fromARGB(60, 0, 0, 0),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        SearchGridView(
+                          interests: interests,
+                          onTap: searchnav,
+                        ),
+                      ],
                     ),
-                    Container(
-                      width: 40,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color.fromARGB(60, 0, 0, 0),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    SearchGridView(
-                      interests: interests,
-                      onTap: searchnav,
-                    ),
-                  ],
-                ),
-                body: Stack(
-                  children: [
-                    GoogleMap(
-                      //Map widget from google_maps_flutter package
-                      myLocationButtonEnabled: false,
-                      markers: Set<Marker>.of(markers.values),
-                      zoomGesturesEnabled: true, //enable Zoom in, out on map
-                      initialCameraPosition: CameraPosition(
-                        //innital position in map
-                        target: LatLng(
-                            widget.curruserlocation.center[1],
-                            widget
-                                .curruserlocation.center[0]), //initial position
-                        zoom: 12.0, //initial zoom level
-                      ),
-
-                      mapType: MapType.normal, //map type
-
-                      onMapCreated: (controller) async {
-                        //method called when map is created
-                        try {
-                          if (widget.curruser.plan != "business") {
-                            List<AppUser> users =
-                                await db.retrievefriendsformap(
-                                    widget.curruser,
-                                    widget.curruserlocation.center[1],
-                                    widget.curruserlocation.center[0]);
-                            List<Event> events = await db.retrieveeventsformap(
+                    body: Stack(
+                      children: [
+                        GoogleMap(
+                          //Map widget from google_maps_flutter package
+                          myLocationButtonEnabled: false,
+                          markers: Set<Marker>.of(markers.values),
+                          zoomGesturesEnabled:
+                              true, //enable Zoom in, out on map
+                          initialCameraPosition: CameraPosition(
+                            //innital position in map
+                            target: LatLng(
                                 widget.curruserlocation.center[1],
-                                widget.curruserlocation.center[0]);
-                            setmarkers(users, events);
-                          } else {
-                            List<Event> events = await db.retrieveeventsformap(
-                                widget.curruserlocation.center[1],
-                                widget.curruserlocation.center[0]);
-                            setmarkers(<AppUser>[], events);
-                          }
-                          setState(() {
-                            mapController = controller;
-                            showbutton = false;
-                          });
-                        } catch (e) {
-                          logic.displayErrorSnackBar(
-                              "Error loading map", context);
-                        }
-                      },
-                      onCameraMove: (position) {
-                        setState(() {
-                          cameraposition = position;
-                          showbutton = true;
-                        });
-                      },
-                    ),
-                    showbutton
-                        ? Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 150),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  try {
-                                    if (widget.curruser.plan != "business") {
-                                      List<AppUser> users =
-                                          await db.retrievefriendsformap(
+                                widget.curruserlocation
+                                    .center[0]), //initial position
+                            zoom: 12.0, //initial zoom level
+                          ),
+
+                          mapType: MapType.normal, //map type
+
+                          onMapCreated: (controller) async {
+                            //method called when map is created
+                            try {
+                              if (widget.curruser.plan != "business") {
+                                List<AppUser> users =
+                                    await db.retrievefriendsformap(
                                         widget.curruser,
-                                        cameraposition!.target.latitude,
-                                        cameraposition!.target.longitude,
-                                      );
-                                      List<Event> events =
-                                          await db.retrieveeventsformap(
-                                        cameraposition!.target.latitude,
-                                        cameraposition!.target.longitude,
-                                      );
-                                      setmarkers(users, events);
-                                    } else {
-                                      List<Event> events =
-                                          await db.retrieveeventsformap(
-                                        cameraposition!.target.latitude,
-                                        cameraposition!.target.longitude,
-                                      );
-                                      setmarkers(<AppUser>[], events);
-                                    }
-                                    setState(() {
-                                      showbutton = false;
-                                    });
-                                  } catch (e) {
-                                    logic.displayErrorSnackBar(
-                                        "Error loading map", context);
-                                  }
-                                },
-                                child: Container(
-                                  width: screenwidth * 0.4,
-                                  height: screenheight * 0.05,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      "Search Area",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                        widget.curruserlocation.center[1],
+                                        widget.curruserlocation.center[0]);
+                                List<Event> events =
+                                    await db.retrieveeventsformap(
+                                        widget.curruserlocation.center[1],
+                                        widget.curruserlocation.center[0]);
+                                setmarkers(users, events);
+                              } else {
+                                List<Event> events =
+                                    await db.retrieveeventsformap(
+                                        widget.curruserlocation.center[1],
+                                        widget.curruserlocation.center[0]);
+                                setmarkers(<AppUser>[], events);
+                              }
+                              setState(() {
+                                mapController = controller;
+                                showbutton = false;
+                              });
+                            } catch (e) {
+                              logic.displayErrorSnackBar(
+                                  "Error loading map", context);
+                            }
+                          },
+                          onCameraMove: (position) {
+                            setState(() {
+                              cameraposition = position;
+                              showbutton = true;
+                            });
+                          },
+                        ),
+                        showbutton
+                            ? Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 150),
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      try {
+                                        if (widget.curruser.plan !=
+                                            "business") {
+                                          List<AppUser> users =
+                                              await db.retrievefriendsformap(
+                                            widget.curruser,
+                                            cameraposition!.target.latitude,
+                                            cameraposition!.target.longitude,
+                                          );
+                                          List<Event> events =
+                                              await db.retrieveeventsformap(
+                                            cameraposition!.target.latitude,
+                                            cameraposition!.target.longitude,
+                                          );
+                                          setmarkers(users, events);
+                                        } else {
+                                          List<Event> events =
+                                              await db.retrieveeventsformap(
+                                            cameraposition!.target.latitude,
+                                            cameraposition!.target.longitude,
+                                          );
+                                          setmarkers(<AppUser>[], events);
+                                        }
+                                        setState(() {
+                                          showbutton = false;
+                                        });
+                                      } catch (e) {
+                                        logic.displayErrorSnackBar(
+                                            "Error loading map", context);
+                                      }
+                                    },
+                                    child: Container(
+                                      width: screenwidth * 0.4,
+                                      height: screenheight * 0.05,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      child: const Center(
+                                        child: Text(
+                                          "Search Area",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          )
-                        : Container(),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding:
-                            EdgeInsets.fromLTRB(0, screenheight * 0.08, 20, 0),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              showsearchscreen = true;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                                color: Colors.white),
-                            width: 50,
-                            height: 50,
-                            child: const Center(
-                              child: Icon(
-                                Icons.search_rounded,
-                                color: Colors.black,
-                                size: 30,
-                              ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.fromLTRB(0, screenheight * 0.08, 20, 0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showsearchscreen = true;
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              color: Colors.white),
+                          width: 50,
+                          height: 50,
+                          child: const Center(
+                            child: Icon(
+                              Icons.search_rounded,
+                              color: Colors.black,
+                              size: 30,
                             ),
                           ),
                         ),
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ));
   }
 }

@@ -169,7 +169,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         curruser: widget.curruser,
                       )
                     : Container()
-                : UserListView(
+                : Expanded(
+                    child: UserListView(
                     userres: searchedusers,
                     onTap: userchatinteract,
                     curruser: widget.curruser,
@@ -178,7 +179,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     showrembutton: false,
                     showsendbutton: false,
                     showfriendbutton: false,
-                  )
+                  ))
           ]),
         ));
   }

@@ -1694,13 +1694,56 @@ class db_conn {
     }
   }
 
-  Future<void> addAttributetoAllDocuments() async {
+  Future<void> addwebsignupAttributetoAllDocuments() async {
     await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users
-                  .doc(element.id)
-                  .set({'incompletewebsignup': false}, SetOptions(merge: true));
+              try {
+                print(element['incompletewebsignup']);
+              } catch (e) {
+                await users.doc(element.id).set(
+                    {'incompletewebsignup': false}, SetOptions(merge: true));
+              }
+            },
+          ),
+        );
+  }
+
+  Future<void> addfriendAttributetoAllDocuments() async {
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              try {
+                print(element['friends']);
+              } catch (e) {
+                List followers = element['followers'] as List;
+                List following = element['following'] as List;
+                List friends = followers;
+                for (int i = 0; i < following.length; i++) {
+                  if (!friends.contains(following[i])) {
+                    friends.add(following[i]);
+                  }
+                }
+                await users
+                    .doc(element.id)
+                    .set({'friends': friends}, SetOptions(merge: true));
+              }
+            },
+          ),
+        );
+  }
+
+  Future<void> addfollowedAttributetoAllDocuments() async {
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              try {
+                print(element['followed_businesses']);
+              } catch (e) {
+                await users
+                    .doc(element.id)
+                    .set({'followed_businesses': []}, SetOptions(merge: true));
+              }
             },
           ),
         );
@@ -1710,9 +1753,13 @@ class db_conn {
     await events.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await events.doc(element.id).set(
-                  {'paid': false, 'currency': '', 'fee': 0},
-                  SetOptions(merge: true));
+              try {
+                print(element['paid']);
+              } catch (e) {
+                await events.doc(element.id).set(
+                    {'paid': false, 'currency': '', 'fee': 0},
+                    SetOptions(merge: true));
+              }
             },
           ),
         );
@@ -1722,10 +1769,46 @@ class db_conn {
     await users.get().then(
           (value) => value.docs.forEach(
             (element) async {
-              await users.doc(element.id).set({
-                'stripe_account_id': '',
-                'stripe_seller_country': '',
-              }, SetOptions(merge: true));
+              try {
+                print(element['stripe_account_id']);
+              } catch (e) {
+                await users.doc(element.id).set({
+                  'stripe_account_id': '',
+                  'stripe_seller_country': '',
+                }, SetOptions(merge: true));
+              }
+            },
+          ),
+        );
+  }
+
+  Future<void> addemailAttributetoAllDocuments() async {
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              try {
+                print(element['email']);
+              } catch (e) {
+                await users
+                    .doc(element.id)
+                    .set({'email': ''}, SetOptions(merge: true));
+              }
+            },
+          ),
+        );
+  }
+
+  Future<void> addreqAttributetoAllDocuments() async {
+    await users.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              try {
+                print(element['requested']);
+              } catch (e) {
+                await users.doc(element.id).set(
+                    {'requested': [], 'requestedby': []},
+                    SetOptions(merge: true));
+              }
             },
           ),
         );
@@ -1740,6 +1823,20 @@ class db_conn {
                   longitude: element['lastknownlng']);
               await users.doc(element.id).set({
                 'lastknownloc': lastknownloc.data,
+              }, SetOptions(merge: true));
+            },
+          ),
+        );
+  }
+
+  Future<void> addeventlocAttributetoAllDocuments() async {
+    await events.get().then(
+          (value) => value.docs.forEach(
+            (element) async {
+              GeoFirePoint loc = geo.point(
+                  latitude: element['lat'], longitude: element['lng']);
+              await events.doc(element.id).set({
+                'loc': loc.data,
               }, SetOptions(merge: true));
             },
           ),

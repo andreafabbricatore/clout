@@ -140,7 +140,7 @@ class _BusinessSignInScreenState extends State<BusinessSignInScreen> {
               ),
             ),
             SizedBox(height: screenheight * 0.02),
-            InkWell(
+            GestureDetector(
                 onTap: signinbuttonpressed
                     ? null
                     : () async {
