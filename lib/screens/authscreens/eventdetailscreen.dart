@@ -272,8 +272,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               applePay: PaymentSheetApplePay(
                 merchantCountryCode: sellerdetails[1],
               ),
-              googlePay:
-                  PaymentSheetGooglePay(merchantCountryCode: sellerdetails[1]),
+              googlePay: PaymentSheetGooglePay(
+                  merchantCountryCode: sellerdetails[1],
+                  currencyCode: widget.event.currency,
+                  testEnv: true),
               style: ThemeMode.light));
       await Stripe.instance
           .presentPaymentSheet()
