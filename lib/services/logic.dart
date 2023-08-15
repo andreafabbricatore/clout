@@ -3,6 +3,7 @@ import 'package:clout/defs/location.dart';
 import 'package:clout/defs/user.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/profilescreen.dart';
+import 'package:clout/screens/unauthscreens/unautheventdetailscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -62,5 +63,23 @@ class applogic {
                   analytics: analytics,
                 ),
             settings: const RouteSettings(name: "EventDetailScreen")));
+  }
+
+  void gounautheventdetailscreen(
+      FirebaseAnalytics analytics,
+      AppLocation curruserlocation,
+      Event chosenEvent,
+      List<AppUser> participants,
+      BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => UnAuthEventDetailScreen(
+                  event: chosenEvent,
+                  participants: participants,
+                  curruserlocation: curruserlocation,
+                  analytics: analytics,
+                ),
+            settings: const RouteSettings(name: "UnAuthEventDetailScreen")));
   }
 }

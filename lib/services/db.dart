@@ -1867,6 +1867,28 @@ class db_conn {
     }
   }
 
+  Future<List<Event>> unauthretrieveeventsformap(double lat, double lng) async {
+    try {
+      GeoFirePoint center = GeoFirePoint(lat, lng);
+      Stream<List<DocumentSnapshot>> stream = geo
+          .collection(
+              collectionRef: events.where('isinviteonly', isEqualTo: false))
+          .within(center: center, radius: 10, field: 'loc');
+      List<Event> res = [];
+      stream.listen((List<DocumentSnapshot> documentList) {
+        for (int i = 0; i < documentList.length; i++) {
+          if (DateTime.now().isBefore(documentList[i]['time'].toDate())) {
+            res.add(Event.fromJson(documentList[i], documentList[i].id));
+          }
+        }
+      });
+      await Future.delayed(const Duration(milliseconds: 50));
+      return res;
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   Future<void> setReadReceipt(String chatid, String readerid) {
     return chats.doc(chatid).set({
       'readby': FieldValue.arrayUnion([readerid])

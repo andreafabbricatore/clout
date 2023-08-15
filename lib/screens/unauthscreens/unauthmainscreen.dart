@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:clout/defs/event.dart';
 import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/screens/unauthscreens/unauthcreateeventscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthfavscreen.dart';
 import 'package:clout/screens/unauthscreens/unauthhomescreen.dart';
 import 'package:clout/screens/unauthscreens/unauthprofilescreen.dart';
 import 'package:clout/screens/unauthscreens/unauthsearchscreen.dart';
 import 'package:clout/services/db.dart';
+import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,6 +37,7 @@ class _UnAuthMainScreenState extends State<UnAuthMainScreen> {
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
   db_conn db = db_conn();
+  applogic logic = applogic();
 
   void parampasser() {
     page = [
@@ -80,6 +84,10 @@ class _UnAuthMainScreenState extends State<UnAuthMainScreen> {
       List<String> splitlink = uri.toString().split("/");
       String id = splitlink.last;
       if (splitlink[splitlink.length - 2] == "event") {
+        Event event = await db.getEventfromDocId(id);
+        List<AppUser> participants = await db.geteventparticipantslist(event);
+        logic.gounautheventdetailscreen(widget.analytics,
+            widget.curruserlocation, event, participants, context);
       } else if (splitlink[splitlink.length - 2] == "user") {}
     } catch (e) {}
   }

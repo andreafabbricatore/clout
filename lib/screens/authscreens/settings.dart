@@ -99,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Enter Code to Delete",
                           style: TextStyle(
                               color: Colors.black,
@@ -577,25 +577,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             height: screenheight * 0.02,
                           ),
                           GestureDetector(
-                            onTap: () async {
-                              await FirebaseAuth.instance.verifyPhoneNumber(
-                                phoneNumber: FirebaseAuth
-                                    .instance.currentUser!.phoneNumber,
-                                verificationCompleted:
-                                    (PhoneAuthCredential credential) {},
-                                verificationFailed: (FirebaseAuthException e) {
-                                  logic.displayErrorSnackBar(
-                                      "Could not verify phone number", context);
-                                },
-                                codeSent:
-                                    (String verificationId, int? resendToken) {
-                                  deleteaccountdialog(screenheight, screenwidth,
-                                      verificationId);
-                                },
-                                codeAutoRetrievalTimeout:
-                                    (String verificationId) {},
-                              );
-                            },
+                            onTap: widget.curruser.plan == "business"
+                                ? () {
+                                    businessdeleteaccountdialog(
+                                        context, screenheight, screenwidth);
+                                  }
+                                : () async {
+                                    await FirebaseAuth.instance
+                                        .verifyPhoneNumber(
+                                      phoneNumber: FirebaseAuth
+                                          .instance.currentUser!.phoneNumber,
+                                      verificationCompleted:
+                                          (PhoneAuthCredential credential) {},
+                                      verificationFailed:
+                                          (FirebaseAuthException e) {
+                                        logic.displayErrorSnackBar(
+                                            "Could not verify phone number",
+                                            context);
+                                      },
+                                      codeSent: (String verificationId,
+                                          int? resendToken) {
+                                        deleteaccountdialog(screenheight,
+                                            screenwidth, verificationId);
+                                      },
+                                      codeAutoRetrievalTimeout:
+                                          (String verificationId) {},
+                                    );
+                                  },
                             child: SizedBox(
                                 height: 50,
                                 width: screenwidth * 0.7,
@@ -628,6 +636,87 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ]),
       ),
     );
+  }
+
+  Future<dynamic> businessdeleteaccountdialog(
+      BuildContext context, double screenheight, double screenwidth) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: Colors.white,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                  height: screenheight * 0.35,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: Column(children: [
+                    const Text("Delete Account",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25)),
+                    SizedBox(
+                      height: screenheight * 0.02,
+                    ),
+                    const Text(
+                      "We hate to see you go...\nEnter Password to permamently delete your account",
+                      style: TextStyle(fontSize: 15),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: screenheight * 0.02,
+                    ),
+                    textdatafield(screenwidth * 0.4, "Enter Password", psw),
+                    SizedBox(
+                      height: screenheight * 0.04,
+                    ),
+                    GestureDetector(
+                        onTap: deletebuttonpressed
+                            ? null
+                            : () async {
+                                setState(() {
+                                  deletebuttonpressed = true;
+                                });
+                                try {
+                                  await FirebaseAuth.instance
+                                      .signInWithEmailAndPassword(
+                                          email: widget.curruser.email,
+                                          password: psw.text.trim());
+                                  await db.deleteuser(widget.curruser);
+                                  await FirebaseAuth.instance.currentUser!
+                                      .delete();
+                                  emailaddress.clear();
+                                  psw.clear();
+                                  newpsw.clear();
+                                  goauthwrapper();
+                                } catch (e) {
+                                  logic.displayErrorSnackBar(
+                                      "Invalid Action, try again", context);
+                                } finally {
+                                  setState(() {
+                                    deletebuttonpressed = false;
+                                  });
+                                }
+                              },
+                        child: PrimaryButton(
+                          bold: false,
+                          screenwidth: screenwidth,
+                          buttonpressed: deletebuttonpressed,
+                          text: "Delete Account :(",
+                          buttonwidth: screenwidth * 0.7,
+                        )),
+                  ]),
+                ),
+              );
+            },
+          );
+        });
   }
 
   Future<dynamic> showchangepswdialog(

@@ -402,7 +402,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             "presentparticipants": widget.event.presentparticipants.length,
           });
           setState(() {
-            qrmessage = "QR code Validated!";
+            qrmessage = "Success!";
           });
           updatescreen(widget.event.docid);
         } else {
@@ -415,7 +415,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             "presentparticipants": widget.event.presentparticipants.length,
           });
           setState(() {
-            qrmessage = "QR code has already been validated";
+            qrmessage = "Already Validated :(";
           });
         }
       } else {
@@ -428,7 +428,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           "presentparticipants": widget.event.presentparticipants.length,
         });
         setState(() {
-          qrmessage = "User is not a participant to this event";
+          qrmessage = "Invalid :(";
         });
       }
     } else {
@@ -440,7 +440,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         "presentparticipants": widget.event.presentparticipants.length,
       });
       setState(() {
-        qrmessage = "Invalid: QR code is not for this event";
+        qrmessage = "Invalid :(";
       });
     }
   }
@@ -609,168 +609,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               ? joinedval == "Finished"
                                   ? () {
                                       Navigator.pop(context);
-                                      showModalBottomSheet(
-                                          backgroundColor: Colors.transparent,
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return StatefulBuilder(
-                                                builder: (context, setState) {
-                                              return SizedBox(
-                                                height: screenheight * 0.8,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    showqrmessage != false
-                                                        ? result != null
-                                                            ? Container(
-                                                                height:
-                                                                    screenheight *
-                                                                        0.06,
-                                                                width:
-                                                                    screenwidth,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .primaryColor,
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    qrmessage,
-                                                                    textScaleFactor:
-                                                                        1.0,
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white,
-                                                                        fontSize:
-                                                                            15,
-                                                                        fontWeight:
-                                                                            FontWeight.w400),
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Container(
-                                                                height:
-                                                                    screenheight *
-                                                                        0.06,
-                                                                width:
-                                                                    screenwidth,
-                                                              )
-                                                        : Container(
-                                                            height:
-                                                                screenheight *
-                                                                    0.06,
-                                                            width: screenwidth,
-                                                          ),
-                                                    SizedBox(
-                                                      height:
-                                                          screenheight * 0.4,
-                                                      child: QRView(
-                                                        key: qrKey,
-                                                        overlay:
-                                                            QrScannerOverlayShape(
-                                                                cutOutSize:
-                                                                    screenheight *
-                                                                        0.35),
-                                                        onPermissionSet:
-                                                            (p0, permission) {
-                                                          if (!permission) {
-                                                            Navigator.pop(
-                                                                context);
-                                                            displayErrorSnackBar(
-                                                                "Could not open camera, please ensure Clout has access to camera");
-                                                          }
-                                                        },
-                                                        onQRViewCreated:
-                                                            (QRViewController
-                                                                controller) async {
-                                                          setState(() {
-                                                            this.qrcontroller =
-                                                                controller;
-                                                            showqrmessage =
-                                                                false;
-                                                            result = null;
-                                                          });
-                                                          controller
-                                                              .scannedDataStream
-                                                              .listen(
-                                                                  (scanData) async {
-                                                            setState(() {
-                                                              result = scanData;
-                                                            });
-                                                          });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      height:
-                                                          screenheight * 0.1,
-                                                      width: screenwidth,
-                                                      color: Colors.white,
-                                                      child: Center(
-                                                        child: GestureDetector(
-                                                          onTap: result == null
-                                                              ? null
-                                                              : () async {
-                                                                  try {
-                                                                    await validateqr(
-                                                                        result!
-                                                                            .code);
-                                                                    setState(
-                                                                        () {
-                                                                      result =
-                                                                          null;
-                                                                      showqrmessage =
-                                                                          true;
-                                                                    });
-                                                                  } catch (e) {}
-                                                                },
-                                                          child: SizedBox(
-                                                              height: 50 >
-                                                                      screenheight *
-                                                                          0.1
-                                                                  ? screenheight *
-                                                                      0.1
-                                                                  : 50,
-                                                              width:
-                                                                  screenwidth *
-                                                                      0.5,
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                    color: result ==
-                                                                            null
-                                                                        ? const Color.fromARGB(
-                                                                            180,
-                                                                            255,
-                                                                            48,
-                                                                            117)
-                                                                        : Theme.of(context)
-                                                                            .primaryColor,
-                                                                    borderRadius: const BorderRadius
-                                                                            .all(
-                                                                        Radius.circular(
-                                                                            20))),
-                                                                child:
-                                                                    const Center(
-                                                                        child:
-                                                                            Text(
-                                                                  "Validate",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800),
-                                                                )),
-                                                              )),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            });
-                                          });
+                                      showqrcodescanner(
+                                          context, screenheight, screenwidth);
                                     }
                                   : null
                               : joinedval == "Leave" || joinedval == "Finished"
@@ -861,6 +701,120 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   ));
             },
           );
+        });
+  }
+
+  Future<dynamic> showqrcodescanner(
+      BuildContext context, double screenheight, double screenwidth) {
+    return showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return SizedBox(
+              height: screenheight * 0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  showqrmessage
+                      ? result != null
+                          ? Container(
+                              height: screenheight * 0.06,
+                              width: screenwidth,
+                              color: qrmessage == "Success!"
+                                  ? Colors.green
+                                  : Colors.red,
+                              child: Center(
+                                child: Text(
+                                  qrmessage,
+                                  textScaleFactor: 1.0,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            )
+                          : SizedBox(
+                              height: screenheight * 0.06,
+                              width: screenwidth,
+                            )
+                      : SizedBox(
+                          height: screenheight * 0.06,
+                          width: screenwidth,
+                        ),
+                  SizedBox(
+                    height: screenheight * 0.4,
+                    child: QRView(
+                      key: qrKey,
+                      overlay: QrScannerOverlayShape(
+                          cutOutSize: screenheight * 0.35),
+                      onPermissionSet: (p0, permission) {
+                        if (!permission) {
+                          Navigator.pop(context);
+                          displayErrorSnackBar(
+                              "Could not open camera, please ensure Clout has access to camera");
+                        }
+                      },
+                      onQRViewCreated: (QRViewController controller) async {
+                        setState(() {
+                          this.qrcontroller = controller;
+                          showqrmessage = false;
+                          result = null;
+                        });
+                        controller.scannedDataStream.listen((scanData) async {
+                          setState(() {
+                            result = scanData;
+                          });
+                        });
+                      },
+                    ),
+                  ),
+                  Container(
+                    height: screenheight * 0.1,
+                    width: screenwidth,
+                    color: Colors.white,
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: result == null
+                            ? null
+                            : () async {
+                                try {
+                                  await validateqr(result!.code);
+                                  setState(() {
+                                    result = null;
+                                    showqrmessage = true;
+                                  });
+                                } catch (e) {}
+                              },
+                        child: SizedBox(
+                            height: 50 > screenheight * 0.1
+                                ? screenheight * 0.1
+                                : 50,
+                            width: screenwidth * 0.5,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: result == null
+                                      ? const Color.fromARGB(180, 255, 48, 117)
+                                      : Theme.of(context).primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20))),
+                              child: const Center(
+                                  child: Text(
+                                "Validate",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800),
+                              )),
+                            )),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          });
         });
   }
 

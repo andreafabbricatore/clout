@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const axios = require('axios');
 const stripe = require("stripe")(functions.config().stripe.testkey)
+const cors = require('cors')({origin: true});
 admin.initializeApp();
 const db = admin.firestore();
 const fcm = admin.messaging();
@@ -398,62 +399,65 @@ exports.stripeUpdatedAccountWebHook = functions.https.onRequest(async (req, res)
 });
 
 exports.stripeCreateCheckoutSession = functions.https.onRequest(async (req, res) => {
-    const { method } = req
-    try {
-    let customerId;
-    let found = false;
+    cors(req, res, async () => {
+        const { method } = req
+        try {
+            let customerId;
+            let found = false;
 
-    //Gets the customer who's email id matches the one sent by the client
-    const customerList = await stripe.customers.list();
+            //Gets the customer who's email id matches the one sent by the client
+            const customerList = await stripe.customers.list();
 
-    for (let i = 0; i<customerList.data.length; i++) {
-        if(customerList.data[i].metadata.uid == req.body.uid) {
-            customerId = customerList.data[i].id;
-            found = true;
-        }
-    }
-            
-    //Checks the if the customer exists, if not creates a new customer
-    if (!found) {
-        const customer = await stripe.customers.create({
-            metadata: {'uid':req.body.uid},
-            name: req.body.name,
-        });
-        customerId = customer.data.id;
-    }
-
-    //Creates a temporary secret key linked with the customer 
-    const ephemeralKey = await stripe.ephemeralKeys.create(
-        { customer: customerId },
-        { apiVersion: '2020-08-27' }
-    );
-
-    const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        success_url: req.body.success_url,
-        cancel_url: req.body.success_url,
-        line_items: [
-            {price_data: {
-                currency: req.body.currency,
-                unit_amount: parseInt(req.body.finalamount),
-                product_data: {name: 'Event'}
-            },
-            quantity: 1,
-        }],
-        customer: customerId,
-        metadata:{'eventid': req.body.eventid, 'useruid':req.body.uid, 'selleruid': req.body.selleruid},
-        payment_intent_data: {
-            transfer_data: {
-                amount: parseInt(req.body.businessamount),
-                destination: req.body.sellerstripebusinessid,
+            for (let i = 0; i<customerList.data.length; i++) {
+                if(customerList.data[i].metadata.uid == req.body.uid) {
+                    customerId = customerList.data[i].id;
+                    found = true;
+                }
             }
+                    
+            //Checks the if the customer exists, if not creates a new customer
+            if (!found) {
+                const customer = await stripe.customers.create({
+                    metadata: {'uid':req.body.uid},
+                    name: req.body.name,
+                });
+                customerId = customer.data.id;
+            }
+
+            //Creates a temporary secret key linked with the customer 
+            const ephemeralKey = await stripe.ephemeralKeys.create(
+                { customer: customerId },
+                { apiVersion: '2020-08-27' }
+            );
+
+            const session = await stripe.checkout.sessions.create({
+                mode: 'payment',
+                success_url: req.body.success_url,
+                cancel_url: req.body.success_url,
+                line_items: [
+                    {price_data: {
+                        currency: req.body.currency,
+                        unit_amount: parseInt(req.body.finalamount),
+                        product_data: {name: 'Event'}
+                    },
+                    quantity: 1,
+                }],
+                customer: customerId,
+                metadata:{'eventid': req.body.eventid, 'useruid':req.body.uid, 'selleruid': req.body.selleruid},
+                payment_intent_data: {
+                    transfer_data: {
+                        amount: parseInt(req.body.businessamount),
+                        destination: req.body.sellerstripebusinessid,
+                    }
+                }
+            });
+            res.status(200).send({url:session.url});
+        } catch(e) {
+            console.log(e);
+            res.sendStatus(400);
         }
-    });
-    res.status(200).send({url:session.url});
-    } catch(e) {
-        console.log(e);
-        res.sendStatus(400);
-    }
+    })
+    
 });
 
 exports.stripeJoinEventWebHook = functions.https.onRequest(async (req, res) => {
