@@ -271,7 +271,7 @@ class _BusinessEditProfileScreenState extends State<BusinessEditProfileScreen> {
                       "Change Location",
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                     ),
                     SizedBox(
                       width: 5,

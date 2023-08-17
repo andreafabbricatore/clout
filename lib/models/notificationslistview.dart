@@ -43,7 +43,7 @@ class NotificationsListView extends StatelessWidget {
                 const Text(
                   "Friend Requests",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                  textScaleFactor: 1.0,
+                  textScaler: TextScaler.linear(1.0),
                 ),
               ],
             ),
@@ -166,7 +166,7 @@ class NotificationsListView extends StatelessWidget {
                   width: screenwidth * 0.8,
                   child: RichText(
                       textAlign: TextAlign.start,
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                       text: finaltext),
                 ),
                 SizedBox(

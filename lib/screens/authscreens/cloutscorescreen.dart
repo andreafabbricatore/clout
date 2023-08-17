@@ -87,7 +87,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
               color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 30),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         ),
         leading: widget.showleading
             ? GestureDetector(
@@ -123,7 +123,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 20),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
               SizedBox(
                 height: screenheight * 0.01,
@@ -134,7 +134,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                     color: Colors.black,
                     fontWeight: FontWeight.w200,
                     fontSize: 20),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
               SizedBox(
                 height: screenheight * 0.02,
@@ -145,7 +145,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 20),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
               SizedBox(
                 height: screenheight * 0.01,
@@ -156,7 +156,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                     color: Colors.black,
                     fontWeight: FontWeight.w200,
                     fontSize: 20),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
               SizedBox(
                 height: screenheight * 0.02,
@@ -176,7 +176,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                   child: Center(
                     child: Text(
                       "Friends invited: ${widget.curruser.referred.length}",
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                       style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -194,7 +194,7 @@ class _CloutScoreScreenState extends State<CloutScoreScreen> {
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 30),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
               SizedBox(
                 height: screenheight * 0.01,

@@ -105,7 +105,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                       "Login or Signup\nto join an event",
                       style: TextStyle(color: Colors.black, fontSize: 25),
                       textAlign: TextAlign.center,
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                     ),
                     SizedBox(
                       height: screenheight * 0.02,
@@ -166,7 +166,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
     super.initState();
   }
 
-  Future<void> usernavigate(AppUser user, int index) async {
+  Future<void> usernavigate(AppUser user) async {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -209,7 +209,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
               ? const Text(
                   "Invite Only",
                   style: TextStyle(color: Colors.black),
-                  textScaleFactor: 1.0,
+                  textScaler: TextScaler.linear(1.0),
                 )
               : null,
           leading: GestureDetector(
@@ -283,7 +283,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                   try {
                     AppUser eventhost =
                         await db.getUserFromUID(widget.event.hostdocid);
-                    usernavigate(eventhost, 0);
+                    usernavigate(eventhost);
                   } catch (e) {
                     logic.displayErrorSnackBar(
                         "Could not retrieve host information", context);
@@ -333,7 +333,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                 : "Participant number reached",
             style: const TextStyle(
                 fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
-            textScaleFactor: 1.0,
+            textScaler: TextScaler.linear(1.0),
           ),
           SizedBox(
             height: screenheight * 0.005,
@@ -349,6 +349,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                         screenwidth: screenwidth,
                         presentparticipants: widget.event.presentparticipants,
                         onTap: usernavigate,
+                        showaddfriend: false,
                         physics: const NeverScrollableScrollPhysics(),
                       ),
                     ],
@@ -372,7 +373,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                               fontSize: 18,
                               color: Colors.black,
                               fontWeight: FontWeight.w200),
-                          textScaleFactor: 1.0,
+                          textScaler: TextScaler.linear(1.0),
                           overflow: TextOverflow.visible,
                         )
                       ]),
@@ -534,7 +535,7 @@ class _UnAuthEventDetailScreenState extends State<UnAuthEventDetailScreen> {
                                 fontSize: 18,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w200),
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                             overflow: TextOverflow.visible,
                             textAlign: TextAlign.center,
                           ),

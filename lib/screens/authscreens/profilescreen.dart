@@ -493,7 +493,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       centerTitle: true,
       title: Text(
         widget.user.username,
-        textScaleFactor: 1.0,
+        textScaler: TextScaler.linear(1.0),
         style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,

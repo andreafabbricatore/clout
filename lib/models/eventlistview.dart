@@ -84,7 +84,7 @@ class EventListView extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Colors.black),
-                    textScaleFactor: 1.0,
+                    textScaler: TextScaler.linear(1.0),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

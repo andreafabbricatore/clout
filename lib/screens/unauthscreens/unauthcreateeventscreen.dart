@@ -181,7 +181,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                       "Login or Signup\nto create an event",
                       style: TextStyle(color: Colors.black, fontSize: 25),
                       textAlign: TextAlign.center,
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                     ),
                     SizedBox(
                       height: screenheight * 0.02,
@@ -320,7 +320,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
           const Text(
             "Event Cover is Optional",
             style: TextStyle(color: Color.fromARGB(53, 0, 0, 0)),
-            textScaleFactor: 1.0,
+            textScaler: TextScaler.linear(1.0),
           ),
           SizedBox(
             height: screenheight * 0.01,
@@ -469,7 +469,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                       : "${DateFormat.MMMd().format(eventdate)} @ ${DateFormat('hh:mm a').format(eventdate)}",
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
-                  textScaleFactor: 1.0,
+                  textScaler: TextScaler.linear(1.0),
                 ),
                 const SizedBox(
                   width: 5,
@@ -538,7 +538,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                   emptylocation ? "Location" : "Change Location",
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
-                  textScaleFactor: 1.0,
+                  textScaler: TextScaler.linear(1.0),
                 ),
                 const SizedBox(
                   width: 5,
@@ -609,7 +609,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                       style: TextStyle(
                           fontSize: isinviteonly ? 16 : 20,
                           color: isinviteonly ? Colors.black : Colors.white),
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                     ),
                   ),
                 ),
@@ -635,7 +635,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                       style: TextStyle(
                           fontSize: isinviteonly ? 18 : 14,
                           color: isinviteonly ? Colors.white : Colors.black),
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                     ),
                   ),
                 ),
@@ -650,7 +650,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                 ? "Can only join through shared link"
                 : "Anyone can join the event",
             style: const TextStyle(color: Color.fromARGB(53, 0, 0, 0)),
-            textScaleFactor: 1.0,
+            textScaler: TextScaler.linear(1.0),
           ),
           SizedBox(
             height: screenheight * 0.01,
@@ -676,7 +676,7 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                     color: !hideparticipants
                         ? Colors.grey
                         : Theme.of(context).primaryColor),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
             ],
           ),

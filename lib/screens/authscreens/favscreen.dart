@@ -156,7 +156,7 @@ class _FavScreenState extends State<FavScreen> {
                             fontSize: 20,
                             color: loadedcolor),
                         textAlign: TextAlign.center,
-                        textScaleFactor: 1.0,
+                        textScaler: TextScaler.linear(1.0),
                       ),
                       SizedBox(
                         height: screenheight * 0.01,
@@ -167,7 +167,7 @@ class _FavScreenState extends State<FavScreen> {
                           Text(
                             "Click on the favorites icon.",
                             style: TextStyle(fontSize: 20, color: loadedcolor),
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                           ),
                           Icon(
                             Icons.bookmark,

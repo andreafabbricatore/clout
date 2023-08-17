@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:app_links/app_links.dart';
 import 'package:clout/defs/chat.dart';
 import 'package:clout/defs/event.dart';
@@ -18,12 +17,10 @@ import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
 
 class MainScreen extends StatefulWidget {
   AppUser curruser;
@@ -41,7 +38,7 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen> {
   int _index = 0;
   List<Widget> page = [];
   PendingDynamicLinkData? initialLink;
@@ -326,7 +323,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _controller = TabController(length: 5, vsync: this);
     requestNotisPermission();
     initMessaging();
     setupInteractedMessage();
@@ -344,43 +340,163 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    double screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
         extendBody: true,
-        body: TabBarView(
-          controller: _controller,
-          physics: const NeverScrollableScrollPhysics(),
-          children: page,
+        body: page[_index],
+        bottomNavigationBar: CustomBottomBar(context));
+  }
+
+  Padding CustomBottomBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(40.0, 8.0, 40.0, 20.0),
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(500),
+          color: const Color.fromARGB(245, 255, 48, 117),
         ),
-        bottomNavigationBar: Container(
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-          height: 50,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color.fromARGB(245, 255, 48, 117),
-          ),
-          child: TabBar(
-            enableFeedback: true,
-            indicatorColor: Colors.transparent,
-            controller: _controller,
-            onTap: (newIndex) {
-              if (newIndex == 0) {
-                setState(() {
-                  widget.justloaded = false;
-                });
-                parampasser();
-              }
-              setState(() => _index = newIndex);
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                widget.justloaded = false;
+              });
+              parampasser();
+              setState(() => _index = 0);
             },
-            tabs: const [
-              Tab(icon: Icon(Icons.home)),
-              Tab(icon: Icon(Icons.search_rounded)),
-              Tab(icon: Icon(Icons.add)),
-              Tab(icon: Icon(Icons.bookmark_outlined)),
-              Tab(
-                icon: Icon(CupertinoIcons.person_crop_circle),
-              )
-            ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.home,
+                  color: Colors.white,
+                ),
+                _index == 0
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
           ),
-        ));
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 1);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.search_rounded,
+                  color: Colors.white,
+                ),
+                _index == 1
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 2);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                _index == 2
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 3);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.bookmark_outlined,
+                  color: Colors.white,
+                ),
+                _index == 3
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 4);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  CupertinoIcons.person_crop_circle,
+                  color: Colors.white,
+                ),
+                _index == 4
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          )
+        ]),
+      ),
+    );
   }
 }

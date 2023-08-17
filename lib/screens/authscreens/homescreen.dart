@@ -5,6 +5,7 @@ import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/defs/location.dart';
 import 'package:clout/components/noeventsbox.dart';
 import 'package:clout/defs/user.dart';
+import 'package:clout/screens/authentication/signupflowscreens.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
 import 'package:clout/screens/authscreens/notificationscreen.dart';
 import 'package:clout/services/db.dart';
@@ -233,14 +234,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   AppBar homescreenappbar(BuildContext context) {
     return AppBar(
-      title: Text(
-        "Clout.",
-        style: TextStyle(
-          color: Theme.of(context).primaryColor,
-          fontWeight: FontWeight.w900,
-          fontSize: 50,
+      title: GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => FriendsContactScreen(
+                        analytics: widget.analytics,
+                      ),
+                  settings: RouteSettings(name: "FriendsContactScreen")));
+        },
+        child: Text(
+          "Clout.",
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.w900,
+            fontSize: 50,
+          ),
+          textScaler: TextScaler.linear(1.0),
         ),
-        textScaleFactor: 1.0,
       ),
       backgroundColor: Colors.white,
       shadowColor: Colors.white,

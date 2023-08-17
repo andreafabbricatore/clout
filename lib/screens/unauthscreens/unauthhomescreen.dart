@@ -114,7 +114,7 @@ class _UnAuthHomeScreenState extends State<UnAuthHomeScreen> {
               fontWeight: FontWeight.w900,
               fontSize: 50,
             ),
-            textScaleFactor: 1.0,
+            textScaler: TextScaler.linear(1.0),
           ),
           backgroundColor: Colors.white,
           shadowColor: Colors.white,

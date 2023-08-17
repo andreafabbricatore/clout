@@ -133,7 +133,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           },
           child: Text(
             chatname,
-            textScaleFactor: 1.0,
+            textScaler: TextScaler.linear(1.0),
             style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25),
           ),
@@ -214,7 +214,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 30),
-              textScaleFactor: 1.0,
+              textScaler: TextScaler.linear(1.0),
             );
           }
 
@@ -282,7 +282,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                                 data['content'].toString().toUpperCase(),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 15),
-                                textScaleFactor: 1.0,
+                                textScaler: TextScaler.linear(1.0),
                                 maxLines: 2,
                                 textAlign: TextAlign.center,
                               ),

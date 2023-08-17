@@ -36,6 +36,7 @@ class AppUser {
   String plan;
   List followedbusinesses;
   String email;
+  String phonenumber;
   String stripeaccountid;
   String stripesellercountry;
 
@@ -75,6 +76,7 @@ class AppUser {
       required this.plan,
       required this.followedbusinesses,
       required this.email,
+      required this.phonenumber,
       required this.stripeaccountid,
       required this.stripesellercountry});
 
@@ -114,6 +116,7 @@ class AppUser {
         referred: json['referred'] as List,
         plan: json['plan'],
         followedbusinesses: json['followed_businesses'] as List,
+        phonenumber: json['phonenumber'],
         email: json['email'],
         stripeaccountid: json['stripe_account_id'],
         stripesellercountry: json['stripe_seller_country']);

@@ -100,7 +100,7 @@ class _RequestScreenState extends State<RequestScreen> {
           centerTitle: true,
           title: const Text(
             "Friend Requests",
-            textScaleFactor: 1.0,
+            textScaler: TextScaler.linear(1.0),
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
           ),
@@ -165,7 +165,7 @@ class _RequestScreenState extends State<RequestScreen> {
                                 color: Colors.black,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 23),
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                           ),
                           SizedBox(
                             height: screenheight * 0.02,
@@ -176,7 +176,7 @@ class _RequestScreenState extends State<RequestScreen> {
                                 color: Colors.black,
                                 fontWeight: FontWeight.w300,
                                 fontSize: 20),
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                             textAlign: TextAlign.center,
                           ),
                         ],

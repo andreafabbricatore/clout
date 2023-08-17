@@ -72,6 +72,7 @@ exports.sendToDevice = functions.firestore.document("updates/{id}").onCreate(asy
 
 exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onCreate(async (snapshot) => {
     const user = snapshot.data();
+    await db.collection("users").doc(user.uid).set({ "stripe_seller_country": "", "stripe_account_id": ""}, { merge: true });
     let targets = ['cl1JMFn20pSmiFPAEwXkS7cho9r1', 'PSxzApY59nN8tllIDe8PUuPSb4l2', 'jR3G8sihlnXHt2nAEaB1sgI5Fog1'];
     const querySnapshot = await db.collection("users").where("uid", "in", targets).get();
     let finaltokens = [];
@@ -84,6 +85,14 @@ exports.userCreatedAdminMessage = functions.firestore.document("users/{id}").onC
         tokens: finaltokens
     };
     fcm.sendEachForMulticast(payload);
+});
+
+exports.addphonenumberattribute = functions.https.onRequest(async (req, res) => {
+    admin.auth().listUsers(300).then(async (listUsersResult) => {
+        listUsersResult.users.forEach(async (userRecord) => {
+          await db.collection("users").doc(userRecord.toJSON().uid).set({ "phonenumber": userRecord.toJSON().phoneNumber == null ? "" : userRecord.toJSON().phoneNumber}, { merge: true });
+        })});
+    res.sendStatus(200);
 });
 
 exports.chatsendToDevices = functions.firestore.document("chats/{chatid}/messages/{id}").onCreate(async (snapshot, context) => {
@@ -279,17 +288,6 @@ exports.forceallEmailVerifications = functions.firestore.document('/all_emails_v
         admin.auth().updateUser(data['uid'], {emailVerified: true});
     })
 });
-
-exports.checkIfPhoneExists = functions.https.onCall((data, context) => {
-    const phone = data.phone
-    return admin.auth().getUserByPhoneNumber(phone)
-     .then(function(userRecord){
-         return true;
-     })
-     .catch(function(error) {
-         return false;
-     });
- });
 
 exports.stripeAccount = functions.https.onRequest(async (req, res) => {
     const { method } = req
@@ -520,4 +518,20 @@ exports.stripeJoinEventWebHook = functions.https.onRequest(async (req, res) => {
         res.sendStatus(400);
     }
     res.sendStatus(200);
+});
+
+
+exports.googlemapfindplace = functions.https.onRequest(async (req, res) => {
+    cors(req,res, () => {
+        axios.get("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry&input=" + req.body.query + "&inputtype=textquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w",
+        {headers: {"Content-Type": "application/json"}}).then(resp => {
+            if (resp.status != 200) {
+                res.sendStatus(resp.status);
+            } else {
+                res.status(200).send({
+                    result: resp.data,
+                });
+            }
+        });
+    })
 });

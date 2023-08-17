@@ -743,7 +743,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       fontWeight: FontWeight.bold,
                       fontSize: 25,
                     ),
-                    textScaleFactor: 1.0,
+                    textScaler: TextScaler.linear(1.0),
                   ),
                   SizedBox(
                     height: screenheight * 0.02,
@@ -827,7 +827,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 25),
-                    textScaleFactor: 1.0,
+                    textScaler: TextScaler.linear(1.0),
                   ),
                   SizedBox(
                     height: screenheight * 0.02,
@@ -917,7 +917,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 25),
-                    textScaleFactor: 1.0,
+                    textScaler: TextScaler.linear(1.0),
                   ),
                   SizedBox(
                     height: screenheight * 0.02,

@@ -218,7 +218,7 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
                   "Server under maintenance\n\nWe'll be back soon!",
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white, fontSize: 14),
-                  textScaleFactor: 1.2,
+                  textScaler: TextScaler.linear(1.2),
                 ),
                 SizedBox(
                   height: screenheight * 0.02,
@@ -239,7 +239,7 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
                             child: Text(
                           "Refresh",
                           style: TextStyle(fontSize: 20, color: Colors.white),
-                          textScaleFactor: 1.2,
+                          textScaler: TextScaler.linear(1.2),
                         )),
                       )),
                 ),
@@ -260,7 +260,7 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
                     "Update available!\n\nUpdate Clout to keep Going Out!",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 14),
-                    textScaleFactor: 1.2),
+                    textScaler: TextScaler.linear(1.2)),
                 SizedBox(
                   height: screenheight * 0.02,
                 ),
@@ -283,7 +283,7 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
                             child: Text(
                           "Update",
                           style: TextStyle(fontSize: 20, color: Colors.white),
-                          textScaleFactor: 1.2,
+                          textScaler: TextScaler.linear(1.2),
                         )),
                       )),
                 ),
@@ -304,7 +304,7 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
                     "Please make sure Location Services are enabled\nor\nCheck your internet connection",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 14),
-                    textScaleFactor: 1.2),
+                    textScaler: TextScaler.linear(1.2)),
                 SizedBox(
                   height: screenheight * 0.02,
                 ),
@@ -324,7 +324,7 @@ class _UnAuthLoadingScreenState extends State<UnAuthLoadingScreen> {
                             child: Text(
                           "Refresh",
                           style: TextStyle(fontSize: 20, color: Colors.white),
-                          textScaleFactor: 1.2,
+                          textScaler: TextScaler.linear(1.2),
                         )),
                       )),
                 ),

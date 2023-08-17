@@ -185,7 +185,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         centerTitle: true,
         title: const Text(
           "Notifications",
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
         ),

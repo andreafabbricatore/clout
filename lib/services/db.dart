@@ -64,7 +64,7 @@ class db_conn {
       FirebaseFirestore.instance.collection('email_verification');
   final geo = GeoFlutterFire();
 
-  Future createuserinstance(String uid) async {
+  Future createuserinstance(String uid, String phonenumber) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       GeoFirePoint loc = geo.point(latitude: 0, longitude: 0);
@@ -109,7 +109,10 @@ class db_conn {
         'donesignuptime': DateTime(1900, 1, 1, 0, 0),
         'lastusagetime': FieldValue.serverTimestamp(),
         'followed_businesses': [],
-        'email': ''
+        'email': '',
+        'phonenumber': phonenumber,
+        'stripe_account_id': '',
+        'stripe_seller_country': ''
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -160,7 +163,10 @@ class db_conn {
         'appversion': packageInfo.version,
         'donesignuptime': DateTime(1900, 1, 1, 0, 0),
         'lastusagetime': FieldValue.serverTimestamp(),
-        'email': email
+        'phonenumber': '',
+        'email': email,
+        'stripe_account_id': '',
+        'stripe_seller_country': ''
       });
     } catch (e) {
       throw Exception("Could not create user");
@@ -2265,6 +2271,28 @@ class db_conn {
     try {
       DocumentSnapshot user = await users.doc(uid).get();
       return [user['stripe_account_id'], user['stripe_seller_country']];
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<List<AppUser>> getUsersfromContacts(List<String> phonenumbers) async {
+    try {
+      List<AppUser> res = [];
+      List<List<String>> subList = [];
+      for (var i = 0; i < phonenumbers.length; i += 10) {
+        subList.add(phonenumbers.sublist(
+            i, i + 10 > phonenumbers.length ? phonenumbers.length : i + 10));
+      }
+      for (int i = 0; i < subList.length; i++) {
+        QuerySnapshot temp =
+            await users.where("phonenumber", whereIn: subList[i]).get();
+        for (int j = 0; j < temp.docs.length; j++) {
+          res.add(AppUser.fromJson(temp.docs[j].data(), temp.docs[j].id));
+        }
+      }
+      await Future.delayed(const Duration(milliseconds: 50));
+      return res;
     } catch (e) {
       throw Exception();
     }

@@ -120,7 +120,7 @@ class _UserListViewState extends State<UserListView> {
                   "${user.clout}",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.right,
-                  textScaleFactor: 1.0,
+                  textScaler: TextScaler.linear(1.0),
                 )
               : Container(),
           showrembutton && user.uid != curruser.uid

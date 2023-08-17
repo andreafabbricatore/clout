@@ -66,7 +66,7 @@ class UnAuthEventListView extends StatelessWidget {
                         color: Colors.black),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    textScaleFactor: 1.0,
+                    textScaler: TextScaler.linear(1.0),
                   ),
                 ),
               ),

@@ -85,7 +85,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                       child: const Center(
                         child: Text(
                           "Invite your friends to Clout!",
-                          textScaleFactor: 1.0,
+                          textScaler: TextScaler.linear(1.0),
                           style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -133,7 +133,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                         textAlign: TextAlign.start,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w500),
-                        textScaleFactor: 1.0,
+                        textScaler: TextScaler.linear(1.0),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -152,7 +152,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                           child: Text(
                             "${widget.user.clout} Clout",
                             textAlign: TextAlign.center,
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor,
                                 fontSize: 15),
@@ -164,7 +164,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                         const Text(
                           "-",
                           textAlign: TextAlign.center,
-                          textScaleFactor: 1.0,
+                          textScaler: TextScaler.linear(1.0),
                           style: TextStyle(color: Colors.black, fontSize: 15),
                         ),
                         SizedBox(
@@ -179,7 +179,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                 ? "${widget.user.friends.length} Followers"
                                 : "${widget.user.friends.length} Friends",
                             textAlign: TextAlign.center,
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                             style: const TextStyle(fontSize: 15),
                           ),
                         ),
@@ -235,7 +235,7 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                                   child: Center(
                                       child: Text(
                                     widget.friendval,
-                                    textScaleFactor: 1.0,
+                                    textScaler: TextScaler.linear(1.0),
                                   )),
                                 ),
                               )

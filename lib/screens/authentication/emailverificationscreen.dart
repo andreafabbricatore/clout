@@ -103,7 +103,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20),
                       textAlign: TextAlign.center,
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                     )),
                     SizedBox(
                       height: screenheight * 0.02,
@@ -112,7 +112,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         child: Text(
                       sendagain,
                       style: const TextStyle(fontSize: 15),
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                     )),
                     SizedBox(
                       height: screenheight * 0.02,
@@ -147,7 +147,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         ? Center(
                             child: RichText(
                               textAlign: TextAlign.justify,
-                              textScaleFactor: 1.0,
+                              textScaler: TextScaler.linear(1.0),
                               text: TextSpan(
                                   style: const TextStyle(
                                       color: Colors.grey, fontSize: 15),
@@ -201,7 +201,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     Center(
                       child: RichText(
                         textAlign: TextAlign.justify,
-                        textScaleFactor: 1.0,
+                        textScaler: TextScaler.linear(1.0),
                         text: TextSpan(
                             style: const TextStyle(
                                 color: Colors.grey, fontSize: 15),
@@ -228,7 +228,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                                   backgroundColor: Colors.white,
                                                   child: Container(
                                                     padding: const EdgeInsets
-                                                            .fromLTRB(
+                                                        .fromLTRB(
                                                         10, 20, 10, 10),
                                                     height: screenheight * 0.35,
                                                     decoration: const BoxDecoration(

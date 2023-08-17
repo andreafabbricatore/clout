@@ -8,26 +8,33 @@ class UnAuthUserListView extends StatefulWidget {
       required this.userres,
       required this.screenwidth,
       required this.onTap,
+      required this.showaddfriend,
       this.physics = const AlwaysScrollableScrollPhysics(),
-      this.presentparticipants = const []})
+      this.presentparticipants = const [],
+      this.sendRequest})
       : super(key: key);
   List<AppUser> userres;
   double screenwidth;
+  bool showaddfriend;
   List presentparticipants;
   var physics;
-  final Function(AppUser user, int index)? onTap;
+  final Function(AppUser user)? onTap;
+  Function(AppUser user, int index)? sendRequest;
 
   @override
   State<UnAuthUserListView> createState() => _UnAuthUserListViewState();
 }
 
 class _UnAuthUserListViewState extends State<UnAuthUserListView> {
+  bool addfriendbuttonpressed = false;
   Widget _listviewitem(
     AppUser user,
     int index,
     double screenwidth,
+    bool showaddfriend,
     List presentparticipants,
-    Function(AppUser user, int index)? onTap,
+    Function(AppUser user)? onTap,
+    Function(AppUser user, int index)? sendRequest,
   ) {
     Widget widget;
     widget = Row(
@@ -76,12 +83,31 @@ class _UnAuthUserListViewState extends State<UnAuthUserListView> {
                 color: Color.fromARGB(255, 255, 48, 117),
               )
             : Container(),
+        showaddfriend
+            ? GestureDetector(
+                onTap: addfriendbuttonpressed
+                    ? null
+                    : () {
+                        setState(() {
+                          addfriendbuttonpressed = true;
+                        });
+                        sendRequest?.call(user, index);
+                        setState(() {
+                          addfriendbuttonpressed = false;
+                        });
+                      },
+                child: const Icon(
+                  Icons.person_add,
+                  color: Colors.black,
+                ),
+              )
+            : Container()
       ],
     );
 
     return GestureDetector(
       onTap: () async {
-        await onTap?.call(user, index);
+        await onTap?.call(user);
       },
       child: widget,
     );
@@ -101,8 +127,10 @@ class _UnAuthUserListViewState extends State<UnAuthUserListView> {
                   widget.userres[index],
                   index,
                   widget.screenwidth,
+                  widget.showaddfriend,
                   widget.presentparticipants,
-                  widget.onTap));
+                  widget.onTap,
+                  widget.sendRequest));
         });
   }
 }

@@ -54,7 +54,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             fontWeight: FontWeight.w900,
             fontSize: 30,
           ),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -237,7 +237,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               width: screenwidth * 0.6,
               child: RichText(
                 textAlign: TextAlign.justify,
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
                 text: TextSpan(
                     style: const TextStyle(
                         color: Colors.grey,
@@ -336,7 +336,7 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
             fontWeight: FontWeight.w900,
             fontSize: 30,
           ),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         ),
         leading: GestureDetector(
             onTap: () {
@@ -393,8 +393,10 @@ class _OTPInputScreenState extends State<OTPInputScreen> {
                     UserCredential usercredential = await FirebaseAuth.instance
                         .signInWithCredential(credential);
                     if (usercredential.additionalUserInfo!.isNewUser) {
-                      await db.createuserinstance(usercredential
-                          .user!.uid); //set all signup attributes to false
+                      await db.createuserinstance(
+                          usercredential.user!.uid,
+                          FirebaseAuth.instance.currentUser!
+                              .phoneNumber!); //set all signup attributes to false
                       if (widget.referral.isNotEmpty) {
                         try {
                           String shareruid = widget.referral.split("/").last;

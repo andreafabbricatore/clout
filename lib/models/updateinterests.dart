@@ -57,7 +57,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
             color: widget.curruser.interests.contains(interest)
                 ? Theme.of(context).primaryColor
                 : Colors.white),
-        textScaleFactor: 1.0,
+        textScaler: TextScaler.linear(1.0),
       )),
     );
 
@@ -86,7 +86,7 @@ class _UpdateInterestsState extends State<UpdateInterests> {
           "Interests",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         ),
         backgroundColor: Colors.white,
         elevation: 0.0,

@@ -98,7 +98,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                       color: Colors.white,
                       fontWeight:
                           widget.bold ? FontWeight.bold : FontWeight.normal),
-                  textScaleFactor: 1.1,
+                  textScaler: TextScaler.linear(1.1),
                 ),
               )),
     );

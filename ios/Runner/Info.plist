@@ -72,6 +72,8 @@
 	<string>The app requires your location to find events nearby you</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>The app requires access to your photo library to setup a profile picture and allow choosing of potential event banners</string>
+	<key>NSContactsUsageDescription</key>
+    <string>The app wants to access your contacts for you to see your friends already on Clout.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

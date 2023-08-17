@@ -70,23 +70,14 @@ class _SearchLocationState extends State<SearchLocation> {
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 16.0, 8.0, 0),
-        child: InkWell(
+        child: GestureDetector(
           onTap: () async {
-            String url =
-                'https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.center[0]},${location.center[1]}&result_type=country&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
-            url = Uri.parse(url).toString();
-            _dio.options.contentType = Headers.jsonContentType;
-            final responseData = await _dio.get(url);
-            String country = responseData.data['results'][0]
-                    ['address_components'][0]['long_name']
-                .toString()
-                .toLowerCase();
             setState(() {
               widget.locationchosen = true;
               chosenLocation = AppLocation(
                   address: location.address,
                   city: location.city,
-                  country: country,
+                  country: "",
                   center: location.center);
             });
             _addMarker(LatLng(location.center[0], location.center[1]));
@@ -188,60 +179,7 @@ class _SearchLocationState extends State<SearchLocation> {
             ),
             Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-                  child: TextField(
-                    controller: searchcontroller,
-                    onChanged: (String searchquery) async {
-                      searchquery.replaceAll(" ", "%20");
-                      String url =
-                          'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${LatLngs[0]},${LatLngs[1]}&radius=15000&keyword=$searchquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
-                      //String url =
-                      //    'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$searchquery&inputtype=textquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
-                      url = Uri.parse(url).toString();
-                      try {
-                        _dio.options.contentType = Headers.jsonContentType;
-                        final responseData = await _dio.get(url);
-                        List<AppLocation> response =
-                            (responseData.data['results'] as List)
-                                .map((e) => AppLocation(
-                                        address: e['name'],
-                                        city: e['vicinity']
-                                            .toString()
-                                            .split(", ")
-                                            .last,
-                                        country: "",
-                                        center: [
-                                          e['geometry']['location']['lat'],
-                                          e['geometry']['location']['lng']
-                                        ]))
-                                .toList();
-                        setState(() {
-                          res = response;
-                        });
-                      } catch (e) {
-                        logic.displayErrorSnackBar("Could not search", context);
-                      }
-                    },
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Search Location',
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      contentPadding: const EdgeInsets.all(20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide:
-                            const BorderSide(color: Colors.white, width: 1.0),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide:
-                            const BorderSide(color: Colors.grey, width: 1.0),
-                      ),
-                    ),
-                  ),
-                ),
+                searchlocationbar(context),
                 searchcontroller.text.isNotEmpty
                     ? Expanded(
                         child: ListView.builder(
@@ -288,6 +226,57 @@ class _SearchLocationState extends State<SearchLocation> {
                   )
                 : Container()
           ]),
+        ),
+      ),
+    );
+  }
+
+  Padding searchlocationbar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
+      child: TextField(
+        controller: searchcontroller,
+        onChanged: (String searchquery) async {
+          searchquery.replaceAll(" ", "%20");
+          String url =
+              'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${LatLngs[0]},${LatLngs[1]}&radius=15000&keyword=$searchquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+          //String url =
+          //    'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$searchquery&inputtype=textquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+          url = Uri.parse(url).toString();
+          try {
+            _dio.options.contentType = Headers.jsonContentType;
+            final responseData = await _dio.get(url);
+            List<AppLocation> response = (responseData.data['results'] as List)
+                .map((e) => AppLocation(
+                        address: e['name'],
+                        city: e['vicinity'].toString().split(", ").last,
+                        country: "",
+                        center: [
+                          e['geometry']['location']['lat'],
+                          e['geometry']['location']['lng']
+                        ]))
+                .toList();
+            setState(() {
+              res = response;
+            });
+          } catch (e) {
+            logic.displayErrorSnackBar("Could not search", context);
+          }
+        },
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          hintText: 'Search Location',
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
+          contentPadding: const EdgeInsets.all(20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(color: Colors.white, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+          ),
         ),
       ),
     );

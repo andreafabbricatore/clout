@@ -108,73 +108,159 @@ class _UnAuthMainScreenState extends State<UnAuthMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: page[_index],
-        bottomNavigationBar: BottomNavyBar(
-          items: [
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.home,
-              ),
-              title: const Text(
-                "Home",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.search,
-              ),
-              title: const Text(
-                "Search",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.add,
-              ),
-              title: const Text(
-                "Create",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(
-                Icons.bookmark,
-              ),
-              title: const Text(
-                "Favorites",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            ),
-            BottomNavyBarItem(
-              icon: const Icon(CupertinoIcons.person_crop_circle),
-              title: const Text(
-                "Profile",
-                textScaleFactor: 1.0,
-              ),
-              activeColor: Theme.of(context).primaryColor,
-              inactiveColor: Colors.grey,
-            )
-          ],
-          onItemSelected: (newIndex) {
-            if (newIndex == 0) {
+        body: page[_index], bottomNavigationBar: CustomBottomBar(context));
+  }
+
+  Padding CustomBottomBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(40.0, 8.0, 40.0, 20.0),
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(500),
+          color: const Color.fromARGB(245, 255, 48, 117),
+        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                widget.justloaded = false;
+              });
               parampasser();
-            }
-            setState(() => _index = newIndex);
-          },
-          selectedIndex: _index,
-          showElevation: false,
-          iconSize: 33,
-          containerHeight: 60,
-        ));
+              setState(() => _index = 0);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.home,
+                  color: Colors.white,
+                ),
+                _index == 0
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 1);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.search_rounded,
+                  color: Colors.white,
+                ),
+                _index == 1
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 2);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                _index == 2
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 3);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.bookmark_outlined,
+                  color: Colors.white,
+                ),
+                _index == 3
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              parampasser();
+              setState(() => _index = 4);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  CupertinoIcons.person_crop_circle,
+                  color: Colors.white,
+                ),
+                _index == 4
+                    ? Center(
+                        child: Container(
+                          width: 15,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+          )
+        ]),
+      ),
+    );
   }
 }

@@ -78,7 +78,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
           "Blocked Users",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         ),
         leading: GestureDetector(
           onTap: () {

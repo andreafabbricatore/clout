@@ -27,7 +27,7 @@ class UnAuthnoEventsBox extends StatelessWidget {
           "No Events Nearby :(",
           style: TextStyle(
               fontWeight: FontWeight.w800, fontSize: 20, color: allcolor),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         ),
         SizedBox(
           height: screenheight * 0.03,
@@ -94,7 +94,7 @@ class UnAuthdelayedNoEventsBox extends StatelessWidget {
                 "No Events Nearby :(",
                 style: TextStyle(
                     fontWeight: FontWeight.w800, fontSize: 20, color: allcolor),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
               SizedBox(
                 height: screenheight * 0.03,

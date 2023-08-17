@@ -1,5 +1,6 @@
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/screens/authscreens/loading.dart';
+import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,10 +31,9 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => LinkOTPInputScreen(
-                    verificationId: verificationId,
-                    analytics: widget.analytics,
-                    updatephonenumber: widget.updatephonenumber,
-                  )));
+                  verificationId: verificationId,
+                  analytics: widget.analytics,
+                  updatephonenumber: widget.updatephonenumber)));
     });
   }
 
@@ -51,7 +51,7 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
             fontWeight: FontWeight.w900,
             fontSize: 30,
           ),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         ),
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -79,7 +79,7 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
                     style: TextStyle(
                       fontSize: 20,
                     ),
-                    textScaleFactor: 1.0,
+                    textScaler: TextScaler.linear(1.0),
                     textAlign: TextAlign.center,
                   ),
                 )
@@ -187,11 +187,12 @@ class _LinkPhoneInputScreenState extends State<LinkPhoneInputScreen> {
 }
 
 class LinkOTPInputScreen extends StatefulWidget {
-  LinkOTPInputScreen(
-      {super.key,
-      required this.verificationId,
-      required this.analytics,
-      required this.updatephonenumber});
+  LinkOTPInputScreen({
+    super.key,
+    required this.verificationId,
+    required this.analytics,
+    required this.updatephonenumber,
+  });
   String verificationId;
   FirebaseAnalytics analytics;
   bool updatephonenumber;
@@ -201,6 +202,7 @@ class LinkOTPInputScreen extends StatefulWidget {
 
 class _LinkOTPInputScreenState extends State<LinkOTPInputScreen> {
   applogic logic = applogic();
+  db_conn db = db_conn();
 
   void donechange() {
     Navigator.push(
@@ -225,7 +227,7 @@ class _LinkOTPInputScreenState extends State<LinkOTPInputScreen> {
               fontWeight: FontWeight.w900,
               fontSize: 30,
             ),
-            textScaleFactor: 1.0,
+            textScaler: TextScaler.linear(1.0),
           ),
           backgroundColor: Colors.white,
           shadowColor: Colors.white,
@@ -283,6 +285,10 @@ class _LinkOTPInputScreenState extends State<LinkOTPInputScreen> {
                       await FirebaseAuth.instance.currentUser
                           ?.linkWithCredential(credential);
                     }
+                    await db.changeattribute(
+                        'phonenumber',
+                        FirebaseAuth.instance.currentUser!.phoneNumber!,
+                        FirebaseAuth.instance.currentUser!.uid);
                     donechange();
                   } catch (e) {
                     logic.displayErrorSnackBar(

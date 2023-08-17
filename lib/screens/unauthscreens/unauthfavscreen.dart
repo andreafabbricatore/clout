@@ -15,7 +15,7 @@ class UnAuthFavScreen extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           "Favorites",
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
         ),

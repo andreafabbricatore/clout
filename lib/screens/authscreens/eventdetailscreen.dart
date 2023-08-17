@@ -597,7 +597,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                       : "Report Event",
                                   style: const TextStyle(
                                       fontSize: 20, color: Colors.white),
-                                  textScaleFactor: 1.0,
+                                  textScaler: TextScaler.linear(1.0),
                                 )
                               ],
                             ),
@@ -692,7 +692,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                       : "Show QR",
                                   style: const TextStyle(
                                       fontSize: 20, color: Colors.white),
-                                  textScaleFactor: 1.0,
+                                  textScaler: TextScaler.linear(1.0),
                                 )
                               ],
                             ),
@@ -729,7 +729,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               child: Center(
                                 child: Text(
                                   qrmessage,
-                                  textScaleFactor: 1.0,
+                                  textScaler: TextScaler.linear(1.0),
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
@@ -916,7 +916,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                       style: TextStyle(
                                         fontSize: 20,
                                       ),
-                                      textScaleFactor: 1.0,
+                                      textScaler: TextScaler.linear(1.0),
                                       textAlign: TextAlign.center,
                                     ),
                                   )
@@ -997,7 +997,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                           fontSize: 20,
                                           color: Colors.white,
                                           fontWeight: FontWeight.normal),
-                                      textScaleFactor: 1.0,
+                                      textScaler: TextScaler.linear(1.0),
                                     ),
                                   ],
                                 )
@@ -1187,7 +1187,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       fontSize: 20,
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
-                  textScaleFactor: 1.0,
+                  textScaler: TextScaler.linear(1.0),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1283,7 +1283,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               fontSize: 18,
                               color: Colors.black,
                               fontWeight: FontWeight.w200),
-                          textScaleFactor: 1.0,
+                          textScaler: TextScaler.linear(1.0),
                           overflow: TextOverflow.visible,
                         ),
                         SizedBox(
@@ -1499,7 +1499,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 fontSize: 18,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w200),
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                             overflow: TextOverflow.visible,
                             textAlign: TextAlign.center,
                           ),
@@ -1521,7 +1521,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ? const Text(
               "Invite Only",
               style: TextStyle(color: Colors.black),
-              textScaleFactor: 1.0,
+              textScaler: TextScaler.linear(1.0),
             )
           : null,
       leading: GestureDetector(

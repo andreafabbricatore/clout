@@ -123,7 +123,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             centerTitle: true,
             title: Text(
               widget.curruser.username,
-              textScaleFactor: 1.0,
+              textScaler: TextScaler.linear(1.0),
               style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,

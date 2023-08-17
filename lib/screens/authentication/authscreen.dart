@@ -36,7 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   SizedBox(height: screenheight * 0.04),
                   RichText(
-                      textScaleFactor: 1.0,
+                      textScaler: TextScaler.linear(1.0),
                       text: TextSpan(
                           style: const TextStyle(
                               fontSize: 60,

@@ -92,7 +92,7 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
       refresh();
     }
 
-    Future<void> usernavigate(AppUser user, int index) async {
+    Future<void> usernavigate(AppUser user) async {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -101,7 +101,7 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
                   visit: true,
                 ),
             fullscreenDialog: true,
-            settings: RouteSettings(name: "UnAuthProfileScreen")),
+            settings: const RouteSettings(name: "UnAuthProfileScreen")),
       );
     }
 
@@ -118,9 +118,11 @@ class _UnAuthSearchBarListViewState extends State<UnAuthSearchBarListView> {
           )
         : Expanded(
             child: UnAuthUserListView(
-                userres: widget.userres,
-                screenwidth: screenwidth,
-                onTap: usernavigate),
+              userres: widget.userres,
+              screenwidth: screenwidth,
+              onTap: usernavigate,
+              showaddfriend: false,
+            ),
           );
   }
 }

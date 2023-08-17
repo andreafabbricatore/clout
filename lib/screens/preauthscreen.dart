@@ -109,7 +109,7 @@ class _PreAuthScreenState extends State<PreAuthScreen> {
                                 fontSize: 15,
                                 decoration: TextDecoration.underline,
                                 color: Colors.grey),
-                            textScaleFactor: 1.0,
+                            textScaler: TextScaler.linear(1.0),
                           ),
                   ),
                   SizedBox(

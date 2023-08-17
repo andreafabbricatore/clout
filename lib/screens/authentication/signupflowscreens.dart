@@ -1,16 +1,22 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:clout/components/datatextfield.dart';
 import 'package:clout/components/primarybutton.dart';
 import 'package:clout/defs/location.dart';
+import 'package:clout/defs/user.dart';
 import 'package:clout/main.dart';
 import 'package:clout/models/searchlocation.dart';
+import 'package:clout/models/unauthuserlistview.dart';
+import 'package:clout/models/userlistview.dart';
 import 'package:clout/screens/authentication/authscreen.dart';
 import 'package:clout/screens/authentication/emailverificationscreen.dart';
 import 'package:clout/services/db.dart';
 import 'package:clout/services/logic.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart' as dp;
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -21,6 +27,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pinput/pinput.dart';
+import 'package:http/http.dart' as http;
 
 class PicandNameScreen extends StatefulWidget {
   PicandNameScreen(
@@ -365,7 +372,7 @@ class _PicandNameScreenState extends State<PicandNameScreen> {
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 20),
-              textScaleFactor: 1.0,
+              textScaler: TextScaler.linear(1.0),
             ),
           ),
           SizedBox(
@@ -1747,7 +1754,7 @@ class _BusinessMiscScreenState extends State<BusinessMiscScreen> {
               "Choose your\nbusiness category",
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
               textAlign: TextAlign.center,
-              textScaleFactor: 1.0,
+              textScaler: TextScaler.linear(1.0),
             ),
             SizedBox(
               height: screenheight * 0.01,
@@ -1840,7 +1847,7 @@ class _BusinessMiscScreenState extends State<BusinessMiscScreen> {
                     emptylocation ? "Set Business Location" : "Change Location",
                     style: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.bold),
-                    textScaleFactor: 1.0,
+                    textScaler: TextScaler.linear(1.0),
                   ),
                   const SizedBox(
                     width: 5,
@@ -1982,11 +1989,11 @@ class _InterestScreenState extends State<InterestScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-          builder: (BuildContext context) => AuthenticationWrapper(
+          builder: (BuildContext context) => FriendsContactScreen(
                 analytics: widget.analytics,
               ),
           fullscreenDialog: true,
-          settings: RouteSettings(name: "AuthenticationWrapper")),
+          settings: const RouteSettings(name: "FriendsContactScreen")),
     );
   }
 
@@ -2149,7 +2156,7 @@ class _InterestScreenState extends State<InterestScreen> {
               color: selectedinterests.contains(interest)
                   ? Theme.of(context).primaryColor
                   : Colors.white),
-          textScaleFactor: 1.0,
+          textScaler: TextScaler.linear(1.0),
         )),
       ),
     );
@@ -2803,7 +2810,7 @@ class _WebFinishScreenState extends State<WebFinishScreen> {
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 20),
-                textScaleFactor: 1.0,
+                textScaler: TextScaler.linear(1.0),
               ),
             ),
             SizedBox(
@@ -2957,5 +2964,459 @@ class _WebFinishScreenState extends State<WebFinishScreen> {
         ),
       )),
     );
+  }
+}
+
+class FriendsContactScreen extends StatefulWidget {
+  FriendsContactScreen({super.key, required this.analytics});
+  FirebaseAnalytics analytics;
+  @override
+  State<FriendsContactScreen> createState() => _FriendsContactScreenState();
+}
+
+class _FriendsContactScreenState extends State<FriendsContactScreen> {
+  bool showcontacts = false;
+  bool loading = false;
+  db_conn db = db_conn();
+  applogic logic = applogic();
+  List<AppUser> friends = [];
+
+  Map<String, int> prefixes = {
+    'SK': 421,
+    'KI': 686,
+    'LV': 371,
+    'GH': 233,
+    'JP': 81,
+    'SA': 966,
+    'TD': 235,
+    'SX': 1,
+    'CY': 357,
+    'CH': 41,
+    'EG': 20,
+    'PA': 507,
+    'KP': 850,
+    'CO': 57,
+    'GW': 245,
+    'KG': 996,
+    'AW': 297,
+    'FM': 691,
+    'SB': 677,
+    'HR': 385,
+    'PY': 595,
+    'BG': 359,
+    'IQ': 964,
+    'ID': 62,
+    'GQ': 240,
+    'CA': 1,
+    'CG': 242,
+    'MO': 853,
+    'SL': 232,
+    'LA': 856,
+    'OM': 968,
+    'MP': 1,
+    'DK': 45,
+    'FI': 358,
+    'DO': 1,
+    'BM': 1,
+    'GN': 224,
+    'NE': 227,
+    'ER': 291,
+    'DE': 49,
+    'UM': 0,
+    'CM': 237,
+    'PR': 1,
+    'RO': 40,
+    'AZ': 994,
+    'DZ': 213,
+    'BW': 267,
+    'MK': 389,
+    'HN': 504,
+    'IS': 354,
+    'SJ': 47,
+    'ME': 382,
+    'NR': 674,
+    'AD': 376,
+    'BY': 375,
+    'RE': 262,
+    'PG': 675,
+    'SO': 252,
+    'NO': 47,
+    'CC': 61,
+    'EE': 372,
+    'BN': 673,
+    'AU': 61,
+    'HM': 0,
+    'ML': 223,
+    'BD': 880,
+    'GE': 995,
+    'US': 1,
+    'UY': 598,
+    'SM': 378,
+    'NG': 234,
+    'BE': 32,
+    'KY': 1,
+    'AR': 54,
+    'CR': 506,
+    'VA': 39,
+    'YE': 967,
+    'TR': 90,
+    'CV': 238,
+    'DM': 1,
+    'ZM': 260,
+    'BR': 55,
+    'MG': 261,
+    'BL': 590,
+    'FJ': 679,
+    'SH': 290,
+    'KN': 1,
+    'ZA': 27,
+    'CF': 236,
+    'ZW': 263,
+    'PL': 48,
+    'SV': 503,
+    'QA': 974,
+    'MN': 976,
+    'SE': 46,
+    'JE': 44,
+    'PS': 970,
+    'MZ': 258,
+    'TK': 690,
+    'PM': 508,
+    'CW': 599,
+    'HK': 852,
+    'LB': 961,
+    'SY': 963,
+    'LC': 1,
+    'IE': 353,
+    'RW': 250,
+    'NL': 31,
+    'MA': 212,
+    'GM': 220,
+    'IR': 98,
+    'AT': 43,
+    'SZ': 268,
+    'GT': 502,
+    'MT': 356,
+    'BQ': 599,
+    'MX': 52,
+    'NC': 687,
+    'CK': 682,
+    'SI': 386,
+    'VE': 58,
+    'IM': 44,
+    'AM': 374,
+    'SD': 249,
+    'LY': 218,
+    'LI': 423,
+    'TN': 216,
+    'UG': 256,
+    'RU': 7,
+    'DJ': 253,
+    'IL': 972,
+    'TM': 993,
+    'BF': 226,
+    'GF': 594,
+    'TO': 676,
+    'GI': 350,
+    'MH': 692,
+    'UZ': 998,
+    'PF': 689,
+    'KZ': 7,
+    'GA': 241,
+    'PE': 51,
+    'TV': 688,
+    'BT': 975,
+    'MQ': 596,
+    'MF': 590,
+    'AF': 93,
+    'IN': 91,
+    'AX': 358,
+    'BH': 973,
+    'JM': 1,
+    'MY': 60,
+    'BO': 591,
+    'AI': 1,
+    'SR': 597,
+    'ET': 251,
+    'ES': 34,
+    'TF': 0,
+    'GU': 1,
+    'BJ': 229,
+    'SS': 211,
+    'KE': 254,
+    'BZ': 501,
+    'IO': 246,
+    'MU': 230,
+    'CL': 56,
+    'MD': 373,
+    'LU': 352,
+    'TJ': 992,
+    'EC': 593,
+    'VG': 1,
+    'NZ': 64,
+    'VU': 678,
+    'FO': 298,
+    'LR': 231,
+    'AL': 355,
+    'GB': 44,
+    'AS': 1,
+    'IT': 39,
+    'TC': 1,
+    'TW': 886,
+    'BI': 257,
+    'HU': 36,
+    'TL': 670,
+    'GG': 44,
+    'PN': 0,
+    'SG': 65,
+    'LS': 266,
+    'KH': 855,
+    'FR': 33,
+    'BV': 0,
+    'CX': 61,
+    'AE': 971,
+    'LT': 370,
+    'PT': 351,
+    'KR': 82,
+    'BB': 1,
+    'TG': 228,
+    'AQ': 0,
+    'EH': 212,
+    'AG': 1,
+    'VN': 84,
+    'CI': 225,
+    'BS': 1,
+    'GL': 299,
+    'MW': 265,
+    'NU': 683,
+    'NF': 672,
+    'LK': 94,
+    'MS': 1,
+    'GP': 590,
+    'NP': 977,
+    'PW': 680,
+    'PK': 92,
+    'WF': 681,
+    'BA': 387,
+    'KM': 269,
+    'JO': 962,
+    'CU': 53,
+    'GR': 30,
+    'YT': 262,
+    'RS': 381,
+    'NA': 264,
+    'ST': 239,
+    'SC': 248,
+    'CN': 86,
+    'CD': 243,
+    'GS': 0,
+    'KW': 965,
+    'MM': 95,
+    'AO': 244,
+    'MV': 960,
+    'UA': 380,
+    'TT': 1,
+    'FK': 500,
+    'WS': 685,
+    'CZ': 420,
+    'PH': 63,
+    'VI': 1,
+    'TZ': 255,
+    'MR': 222,
+    'MC': 377,
+    'SN': 221,
+    'HT': 509,
+    'VC': 1,
+    'NI': 505,
+    'GD': 1,
+    'GY': 592,
+    'TH': 66
+  };
+  void donesignup() async {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => AuthenticationWrapper(
+                analytics: widget.analytics,
+              ),
+          fullscreenDialog: true,
+          settings: const RouteSettings(name: "AuthenticationWrapper")),
+    );
+  }
+
+  Future<void> sendfriendrequest(AppUser user, int index) async {
+    try {
+      await db.sendfriendrequest(
+          FirebaseAuth.instance.currentUser!.uid, user.uid);
+      logic.displayErrorSnackBar("Sent friend request", context);
+      setState(() {
+        friends.removeAt(index);
+      });
+    } catch (e) {
+      logic.displayErrorSnackBar("Could not send friend request", context);
+    }
+  }
+
+  void setup() async {
+    if (await fc.FlutterContacts.requestPermission()) {
+      try {
+        setState(() {
+          showcontacts = true;
+          loading = true;
+        });
+        List<Contact> contacts = await ContactsService.getContacts();
+        var response = await http.get(Uri.parse("http://ip-api.com/json"));
+        final jsonResponse = jsonDecode(response.body);
+        String countrycode = jsonResponse["countryCode"];
+        List<String> phonenumbers = [];
+        for (int i = 0; i < contacts.length; i++) {
+          for (int j = 0; j < contacts[i].phones!.toList().length; j++) {
+            if (contacts[i].phones!.toList()[j].value!.startsWith("00")) {
+              phonenumbers.add(contacts[i]
+                  .phones!
+                  .toList()[j]
+                  .value!
+                  .replaceFirst("00", "+")
+                  .replaceAll(" ", ""));
+            } else if (contacts[i].phones!.toList()[j].value!.startsWith("+")) {
+              phonenumbers.add(
+                  contacts[i].phones!.toList()[j].value!.replaceAll(" ", ""));
+            } else {
+              phonenumbers.add("+" +
+                  countrycode +
+                  contacts[i].phones!.toList()[j].value!.replaceAll(" ", ""));
+            }
+          }
+        }
+
+        List<AppUser> suggestions = await db.getUsersfromContacts(phonenumbers);
+        await Future.delayed(const Duration(milliseconds: 50));
+        setState(() {
+          friends = suggestions;
+          loading = false;
+        });
+      } catch (e) {
+        logic.displayErrorSnackBar(
+            "Could not load friend suggestions", context);
+        setState(() {
+          loading = false;
+          showcontacts = false;
+        });
+      }
+    } else {
+      setState(() {
+        loading = false;
+        showcontacts = false;
+      });
+    }
+  }
+
+  navigate(AppUser user) {}
+
+  @override
+  void initState() {
+    setup();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenwidth = MediaQuery.of(context).size.width;
+    double screenheight = MediaQuery.of(context).size.height;
+    return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: Text(
+            "Add your friends.",
+            style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 25),
+            textScaler: TextScaler.linear(1.0),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          shadowColor: Colors.white,
+          elevation: 0.0,
+          automaticallyImplyLeading: false,
+        ),
+        body: showcontacts
+            ? loading
+                ? Column(children: [
+                    SizedBox(
+                      height: screenheight * 0.2,
+                    ),
+                    const Center(
+                      child: Text(
+                        "Finding friends...",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w800),
+                        textScaler: TextScaler.linear(1.0),
+                      ),
+                    ),
+                  ])
+                : SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        UnAuthUserListView(
+                          userres: friends,
+                          onTap: navigate,
+                          screenwidth: screenwidth,
+                          showaddfriend: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          sendRequest: sendfriendrequest,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                          child: GestureDetector(
+                            onTap: () {
+                              donesignup();
+                            },
+                            child: PrimaryButton(
+                                screenwidth: screenwidth,
+                                buttonpressed: false,
+                                text: "Continue",
+                                buttonwidth: screenwidth * 0.6,
+                                bold: true),
+                          ),
+                        ),
+                        SizedBox(
+                          height: screenheight * 0.05,
+                        )
+                      ],
+                    ),
+                  )
+            : Column(children: [
+                SizedBox(
+                  height: screenheight * 0.2,
+                ),
+                const Center(
+                  child: Text(
+                    "Need Contact Permission\nto suggest friends.",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w800),
+                    textAlign: TextAlign.center,
+                    textScaler: TextScaler.linear(1.0),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  child: GestureDetector(
+                    onTap: () {
+                      donesignup();
+                    },
+                    child: PrimaryButton(
+                        screenwidth: screenwidth,
+                        buttonpressed: false,
+                        text: "Skip",
+                        buttonwidth: screenwidth * 0.6,
+                        bold: true),
+                  ),
+                ),
+              ]));
   }
 }
