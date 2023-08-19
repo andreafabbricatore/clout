@@ -3,6 +3,7 @@ import 'package:clout/components/loadingwidget.dart';
 import 'package:clout/defs/location.dart';
 import 'package:clout/models/profiletopcontainer.dart';
 import 'package:clout/defs/user.dart';
+import 'package:clout/screens/authentication/signupflowscreens.dart';
 import 'package:clout/screens/authscreens/cloutscorescreen.dart';
 import 'package:clout/screens/authscreens/editprofilescreen.dart';
 import 'package:clout/screens/authscreens/eventdetailscreen.dart';
@@ -178,6 +179,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   analytics: widget.analytics,
                 ),
             settings: RouteSettings(name: "SettingsScreen")));
+    refresh();
+  }
+
+  void contacts() async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => FriendsContactScreen(
+                  analytics: widget.analytics,
+                  curruser: widget.curruser,
+                ),
+            settings: RouteSettings(name: "FriendsContactScreen")));
     refresh();
   }
 
@@ -491,13 +504,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 0,
             ),
       centerTitle: true,
-      title: Text(
-        widget.user.username,
-        textScaler: TextScaler.linear(1.0),
-        style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: widget.iscurruser ? 30 : 20),
+      title: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          widget.user.username,
+          textScaler: const TextScaler.linear(1.0),
+          style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: widget.iscurruser ? 30 : 20),
+        ),
       ),
       backgroundColor: Colors.white,
       shadowColor: Colors.white,
@@ -518,54 +534,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   )),
               GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(
-                      backgroundColor: Colors.white,
-                      context: context,
-                      builder: (BuildContext context) {
-                        return SizedBox(
-                          height: screenheight * 0.1,
-                          width: screenwidth,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(16.0, 8.0, 0.0, 0.0),
-                            child: Column(children: [
-                              Container(
-                                width: 40,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.transparent),
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: const Color.fromARGB(60, 0, 0, 0),
-                                ),
-                              ),
-                              SizedBox(
-                                height: screenheight * 0.01,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  settings();
-                                },
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.settings, size: 30),
-                                    SizedBox(
-                                      width: 6,
-                                    ),
-                                    Text(
-                                      "Settings",
-                                      style: TextStyle(fontSize: 20),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: screenheight * 0.02,
-                              ),
-                            ]),
-                          ),
-                        );
-                      });
+                  showthreedotbottomsheet(context, screenheight, screenwidth);
                 },
                 child: const Padding(
                   padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
@@ -667,5 +636,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
       shape: const Border(
           bottom: BorderSide(color: Color.fromARGB(55, 158, 158, 158))),
     );
+  }
+
+  Future<dynamic> showthreedotbottomsheet(
+      BuildContext context, double screenheight, double screenwidth) {
+    return showModalBottomSheet(
+        backgroundColor: Colors.white,
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+            height: screenheight * 0.15,
+            width: screenwidth,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 0.0, 0.0),
+              child: Column(children: [
+                Container(
+                  width: 40,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromARGB(60, 0, 0, 0),
+                  ),
+                ),
+                SizedBox(
+                  height: screenheight * 0.01,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    settings();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(Icons.settings, size: 30),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "Settings",
+                        style: TextStyle(fontSize: 20),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: screenheight * 0.01,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    contacts();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(CupertinoIcons.person_add_solid, size: 30),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "Friend suggestions",
+                        style: TextStyle(fontSize: 20),
+                      )
+                    ],
+                  ),
+                ),
+              ]),
+            ),
+          );
+        });
   }
 }

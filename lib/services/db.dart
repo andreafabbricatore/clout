@@ -1948,6 +1948,28 @@ class db_conn {
     }
   }
 
+  Future<List<AppUser>> retrievebusinessesformap(double lat, double lng) async {
+    GeoFirePoint center = GeoFirePoint(lat, lng);
+    try {
+      List<AppUser> res = [];
+
+      Stream<List<DocumentSnapshot>> stream = geo
+          .collection(collectionRef: users.where('plan', isEqualTo: "business"))
+          .within(center: center, radius: 10, field: 'lastknownloc');
+
+      stream.listen((List<DocumentSnapshot> documentList) {
+        for (int i = 0; i < documentList.length; i++) {
+          res.add(AppUser.fromJson(documentList[i], documentList[i].id));
+        }
+      });
+
+      await Future.delayed(const Duration(milliseconds: 50));
+      return res;
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
   Future<List<Event>> retrieveeventsformap(double lat, double lng) async {
     try {
       GeoFirePoint center = GeoFirePoint(lat, lng);

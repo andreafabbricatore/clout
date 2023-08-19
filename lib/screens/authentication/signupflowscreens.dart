@@ -812,14 +812,15 @@ class _UsernameScreenState extends State<UsernameScreen> {
                     setState(() {
                       continuebuttonpressed = true;
                     });
-                    bool uniqueness =
-                        await db.usernameUnique(usernamecontroller.text);
-                    if (!uniqueness && usernamecontroller.text.isNotEmpty) {
+                    bool uniqueness = await db.usernameUnique(
+                        usernamecontroller.text.trim().toLowerCase());
+                    if (!uniqueness &&
+                        usernamecontroller.text.trim().isNotEmpty) {
                       setState(() {
                         logic.displayErrorSnackBar(
                             "Username already taken", context);
                       });
-                    } else if (usernamecontroller.text.isEmpty) {
+                    } else if (usernamecontroller.text.trim().isEmpty) {
                       logic.displayErrorSnackBar("Invalid Username", context);
                     } else if (!RegExp(r'^[a-zA-Z0-9&%=]+$')
                         .hasMatch(usernamecontroller.text.trim())) {
@@ -1600,18 +1601,6 @@ class _BusinessMiscScreenState extends State<BusinessMiscScreen> {
     );
   }
 
-  void gointerestscreen() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-          builder: (BuildContext context) => InterestScreen(
-                analytics: widget.analytics,
-              ),
-          fullscreenDialog: true,
-          settings: const RouteSettings(name: "InterestScreen")),
-    );
-  }
-
   void cancelsignupdialogbusiness(double screenheight, double screenwidth) {
     showDialog(
         context: context,
@@ -1986,11 +1975,14 @@ class _InterestScreenState extends State<InterestScreen> {
 
   void donesignup() async {
     await db.setdonesignuptime(FirebaseAuth.instance.currentUser!.uid);
+    AppUser curruser =
+        await db.getUserFromUID(FirebaseAuth.instance.currentUser!.uid);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
           builder: (BuildContext context) => FriendsContactScreen(
                 analytics: widget.analytics,
+                curruser: curruser,
               ),
           fullscreenDialog: true,
           settings: const RouteSettings(name: "FriendsContactScreen")),
@@ -2968,8 +2960,14 @@ class _WebFinishScreenState extends State<WebFinishScreen> {
 }
 
 class FriendsContactScreen extends StatefulWidget {
-  FriendsContactScreen({super.key, required this.analytics});
+  FriendsContactScreen(
+      {super.key,
+      required this.analytics,
+      required this.curruser,
+      required this.loggedin});
   FirebaseAnalytics analytics;
+  AppUser curruser;
+  bool loggedin;
   @override
   State<FriendsContactScreen> createState() => _FriendsContactScreenState();
 }
@@ -3290,9 +3288,15 @@ class _FriendsContactScreenState extends State<FriendsContactScreen> {
         }
 
         List<AppUser> suggestions = await db.getUsersfromContacts(phonenumbers);
+        List<AppUser> finalsuggestions = [];
+        for (int i = 0; i < suggestions.length; i++) {
+          if (!widget.curruser.friends.contains(suggestions[i].uid)) {
+            finalsuggestions.add(suggestions[i]);
+          }
+        }
         await Future.delayed(const Duration(milliseconds: 50));
         setState(() {
-          friends = suggestions;
+          friends = finalsuggestions;
           loading = false;
         });
       } catch (e) {
@@ -3332,7 +3336,7 @@ class _FriendsContactScreenState extends State<FriendsContactScreen> {
                 color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 25),
-            textScaler: TextScaler.linear(1.0),
+            textScaler: const TextScaler.linear(1.0),
           ),
           centerTitle: true,
           backgroundColor: Colors.white,
@@ -3346,14 +3350,10 @@ class _FriendsContactScreenState extends State<FriendsContactScreen> {
                     SizedBox(
                       height: screenheight * 0.2,
                     ),
-                    const Center(
-                      child: Text(
-                        "Finding friends...",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w800),
-                        textScaler: TextScaler.linear(1.0),
+                    Center(
+                      child: SpinKitThreeInOut(
+                        color: Theme.of(context).primaryColor,
+                        size: screenwidth * 0.1, //14?
                       ),
                     ),
                   ])
@@ -3368,20 +3368,22 @@ class _FriendsContactScreenState extends State<FriendsContactScreen> {
                           physics: const NeverScrollableScrollPhysics(),
                           sendRequest: sendfriendrequest,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                          child: GestureDetector(
-                            onTap: () {
-                              donesignup();
-                            },
-                            child: PrimaryButton(
-                                screenwidth: screenwidth,
-                                buttonpressed: false,
-                                text: "Continue",
-                                buttonwidth: screenwidth * 0.6,
-                                bold: true),
-                          ),
-                        ),
+                        !widget.loggedin
+                            ? Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    donesignup();
+                                  },
+                                  child: PrimaryButton(
+                                      screenwidth: screenwidth,
+                                      buttonpressed: false,
+                                      text: "Continue",
+                                      buttonwidth: screenwidth * 0.6,
+                                      bold: true),
+                                ),
+                              )
+                            : Container(),
                         SizedBox(
                           height: screenheight * 0.05,
                         )
@@ -3403,20 +3405,22 @@ class _FriendsContactScreenState extends State<FriendsContactScreen> {
                     textScaler: TextScaler.linear(1.0),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                  child: GestureDetector(
-                    onTap: () {
-                      donesignup();
-                    },
-                    child: PrimaryButton(
-                        screenwidth: screenwidth,
-                        buttonpressed: false,
-                        text: "Skip",
-                        buttonwidth: screenwidth * 0.6,
-                        bold: true),
-                  ),
-                ),
+                !widget.loggedin
+                    ? Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                        child: GestureDetector(
+                          onTap: () {
+                            donesignup();
+                          },
+                          child: PrimaryButton(
+                              screenwidth: screenwidth,
+                              buttonpressed: false,
+                              text: "Skip",
+                              buttonwidth: screenwidth * 0.6,
+                              bold: true),
+                        ),
+                      )
+                    : Container(),
               ]));
   }
 }

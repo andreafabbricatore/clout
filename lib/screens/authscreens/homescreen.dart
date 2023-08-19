@@ -234,25 +234,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   AppBar homescreenappbar(BuildContext context) {
     return AppBar(
-      title: GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => FriendsContactScreen(
-                        analytics: widget.analytics,
-                      ),
-                  settings: RouteSettings(name: "FriendsContactScreen")));
-        },
-        child: Text(
-          "Clout.",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.w900,
-            fontSize: 50,
-          ),
-          textScaler: TextScaler.linear(1.0),
+      title: Text(
+        "Clout.",
+        style: TextStyle(
+          color: Theme.of(context).primaryColor,
+          fontWeight: FontWeight.w900,
+          fontSize: 50,
         ),
+        textScaler: TextScaler.linear(1.0),
       ),
       backgroundColor: Colors.white,
       shadowColor: Colors.white,

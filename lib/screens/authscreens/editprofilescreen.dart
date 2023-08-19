@@ -523,14 +523,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           await db.changepfp(
                               compressedimgpath, widget.curruser.uid);
                         }
-                        bool unique = await db
-                            .usernameUnique(usernamecontroller.text.trim());
+                        bool unique = await db.usernameUnique(
+                            usernamecontroller.text.trim().toLowerCase());
                         if (unique &&
-                            usernamecontroller.text.isNotEmpty &&
+                            usernamecontroller.text.trim().isNotEmpty &&
                             RegExp(r'^[a-zA-Z0-9&%=]+$')
                                 .hasMatch(usernamecontroller.text.trim())) {
                           await db.changeusername(
-                              usernamecontroller.text.trim(),
+                              usernamecontroller.text.trim().toLowerCase(),
                               widget.curruser.uid);
                         } else {
                           if (usernamecontroller.text.trim() !=

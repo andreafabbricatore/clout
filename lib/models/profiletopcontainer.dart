@@ -126,15 +126,19 @@ class _ProfileTopContainerState extends State<ProfileTopContainer> {
                     ),
                     SizedBox(
                       width: screenwidth * 0.5,
-                      child: Text(
-                        widget.user.plan == "business"
-                            ? widget.user.fullname
-                            : "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
-                        textScaler: TextScaler.linear(1.0),
-                        overflow: TextOverflow.ellipsis,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.user.plan == "business"
+                              ? widget.user.fullname
+                              : "${widget.user.fullname}, ${calculateAge(widget.user.birthday)}",
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w500),
+                          textScaler: const TextScaler.linear(1.0),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                     SizedBox(

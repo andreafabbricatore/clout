@@ -127,7 +127,8 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
     return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
   }
 
-  void setmarkers(List<AppUser> users, List<Event> events) async {
+  void setmarkers(
+      List<AppUser> users, List<AppUser> businesses, List<Event> events) async {
     Map<MarkerId, Marker> markerdict = {};
 
     for (int i = 0; i < events.length; i++) {
@@ -154,6 +155,25 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
         icon: bmd,
       );
       markerdict[MarkerId(events[i].docid)] = marker;
+    }
+
+    for (int i = 0; i < businesses.length; i++) {
+      final File markerImageFile =
+          await DefaultCacheManager().getSingleFile(businesses[i].pfpurl);
+      BitmapDescriptor bmd =
+          await convertImageFileToCustomBitmapDescriptor(markerImageFile);
+
+      Marker marker = Marker(
+          markerId: MarkerId(businesses[i].uid),
+          draggable: true,
+          position: LatLng(
+              businesses[i].lastknownlat,
+              businesses[i]
+                  .lastknownlng), //With this parameter you automatically obtain latitude and longitude
+          icon: bmd,
+          infoWindow: InfoWindow.noText,
+          onTap: () async {});
+      markerdict[MarkerId(businesses[i].uid)] = marker;
     }
 
     setState(() {
@@ -237,7 +257,11 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
                     List<Event> events = await db.unauthretrieveeventsformap(
                         widget.curruserlocation.center[1],
                         widget.curruserlocation.center[0]);
-                    setmarkers(<AppUser>[], events);
+                    List<AppUser> businesses =
+                        await db.retrievebusinessesformap(
+                            widget.curruserlocation.center[1],
+                            widget.curruserlocation.center[0]);
+                    setmarkers(<AppUser>[], businesses, events);
 
                     setState(() {
                       mapController = controller;
@@ -267,7 +291,11 @@ class _UnAuthSearchScreenState extends State<UnAuthSearchScreen> {
                                 cameraposition!.target.latitude,
                                 cameraposition!.target.longitude,
                               );
-                              setmarkers(<AppUser>[], events);
+                              List<AppUser> businesses =
+                                  await db.retrievebusinessesformap(
+                                      widget.curruserlocation.center[1],
+                                      widget.curruserlocation.center[0]);
+                              setmarkers(<AppUser>[], businesses, events);
                               setState(() {
                                 showbutton = false;
                               });

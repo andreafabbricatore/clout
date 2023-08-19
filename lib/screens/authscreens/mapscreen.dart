@@ -145,7 +145,8 @@ class _MapScreenState extends State<MapScreen> {
     return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
   }
 
-  void setmarkers(List<AppUser> users, List<Event> events) async {
+  void setmarkers(
+      List<AppUser> users, List<AppUser> businesses, List<Event> events) async {
     Map<MarkerId, Marker> markerdict = {};
     for (int i = 0; i < users.length; i++) {
       final File markerImageFile =
@@ -168,6 +169,29 @@ class _MapScreenState extends State<MapScreen> {
                 widget.curruser, user, context);
           });
       markerdict[MarkerId(users[i].uid)] = marker;
+    }
+
+    for (int i = 0; i < businesses.length; i++) {
+      final File markerImageFile =
+          await DefaultCacheManager().getSingleFile(businesses[i].pfpurl);
+      BitmapDescriptor bmd =
+          await convertImageFileToCustomBitmapDescriptor(markerImageFile);
+
+      Marker marker = Marker(
+          markerId: MarkerId(businesses[i].uid),
+          draggable: true,
+          position: LatLng(
+              businesses[i].lastknownlat,
+              businesses[i]
+                  .lastknownlng), //With this parameter you automatically obtain latitude and longitude
+          icon: bmd,
+          infoWindow: InfoWindow.noText,
+          onTap: () async {
+            AppUser user = await db.getUserFromUID(businesses[i].uid);
+            logic.usernavigate(widget.analytics, widget.curruserlocation,
+                widget.curruser, user, context);
+          });
+      markerdict[MarkerId(businesses[i].uid)] = marker;
     }
 
     for (int i = 0; i < events.length; i++) {
@@ -306,17 +330,25 @@ class _MapScreenState extends State<MapScreen> {
                                         widget.curruser,
                                         widget.curruserlocation.center[1],
                                         widget.curruserlocation.center[0]);
+                                List<AppUser> businesses =
+                                    await db.retrievebusinessesformap(
+                                        widget.curruserlocation.center[1],
+                                        widget.curruserlocation.center[0]);
                                 List<Event> events =
                                     await db.retrieveeventsformap(
                                         widget.curruserlocation.center[1],
                                         widget.curruserlocation.center[0]);
-                                setmarkers(users, events);
+                                setmarkers(users, businesses, events);
                               } else {
                                 List<Event> events =
                                     await db.retrieveeventsformap(
                                         widget.curruserlocation.center[1],
                                         widget.curruserlocation.center[0]);
-                                setmarkers(<AppUser>[], events);
+                                List<AppUser> businesses =
+                                    await db.retrievebusinessesformap(
+                                        widget.curruserlocation.center[1],
+                                        widget.curruserlocation.center[0]);
+                                setmarkers(<AppUser>[], businesses, events);
                               }
                               setState(() {
                                 mapController = controller;
@@ -351,19 +383,30 @@ class _MapScreenState extends State<MapScreen> {
                                             cameraposition!.target.latitude,
                                             cameraposition!.target.longitude,
                                           );
+                                          List<AppUser> businesses =
+                                              await db.retrievebusinessesformap(
+                                            cameraposition!.target.latitude,
+                                            cameraposition!.target.longitude,
+                                          );
                                           List<Event> events =
                                               await db.retrieveeventsformap(
                                             cameraposition!.target.latitude,
                                             cameraposition!.target.longitude,
                                           );
-                                          setmarkers(users, events);
+                                          setmarkers(users, businesses, events);
                                         } else {
                                           List<Event> events =
                                               await db.retrieveeventsformap(
                                             cameraposition!.target.latitude,
                                             cameraposition!.target.longitude,
                                           );
-                                          setmarkers(<AppUser>[], events);
+                                          List<AppUser> businesses =
+                                              await db.retrievebusinessesformap(
+                                            cameraposition!.target.latitude,
+                                            cameraposition!.target.longitude,
+                                          );
+                                          setmarkers(
+                                              <AppUser>[], businesses, events);
                                         }
                                         setState(() {
                                           showbutton = false;
