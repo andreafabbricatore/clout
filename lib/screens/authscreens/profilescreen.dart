@@ -72,6 +72,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           friendval = "Request Sent";
         });
+      } else if (widget.curruser.requestedby.contains(widget.user.uid)) {
+        setState(() {
+          friendval = "Accept";
+        });
       } else if (!widget.curruser.requested.contains(widget.user.uid)) {
         setState(() {
           friendval = "Add Friend";
@@ -187,9 +191,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         context,
         MaterialPageRoute(
             builder: (_) => FriendsContactScreen(
-                  analytics: widget.analytics,
-                  curruser: widget.curruser,
-                ),
+                analytics: widget.analytics,
+                curruser: widget.curruser,
+                loggedin: true),
             settings: RouteSettings(name: "FriendsContactScreen")));
     refresh();
   }
@@ -248,6 +252,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await db.removefriend(widget.curruser.uid, widget.user.uid);
       } else if (widget.curruser.requested.contains(widget.user.uid)) {
         await db.removefriendrequest(widget.curruser.uid, widget.user.uid);
+      } else if (widget.curruser.requestedby.contains(widget.user.uid)) {
+        await db.acceptfriendrequest(widget.curruser.uid, widget.user.uid);
       } else if (!widget.curruser.requested.contains(widget.user.uid)) {
         await db.sendfriendrequest(widget.curruser.uid, widget.user.uid);
       }

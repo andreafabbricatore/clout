@@ -1797,6 +1797,7 @@ class _BusinessMiscScreenState extends State<BusinessMiscScreen> {
                                       city: "",
                                       country: ""),
                                   curruserLatLng: LatLngs,
+                                  isbusiness: true,
                                 ),
                             settings:
                                 const RouteSettings(name: "SearchLocation")))
@@ -1811,6 +1812,7 @@ class _BusinessMiscScreenState extends State<BusinessMiscScreen> {
                                     city: chosenLocation.city,
                                     country: chosenLocation.country,
                                   ),
+                                  isbusiness: true,
                                   curruserLatLng: LatLngs,
                                 ),
                             settings: RouteSettings(name: "SearchLocation")));
@@ -1983,6 +1985,7 @@ class _InterestScreenState extends State<InterestScreen> {
           builder: (BuildContext context) => FriendsContactScreen(
                 analytics: widget.analytics,
                 curruser: curruser,
+                loggedin: false,
               ),
           fullscreenDialog: true,
           settings: const RouteSettings(name: "FriendsContactScreen")),
@@ -2695,11 +2698,12 @@ class _WebFinishScreenState extends State<WebFinishScreen> {
                                       cancelbuttonpressed = true;
                                     });
                                     try {
-                                      await db.cancelsignup(FirebaseAuth
-                                          .instance.currentUser!.uid);
+                                      AppUser curruser =
+                                          await db.getUserFromUID(FirebaseAuth
+                                              .instance.currentUser!.uid);
+                                      await db.deletewebuser(curruser);
                                       await FirebaseAuth.instance.currentUser!
                                           .delete();
-
                                       goauthscreen();
                                     } catch (e) {
                                       logic.displayErrorSnackBar(
@@ -3290,7 +3294,9 @@ class _FriendsContactScreenState extends State<FriendsContactScreen> {
         List<AppUser> suggestions = await db.getUsersfromContacts(phonenumbers);
         List<AppUser> finalsuggestions = [];
         for (int i = 0; i < suggestions.length; i++) {
-          if (!widget.curruser.friends.contains(suggestions[i].uid)) {
+          if (!widget.curruser.friends.contains(suggestions[i].uid) &&
+              !widget.curruser.requestedby.contains(suggestions[i].uid) &&
+              widget.curruser.uid != suggestions[i].uid) {
             finalsuggestions.add(suggestions[i]);
           }
         }
@@ -3338,6 +3344,20 @@ class _FriendsContactScreenState extends State<FriendsContactScreen> {
                 fontSize: 25),
             textScaler: const TextScaler.linear(1.0),
           ),
+          leading: widget.loggedin
+              ? GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                )
+              : Container(),
           centerTitle: true,
           backgroundColor: Colors.white,
           shadowColor: Colors.white,

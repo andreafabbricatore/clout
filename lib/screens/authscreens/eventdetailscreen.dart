@@ -211,7 +211,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void updatescreen(eventid) async {
     try {
       Event updatedevent = await db.getEventfromDocId(eventid);
-      List<AppUser> temp = await db.geteventparticipantslist(widget.event);
+      List<AppUser> temp = await db.geteventparticipantslist(updatedevent);
       await Future.delayed(const Duration(milliseconds: 50));
       setState(() {
         widget.event = updatedevent;
@@ -297,6 +297,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     } catch (error) {
       displayErrorSnackBar(error.toString());
     } finally {
+      await Future.delayed(const Duration(milliseconds: 50));
       updatescreen(widget.event.docid);
       setState(() {
         buttonpressed = false;
@@ -328,6 +329,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             setState(() {
               buttonpressed = false;
             });
+            await Future.delayed(const Duration(milliseconds: 50));
             updatescreen(widget.event.docid);
           }
         }
@@ -359,6 +361,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         );
       } catch (e) {
         displayErrorSnackBar("Could not delete event");
+        await Future.delayed(const Duration(milliseconds: 50));
         updatescreen(widget.event.docid);
         setState(() {
           buttonpressed = false;
@@ -379,6 +382,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       } catch (e) {
         displayErrorSnackBar("Could not leave event");
       } finally {
+        await Future.delayed(const Duration(milliseconds: 50));
         updatescreen(widget.event.docid);
         setState(() {
           buttonpressed = false;

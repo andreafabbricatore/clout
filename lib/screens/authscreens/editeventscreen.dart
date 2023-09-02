@@ -453,6 +453,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                                 country: widget.event.country,
                                 center: [widget.event.lat, widget.event.lng]),
                             curruserLatLng: LatLngs,
+                            isbusiness: widget.curruser.plan == "business",
                           ),
                       settings: RouteSettings(name: "SearchLocation")));
               setState(() {

@@ -246,6 +246,7 @@ class _BusinessEditProfileScreenState extends State<BusinessEditProfileScreen> {
                               city: chosenLocation.city,
                               country: chosenLocation.country,
                             ),
+                            isbusiness: true,
                             curruserLatLng: LatLngs,
                           ),
                       settings: RouteSettings(name: "SearchLocation")));

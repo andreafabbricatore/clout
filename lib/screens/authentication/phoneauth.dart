@@ -226,9 +226,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 child: Text(
                   "Invited by a friend?",
                   style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    decoration: TextDecoration.underline,
-                  ),
+                      color: Theme.of(context).primaryColor,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Theme.of(context).primaryColor),
                 ),
               ),
             ),

@@ -164,6 +164,7 @@ class db_conn {
         'donesignuptime': DateTime(1900, 1, 1, 0, 0),
         'lastusagetime': FieldValue.serverTimestamp(),
         'phonenumber': '',
+        'followed_businesses': [],
         'email': email,
         'stripe_account_id': '',
         'stripe_seller_country': ''
@@ -224,6 +225,44 @@ class db_conn {
           .ref('/user_pfp/${curruser.uid}.jpg')
           .delete();
       //print("deleted pfp");
+      try {
+        final instance = FirebaseFirestore.instance;
+        final batch = instance.batch();
+        var collection =
+            instance.collection('users').doc(curruser.uid).collection('tokens');
+        var snapshots = await collection.get();
+        for (var doc in snapshots.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      } catch (e) {
+        //print("Nothing")
+      }
+      return users.doc(curruser.uid).delete();
+    } catch (e) {
+      throw Exception("Could not delete user");
+    }
+  }
+
+  Future deletewebuser(AppUser curruser) async {
+    try {
+      DocumentSnapshot userSnapshot = await users.doc(curruser.uid).get();
+      List joinedEvents = userSnapshot['joined_events'];
+      List hostedEvents = userSnapshot['hosted_events'];
+      List friends = userSnapshot['friends'];
+      for (String eventid in joinedEvents) {
+        Event i = await getEventfromDocId(eventid);
+        await leaveevent(curruser, i);
+      }
+      //print("left events");
+      for (String eventid in hostedEvents) {
+        Event i = await getEventfromDocId(eventid);
+        await deleteevent(i, curruser);
+      }
+      //print("deleted events");
+      for (String userid in friends) {
+        await removefriend(curruser.uid, userid);
+      }
       try {
         final instance = FirebaseFirestore.instance;
         final batch = instance.batch();

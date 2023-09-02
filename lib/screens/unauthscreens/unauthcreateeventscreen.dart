@@ -500,21 +500,22 @@ class _UnAuthCreateEventScreenState extends State<UnAuthCreateEventScreen> {
                                     city: "",
                                     country: ""),
                                 curruserLatLng: LatLngs,
+                                isbusiness: false,
                               ),
                           settings: RouteSettings(name: "SearchLocation")))
                   : await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => SearchLocation(
-                                locationchosen: true,
-                                startlocation: AppLocation(
-                                  address: chosenLocation.address,
-                                  center: chosenLocation.center,
-                                  city: chosenLocation.city,
-                                  country: chosenLocation.country,
-                                ),
-                                curruserLatLng: LatLngs,
+                              locationchosen: true,
+                              startlocation: AppLocation(
+                                address: chosenLocation.address,
+                                center: chosenLocation.center,
+                                city: chosenLocation.city,
+                                country: chosenLocation.country,
                               ),
+                              curruserLatLng: LatLngs,
+                              isbusiness: false),
                           settings: RouteSettings(name: "SearchLocation")));
               setState(() {
                 chosenLocation = chosen;

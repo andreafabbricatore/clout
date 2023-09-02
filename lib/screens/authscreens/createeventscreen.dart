@@ -195,6 +195,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final screenheight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -451,6 +452,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                     city: "",
                                     country: ""),
                                 curruserLatLng: LatLngs,
+                                isbusiness: widget.curruser.plan == "business",
                               ),
                           settings: RouteSettings(name: "SearchLocation")))
                   : await Navigator.push(
@@ -465,6 +467,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                   country: chosenLocation.country,
                                 ),
                                 curruserLatLng: LatLngs,
+                                isbusiness: widget.curruser.plan == "business",
                               ),
                           settings: RouteSettings(name: "SearchLocation")));
               setState(() {

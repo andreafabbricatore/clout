@@ -42,7 +42,7 @@ Widget chatbubble(String sender, String content, bool curruser) {
                         content,
                         style: const TextStyle(
                           color: Colors.black,
-                          fontSize: 18,
+                          fontSize: 16,
                         ),
                         textAlign: TextAlign.left,
                       ),
@@ -77,7 +77,7 @@ Widget chatbubble(String sender, String content, bool curruser) {
                           content,
                           style: const TextStyle(
                             color: Colors.black,
-                            fontSize: 18,
+                            fontSize: 16,
                           ),
                           textAlign: TextAlign.left,
                         ),
@@ -101,7 +101,7 @@ Widget eventchatbubble(String sender, String eventtitle, String bannerurl,
       child: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
           child: SizedBox(
-            height: screenheight * 0.43,
+            height: screenheight * 0.45,
             width: screenwidth * 0.6,
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,

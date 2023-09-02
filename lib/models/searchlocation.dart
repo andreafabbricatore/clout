@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:clout/defs/location.dart';
 import 'package:clout/services/logic.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SearchLocation extends StatefulWidget {
@@ -10,11 +13,13 @@ class SearchLocation extends StatefulWidget {
       {Key? key,
       required this.locationchosen,
       required this.startlocation,
-      required this.curruserLatLng})
+      required this.curruserLatLng,
+      required this.isbusiness})
       : super(key: key);
   bool locationchosen;
   AppLocation startlocation;
   List curruserLatLng;
+  bool isbusiness;
   @override
   State<SearchLocation> createState() => _SearchLocationState();
 }
@@ -131,9 +136,11 @@ class _SearchLocationState extends State<SearchLocation> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Search Locations Around You",
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          widget.isbusiness
+              ? "Search Locations Around You"
+              : "Search Locations",
+          style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
         elevation: 0.0,
@@ -236,33 +243,61 @@ class _SearchLocationState extends State<SearchLocation> {
       padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
       child: TextField(
         controller: searchcontroller,
-        onChanged: (String searchquery) async {
-          searchquery.replaceAll(" ", "%20");
-          String url =
-              'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${LatLngs[0]},${LatLngs[1]}&radius=15000&keyword=$searchquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
-          //String url =
-          //    'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$searchquery&inputtype=textquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
-          url = Uri.parse(url).toString();
-          try {
-            _dio.options.contentType = Headers.jsonContentType;
-            final responseData = await _dio.get(url);
-            List<AppLocation> response = (responseData.data['results'] as List)
-                .map((e) => AppLocation(
-                        address: e['name'],
-                        city: e['vicinity'].toString().split(", ").last,
-                        country: "",
-                        center: [
-                          e['geometry']['location']['lat'],
-                          e['geometry']['location']['lng']
-                        ]))
-                .toList();
-            setState(() {
-              res = response;
-            });
-          } catch (e) {
-            logic.displayErrorSnackBar("Could not search", context);
-          }
-        },
+        onChanged: widget.isbusiness
+            ? (String searchquery) async {
+                searchquery.replaceAll(" ", "%20");
+                String url =
+                    "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry&input=${searchquery}&inputtype=textquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w";
+                url = Uri.parse(url).toString();
+                try {
+                  _dio.options.contentType = Headers.jsonContentType;
+                  final responseData = await _dio.get(url);
+                  List<AppLocation> response =
+                      (responseData.data['candidates'] as List)
+                          .map((e) => AppLocation(
+                                  address: e['name'],
+                                  city: e['formatted_address'],
+                                  country: "",
+                                  center: [
+                                    e['geometry']['location']['lat'],
+                                    e['geometry']['location']['lng']
+                                  ]))
+                          .toList();
+                  setState(() {
+                    res = response;
+                  });
+                } catch (e) {
+                  logic.displayErrorSnackBar("Could not search", context);
+                }
+              }
+            : (String searchquery) async {
+                searchquery.replaceAll(" ", "%20");
+                String url =
+                    'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${LatLngs[0]},${LatLngs[1]}&radius=15000&keyword=$searchquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+                //String url =
+                //    'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$searchquery&inputtype=textquery&key=AIzaSyAR9bmRxpCYai5b2k6AKtc4f7Es9w1307w';
+                url = Uri.parse(url).toString();
+                try {
+                  _dio.options.contentType = Headers.jsonContentType;
+                  final responseData = await _dio.get(url);
+                  List<AppLocation> response = (responseData.data['results']
+                          as List)
+                      .map((e) => AppLocation(
+                              address: e['name'],
+                              city: e['vicinity'].toString().split(", ").last,
+                              country: "",
+                              center: [
+                                e['geometry']['location']['lat'],
+                                e['geometry']['location']['lng']
+                              ]))
+                      .toList();
+                  setState(() {
+                    res = response;
+                  });
+                } catch (e) {
+                  logic.displayErrorSnackBar("Could not search", context);
+                }
+              },
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,

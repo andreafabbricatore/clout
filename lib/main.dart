@@ -1,4 +1,4 @@
-import 'package:clout/screens/authscreens/loading.dart';
+import 'package:clout/screens/authscreens/loadingnew.dart';
 import 'package:clout/screens/preauthscreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -71,14 +71,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthenticationWrapper extends StatefulWidget {
+class AuthenticationWrapper extends StatelessWidget {
   AuthenticationWrapper({super.key, required this.analytics});
   FirebaseAnalytics analytics;
-  @override
-  State<AuthenticationWrapper> createState() => _AuthenticationWrapperState();
-}
-
-class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,9 +83,9 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
           if (snapshot.hasData) {
             return LoadingScreen(
                 uid: FirebaseAuth.instance.currentUser!.uid,
-                analytics: widget.analytics);
+                analytics: analytics);
           } else {
-            return PreAuthScreen(analytics: widget.analytics);
+            return PreAuthScreen(analytics: analytics);
           }
         }),
       ),
